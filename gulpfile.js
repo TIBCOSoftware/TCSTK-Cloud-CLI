@@ -134,6 +134,7 @@ test = function() {
   return new Promise(async function (resolve, reject) {
     console.log('test...');
     var now = new Date();
+    console.log(now);
 
     resolve();
   });
@@ -144,7 +145,9 @@ gulp.task('test', test);
 gulp.task('help', help);
 help.description = 'Displays this message';
 gulp.task('main', mainT);
-gulp.task('default', gulp.series('help', 'main'));
+
+//gulp.task('default', gulp.series('help', 'main'));
+gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
 gulp.task('obfuscate', obfuscate);
@@ -187,10 +190,11 @@ TODO: Additional Cloud CLI Capabilities
 - List TCI Endpoints
 - List Cloud Event Channels
 - List Spotfire Reports
+- Swap between different tennants (EU / US / AUS)
 
 -- perhaps provide a gate into the various CLI's
 
-
+-- Get the token from the cloud
 
  */
 

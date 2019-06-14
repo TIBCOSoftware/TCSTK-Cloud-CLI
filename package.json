@@ -1,13 +1,12 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
   },
   "dependencies": {
     "arg": "^4.1.0",
     "child_process": "^1.0.2",
-    "codelyzer": "~5.0.1",
     "del": "^4.1.1",
     "esm": "^3.2.25",
     "file-system": "^2.2.2",
@@ -39,6 +38,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI"
-  },
-  "license": "TBD"
+  }
 }
