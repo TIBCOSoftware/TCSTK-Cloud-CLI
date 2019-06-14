@@ -22,3 +22,5 @@
 # compiled output
 /dist
 /tmp
+
+tibco-cloud.properties
