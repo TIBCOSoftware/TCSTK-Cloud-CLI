@@ -132,7 +132,7 @@ mainT = function() {
 
 test = function() {
   return new Promise(async function (resolve, reject) {
-    console.log('test...');
+    console.log('test 2...');
     var now = new Date();
     console.log(now);
 
