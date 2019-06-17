@@ -1,6 +1,5 @@
+// File to manage the CLI Interaction
 import arg from 'arg';
-var gulp = require('gulp');
-require('./gulpfile');
 
 function parseArgumentsIntoOptions(rawArgs) {
     const args = arg(
@@ -22,11 +21,37 @@ function parseArgumentsIntoOptions(rawArgs) {
 // Main function
 export function cli(args) {
     let options = parseArgumentsIntoOptions(args);
-    // console.log(options);
+    var appRoot = process.env.PWD;
+    var cwdir = process.cwd();
+    if (options.debug) {
+        console.log(options);
+        console.log('Project Root: ' + appRoot);
+        console.log('Current Working Directory: ' + cwdir);
+        console.log('__dirname: ' + __dirname);
+        console.log('__filename: ' + __filename);
+    }
+    // Test if tibco-cloud.properties exists
+    const fs = require("fs");
+    if (!fs.existsSync(cwdir + '/tibco-cloud.properties')) {
+        console.log('No TIBCO Cloud Propeties file found, creating initial one...');
+        fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/tibco-cloud.properties');
+        // TODO: Ask questions about the cloud prop file:
+        // Which tenant to use
+        // Client ID
+        // Username & Password (obfuscate)
+        // Get the AppName Automatically from the package.json
+    } else {
+        if(options.debug){
+            console.log('tibco-cloud.properties found...');
+        }
+    }
+
+    var gulp = require('gulp');
+    require(__dirname + '/gulpfile');
+
     // gulp.start('default');
     // gulp.series('default').;
     // TODO: Change this to pass the commandline option
     require('gulp-cli')();
     // runGulpTask('test', 'gulpfile.js'); Does not work...
-
 }
