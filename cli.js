@@ -48,10 +48,9 @@ export function cli(args) {
 
     var gulp = require('gulp');
     require(__dirname + '/gulpfile');
-
-    // gulp.start('default');
-    // gulp.series('default').;
+    checkPW();
+    promptGulp(__dirname, appRoot);
+    // gulp.series('default')();
     // TODO: Change this to pass the commandline option
-    require('gulp-cli')();
-    // runGulpTask('test', 'gulpfile.js'); Does not work...
+
 }
