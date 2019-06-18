@@ -9,145 +9,147 @@ const props = properties.path();
 
 // Function to build the cloud starter
 function build() {
-  return new Promise(function (resolve, reject) {
-    log('INFO', 'Building... ' + props.App_Name);
-    buildCloudStarterZip(props.App_Name);
-    resolve();
-  });
+    return new Promise(function (resolve, reject) {
+        log('INFO', 'Building... ' + props.App_Name);
+        buildCloudStarterZip(props.App_Name);
+        resolve();
+    });
 };
 
 // Function to delpoy the cloud starter
 function deploy() {
-  return new Promise(async function (resolve, reject) {
-    await uploadApp(props.App_Name);
-    log('INFO', "DONE DEPLOYING: " + props.App_Name);
-    resolve();
+    return new Promise(async function (resolve, reject) {
+        await uploadApp(props.App_Name);
+        log('INFO', "DONE DEPLOYING: " + props.App_Name);
+        resolve();
 
-  });
+    });
 }
 
 // Function to publish the cloud starter
 function publish() {
-  return new Promise(async function (resolve, reject) {
-    await publishApp(props.App_Name);
-    log('INFO', 'APP PUBLISHED: ' + props.App_Name);
-    log('INFO', "LOCATION: " + props.Cloud_URL + "/webresource/apps/" + props.App_Name + "/index.html#/starterApp/home");
-    resolve();
-  });
+    return new Promise(async function (resolve, reject) {
+        await publishApp(props.App_Name);
+        log('INFO', 'APP PUBLISHED: ' + props.App_Name);
+        log('INFO', "LOCATION: " + props.Cloud_URL + "/webresource/apps/" + props.App_Name + "/index.html#/starterApp/home");
+        resolve();
+    });
 }
 
 // Function to get the cloud library sources from GIT
 getCLgit = function () {
-  return getGit(props.GIT_Source_TCSTLocation, props.TCSTLocation, props.GIT_Tag_TCST);
+    return getGit(props.GIT_Source_TCSTLocation, props.TCSTLocation, props.GIT_Tag_TCST);
 }
 
 // Function that injects the sources of the library into this project
 function injectLibSources() {
-  return new Promise(function (resolve, reject) {
-    log('INFO', 'Injecting Lib Sources');
-    //run('mkdir tmp');
-    mkdirIfNotExist('./projects/tibco-tcstk');
-    copyDir('./tmp/TCSDK-Angular/projects/tibco-tcstk', './projects/tibco-tcstk');
-    //use debug versions
-    var now = new Date();
-    mkdirIfNotExist('./backup/');
-    // Make Backups in the back up folder
-    copyFile('./tsconfig.json', './backup/tsconfig-Before-Debug('+now+').json');
-    copyFile('./angular.json', './backup/angular-Before-Debug('+now+').json');
-    copyFile('./package.json', './backup/package-Before-Debug('+now+').json');
-    copyFile('./tsconfig.debug.json', './tsconfig.json');
-    copyFile('./angular.debug.json', './angular.json');
-    copyFile('./package.debug.json', './package.json');
-    //do NPM install
-    npmInstall('./');
-    npmInstall('./', 'lodash-es');
-    log('INFO', 'Now you can debug the cloud library sources in your browser !!');
-    resolve();
-  });
+    return new Promise(function (resolve, reject) {
+        log('INFO', 'Injecting Lib Sources');
+        //run('mkdir tmp');
+        mkdirIfNotExist('./projects/tibco-tcstk');
+        copyDir('./tmp/TCSDK-Angular/projects/tibco-tcstk', './projects/tibco-tcstk');
+        //use debug versions
+        var now = new Date();
+        mkdirIfNotExist('./backup/');
+        // Make Backups in the back up folder
+        copyFile('./tsconfig.json', './backup/tsconfig-Before-Debug(' + now + ').json');
+        copyFile('./angular.json', './backup/angular-Before-Debug(' + now + ').json');
+        copyFile('./package.json', './backup/package-Before-Debug(' + now + ').json');
+        copyFile('./tsconfig.debug.json', './tsconfig.json');
+        copyFile('./angular.debug.json', './angular.json');
+        copyFile('./package.debug.json', './package.json');
+        //do NPM install
+        npmInstall('./');
+        npmInstall('./', 'lodash-es');
+        log('INFO', 'Now you can debug the cloud library sources in your browser !!');
+        resolve();
+    });
 }
 
 // Function to go back to the compiled versions of the libraries
 function undoLibSources() {
-  return new Promise(function (resolve, reject) {
-    log('INFO', 'Undo-ing Injecting Lib Sources');
-    //Move back to Angular build files
-    var now = new Date();
-    mkdirIfNotExist('./backup/');
-    // Make Backups in the back up folder
-    copyFile('./tsconfig.json', './backup/tsconfig-Before-Build('+now+').json');
-    copyFile('./angular.json', './backup/angular-Before-Build('+now+').json');
-    copyFile('./package.json', './backup/package-Before-Build('+now+').json');
-    copyFile('./tsconfig.build.json', './tsconfig.json');
-    copyFile('./angular.build.json', './angular.json');
-    copyFile('./package.build.json', './package.json');
-    //Delete Project folder
-    //FIX: Just delete those folders imported...
-    deleteFolder('./projects/tibco-tcstk/tc-core-lib');
-    deleteFolder('./projects/tibco-tcstk/tc-forms-lib');
-    deleteFolder('./projects/tibco-tcstk/tc-liveapps-lib');
-    deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
-    npmInstall('./');
-    resolve();
-  });
+    return new Promise(function (resolve, reject) {
+        log('INFO', 'Undo-ing Injecting Lib Sources');
+        //Move back to Angular build files
+        var now = new Date();
+        mkdirIfNotExist('./backup/');
+        // Make Backups in the back up folder
+        copyFile('./tsconfig.json', './backup/tsconfig-Before-Build(' + now + ').json');
+        copyFile('./angular.json', './backup/angular-Before-Build(' + now + ').json');
+        copyFile('./package.json', './backup/package-Before-Build(' + now + ').json');
+        copyFile('./tsconfig.build.json', './tsconfig.json');
+        copyFile('./angular.build.json', './angular.json');
+        copyFile('./package.build.json', './package.json');
+        //Delete Project folder
+        //FIX: Just delete those folders imported...
+        deleteFolder('./projects/tibco-tcstk/tc-core-lib');
+        deleteFolder('./projects/tibco-tcstk/tc-forms-lib');
+        deleteFolder('./projects/tibco-tcstk/tc-liveapps-lib');
+        deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
+        npmInstall('./');
+        resolve();
+    });
 }
-help = function(){
-  return new Promise(async function (resolve, reject) {
-    console.log('                               # |-------------------------------------------|');
-    console.log('                               # |  *** T I B C O    C L O U D   C L I ***   |');
-    console.log('                               # |            V1.1.0 (14-6-2019)             |');
-    console.log('                               # |-------------------------------------------|');
-    log('INFO', 'GULP DETAILS:');
-    run('gulp --version');
-    log('INFO', 'Choose a task from the following list:');
-    run('gulp -T');
-    resolve()
-  });
+
+help = function () {
+    return new Promise(async function (resolve, reject) {
+        console.log('                               # |-------------------------------------------|');
+        console.log('                               # |  *** T I B C O    C L O U D   C L I ***   |');
+        console.log('                               # |            V1.1.3 (17-6-2019)             |');
+        console.log('                               # |-------------------------------------------|');
+        log('INFO', 'GULP DETAILS:');
+        console.log();
+        var cwdir = process.cwd();
+        run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
+        log('INFO', 'Choose a task from the following list:');
+        run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
+
+        resolve();
+    });
 }
 
 // Start Cloudstarter Locally
-start = function(){
-  return new Promise(async function (resolve, reject) {
-    log('INFO', 'Starting: ' + props.App_Name);
-    if(props.cloudHost.includes('eu')){
-      run('npm run serve_eu');
-    }else{
-      if(props.cloudHost.includes('au')){
-        run('npm run serve_au');
-      }else {
-        run('npm run serve_us');
-      }
-    }
-
-    resolve();
-  });
+start = function () {
+    return new Promise(async function (resolve, reject) {
+        log('INFO', 'Starting: ' + props.App_Name);
+        if (props.cloudHost.includes('eu')) {
+            run('npm run serve_eu');
+        } else {
+            if (props.cloudHost.includes('au')) {
+                run('npm run serve_au');
+            } else {
+                run('npm run serve_us');
+            }
+        }
+        resolve();
+    });
 }
 
-mainT = function() {
-  return new Promise(async function (resolve, reject) {
-    checkPW();
-    resolve();
-    await promptGulp();
-  });
+mainT = function () {
+    return new Promise(async function (resolve, reject) {
+        checkPW();
+        resolve();
+        await promptGulp(__dirname);
+    });
 };
 
-test = function() {
-  return new Promise(async function (resolve, reject) {
-    console.log('test 2...');
-    var now = new Date();
-    console.log(now);
+test = function () {
+    return new Promise(async function (resolve, reject) {
+        console.log('test 2...');
+        var now = new Date();
+        console.log(now);
 
-    resolve();
-  });
+        resolve();
+    });
 };
 
 gulp.task('test', test);
-
 gulp.task('help', help);
 help.description = 'Displays this message';
 gulp.task('main', mainT);
 
-//gulp.task('default', gulp.series('help', 'main'));
-gulp.task('default', test);
+gulp.task('default', gulp.series('help', 'main'));
+// gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
 gulp.task('obfuscate', obfuscate);
@@ -200,52 +202,57 @@ TODO: Additional Cloud CLI Capabilities
 
 
 
+
+
 //Main Cloud CLI Questions
-function promptGulp() {
-  return new Promise(function (resolve, reject) {
-    var inquirer = require('inquirer');
-    inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-    inquirer.prompt([{
-      type: 'autocomplete',
-      name: 'command',
-      suggestOnly: true,
-      message: '[TIBCO CLOUD CLI] (exit to quit): ',
-      source: searchAnswer,
-      pageSize: 4,
-      validate: function (val) {
-        return val ? true : 'Type something!';
-      },
-    }]).then(function (answers) {
-      //console.log(answers);
-      console.log('Command: ' + answers.command);
-      var com = answers.command;
-      if (com == 'q' || com == 'quit' || com == 'exit') {
-        console.log('Thank you for using the Cloud CLI... Goodbye :-) ');
-        return resolve();
-      } else {
-        console.log('gulp ' + com);
-        run('gulp ' + com);
-        return promptGulp();
-      }
+promptGulp = function (stDir, cwdDir) {
+    console.log('PromtGulp)           stDir dir: ' + stDir);
+    console.log('PromtGulp) current working dir: ' + cwdDir);
+    return new Promise(function (resolve, reject) {
+        var inquirer = require('inquirer');
+        inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+        inquirer.prompt([{
+            type: 'autocomplete',
+            name: 'command',
+            suggestOnly: true,
+            message: '[TIBCO CLOUD CLI] (exit to quit): ',
+            source: searchAnswer,
+            pageSize: 4,
+            validate: function (val) {
+                return val ? true : 'Type something!';
+            },
+        }]).then(function (answers) {
+            //console.log(answers);
+            // console.log('Command: ' + answers.command);
+            var com = answers.command;
+            if (com == 'q' || com == 'quit' || com == 'exit') {
+                console.log('Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
+                return resolve();
+            } else {
+                // console.log('cd ' + stDir + ' && gulp ' + com + ' --cwd ' + cwdDir);
+                run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/gulpfile.js"');
+                // gulp.series(com)();
+                return promptGulp(stDir, cwdDir);
+            }
+        });
     });
-  });
 }
 
 const _ = require('lodash');
 const fuzzy = require('fuzzy');
-const gtasks = ['show-cloud', 'show-apps','show-application-links', 'obfuscate' ,'start','build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help'];
+const gtasks = ['show-cloud', 'show-apps', 'show-application-links', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help'];
 
 //User interaction
-function searchAnswer(answers, input) {
-  input = input || '';
-  return new Promise(function (resolve) {
-    setTimeout(function () {
-      var fuzzyResult = fuzzy.filter(input, gtasks);
-      resolve(
-          fuzzyResult.map(function (el) {
-            return el.original;
-          })
-      );
-    }, _.random(30, 60));
-  });
+searchAnswer = function (answers, input) {
+    input = input || '';
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            var fuzzyResult = fuzzy.filter(input, gtasks);
+            resolve(
+                fuzzyResult.map(function (el) {
+                    return el.original;
+                })
+            );
+        }, _.random(30, 60));
+    });
 }
