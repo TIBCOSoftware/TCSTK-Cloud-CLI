@@ -35,7 +35,7 @@ deleteFolder = function (folder) {
 // Run an OS Command
 run = function (command) {
   return new Promise(function (resolve, reject) {
-    log(INFO, 'Executing Command: ' + command);
+    log(DEBUG, 'Executing Command: ' + command);
     try{
       execSync(
           command,
@@ -173,6 +173,8 @@ showApps = function(){
     resolve();
   });
 }
+
+
 
 
 // Function to show claims for the configured user
@@ -356,6 +358,46 @@ npmInstall = function (location, package) {
   });
 }
 
+// Function to add or update property to a file
+addOrUpdateProperty = function (location, property, value){
+  log(INFO, 'Updating: ' + property + ' to: ' + value + '(in:' + location + ')');
+  // Check if file exists
+  const fs = require('fs')
+  try {
+    if (fs.existsSync(location)) {
+      //file exists
+      log(DEBUG, 'Property file found: ' + location);
+      // Check if file contains property
+      fs.readFile(location, 'utf8', function (err,data) {
+        if (err) {
+          return console.log(err);
+        }
+        var reg = new RegExp(property + '\\s*=\\s*(.*)');
+        if(data.search(reg) > -1) {
+          // We found the property
+          log(DEBUG, 'Property found: ' + property + ' We are updating it to: ' + value);
+          var regRes = new RegExp(property + '\\s*=\\s*(.*)');
+          var result = data.replace(regRes , property + '=' + value);
+          fs.writeFile(location, result, 'utf8', function (err) {
+            if (err) return console.log(err);
+          });
+        } else {
+          // append prop to the end.
+          log(DEBUG, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
+          var result = data + '\n' + property + '=' + value;
+          fs.writeFile(location, result, 'utf8', function (err) {
+            if (err) return console.log(err);
+          });
+        }
+      });
+    } else {
+      log(ERROR, 'Property File does not exist: ' + location);
+    }
+  } catch(err) {
+    console.error(err)
+  }
+}
+
 
 // Function to copy a directory
 copyDir = function (fromDir, toDir) {
@@ -427,7 +469,7 @@ log = function (level, message) {
   if (!(level == DEBUG && !useDebug)) {
     var timeStamp = new Date();
     //console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-    console.log('TIBCO CLOUD CLI] -' + level + '- ' + message);
+    console.log('TIBCO CLOUD CLI] (' + level + ') ' + message);
   }
 }
 logO = function (level, message) {

@@ -1,5 +1,6 @@
 // File to manage the CLI Interaction
 import arg from 'arg';
+const propFileName = 'tibco-cloud.properties';
 
 function parseArgumentsIntoOptions(rawArgs) {
     const args = arg(
@@ -13,28 +14,31 @@ function parseArgumentsIntoOptions(rawArgs) {
     );
     return {
         debug: args['--debug'] || false,
-        task: args._[0]
+        task: args._[0] || ''
     };
 }
 
-// const runGulpTask = require('run-gulp-task');
 // Main function
 export function cli(args) {
     let options = parseArgumentsIntoOptions(args);
     var appRoot = process.env.PWD;
     var cwdir = process.cwd();
     if (options.debug) {
-        console.log(options);
+        console.log('Options: ' , options);
         console.log('Project Root: ' + appRoot);
         console.log('Current Working Directory: ' + cwdir);
         console.log('__dirname: ' + __dirname);
         console.log('__filename: ' + __filename);
     }
+
     // Test if tibco-cloud.properties exists
     const fs = require("fs");
-    if (!fs.existsSync(cwdir + '/tibco-cloud.properties')) {
-        console.log('No TIBCO Cloud Propeties file found, creating initial one...');
-        fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/tibco-cloud.properties');
+    if (!fs.existsSync(cwdir + '/' + propFileName)) {
+        console.log('No TIBCO Cloud Properties file found, creating an initial one...');
+        fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
+        // TODO: Hier verder, we hebben de functie om properties te kunnen updaten...
+        // addOrUpdateProperty ('tibco-cloud.properties' , 'Use_Debug' , now);
+
         // TODO: Ask questions about the cloud prop file:
         // Which tenant to use
         // Client ID
@@ -42,15 +46,18 @@ export function cli(args) {
         // Get the AppName Automatically from the package.json
     } else {
         if(options.debug){
-            console.log('tibco-cloud.properties found...');
+            console.log(propFileName + ' found...');
         }
     }
 
+    // Start the specified Gulp Task
     var gulp = require('gulp');
     require(__dirname + '/gulpfile');
-    checkPW();
-    promptGulp(__dirname, appRoot);
-    // gulp.series('default')();
-    // TODO: Change this to pass the commandline option
+    // TODO: pass in commandline options
+    if(options.task == ''){
+        gulp.series('default')();
+    } else {
+        gulp.series(options.task)();
+    }
 
 }
