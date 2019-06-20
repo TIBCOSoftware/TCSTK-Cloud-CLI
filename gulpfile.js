@@ -3,6 +3,7 @@ const gulp = require('gulp');
 require('./build/functions');
 // Read TIBCO cloud properties...
 const PropertiesReader = require('properties-reader');
+const propFileNameGulp = 'tibco-cloud.properties';
 const properties = PropertiesReader('tibco-cloud.properties');
 const props = properties.path();
 const version = '1.1.4';
@@ -91,6 +92,14 @@ function undoLibSources() {
     });
 }
 
+// Function to change the tenant in the properties file
+changeTenant = function () {
+    return new Promise( async function (resolve, reject) {
+        await updateTenant(propFileNameGulp);
+        resolve();
+    });
+};
+
 
 help = function () {
     return new Promise(async function (resolve, reject) {
@@ -129,22 +138,31 @@ start = function () {
 mainT = function () {
     return new Promise(async function (resolve, reject) {
         console.log('[TIBCO CLOUD CLI - V '+version+'] ("exit" to quit / "help" to display tasks)');
-        checkPW();
+        // checkPW();
         resolve();
         var appRoot = process.env.PWD;
+        if (props.CloudLogin.pass == ''){
+            // When password is empty ask it manually for the session.
+            var pass = await askQuestion('Please provide your password: ', 'password');
+            properties.set('CloudLogin.pass', obfuscatePW(pass));
+        }
+
         await promptGulp(__dirname, appRoot);
     });
 };
 
 test = function () {
-    return new Promise(async function (resolve, reject) {
-        console.log('test 2...');
+    return new Promise( async function (resolve, reject) {
+        console.log('test...');
         var now = new Date();
         console.log(now);
-        addOrUpdateProperty ('tibco-cloud.properties' , 'Use_Debug' , now);
         resolve();
     });
 };
+
+
+
+
 
 gulp.task('test', test);
 gulp.task('help', help);
@@ -155,6 +173,10 @@ gulp.task('default', gulp.series('main'));
 // gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
+
+gulp.task('change-tenant', changeTenant);
+changeTenant.description = 'Change the tenant to login to';
+
 gulp.task('obfuscate', obfuscate);
 obfuscate.description = 'Obfuscates a Password';
 mainT.description = 'Displays this message';
@@ -205,7 +227,7 @@ TODO: Additional Cloud CLI Capabilities
 
 
 
-
+var globalLastCommand = 'help';
 
 //Main Cloud CLI Questions
 promptGulp = function (stDir, cwdDir) {
@@ -232,19 +254,23 @@ promptGulp = function (stDir, cwdDir) {
                 console.log('Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
             } else {
-                // console.log('cd ' + stDir + ' && gulp ' + com + ' --cwd ' + cwdDir);
-                // TODO: Save last command
-                run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/gulpfile.js"');
-                // gulp.series(com)();
+                // Check if we need to repeat the last task
+                if (com == 'repeat-last-task'){
+                    log('INFO', 'Repeating Last Task: ' + globalLastCommand);
+                    com = globalLastCommand;
+                }
+                globalLastCommand = com;
+                run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/gulpfile.js" --pass "' + props.CloudLogin.pass + '"');
                 return promptGulp(stDir, cwdDir);
             }
         });
     });
 }
 
+
+const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-tenant', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help' , 'repeat-last-task'];
 const _ = require('lodash');
 const fuzzy = require('fuzzy');
-const gtasks = ['show-cloud', 'show-apps', 'show-application-links', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help'];
 
 //User interaction
 searchAnswer = function (answers, input) {
@@ -260,3 +286,4 @@ searchAnswer = function (answers, input) {
         }, _.random(30, 60));
     });
 }
+
