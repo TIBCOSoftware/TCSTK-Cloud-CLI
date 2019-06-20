@@ -5,7 +5,7 @@ require('./build/functions');
 const PropertiesReader = require('properties-reader');
 const properties = PropertiesReader('tibco-cloud.properties');
 const props = properties.path();
-
+const version = '1.1.4';
 
 // Function to build the cloud starter
 function build() {
@@ -91,18 +91,19 @@ function undoLibSources() {
     });
 }
 
+
 help = function () {
     return new Promise(async function (resolve, reject) {
-        console.log('                               # |-------------------------------------------|');
-        console.log('                               # |  *** T I B C O    C L O U D   C L I ***   |');
-        console.log('                               # |            V1.1.3 (17-6-2019)             |');
-        console.log('                               # |-------------------------------------------|');
         log('INFO', 'GULP DETAILS:');
-        console.log();
         var cwdir = process.cwd();
         run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
-        log('INFO', 'Choose a task from the following list:');
+        log('INFO', 'These are the available TIBCO CLOUD CLI Tasks:');
         run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
+        console.log('# |-------------------------------------------|');
+        console.log('# |  *** T I B C O    C L O U D   C L I ***   |');
+        console.log('# |            V'+version+'                         |');
+        console.log('# |-------------------------------------------|');
+        console.log('# |For more info see: https://cloud.tibco.com');
 
         resolve();
     });
@@ -127,9 +128,11 @@ start = function () {
 
 mainT = function () {
     return new Promise(async function (resolve, reject) {
+        console.log('[TIBCO CLOUD CLI - V '+version+'] ("exit" to quit / "help" to display tasks)');
         checkPW();
         resolve();
-        await promptGulp(__dirname);
+        var appRoot = process.env.PWD;
+        await promptGulp(__dirname, appRoot);
     });
 };
 
@@ -138,7 +141,7 @@ test = function () {
         console.log('test 2...');
         var now = new Date();
         console.log(now);
-
+        addOrUpdateProperty ('tibco-cloud.properties' , 'Use_Debug' , now);
         resolve();
     });
 };
@@ -148,7 +151,7 @@ gulp.task('help', help);
 help.description = 'Displays this message';
 gulp.task('main', mainT);
 
-gulp.task('default', gulp.series('help', 'main'));
+gulp.task('default', gulp.series('main'));
 // gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
@@ -206,21 +209,21 @@ TODO: Additional Cloud CLI Capabilities
 
 //Main Cloud CLI Questions
 promptGulp = function (stDir, cwdDir) {
-    console.log('PromtGulp)           stDir dir: ' + stDir);
-    console.log('PromtGulp) current working dir: ' + cwdDir);
+    log('DEBUG', 'PromtGulp)           stDir dir: ' + stDir);
+    log('DEBUG', 'PromtGulp) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
         var inquirer = require('inquirer');
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         inquirer.prompt([{
             type: 'autocomplete',
             name: 'command',
-            suggestOnly: true,
-            message: '[TIBCO CLOUD CLI] (exit to quit): ',
+            suggestOnly: false,
+            message: '[TIBCO CLOUD CLI]: ',
             source: searchAnswer,
-            pageSize: 4,
+            pageSize: 4/*,
             validate: function (val) {
                 return val ? true : 'Type something!';
-            },
+            }*/
         }]).then(function (answers) {
             //console.log(answers);
             // console.log('Command: ' + answers.command);
@@ -230,6 +233,7 @@ promptGulp = function (stDir, cwdDir) {
                 return resolve();
             } else {
                 // console.log('cd ' + stDir + ' && gulp ' + com + ' --cwd ' + cwdDir);
+                // TODO: Save last command
                 run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/gulpfile.js"');
                 // gulp.series(com)();
                 return promptGulp(stDir, cwdDir);
