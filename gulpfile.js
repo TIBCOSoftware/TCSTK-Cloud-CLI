@@ -6,7 +6,7 @@ const PropertiesReader = require('properties-reader');
 const propFileNameGulp = 'tibco-cloud.properties';
 const properties = PropertiesReader('tibco-cloud.properties');
 const props = properties.path();
-const version = '1.1.4';
+const version = '0.1.2';
 
 // Function to build the cloud starter
 function build() {

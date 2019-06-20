@@ -57,7 +57,7 @@ export async function cli(args) {
         var email = await askQuestion ('What is your User Name (Email) ?');
         addOrUpdateProperty(propFileName, 'CloudLogin.email', email);
         log('INFO' , 'Your password will be obfuscated, but is not unbreakable (press enter to skip and enter manually later)');
-        var pass = await askQuestion ('What is your Password ?');
+        var pass = await askQuestion ('What is your Password ?', 'password');
         addOrUpdateProperty(propFileName, 'CloudLogin.pass', obfuscatePW(pass));
     } else {
         if(options.debug){
