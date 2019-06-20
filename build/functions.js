@@ -415,6 +415,7 @@ askMultipleChoiceQuestion = async function (question, options) {
 // function to ask a question
 askQuestion = async function (question, type = 'input') {
     var re = 'result';
+    console.log('Type: ' , type);
     await inquirer.prompt([{
         type: type,
         name: 'result',
