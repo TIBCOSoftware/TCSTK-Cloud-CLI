@@ -20,7 +20,8 @@
     "inquirer": "^6.3.1",
     "inquirer-autocomplete-prompt": "^1.0.1",
     "properties-reader": "0.0.16",
-    "sync-rest-client": "^1.0.3"
+    "sync-rest-client": "^1.0.3",
+    "yargs": "^13.2.4"
   },
   "devDependencies": {},
   "bin": {
