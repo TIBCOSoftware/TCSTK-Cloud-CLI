@@ -9,7 +9,7 @@ const del = require('del');
 const PropertiesReader = require('properties-reader');
 const propertiesF = PropertiesReader('tibco-cloud.properties');
 const propsF = propertiesF.path();
-const inquirer = require('inquirer');
+
 
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
@@ -116,7 +116,7 @@ buildCloudStarterZip = function (cloudStarter) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
         //copyFile('./tmp/' + cloudStarter + '/tsconfig.build.json', './tmp/' + cloudStarter + '/tsconfig.json');
-        run('cd ./dist/' + cloudStarter + '/ && zip -r ./../../build/' + cloudStarter + '.zip .');
+        run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
         resolve();
     });
 }
@@ -287,7 +287,7 @@ uploadApp = function (application) {
         var uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
         //formData.append('key1', 1);
         // formData.setHeader("cookie", "tsc="+lCookie.tsc + "; domain=" + lCookie.domain);
-        formData.append('appContents', require("fs").createReadStream('./build/' + application + '.zip'));
+        formData.append('appContents', require("fs").createReadStream('./dist/' + application + '.zip'));
         let query = require('https').request({
             hostname: propsF.cloudHost,
             path: uploadAppLocation,
@@ -393,11 +393,11 @@ addOrUpdateProperty = function (location, property, value) {
         console.error(err)
     }
 }
-
+const inquirerF = require('inquirer');
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
     var re = 'result';
-    await inquirer.prompt([{
+    await inquirerF.prompt([{
         type: 'list',
         name: 'result',
         message: question,
@@ -416,7 +416,7 @@ askMultipleChoiceQuestion = async function (question, options) {
 askQuestion = async function (question, type = 'input') {
     var re = 'result';
     console.log('Type: ' , type);
-    await inquirer.prompt([{
+    await inquirerF.prompt([{
         type: type,
         name: 'result',
         message: question,
