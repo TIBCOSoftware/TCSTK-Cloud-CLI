@@ -32,7 +32,7 @@ function publish() {
     return new Promise(async function (resolve, reject) {
         await publishApp(props.App_Name);
         log('INFO', 'APP PUBLISHED: ' + props.App_Name);
-        log('INFO', "LOCATION: " + props.Cloud_URL + "/webresource/apps/" + props.App_Name + "/index.html#/starterApp/home");
+        log('INFO', "LOCATION: " + props.Cloud_URL + "webresource/apps/" + props.App_Name + "/index.html");
         resolve();
     });
 }
@@ -156,6 +156,10 @@ test = function () {
         console.log('test...');
         var now = new Date();
         console.log(now);
+        var q1 = await askQuestion('Question 1');
+        console.log(q1);
+        var q2 = await askQuestion('Question 2');
+        console.log(q2);
         resolve();
     });
 };
@@ -228,13 +232,12 @@ TODO: Additional Cloud CLI Capabilities
 
 
 var globalLastCommand = 'help';
-
+var inquirer = require('inquirer');
 //Main Cloud CLI Questions
 promptGulp = function (stDir, cwdDir) {
     log('DEBUG', 'PromtGulp)           stDir dir: ' + stDir);
     log('DEBUG', 'PromtGulp) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
-        var inquirer = require('inquirer');
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         inquirer.prompt([{
             type: 'autocomplete',

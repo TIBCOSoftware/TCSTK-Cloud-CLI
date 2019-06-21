@@ -69,6 +69,7 @@ export async function cli(args) {
     require(__dirname + '/gulpfile');
 
     // TODO: pass in commandline options
+    // TODO: Maybe call run here to prevent two times asking of PW on new file
     if(options.task == ''){
         gulp.series('default')();
     } else {
