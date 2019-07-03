@@ -61,7 +61,7 @@ var loginURL = propsF.Cloud_URL + propsF.loginURE;
 var loginC = null;
 var argv = require('yargs').argv;
 
-function cLogin() {
+cLogin = function() {
     // checkPW();
     var pass = propsF.CloudLogin.pass;
     if(pass == ''){
@@ -79,8 +79,12 @@ function cLogin() {
         log(INFO, 'Error Exiting..');
         process.exit();
     }
+    // console.log("RETURN: " , loginC);
     return loginC;
 }
+
+
+
 
 // Function that logs into the cloud and returns a cookie
 function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
@@ -201,7 +205,7 @@ showClaims = function () {
 };
 
 
-function getCloud(url) {
+getCloud = function(url) {
     const lCookie = cLogin();
     log(DEBUG, 'Login Cookie: ', lCookie);
     const response = syncClient.get(url, {

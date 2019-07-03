@@ -64,15 +64,22 @@ export async function cli(args) {
             console.log(propFileName + ' found...');
         }
     }
+
     // Start the specified Gulp Task
     var gulp = require('gulp');
+
     require(__dirname + '/gulpfile');
 
     // TODO: pass in commandline options
     // TODO: Maybe call run here to prevent two times asking of PW on new file
     if(options.task == ''){
+
         gulp.series('default')();
     } else {
+        if(options.task == 'help'){
+            options.task = 'help-tcli';
+        }
+
         gulp.series(options.task)();
     }
 }
