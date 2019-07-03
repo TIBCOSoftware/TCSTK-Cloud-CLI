@@ -6,7 +6,7 @@ const PropertiesReader = require('properties-reader');
 const propFileNameGulp = 'tibco-cloud.properties';
 const properties = PropertiesReader('tibco-cloud.properties');
 const props = properties.path();
-const version = '0.1.2';
+const version = '0.1.12';
 
 // Function to build the cloud starter
 function build() {
@@ -101,7 +101,7 @@ changeTenant = function () {
 };
 
 
-help = function () {
+helptcli = function () {
     return new Promise(async function (resolve, reject) {
         log('INFO', 'GULP DETAILS:');
         var cwdir = process.cwd();
@@ -151,29 +151,154 @@ mainT = function () {
     });
 };
 
+
+testCallService = function() {
+    return new Promise( async function (resolve, reject) {
+        const lCookie = cLogin();
+        const sc = require('sync-rest-client');
+
+        const SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger';
+        const responseSW = sc.get(SwaggerURL, {
+            headers: {
+                "accept": "application/json, text/plain, */*",
+                "authority": "integration.cloud.tibco.com",
+                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+            }
+        });
+        console.log(responseSW.body);
+
+        // EXAMPLE TO CALL THE SERVICE
+        const Swagger = require('swagger-client');
+        Swagger({spec: responseSW.body}).then((client) => {
+            console.log('API: ', client.apis);
+            client.apis.default.getNumber().then((result) => {
+                    console.log('Result: ', result.body.number);
+                }
+            );
+            resolve();
+
+        });
+
+
+    });
+}
+
+
+
 test = function () {
     return new Promise( async function (resolve, reject) {
         console.log('test...');
         var now = new Date();
         console.log(now);
-        var q1 = await askQuestion('Question 1');
-        console.log(q1);
-        var q2 = await askQuestion('Question 2');
-        console.log(q2);
+
+
+        const lCookie = cLogin();
+        const sc = require('sync-rest-client');
+
+        //const response = sc.get('https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger', {
+        const response = sc.get('https://integration.cloud.tibco.com/domain/v1/applications?scope=all', {
+            headers: {
+                "accept": "application/json, text/plain, */*",
+                "authority": "integration.cloud.tibco.com",
+                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+            }
+        });
+
+        var TCI_Applications = response.body.applications;
+
+        var apps = {};
+        var appNames = new Array();
+        for (var app in TCI_Applications) {
+
+            var appTemp = {};
+            var appN = parseInt(app) + 1;
+            //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
+            var thisApp = TCI_Applications[app];
+            appTemp['APP NAME'] = thisApp.applicationName;
+            appNames.push(thisApp.applicationName + ' ['+ thisApp.id + ']');
+            appTemp['SANDBOX'] = thisApp.sandboxName;
+            appTemp['TYPE'] = thisApp.appType;
+            var updated = new Date(thisApp.lastUpdatedTime);
+            var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            appTemp['UPDATED'] = updated.toLocaleDateString("en-US", options);
+            apps[appN] = appTemp;
+
+        }
+        //logO(INFO,apps);
+        console.table(apps);
+
+        // Select an App
+        // TODO: Mak the app type-ble in mc list
+        askMultipleChoiceQuestion('Which app do you want to generate the source for ? ', appNames, true).then( (selectedApp) => {
+            console.log('Selected App: ' + selectedApp);
+            var matches = selectedApp.match(/\[(.*?)\]/);
+
+            if (matches) {
+                var selectedID = matches[1];
+            }
+            console.log('Selected ID: ' + selectedID);
+            var SwaggerURL = '';
+
+            for (var app in TCI_Applications) {
+                var thisApp = TCI_Applications[app];
+                if(thisApp.id == selectedID){
+                    console.log('Application Details: ' , thisApp);
+                    // TODO: Select Right endpoint
+                    SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/'+ thisApp.sandboxName +'/applications/'+thisApp.id+'/endpoints/'+thisApp.endpointIds[0]+'/swagger';
+                }
+
+            }
+
+            console.log('Swagger URL: ' + SwaggerURL);
+            //const SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger';
+            const responseSW = sc.get(SwaggerURL, {
+                headers: {
+                    "accept": "application/json, text/plain, */*",
+                    "authority": "integration.cloud.tibco.com",
+                    "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+                }
+            });
+
+            var myJson = JSON.stringify(responseSW.body);
+            deleteFolder('swaggerTmp').then(() => {
+                run('mkdir swaggerTmp');
+                var fs = require('fs');
+                fs.writeFileSync('swaggerTmp/swagger.json', myJson, 'utf8');
+                console.log('Defininition: ', myJson);
+                run('cd swaggerTmp &&  ng-swagger-gen -i swagger.json');
+            });
+
+
+
+        });
+
+
+        // Download the JSON
+
+        // Run the creator of the sources
+
+
+
+
+
+
+
+
         resolve();
+
     });
 };
 
 
 
-
+gulp.task('test-call-service', testCallService);
 
 gulp.task('test', test);
-gulp.task('help', help);
-help.description = 'Displays this message';
+gulp.task('help-tcli', helptcli);
+helptcli.description = 'Displays this message';
 gulp.task('main', mainT);
 
-gulp.task('default', gulp.series('main'));
+gulp.task('default', gulp.series('help-tcli', 'main'));
 // gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
@@ -231,7 +356,7 @@ TODO: Additional Cloud CLI Capabilities
 
 
 
-var globalLastCommand = 'help';
+var globalLastCommand = 'help-tcli';
 var inquirer = require('inquirer');
 //Main Cloud CLI Questions
 promptGulp = function (stDir, cwdDir) {
@@ -271,7 +396,8 @@ promptGulp = function (stDir, cwdDir) {
 }
 
 
-const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-tenant', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help' , 'repeat-last-task'];
+const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-tenant', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
+/*
 const _ = require('lodash');
 const fuzzy = require('fuzzy');
 
@@ -289,4 +415,4 @@ searchAnswer = function (answers, input) {
         }, _.random(30, 60));
     });
 }
-
+*/
