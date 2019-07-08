@@ -22,5 +22,6 @@
 # compiled output
 /dist
 /tmp
+/swaggerTmp
 
 /tibco-cloud.properties
