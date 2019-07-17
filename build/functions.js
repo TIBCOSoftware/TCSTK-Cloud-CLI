@@ -416,6 +416,51 @@ askMultipleChoiceQuestion = async function (question, options) {
     return re;
 }
 
+var gOptions = [];
+
+askMultipleChoiceQuestionSearch = async function (question, options) {
+    gOptions = options;
+    var re = 'result';
+    inquirerF.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+    await inquirerF.prompt([{
+        type: 'autocomplete',
+        name: 'command',
+        suggestOnly: false,
+        message: question,
+        source: searchAnswerF,
+        pageSize: 4/*,
+            validate: function (val) {
+                return val ? true : 'Type something!';
+            }*/
+    }]).then((answers) => {
+        console.log('answers: ' , answers);
+        logO(DEBUG, answers);
+        re = answers.command;
+    });
+    return re;
+}
+
+
+
+const _F = require('lodash');
+const fuzzyF = require('fuzzy');
+
+//User interaction
+searchAnswerF = function (answers, input) {
+    input = input || '';
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            var fuzzyResult = fuzzyF.filter(input, gOptions);
+            resolve(
+                fuzzyResult.map(function (el) {
+                    return el.original;
+                })
+            );
+        }, _F.random(30, 60));
+    });
+}
+
+
 // function to ask a question
 askQuestion = async function (question, type = 'input') {
     var re = 'result';
@@ -436,7 +481,7 @@ askQuestion = async function (question, type = 'input') {
 
 // function to update the tenant
 updateTenant = async function (propFile) {
-    var re = await askMultipleChoiceQuestion('Which initial tenent would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+    var re = await askMultipleChoiceQuestion('Which initial tenant would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     switch (re) {
         case 'US - Oregon':
             addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
