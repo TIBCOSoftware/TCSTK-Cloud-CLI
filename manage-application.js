@@ -8,8 +8,7 @@ var templatesToUse = [];
 
 // Funcation called from the cli to pick up info and call the create starter function
 async function newStarter(){
-    // TODO: Add a log function (with color): TIBCO CLOUD CLI]
-    console.log('Creating New Starter...');
+    log(INFO, 'Creating New Starter...');
     //console.log(configApp);
 
     for (var key in configApp.templates) {
@@ -37,6 +36,18 @@ async function newStarter(){
                 var temp = parseInt(arg) + 1;
                 // console.log('Template: ('+arg+')('+temp+') ' + process.argv[temp]);
                 starterTemplate = process.argv[temp];
+
+                for (var key in configApp.templates) {
+                    // console.log('KEY: ' + key );
+                    if (configApp.templates.hasOwnProperty(key)) {
+                        // console.log(key + " -> " + configApp.templates[key]);
+                        //if(configApp.templates[key].enabled) {
+                            if(starterTemplate == key){
+                                starterTemplate = configApp.templates[key].displayName;
+                            }
+                        //}
+                    }
+                }
             }
         }
     }
@@ -46,7 +57,7 @@ async function newStarter(){
     if(starterTemplate == ''){
         starterTemplate = await askMultipleChoiceQuestionAPP ('Which template would you like to use for your cloud starter ?', templatesToUse);
     }
-    console.log('    Cloud Starter Name: ' + starterName);
+    log(INFO, '    Cloud Starter Name: ' + starterName);
     var stTempJson = {};
     for (var key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
@@ -56,7 +67,7 @@ async function newStarter(){
 
         }
     }
-    console.log('Cloud Starter Template: ', stTempJson);
+    log(INFO, 'Cloud Starter Template: ', stTempJson);
     return createNewStarter(starterName, stTempJson);
 }
 
@@ -74,7 +85,7 @@ async function askMultipleChoiceQuestionAPP(question, options) {
             return val;
         }
     }]).then((answers) => {
-        //logO(DEBUG, answers);
+        logO(DEBUG, answers);
         re = answers.result;
     });
     return re;
@@ -83,7 +94,6 @@ async function askMultipleChoiceQuestionAPP(question, options) {
 // function to ask a question
 askQuestionAPP = async function (question, type = 'input') {
     var re = 'result';
-    // console.log('Type: ' , type);
     await inquirerA.prompt([{
         type: type,
         name: 'result',
@@ -92,7 +102,7 @@ askQuestionAPP = async function (question, type = 'input') {
             return val;
         }
     }]).then((answers) => {
-        //logO(DEBUG, answers);
+        logO(DEBUG, answers);
         re = answers.result;
     });
     return re;
@@ -101,25 +111,19 @@ askQuestionAPP = async function (question, type = 'input') {
 // Function to create a new starter, based on a template
 createNewStarter = function (name, template) {
     return new Promise( function (resolve, reject) {
-
-
         var toDir = process.cwd() + '/' + name;
-
         if(template.useGit){
             //TODO: implament use git for template
-
         } else {
             var fromDir = __dirname + template.templateFolder;
             // console.log('Copying template ' + template + ' From: ' + fromDir + ' To: ' + toDir);
             copyDir(fromDir, toDir);
         }
-
         const replace = require('replace-in-file');
-
         try {
             var results = {};
             for(rep of template.replacements){
-                console.log('Replacing from: ' + rep.from + " to: " + rep.to);
+                log(DEBUG, 'Replacing from: ' + rep.from + " to: " + rep.to);
                 var repTo = rep.to;
                 if(rep.to == "@name"){
                     repTo = name;
@@ -136,14 +140,16 @@ createNewStarter = function (name, template) {
             }
 
             //console.log('Replacement results:', results);
+            // TODO: provide all replacement values at once
             for(result of results){
                 console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')',  result.file);
             }
             run('cd ' + name + ' && npm install');
             console.log('\x1b[34m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully...');
+            //TODO: provide command to create the tibco-cloud.properties file
         }
         catch (error) {
-            console.error('Error occurred:', error);
+            log(ERROR, 'Error occurred:', error);
         }
         resolve();
     });
@@ -152,7 +158,7 @@ createNewStarter = function (name, template) {
 const fseA = require('fs-extra');
 // Function to copy a directory
 copyDir = function (fromDir, toDir) {
-    console.log('Copying Directory from: ' + fromDir + ' to: ' + toDir);
+    log(DEBUG, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fseA.copySync(fromDir, toDir, {overwrite: true});
 }
 
@@ -163,8 +169,8 @@ const execSync = require('child_process').execSync;
 // Run an OS Command
 run = function (command) {
     return new Promise(function (resolve, reject) {
-        //log(DEBUG, 'Executing Command: ' + command);
-        console.log('Executing Command: ' + command);
+        log(DEBUG, 'Executing Command: ' + command);
+        //console.log('Executing Command: ' + command);
         try {
             execSync(
                 command,
@@ -176,8 +182,26 @@ run = function (command) {
         resolve();
     }).catch(
         (reason => {
-            // logO(ERROR, reason);
+            logO(ERROR, reason);
             process.exit(1);
         })
     );
+}
+
+// Log function
+const INFO = 'INFO';
+const DEBUG = 'DEBUG';
+const ERROR = 'ERROR';
+const useDebug = (configApp.Use_Debug == 'true');
+log = function (level, message) {
+    if (!(level == DEBUG && !useDebug)) {
+        var timeStamp = new Date();
+        //console.log('(' + timeStamp + ')[' + level + ']  ' + message);
+        console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
+    }
+}
+logO = function (level, message) {
+    if (!(level == DEBUG && !useDebug)) {
+        console.log(message);
+    }
 }
