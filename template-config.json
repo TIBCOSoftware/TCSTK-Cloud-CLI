@@ -1,0 +1,56 @@
+{
+  "templates": {
+    "TCSTK-case-manager-app": {
+      "displayName": "Case Manager App",
+      "enabled": true,
+      "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
+      "useGit": false,
+      "git" : "",
+      "replacements": [
+        {
+          "from": "tcstk-case-manager-app",
+          "to": "@name"
+        },
+        {
+          "from": "Case Manager",
+          "to": "@name"
+        }
+      ]
+    },
+    "Template1": {
+      "displayName": "First Template",
+      "enabled": false,
+      "templateFolder": "/applicationTemplate/template1",
+      "useGit": false,
+      "git" : "",
+      "replacements": [
+        {
+          "from": "@@ReplaceMe@@",
+          "to": "@name"
+        },
+        {
+          "from": "is",
+          "to": "Hugo"
+        }
+      ]
+    },
+    "Template2": {
+      "displayName": "Second Template",
+      "enabled": false,
+      "templateFolder": "/applicationTemplate/template2",
+      "useGit": false,
+      "git" : "",
+      "replacements": [
+        {
+          "from": "String1",
+          "to": "ToString1"
+        },
+        {
+          "from": "String2",
+          "to": "ToString2"
+        }
+      ]
+    }
+  }
+}
+
