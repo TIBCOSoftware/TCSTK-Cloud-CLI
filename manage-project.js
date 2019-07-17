@@ -430,7 +430,7 @@ promptGulp = function (stDir, cwdDir) {
                     com = globalLastCommand;
                 }
                 globalLastCommand = com;
-                run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/gulpfile.js" --pass "' + props.CloudLogin.pass + '"');
+                run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + props.CloudLogin.pass + '"');
                 return promptGulp(stDir, cwdDir);
             }
         });
