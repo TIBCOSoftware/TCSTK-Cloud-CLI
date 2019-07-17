@@ -1,3 +1,6 @@
+// This file manages all the tasks within a project
+
+
 const gulp = require('gulp');
 //import functions
 require('./build/functions');
@@ -6,7 +9,7 @@ const PropertiesReader = require('properties-reader');
 const propFileNameGulp = 'tibco-cloud.properties';
 const properties = PropertiesReader('tibco-cloud.properties');
 const props = properties.path();
-const version = '0.1.12';
+const version = '0.2.0';
 
 // Function to build the cloud starter
 function build() {
@@ -156,7 +159,6 @@ testCallService = function() {
     return new Promise( async function (resolve, reject) {
         const lCookie = cLogin();
         const sc = require('sync-rest-client');
-
         const SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger';
         const responseSW = sc.get(SwaggerURL, {
             headers: {
@@ -176,14 +178,30 @@ testCallService = function() {
                 }
             );
             resolve();
-
         });
-
-
     });
 }
 
 
+testWSU = function () {
+    return new Promise(async function (resolve, reject) {
+        console.log('test...');
+        var now = new Date();
+        console.log(now);
+        var wsu = require('wsu');
+        console.log(wsu.API.getVersion());
+
+        var id = 'ivXo63MVxNPpsoPzQ-D_bDBO7sSnu4fv5HJlqI-OiVgXfRgWVDSgH_NgC5ws94idTPRDgNqI5XJR0hNPKwHyAHtVjApNLj-nJB3w';
+        var user = 'segliveapps@outlook.com';
+        var pass = 'Tibco123.';
+        wsu.API.login(id,user,pass);
+        console.log(wsu.API.getArtefactList("TCI"));
+
+        resolve();
+    });
+}
+
+const getAppOwner = false;
 
 test = function () {
     return new Promise( async function (resolve, reject) {
@@ -204,23 +222,47 @@ test = function () {
             }
         });
 
+
+
+
+
         var TCI_Applications = response.body.applications;
 
         var apps = {};
         var appNames = new Array();
         for (var app in TCI_Applications) {
 
+
             var appTemp = {};
             var appN = parseInt(app) + 1;
             //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
             var thisApp = TCI_Applications[app];
+
+
             appTemp['APP NAME'] = thisApp.applicationName;
+            if(getAppOwner) {
+                // console.log(thisApp.id);
+                var responseApp = sc.get('https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/' + thisApp.id, {
+                    headers: {
+                        "accept": "application/json, text/plain, */*",
+                        "authority": "integration.cloud.tibco.com",
+                        "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+                    }
+                });
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+                process.stdout.write("Processing App: (" + appN + '/' + TCI_Applications.length + ')...');
+                // console.log(responseApp.body.ownerName);
+                appTemp['OWNER'] = responseApp.body.ownerName;
+            }
             appNames.push(thisApp.applicationName + ' ['+ thisApp.id + ']');
             appTemp['SANDBOX'] = thisApp.sandboxName;
             appTemp['TYPE'] = thisApp.appType;
             var updated = new Date(thisApp.lastUpdatedTime);
             var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-            appTemp['UPDATED'] = updated.toLocaleDateString("en-US", options);
+            if(!getAppOwner) {
+                appTemp['UPDATED'] = updated.toLocaleDateString("en-US", options);
+            }
             apps[appN] = appTemp;
 
         }
@@ -228,8 +270,7 @@ test = function () {
         console.table(apps);
 
         // Select an App
-        // TODO: Mak the app type-ble in mc list
-        askMultipleChoiceQuestion('Which app do you want to generate the source for ? ', appNames, true).then( (selectedApp) => {
+        askMultipleChoiceQuestionSearch('Which app do you want to generate the source for ? ', appNames).then( (selectedApp) => {
             console.log('Selected App: ' + selectedApp);
             var matches = selectedApp.match(/\[(.*?)\]/);
 
@@ -248,7 +289,7 @@ test = function () {
                 }
 
             }
-
+            // https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy
             console.log('Swagger URL: ' + SwaggerURL);
             //const SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger';
             const responseSW = sc.get(SwaggerURL, {
@@ -265,7 +306,7 @@ test = function () {
                 var fs = require('fs');
                 fs.writeFileSync('swaggerTmp/swagger.json', myJson, 'utf8');
                 console.log('Defininition: ', myJson);
-                run('cd swaggerTmp &&  ng-swagger-gen -i swagger.json');
+                run('cd swaggerTmp &&  ng-swagger-gen -i swagger.json -c ./../ng-swagger-gen-config.json');
             });
 
 
@@ -294,6 +335,7 @@ test = function () {
 gulp.task('test-call-service', testCallService);
 
 gulp.task('test', test);
+gulp.task('test-wsu', testWSU);
 gulp.task('help-tcli', helptcli);
 helptcli.description = 'Displays this message';
 gulp.task('main', mainT);
@@ -397,7 +439,7 @@ promptGulp = function (stDir, cwdDir) {
 
 
 const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-tenant', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
-/*
+
 const _ = require('lodash');
 const fuzzy = require('fuzzy');
 
@@ -415,4 +457,4 @@ searchAnswer = function (answers, input) {
         }, _.random(30, 60));
     });
 }
-*/
+
