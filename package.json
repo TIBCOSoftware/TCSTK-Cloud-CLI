@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "0.1.12",
+  "version": "0.2.2",
   "scripts": {
     "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
   },
@@ -23,7 +23,6 @@
     "replace-in-file": "^4.1.1",
     "swagger-client": "^3.9.0",
     "sync-rest-client": "^1.0.3",
-    "wsu": "1.0.0",
     "yargs": "^13.2.4"
   },
   "devDependencies": {},
