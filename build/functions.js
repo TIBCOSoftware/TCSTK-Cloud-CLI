@@ -464,7 +464,7 @@ searchAnswerF = function (answers, input) {
 // function to ask a question
 askQuestion = async function (question, type = 'input') {
     var re = 'result';
-    console.log('Type: ' , type);
+    // console.log('Type: ' , type);
     await inquirerF.prompt([{
         type: type,
         name: 'result',
@@ -573,7 +573,7 @@ log = function (level, message) {
     if (!(level == DEBUG && !useDebug)) {
         var timeStamp = new Date();
         //console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-        console.log('TIBCO CLOUD CLI] (' + level + ') ' + message);
+        console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
     }
 }
 logO = function (level, message) {
