@@ -20,8 +20,10 @@
     "inquirer": "^6.4.1",
     "inquirer-autocomplete-prompt": "^1.0.1",
     "properties-reader": "0.0.16",
+    "replace-in-file": "^4.1.1",
     "swagger-client": "^3.9.0",
     "sync-rest-client": "^1.0.3",
+    "wsu": "1.0.0",
     "yargs": "^13.2.4"
   },
   "devDependencies": {},
