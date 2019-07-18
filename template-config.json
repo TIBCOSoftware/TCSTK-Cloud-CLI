@@ -36,8 +36,8 @@
       ]
     },
     "Form-Template-Git": {
-      "displayName": "First Template",
-      "enabled": false,
+      "displayName": "Form Template (GIT)",
+      "enabled": true,
       "templateFolder": "",
       "useGit": true,
       "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
@@ -51,20 +51,46 @@
         }
       ]
     },
-    "Template2": {
-      "displayName": "Second Template",
+    "process-discovery": {
+      "displayName": "Process Discovery (GIT)",
       "enabled": false,
-      "templateFolder": "/applicationTemplate/template2",
-      "useGit": false,
-      "git" : "",
+      "templateFolder": "",
+      "useGit": true,
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-process-discovery-app",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": ["rm package-lock.json"],
+      "replacements": []
+    },
+    "process-discovery-replace": {
+      "displayName": "Process Discovery Replace (GIT)",
+      "enabled": false,
+      "templateFolder": "",
+      "useGit": true,
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-process-discovery-app",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": ["rm package-lock.json"],
       "replacements": [
         {
-          "from": "String1",
-          "to": "ToString1"
-        },
+          "from": "process-discovery-app",
+          "to": "@name"
+        }
+      ]
+    },
+    "template-sample": {
+      "displayName": "Your Template",
+      "enabled": false,
+      "templateFolder": "/applicationTemplate/",
+      "useGit": false,
+      "git" : "",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": [],
+      "replacements": [
         {
-          "from": "String2",
-          "to": "ToString2"
+          "from": "Find-Me",
+          "to": "@name"
         }
       ]
     }
