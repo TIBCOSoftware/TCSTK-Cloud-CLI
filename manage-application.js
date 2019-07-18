@@ -7,14 +7,14 @@ const configApp = require('./template-config.json');
 var templatesToUse = [];
 
 // Funcation called from the cli to pick up info and call the create starter function
-async function newStarter(){
+async function newStarter() {
     log(INFO, 'Creating New Starter...');
     //console.log(configApp);
 
     for (var key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
             // console.log(key + " -> " + configApp.templates[key]);
-            if(configApp.templates[key].enabled) {
+            if (configApp.templates[key].enabled) {
                 templatesToUse.push(configApp.templates[key].displayName);
             }
         }
@@ -22,17 +22,17 @@ async function newStarter(){
     // console.log(process.argv);
     var starterName = '';
     var starterTemplate = '';
-    for(arg in process.argv){
+    for (arg in process.argv) {
         // console.log(process.argv[arg]);
-        if(process.argv[arg] == 'new'){
-            if(process.argv.length - 1 > arg){
+        if (process.argv[arg] == 'new') {
+            if (process.argv.length - 1 > arg) {
                 var temp = parseInt(arg) + 1;
                 // console.log('Name: ('+arg+')('+temp+') ' + process.argv[temp]);
                 starterName = process.argv[temp];
             }
         }
-        if(process.argv[arg] == '--template' || process.argv[arg] == '-t' ){
-            if(process.argv.length - 1 > arg){
+        if (process.argv[arg] == '--template' || process.argv[arg] == '-t') {
+            if (process.argv.length - 1 > arg) {
                 var temp = parseInt(arg) + 1;
                 // console.log('Template: ('+arg+')('+temp+') ' + process.argv[temp]);
                 starterTemplate = process.argv[temp];
@@ -42,26 +42,26 @@ async function newStarter(){
                     if (configApp.templates.hasOwnProperty(key)) {
                         // console.log(key + " -> " + configApp.templates[key]);
                         //if(configApp.templates[key].enabled) {
-                            if(starterTemplate == key){
-                                starterTemplate = configApp.templates[key].displayName;
-                            }
+                        if (starterTemplate == key) {
+                            starterTemplate = configApp.templates[key].displayName;
+                        }
                         //}
                     }
                 }
             }
         }
     }
-    if(starterName == ''){
+    if (starterName == '') {
         starterName = await askQuestionAPP('What is the name of your cloud starter ?');
     }
-    if(starterTemplate == ''){
-        starterTemplate = await askMultipleChoiceQuestionAPP ('Which template would you like to use for your cloud starter ?', templatesToUse);
+    if (starterTemplate == '') {
+        starterTemplate = await askMultipleChoiceQuestionAPP('Which template would you like to use for your cloud starter ?', templatesToUse);
     }
     log(INFO, '    Cloud Starter Name: ' + starterName);
     var stTempJson = {};
     for (var key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
-            if(starterTemplate == configApp.templates[key].displayName){
+            if (starterTemplate == configApp.templates[key].displayName) {
                 stTempJson = configApp.templates[key];
             }
 
@@ -70,7 +70,6 @@ async function newStarter(){
     log(INFO, 'Cloud Starter Template: ', stTempJson);
     return createNewStarter(starterName, stTempJson);
 }
-
 
 
 // function to ask a multiple choice question
@@ -110,24 +109,22 @@ askQuestionAPP = async function (question, type = 'input') {
 
 // Function to create a new starter, based on a template
 createNewStarter = function (name, template) {
-    return new Promise( async function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         var toDir = process.cwd() + '/' + name;
-        if(template.useGit){
+        if (template.useGit) {
             //use git for template
 
             getGit(template.git, toDir, template.gitTag);
 
 
             //remove git folder
-            if(template.removeGitFolder){
+            if (template.removeGitFolder) {
                 run('cd ' + toDir + ' && rm -rf .git');
             }
-            for(var gitPostCom of template.gitPostCommands){
-                console.log(gitPostCom);
+            for (var gitPostCom of template.gitPostCommands) {
+                // console.log(gitPostCom);
                 run('cd ' + toDir + ' && ' + gitPostCom);
             }
-
-
 
 
         } else {
@@ -138,10 +135,12 @@ createNewStarter = function (name, template) {
         const replace = require('replace-in-file');
         try {
             var results = {};
-            for(var rep of template.replacements){
+            var doReplace = false;
+            for (var rep of template.replacements) {
+                doReplace = true;
                 log(DEBUG, 'Replacing from: ' + rep.from + " to: " + rep.to);
                 var repTo = rep.to;
-                if(rep.to == "@name"){
+                if (rep.to == "@name") {
                     repTo = name;
                 }
                 const regex = new RegExp(rep.from, 'g');
@@ -157,17 +156,18 @@ createNewStarter = function (name, template) {
 
             //console.log('Replacement results:', results);
             // TODO: provide all replacement values at once
-            for(result of results){
-                console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')',  result.file);
+            if (doReplace) {
+                for (result of results) {
+                    console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')', result.file);
+                }
             }
             run('cd ' + name + ' && tcli -c');
             console.log('\x1b[34m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
-            console.log('\x1b[34m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "npm run serve_eu" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
+            console.log('\x1b[34m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
             //create a new tibco-cloud.properties file
 
-        }
-        catch (error) {
+        } catch (error) {
             log(ERROR, 'Error occurred:', error);
         }
         resolve();
@@ -235,15 +235,17 @@ run = function (command) {
 const INFO = 'INFO';
 const DEBUG = 'DEBUG';
 const ERROR = 'ERROR';
-const useDebug = (configApp.useDebug == 'true');
+// const useDebug = (configApp.useDebug == 'true');
 log = function (level, message) {
+    var useDebug = configApp.useDebug;
     if (!(level == DEBUG && !useDebug)) {
         var timeStamp = new Date();
         //console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-        console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
+        console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ', message);
     }
 }
 logO = function (level, message) {
+    var useDebug = configApp.useDebug;
     if (!(level == DEBUG && !useDebug)) {
         console.log(message);
     }
