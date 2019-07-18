@@ -11,7 +11,9 @@ function parseArgumentsIntoOptions(rawArgs) {
             '--debug': Boolean,
             '-d': '--debug',
             '--template': String,
-            '-t': '--template'
+            '-t': '--template',
+            '--createCP': Boolean,
+            '-c': '--createCP'
 
         },
         {
@@ -21,6 +23,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     return {
         template: args['--template'] || '',
         debug: args['--debug'] || false,
+        createCP: args['--createCP'] || false,
         task: args._[0] || ''
     };
 }
@@ -47,10 +50,15 @@ export async function cli(args) {
 
         // Test if tibco-cloud.properties exists
         const fs = require("fs");
-        if (!fs.existsSync(cwdir + '/' + propFileName)) {
-            console.log('No TIBCO Cloud Properties file found...');
-            var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New tibco-cloud.properties file', 'Nothing']);
-            // var cif = 'YES';
+        if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
+            var cif = '';
+            if(!options.createCP) {
+                console.log('No TIBCO Cloud Properties file found...');
+                var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New tibco-cloud.properties file', 'Nothing']);
+            }else{
+                cif = 'Create New tibco-cloud.properties file';
+            }
+
             switch (cif) {
                 case 'Create New tibco-cloud.properties file':
                     fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
@@ -100,23 +108,25 @@ export async function cli(args) {
         }
     }
 
-    // Start the specified Gulp Task
-    var gulp = require('gulp');
-    if(projectManagementMode) {
-        require(__dirname + '/manage-project');
-    }else{
-        require(__dirname + '/manage-application');
-    }
-    // TODO: pass in commandline options
-    // TODO: Maybe call run here to prevent two times asking of PW on new file
-    console.log('TASK: ' + options.task);
-    if (options.task == '') {
-        gulp.series('default')();
-    } else {
-        if (options.task == 'help') {
-            options.task = 'help-tcli';
+    if(!options.createCP) {
+        // Start the specified Gulp Task
+        var gulp = require('gulp');
+        if (projectManagementMode) {
+            require(__dirname + '/manage-project');
+        } else {
+            require(__dirname + '/manage-application');
         }
-        gulp.series(options.task)();
+        // TODO: pass in commandline options
+        // TODO: Maybe call run here to prevent two times asking of PW on new file
+        console.log('TASK: ' + options.task);
+        if (options.task == '') {
+            gulp.series('default')();
+        } else {
+            if (options.task == 'help') {
+                options.task = 'help-tcli';
+            }
+            gulp.series(options.task)();
+        }
     }
 }
 

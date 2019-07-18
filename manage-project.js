@@ -188,7 +188,7 @@ testWSU = function () {
         console.log('test...');
         var now = new Date();
         console.log(now);
-        var wsu = require('wsu');
+        var wsu = require('@tibco-tcstk/web-scaffolding-utility');
         console.log(wsu.API.getVersion());
 
         var id = 'ivXo63MVxNPpsoPzQ-D_bDBO7sSnu4fv5HJlqI-OiVgXfRgWVDSgH_NgC5ws94idTPRDgNqI5XJR0hNPKwHyAHtVjApNLj-nJB3w';

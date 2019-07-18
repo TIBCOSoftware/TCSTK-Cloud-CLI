@@ -5,7 +5,25 @@
       "enabled": true,
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": false,
-      "git" : "",
+      "replacements": [
+        {
+          "from": "tcstk-case-manager-app",
+          "to": "@name"
+        },
+        {
+          "from": "Case Manager",
+          "to": "@name"
+        }
+      ]
+    },"TCSTK-case-manager-app-git": {
+      "displayName": "Case Manager App (GIT)",
+      "enabled": true,
+      "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
+      "useGit": true,
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": ["rm package-lock.json"],
       "replacements": [
         {
           "from": "tcstk-case-manager-app",
@@ -17,20 +35,19 @@
         }
       ]
     },
-    "Template1": {
+    "Form-Template-Git": {
       "displayName": "First Template",
       "enabled": false,
-      "templateFolder": "/applicationTemplate/template1",
-      "useGit": false,
-      "git" : "",
+      "templateFolder": "",
+      "useGit": true,
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": ["rm package-lock.json"],
       "replacements": [
         {
-          "from": "@@ReplaceMe@@",
+          "from": "custom-form-app",
           "to": "@name"
-        },
-        {
-          "from": "is",
-          "to": "Hugo"
         }
       ]
     },
@@ -52,6 +69,6 @@
       ]
     }
   },
-  "useDebug": false
+  "useDebug": true
 }
 
