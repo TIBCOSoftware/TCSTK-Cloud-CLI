@@ -110,10 +110,26 @@ askQuestionAPP = async function (question, type = 'input') {
 
 // Function to create a new starter, based on a template
 createNewStarter = function (name, template) {
-    return new Promise( function (resolve, reject) {
+    return new Promise( async function (resolve, reject) {
         var toDir = process.cwd() + '/' + name;
         if(template.useGit){
-            //TODO: implament use git for template
+            //use git for template
+
+            getGit(template.git, toDir, template.gitTag);
+
+
+            //remove git folder
+            if(template.removeGitFolder){
+                run('cd ' + toDir + ' && rm -rf .git');
+            }
+            for(var gitPostCom of template.gitPostCommands){
+                console.log(gitPostCom);
+                run('cd ' + toDir + ' && ' + gitPostCom);
+            }
+
+
+
+
         } else {
             var fromDir = __dirname + template.templateFolder;
             // console.log('Copying template ' + template + ' From: ' + fromDir + ' To: ' + toDir);
@@ -122,7 +138,7 @@ createNewStarter = function (name, template) {
         const replace = require('replace-in-file');
         try {
             var results = {};
-            for(rep of template.replacements){
+            for(var rep of template.replacements){
                 log(DEBUG, 'Replacing from: ' + rep.from + " to: " + rep.to);
                 var repTo = rep.to;
                 if(rep.to == "@name"){
@@ -144,9 +160,12 @@ createNewStarter = function (name, template) {
             for(result of results){
                 console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')',  result.file);
             }
+            run('cd ' + name + ' && tcli -c');
+            console.log('\x1b[34m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
-            console.log('\x1b[34m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully...');
-            //TODO: provide command to create the tibco-cloud.properties file
+            console.log('\x1b[34m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "npm run serve_eu" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
+            //create a new tibco-cloud.properties file
+
         }
         catch (error) {
             log(ERROR, 'Error occurred:', error);
@@ -154,6 +173,30 @@ createNewStarter = function (name, template) {
         resolve();
     });
 }
+
+const git = require('gulp-git');
+//const simpleGit = require('simple-git')();
+//function to get git repo
+getGit = function (source, target, tag) {
+    //TODO: use git package
+    log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
+    // git clone --branch bp-baseV1 https://github.com/TIBCOSoftware/TCSDK-Angular
+    if (tag == null || tag == 'LATEST' || tag == '') {
+        //git.clone(source, target);
+        run('git clone "' + source + '" "' + target + '" ');
+        /*
+        git.clone(source, {args: target}, function (err) {
+            logO(ERROR, err);
+        });*/
+    } else {
+        run('git clone "' + source + '" "' + target + '" -b ' + tag);
+        /*
+        git.clone(source, {args: '--branch ' + tag + ' ' + target}, function (err) {
+            logO(ERROR, err);
+        });*/
+    }
+}
+
 
 const fseA = require('fs-extra');
 // Function to copy a directory
@@ -192,7 +235,7 @@ run = function (command) {
 const INFO = 'INFO';
 const DEBUG = 'DEBUG';
 const ERROR = 'ERROR';
-const useDebug = (configApp.Use_Debug == 'true');
+const useDebug = (configApp.useDebug == 'true');
 log = function (level, message) {
     if (!(level == DEBUG && !useDebug)) {
         var timeStamp = new Date();

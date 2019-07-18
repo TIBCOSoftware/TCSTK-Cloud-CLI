@@ -5,6 +5,7 @@
     "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
   },
   "dependencies": {
+    "@tibco-tcstk/web-scaffolding-utility": "^0.0.1",
     "arg": "^4.1.0",
     "child_process": "^1.0.2",
     "del": "^4.1.1",
