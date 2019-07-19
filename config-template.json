@@ -15,7 +15,8 @@
           "to": "@name"
         }
       ]
-    },"TCSTK-case-manager-app-git": {
+    },
+    "TCSTK-case-manager-app-git": {
       "displayName": "Case Manager App (GIT)",
       "enabled": true,
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
@@ -95,6 +96,6 @@
       ]
     }
   },
-  "useDebug": true
+  "useDebug": false
 }
 
