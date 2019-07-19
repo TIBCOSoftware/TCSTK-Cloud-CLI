@@ -480,8 +480,8 @@ askQuestion = async function (question, type = 'input') {
 }
 
 // function to update the tenant
-updateTenant = async function (propFile) {
-    var re = await askMultipleChoiceQuestion('Which initial tenant would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+updateRegion = async function (propFile) {
+    var re = await askMultipleChoiceQuestion('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     switch (re) {
         case 'US - Oregon':
             addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
@@ -562,6 +562,28 @@ obfuscatePW = function (toObfuscate){
     // TODO: use stronger obfuscation
     return '#' + Buffer.from(toObfuscate).toString('base64');
 }
+
+// Use WSU to generate TCI code
+wsuAddTci = function () {
+    return new Promise(async function (resolve, reject) {
+        // TODO: Implement
+        console.log('TODO: Implement');
+        resolve();
+    });
+}
+
+wsuListTci = function () {
+    return new Promise(async function (resolve, reject) {
+        var wsu = require('@tibco-tcstk/web-scaffolding-utility');
+        console.log(wsu.API.getVersion());
+        wsu.API.login(propsF.CloudLogin.clientID, propsF.CloudLogin.email, propsF.CloudLogin.pass);
+        // console.log(wsu.API.getArtefactList("TCI").createTable());
+        var afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
+        console.table(afList.createTable());
+        resolve();
+    });
+}
+
 
 
 // Log function

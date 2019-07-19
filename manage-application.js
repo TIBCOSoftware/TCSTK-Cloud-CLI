@@ -2,7 +2,7 @@
 
 const gulp = require('gulp');
 const inquirerA = require('inquirer');
-const configApp = require('./template-config.json');
+const configApp = require('./config-template.json');
 //var templatesToUse = ['Template1', 'Template2', 'TCSTK-case-manager-app'];
 var templatesToUse = [];
 
@@ -55,7 +55,7 @@ async function newStarter() {
         starterName = await askQuestionAPP('What is the name of your cloud starter ?');
     }
     if (starterTemplate == '') {
-        starterTemplate = await askMultipleChoiceQuestionAPP('Which template would you like to use for your cloud starter ?', templatesToUse);
+        starterTemplate = await askMultipleChoiceQuestionAPP('Which Template would you like to use for your cloud starter ?', templatesToUse);
     }
     log(INFO, '    Cloud Starter Name: ' + starterName);
     var stTempJson = {};
