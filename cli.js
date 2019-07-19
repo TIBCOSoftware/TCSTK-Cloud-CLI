@@ -64,7 +64,7 @@ export async function cli(args) {
                     fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
                     require(__dirname + '/manage-project');
                     // Select Tenant
-                    await updateTenant(propFileName);
+                    await updateRegion(propFileName);
                     // Get the AppName Automatically from the package.json
                     try {
                         if(fs.existsSync('package.json')) {
