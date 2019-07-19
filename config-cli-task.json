@@ -1,0 +1,137 @@
+{
+  "cliTasks": {
+    "show-cloud": {
+      "description": "Show Cloud Details",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-cloud"
+    },
+    "show-apps": {
+      "description": "Show Applications of LiveApps WebApps",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-apps"
+    },
+    "show-application-links": {
+      "description": "Show Links to Applications of LiveApps WebApps",
+      "enabled": false,
+      "gulpTask": "show-application-links"
+    },
+    "change-region": {
+      "description": "Change the Region in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "change-region"
+    },
+    "obfuscate": {
+      "description": "Obfuscate a password and put it in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "obfuscate"
+    },
+    "start": {
+      "description": "Start your local cloud starter project",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "start"
+    },
+    "build": {
+      "description": "Build your local cloud starter project",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "build"
+    },
+    "deploy": {
+      "description": "Deploy your local cloud starter project",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "deploy"
+    },
+    "publish": {
+      "description": "Publish your cloud starter project in the cloud",
+      "enabled": false,
+      "gulpTask": "publish"
+    },
+    "clean": {
+      "description": "Clean the temporary folders",
+      "enabled": true,
+      "internal": true,
+      "gulpTask": "clean"
+    },
+    "build-deploy-publish": {
+      "description": "Builds, Deploys and Publishes your local project to the cloud",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "build-deploy-publish"
+    },
+    "get-cloud-libs-from-git": {
+      "description": "Get's the cloud libraries from git",
+      "enabled": true,
+      "internal": true,
+      "gulpTask": "get-cloud-libs-from-git"
+    },
+    "inject-lib-sources": {
+      "description": "Enables your project for Cloud Library Debugging",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "inject-lib-sources"
+    },
+    "undo-lib-sources": {
+      "description": "Undo's the enabling for Cloud Library Debugging",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "undo-lib-sources"
+    },
+    "wsu-list-tci": {
+      "description": "[BETA] Get a list of TCI Services using the Web Scaffolding Utility(WSU)",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "wsu-list-tci"
+    },
+    "wsu-add-tci": {
+      "description": "[BETA] Add a TCI Service with the Web Scaffolding Utility(WSU) ",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "wsu-add-tci"
+    },
+    "schematic-add": {
+      "description": "Add a schematic into your project",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "schematic-add"
+    },
+
+
+    "q": {
+      "description": "Quit the console",
+      "enabled": true,
+      "internal": true,
+      "gulpTask": ""
+    },
+    "exit": {
+      "description": "Quit the console",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": ""
+    },
+    "quit": {
+      "description": "Quit the console",
+      "enabled": true,
+      "internal": true,
+      "gulpTask": ""
+    },
+    "help-tcli": {
+      "description": "Display's help message",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "help-tcli"
+    },
+    "repeat-last-task": {
+      "NOTE" : "MAKE SURE THIS TASK IS LAST IN THE LIST !!!",
+      "description": "Repeats the last executed task",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "repeat-last-task"
+    }
+  }
+}

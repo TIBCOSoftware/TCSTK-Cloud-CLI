@@ -96,12 +96,23 @@ function undoLibSources() {
 }
 
 // Function to change the tenant in the properties file
-changeTenant = function () {
+changeRegion = function () {
     return new Promise( async function (resolve, reject) {
-        await updateTenant(propFileNameGulp);
+        await updateRegion(propFileNameGulp);
         resolve();
     });
 };
+
+openingMessage = function() {
+    return new Promise(async function (resolve, reject) {
+        console.log('\x1b[35m%s\x1b[0m', '# |-------------------------------------------|');
+        console.log('\x1b[35m%s\x1b[0m', '# |  *** T I B C O    C L O U D   C L I ***   |');
+        console.log('\x1b[35m%s\x1b[0m', '# |            V' + version + '                         |');
+        console.log('\x1b[35m%s\x1b[0m', '# |-------------------------------------------|');
+        console.log('\x1b[35m%s\x1b[0m', '# |For more info see: https://cloud.tibco.com');
+        resolve();
+    });
+}
 
 
 helptcli = function () {
@@ -110,12 +121,14 @@ helptcli = function () {
         var cwdir = process.cwd();
         run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
         log('INFO', 'These are the available TIBCO CLOUD CLI Tasks:');
-        run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
-        console.log('# |-------------------------------------------|');
-        console.log('# |  *** T I B C O    C L O U D   C L I ***   |');
-        console.log('# |            V'+version+'                         |');
-        console.log('# |-------------------------------------------|');
-        console.log('# |For more info see: https://cloud.tibco.com');
+        // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
+        var cTsks = cliTaskConfig.cliTasks;
+        for(cliTask in cTsks){
+            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal) {
+                console.log('\x1b[34m%s\x1b[0m', cliTask + ':' , ' ' + cTsks[cliTask].description);
+            }
+            // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
+        }
 
         resolve();
     });
@@ -200,6 +213,9 @@ testWSU = function () {
         resolve();
     });
 }
+
+
+
 
 const getAppOwner = false;
 
@@ -336,17 +352,22 @@ gulp.task('test-call-service', testCallService);
 
 gulp.task('test', test);
 gulp.task('test-wsu', testWSU);
+gulp.task('wsu-add-tci', wsuAddTci);
+gulp.task('wsu-list-tci', wsuListTci);
+
 gulp.task('help-tcli', helptcli);
 helptcli.description = 'Displays this message';
 gulp.task('main', mainT);
+gulp.task('opening', openingMessage);
 
-gulp.task('default', gulp.series('help-tcli', 'main'));
+
+gulp.task('default', gulp.series('opening', 'main'));
 // gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
 
-gulp.task('change-tenant', changeTenant);
-changeTenant.description = 'Change the tenant to login to';
+gulp.task('change-region', changeRegion);
+changeRegion.description = 'Change the tenant to login to';
 
 gulp.task('obfuscate', obfuscate);
 obfuscate.description = 'Obfuscates a Password';
@@ -396,7 +417,7 @@ TODO: Additional Cloud CLI Capabilities
 
  */
 
-
+const cliTaskConfig = require('./config-cli-task.json');
 
 var globalLastCommand = 'help-tcli';
 var inquirer = require('inquirer');
@@ -405,6 +426,14 @@ promptGulp = function (stDir, cwdDir) {
     log('DEBUG', 'PromtGulp)           stDir dir: ' + stDir);
     log('DEBUG', 'PromtGulp) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
+        var cTsks = cliTaskConfig.cliTasks;
+        for(cliTask in cTsks){
+            // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
+            if(cTsks[cliTask].enabled) {
+                gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
+            }
+        }
+
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         inquirer.prompt([{
             type: 'autocomplete',
@@ -418,27 +447,46 @@ promptGulp = function (stDir, cwdDir) {
             }*/
         }]).then(function (answers) {
             //console.log(answers);
-            // console.log('Command: ' + answers.command);
-            var com = answers.command;
+            //console.log('Command: ' + answers.command);
+            let selectedTask = '';
+            let selectedTaskConfig = {};
+            for(cliTask in cTsks){
+                if(answers.command.substr(0, answers.command.indexOf('(') - 1)  == cliTask){
+                    selectedTask = cliTask;
+                    selectedTaskConfig = cTsks[cliTask];
+                }
+                //gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
+            }
+            // console.log('Selected Task: ' , selectedTask);
+            // console.log('Task Config: ' , selectedTaskConfig);
+
+            var com = selectedTask;
             if (com == 'q' || com == 'quit' || com == 'exit') {
-                console.log('Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
+                console.log('\x1b[34m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
             } else {
                 // Check if we need to repeat the last task
+                var comToInject = selectedTaskConfig.gulpTask;
                 if (com == 'repeat-last-task'){
                     log('INFO', 'Repeating Last Task: ' + globalLastCommand);
-                    com = globalLastCommand;
+                    comToInject = globalLastCommand;
+                }else {
+                    globalLastCommand = com;
                 }
-                globalLastCommand = com;
-                run('cd ' + stDir + ' && gulp ' + com + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + props.CloudLogin.pass + '"');
+                run('cd ' + stDir + ' && gulp ' + comToInject + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + props.CloudLogin.pass + '"');
                 return promptGulp(stDir, cwdDir);
             }
         });
     });
 }
 
+/*
+ [ '', '', '', '', '', '', '', '', '', '', '' , ''];
+*/
 
-const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-tenant', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
+
+// const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-region', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
+var gtasks = [];
 
 const _ = require('lodash');
 const fuzzy = require('fuzzy');
