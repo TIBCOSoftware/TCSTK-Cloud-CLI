@@ -96,7 +96,7 @@
     },
     "schematic-add": {
       "description": "Add a schematic into your project",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "schematic-add"
     },
