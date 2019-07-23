@@ -354,6 +354,8 @@ gulp.task('test', test);
 gulp.task('test-wsu', testWSU);
 gulp.task('wsu-add-tci', wsuAddTci);
 gulp.task('wsu-list-tci', wsuListTci);
+gulp.task('schematic-add', schematicAdd);
+
 
 gulp.task('help-tcli', helptcli);
 helptcli.description = 'Displays this message';
