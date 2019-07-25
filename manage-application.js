@@ -161,7 +161,7 @@ createNewStarter = function (name, template) {
                     console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')', result.file);
                 }
             }
-            run('cd ' + name + ' && tcli -c');
+            run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
             console.log('\x1b[34m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
             console.log('\x1b[34m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');

@@ -84,7 +84,7 @@
     },
     "wsu-list-tci": {
       "description": "[BETA] Get a list of TCI Services using the Web Scaffolding Utility(WSU)",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "gulpTask": "wsu-list-tci"
     },
