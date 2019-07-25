@@ -13,7 +13,9 @@ function parseArgumentsIntoOptions(rawArgs) {
             '--template': String,
             '-t': '--template',
             '--createCP': Boolean,
-            '-c': '--createCP'
+            '-c': '--createCP',
+            '--help': Boolean,
+            '-h':'--help'
 
         },
         {
@@ -23,6 +25,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     return {
         template: args['--template'] || '',
         debug: args['--debug'] || false,
+        help: args['--help'] || false,
         createCP: args['--createCP'] || false,
         task: args._[0] || ''
     };
@@ -41,6 +44,12 @@ export async function cli(args) {
         console.log('__dirname: ' + __dirname);
         console.log('__filename: ' + __filename);
     }
+    if(options.help){
+        helptcli();
+        process.exit(0);
+        //TODO: Reuse Help Function
+        //options.task = 'help-tcli';
+    }
     var projectManagementMode = true;
     if(options.task == 'new' || options.task == 'new-starter'){
         options.task = 'new-starter';
@@ -49,7 +58,7 @@ export async function cli(args) {
     }else {
 
         // Test if tibco-cloud.properties exists
-        const fs = require("fs");
+        const fs = require("file-system");
         if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
             var cif = '';
             if(!options.createCP) {
@@ -79,6 +88,10 @@ export async function cli(args) {
                     } catch (e) {
                         console.log(e)
                     }
+                    //Add used template to property file
+                    if(options.template){
+                        addOrUpdateProperty(propFileName, 'App_Type', options.template);
+                    }
                     // Client ID
                     log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
                     var cid = await askQuestion('What is your Client ID ?');
@@ -88,7 +101,9 @@ export async function cli(args) {
                     addOrUpdateProperty(propFileName, 'CloudLogin.email', email);
                     log('INFO', 'Your password will be obfuscated, but is not unbreakable (press enter to skip and enter manually later)');
                     var pass = await askQuestion('What is your Password ?', 'password');
-                    addOrUpdateProperty(propFileName, 'CloudLogin.pass', obfuscatePW(pass));
+                    if(pass != '') {
+                        addOrUpdateProperty(propFileName, 'CloudLogin.pass', obfuscatePW(pass));
+                    }
                     break;
                 case 'Create New Cloud Starter':
                     console.log('Creating new Cloud starter...');
@@ -149,4 +164,32 @@ async function askMultipleChoiceQuestionCLI(question, options) {
     return re;
 }
 
-
+// Display commandline usage
+function helptcli() {
+        /*
+        console.log('GULP DETAILS:');
+        var cwdir = process.cwd();
+        run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');*/
+        // TODO: Display the version from generic config
+        console.log('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)');
+        console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
+        console.log('new: Create new Cloud starter. Usage] tcli new <name> [--template(-t)] <template-to-use>');
+        console.log('   --debug: Display debug information.');
+        console.log('--createCP: Create a new tibco-cloud.properties file.');
+        console.log('    --help: display this help ');
+        console.log('These are the available TIBCO CLOUD CLI Tasks:');
+        // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
+        const cliTaskConfigCLI = require('./config-cli-task.json');
+        var cTsks = cliTaskConfigCLI.cliTasks;
+        for(var cliTask in cTsks){
+            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal) {
+                var str = cliTask;
+                var x = 20 - cliTask.length;
+                for (var i = 0; i < x; i++){
+                    str = ' ' + str;
+                }
+                console.log('\x1b[34m%s\x1b[0m', str + ':' , ' ' + cTsks[cliTask].description);
+            }
+            // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
+        }
+}

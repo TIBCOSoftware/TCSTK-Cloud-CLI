@@ -2,7 +2,7 @@
   "templates": {
     "TCSTK-case-manager-app": {
       "displayName": "Case Manager App",
-      "enabled": true,
+      "enabled": false,
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": false,
       "replacements": [

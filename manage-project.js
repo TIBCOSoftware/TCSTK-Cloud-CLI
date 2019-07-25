@@ -1,15 +1,13 @@
 // This file manages all the tasks within a project
-
-
 const gulp = require('gulp');
 //import functions
 require('./build/functions');
 // Read TIBCO cloud properties...
 const PropertiesReader = require('properties-reader');
 const propFileNameGulp = 'tibco-cloud.properties';
-const properties = PropertiesReader('tibco-cloud.properties');
+const properties = PropertiesReader(propFileNameGulp);
 const props = properties.path();
-const version = '0.2.0';
+const version = '0.3.2';
 
 // Function to build the cloud starter
 function build() {
@@ -61,15 +59,16 @@ function injectLibSources() {
         copyFile('./package.json', './backup/package-Before-Debug(' + now + ').json');
         copyFile('./tsconfig.debug.json', './tsconfig.json');
         copyFile('./angular.debug.json', './angular.json');
-        copyFile('./package.debug.json', './package.json');
+        //copyFile('./package.debug.json', './package.json');
+        run('npm uninstall ' + props.TCSTDebugPackages);
         //do NPM install
-        npmInstall('./');
+        //npmInstall('./');
         npmInstall('./', 'lodash-es');
         log('INFO', 'Now you can debug the cloud library sources in your browser !!');
         resolve();
     });
 }
-
+const packagesForLibSources = '';
 // Function to go back to the compiled versions of the libraries
 function undoLibSources() {
     return new Promise(function (resolve, reject) {
@@ -83,14 +82,16 @@ function undoLibSources() {
         copyFile('./package.json', './backup/package-Before-Build(' + now + ').json');
         copyFile('./tsconfig.build.json', './tsconfig.json');
         copyFile('./angular.build.json', './angular.json');
-        copyFile('./package.build.json', './package.json');
+        // copyFile('./package.build.json', './package.json');
         //Delete Project folder
         //FIX: Just delete those folders imported...
         deleteFolder('./projects/tibco-tcstk/tc-core-lib');
         deleteFolder('./projects/tibco-tcstk/tc-forms-lib');
         deleteFolder('./projects/tibco-tcstk/tc-liveapps-lib');
         deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
-        npmInstall('./');
+        //FIX: just install those npm packages (instead of removing the entire package.json file...)
+        run('npm install ' + props.TCSTDebugPackages);
+        // npmInstall('./');
         resolve();
     });
 }
@@ -167,196 +168,25 @@ mainT = function () {
     });
 };
 
-
-testCallService = function() {
-    return new Promise( async function (resolve, reject) {
-        const lCookie = cLogin();
-        const sc = require('sync-rest-client');
-        const SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger';
-        const responseSW = sc.get(SwaggerURL, {
-            headers: {
-                "accept": "application/json, text/plain, */*",
-                "authority": "integration.cloud.tibco.com",
-                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-            }
-        });
-        console.log(responseSW.body);
-
-        // EXAMPLE TO CALL THE SERVICE
-        const Swagger = require('swagger-client');
-        Swagger({spec: responseSW.body}).then((client) => {
-            console.log('API: ', client.apis);
-            client.apis.default.getNumber().then((result) => {
-                    console.log('Result: ', result.body.number);
-                }
-            );
-            resolve();
-        });
-    });
-}
-
-
-testWSU = function () {
-    return new Promise(async function (resolve, reject) {
-        console.log('test...');
-        var now = new Date();
-        console.log(now);
-        var wsu = require('@tibco-tcstk/web-scaffolding-utility');
-        console.log(wsu.API.getVersion());
-
-        var id = 'ivXo63MVxNPpsoPzQ-D_bDBO7sSnu4fv5HJlqI-OiVgXfRgWVDSgH_NgC5ws94idTPRDgNqI5XJR0hNPKwHyAHtVjApNLj-nJB3w';
-        var user = 'segliveapps@outlook.com';
-        var pass = 'Tibco123.';
-        wsu.API.login(id,user,pass);
-        console.log(wsu.API.getArtefactList("TCI"));
-
-        resolve();
-    });
-}
-
-
-
-
 const getAppOwner = false;
 
 test = function () {
     return new Promise( async function (resolve, reject) {
-        console.log('test...');
+        console.log('Test...');
         var now = new Date();
         console.log(now);
-
-
-        const lCookie = cLogin();
-        const sc = require('sync-rest-client');
-
-        //const response = sc.get('https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger', {
-        const response = sc.get('https://integration.cloud.tibco.com/domain/v1/applications?scope=all', {
-            headers: {
-                "accept": "application/json, text/plain, */*",
-                "authority": "integration.cloud.tibco.com",
-                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-            }
-        });
-
-
-
-
-
-        var TCI_Applications = response.body.applications;
-
-        var apps = {};
-        var appNames = new Array();
-        for (var app in TCI_Applications) {
-
-
-            var appTemp = {};
-            var appN = parseInt(app) + 1;
-            //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
-            var thisApp = TCI_Applications[app];
-
-
-            appTemp['APP NAME'] = thisApp.applicationName;
-            if(getAppOwner) {
-                // console.log(thisApp.id);
-                var responseApp = sc.get('https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/' + thisApp.id, {
-                    headers: {
-                        "accept": "application/json, text/plain, */*",
-                        "authority": "integration.cloud.tibco.com",
-                        "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-                    }
-                });
-                process.stdout.clearLine();
-                process.stdout.cursorTo(0);
-                process.stdout.write("Processing App: (" + appN + '/' + TCI_Applications.length + ')...');
-                // console.log(responseApp.body.ownerName);
-                appTemp['OWNER'] = responseApp.body.ownerName;
-            }
-            appNames.push(thisApp.applicationName + ' ['+ thisApp.id + ']');
-            appTemp['SANDBOX'] = thisApp.sandboxName;
-            appTemp['TYPE'] = thisApp.appType;
-            var updated = new Date(thisApp.lastUpdatedTime);
-            var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-            if(!getAppOwner) {
-                appTemp['UPDATED'] = updated.toLocaleDateString("en-US", options);
-            }
-            apps[appN] = appTemp;
-
-        }
-        //logO(INFO,apps);
-        console.table(apps);
-
-        // Select an App
-        askMultipleChoiceQuestionSearch('Which app do you want to generate the source for ? ', appNames).then( (selectedApp) => {
-            console.log('Selected App: ' + selectedApp);
-            var matches = selectedApp.match(/\[(.*?)\]/);
-
-            if (matches) {
-                var selectedID = matches[1];
-            }
-            console.log('Selected ID: ' + selectedID);
-            var SwaggerURL = '';
-
-            for (var app in TCI_Applications) {
-                var thisApp = TCI_Applications[app];
-                if(thisApp.id == selectedID){
-                    console.log('Application Details: ' , thisApp);
-                    // TODO: Select Right endpoint
-                    SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/'+ thisApp.sandboxName +'/applications/'+thisApp.id+'/endpoints/'+thisApp.endpointIds[0]+'/swagger';
-                }
-
-            }
-            // https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy
-            console.log('Swagger URL: ' + SwaggerURL);
-            //const SwaggerURL = 'https://integration.cloud.tibco.com/domain/v1/sandboxes/MyDefaultSandbox/applications/swjmdg2ejqafrb72j5bjqpyaf3wxvtmy/endpoints/5xzfupsbcgwbfsslyrzlsu6swvpbwdpq/swagger';
-            const responseSW = sc.get(SwaggerURL, {
-                headers: {
-                    "accept": "application/json, text/plain, */*",
-                    "authority": "integration.cloud.tibco.com",
-                    "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-                }
-            });
-
-            var myJson = JSON.stringify(responseSW.body);
-            deleteFolder('swaggerTmp').then(() => {
-                run('mkdir swaggerTmp');
-                var fs = require('fs');
-                fs.writeFileSync('swaggerTmp/swagger.json', myJson, 'utf8');
-                console.log('Defininition: ', myJson);
-                run('cd swaggerTmp &&  ng-swagger-gen -i swagger.json -c ./../ng-swagger-gen-config.json');
-            });
-
-
-
-        });
-
-
-        // Download the JSON
-
-        // Run the creator of the sources
-
-
-
-
-
-
-
-
         resolve();
-
     });
 };
 
 
 
-gulp.task('test-call-service', testCallService);
-
+//gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
-gulp.task('test-wsu', testWSU);
+//gulp.task('test-wsu', testWSU);
 gulp.task('wsu-add-tci', wsuAddTci);
 gulp.task('wsu-list-tci', wsuListTci);
 gulp.task('schematic-add', schematicAdd);
-
-
 gulp.task('help-tcli', helptcli);
 helptcli.description = 'Displays this message';
 gulp.task('main', mainT);
@@ -420,6 +250,16 @@ TODO: Additional Cloud CLI Capabilities
  */
 
 const cliTaskConfig = require('./config-cli-task.json');
+// Comes from prop file now...
+// const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-region', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
+var gtasks = [];
+var cTsks = cliTaskConfig.cliTasks;
+for(cliTask in cTsks){
+    // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
+    if(cTsks[cliTask].enabled) {
+        gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
+    }
+}
 
 var globalLastCommand = 'help-tcli';
 var inquirer = require('inquirer');
@@ -428,14 +268,6 @@ promptGulp = function (stDir, cwdDir) {
     log('DEBUG', 'PromtGulp)           stDir dir: ' + stDir);
     log('DEBUG', 'PromtGulp) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
-        var cTsks = cliTaskConfig.cliTasks;
-        for(cliTask in cTsks){
-            // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
-            if(cTsks[cliTask].enabled) {
-                gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
-            }
-        }
-
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         inquirer.prompt([{
             type: 'autocomplete',
@@ -482,13 +314,7 @@ promptGulp = function (stDir, cwdDir) {
     });
 }
 
-/*
- [ '', '', '', '', '', '', '', '', '', '', '' , ''];
-*/
 
-
-// const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-region', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
-var gtasks = [];
 
 const _ = require('lodash');
 const fuzzy = require('fuzzy');
