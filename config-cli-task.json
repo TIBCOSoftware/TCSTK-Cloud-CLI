@@ -58,11 +58,11 @@
       "internal": true,
       "gulpTask": "clean"
     },
-    "build-deploy-publish": {
-      "description": "Builds, Deploys and Publishes your local project to the cloud",
+    "build-deploy": {
+      "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
-      "gulpTask": "build-deploy-publish"
+      "gulpTask": "build-deploy"
     },
     "get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
