@@ -130,7 +130,7 @@
       "NOTE" : "MAKE SURE THIS TASK IS LAST IN THE LIST !!!",
       "description": "Repeats the last executed task",
       "enabled": true,
-      "internal": false,
+      "internal": true,
       "gulpTask": "repeat-last-task"
     }
   }
