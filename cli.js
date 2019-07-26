@@ -111,7 +111,7 @@ export async function cli(args) {
                     projectManagementMode = false;
                     break;
                 default:
-                    console.log('Not creating properties file, Exiting...');
+                    console.log('\x1b[34m%s\x1b[0m', "Ok I won't do anything :-(  ...");
                     process.exit();
 
             }
