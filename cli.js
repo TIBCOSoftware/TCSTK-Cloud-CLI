@@ -16,7 +16,6 @@ function parseArgumentsIntoOptions(rawArgs) {
             '-c': '--createCP',
             '--help': Boolean,
             '-h':'--help'
-
         },
         {
             argv: rawArgs.slice(2),
@@ -171,7 +170,7 @@ function helptcli() {
         var cwdir = process.cwd();
         run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');*/
         // TODO: Display the version from generic config
-        console.log('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)');
+        console.log('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]');
         console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
         console.log('new: Create new Cloud starter. Usage] tcli new <name> [--template(-t)] <template-to-use>');
         console.log('   --debug: Display debug information.');
