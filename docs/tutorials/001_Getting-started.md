@@ -120,7 +120,7 @@ npm install -g @tibco-tcstk/cloud-cli
 
 #### 3.) Test the command line
 
-Run the commande to see if it responds
+Run the command to see if it responds
 
 
 ```console
@@ -128,6 +128,19 @@ tcli
 ```
 
 You should get a response like : 
+    
+ ![](002_empty-context.png)
+ 
+ You can navigate through all the commands by either : 
+ - Using the up and down keys
+ - Type the beginning of the command you want to use 
+ 
+ And finally, type the "enter" key to run that command.
+ 
+ alernatively you could try something like 
+ 
+ ```console
+ tcli --help
+ ```
 
- ![](001_getting_started_command_output.png)
 

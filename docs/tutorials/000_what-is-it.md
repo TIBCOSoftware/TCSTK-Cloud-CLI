@@ -4,7 +4,7 @@ Here you will find a description of what is TCLI command line
 
 ### Goal
 
-TCLI command line is a tool that will help you, as a developper, for using all the TIBCO Cloud Starter suite in order to be efficient and quick.
+TCLI command line is a tool that will help you, as a developer, for using all the TIBCO Cloud Starter suite in order to be efficient and quick.
 
 It can serve a lots of purpose from Application Generation , Test to Deployment
 
@@ -15,7 +15,7 @@ Behind the scene, it will use technologies such as :
 - Angular
 - Gulp
 - NPM
-- Schematic (TODO : @HUGO to confirm)
+- Schematic
 
 
 
