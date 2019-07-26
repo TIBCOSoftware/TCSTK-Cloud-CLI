@@ -23,6 +23,7 @@ function deploy() {
     return new Promise(async function (resolve, reject) {
         await uploadApp(props.App_Name);
         log('INFO', "DONE DEPLOYING: " + props.App_Name);
+        log('INFO', "LOCATION: " + props.Cloud_URL + "webresource/apps/" + props.App_Name + "/index.html");
         resolve();
 
     });
@@ -217,7 +218,7 @@ gulp.task('deploy', deploy);
 deploy.description = 'Deploys your application to the cloud.';
 gulp.task('publish', publish);
 publish.description = 'Publishes the latest version of your application.';
-gulp.task('build-deploy-publish', gulp.series('build', 'deploy', 'publish'));
+gulp.task('build-deploy', gulp.series('build', 'deploy'));
 
 gulp.task('get-cloud-libs-from-git', getCLgit);
 getCLgit.description = 'Get the library sources from GIT';
