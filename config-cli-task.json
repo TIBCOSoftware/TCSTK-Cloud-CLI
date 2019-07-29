@@ -2,7 +2,7 @@
   "cliTasks": {
    "test": {
       "description": "Run Test",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "gulpTask": "test",
       "availableOnOs": ["win32","darwin"],
@@ -125,7 +125,7 @@
       "enabled": true,
       "internal": false,
       "gulpTask": "schematic-add",
-      "availableOnOs": ["darwin"]
+      "availableOnOs": ["all"]
     },
 
 
