@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "scripts": {
     "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
   },
