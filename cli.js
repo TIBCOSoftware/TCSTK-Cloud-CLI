@@ -30,6 +30,8 @@ function parseArgumentsIntoOptions(rawArgs) {
     };
 }
 
+export var isWindows = process.platform == 'win32';
+
 // Main function
 export async function cli(args) {
     let options = parseArgumentsIntoOptions(args);
@@ -42,6 +44,9 @@ export async function cli(args) {
         console.log('Current Working Directory: ' + cwdir);
         console.log('__dirname: ' + __dirname);
         console.log('__filename: ' + __filename);
+        console.log(' Platform: ' + process.platform);
+        console.log('isWindows: ' + isWindows);
+
     }
     if(options.help){
         helptcli();

@@ -25,6 +25,7 @@
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": ["rm package-lock.json"],
+      "gitPostCommandsWin": ["del package-lock.json"],
       "replacements": [
         {
           "from": "tcstk-case-manager-app",
@@ -45,6 +46,7 @@
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": ["rm package-lock.json"],
+      "gitPostCommandsWin": ["del package-lock.json"],
       "replacements": [
         {
           "from": "custom-form-app",
@@ -61,6 +63,7 @@
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": ["rm package-lock.json"],
+      "gitPostCommandsWin": ["del package-lock.json"],
       "replacements": []
     },
     "process-discovery-replace": {
@@ -72,6 +75,7 @@
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": ["rm package-lock.json"],
+      "gitPostCommandsWin": ["del package-lock.json"],
       "replacements": [
         {
           "from": "process-discovery-app",
