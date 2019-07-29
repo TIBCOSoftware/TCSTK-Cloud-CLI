@@ -121,6 +121,7 @@ buildCloudStarterZip = function (cloudStarter) {
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
         //copyFile('./tmp/' + cloudStarter + '/tsconfig.build.json', './tmp/' + cloudStarter + '/tsconfig.json');
         run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
+        log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
         resolve();
     });
 }
