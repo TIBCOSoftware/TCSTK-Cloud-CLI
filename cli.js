@@ -1,4 +1,5 @@
 // File to manage the CLI Interaction
+require('./build/common-functions');
 import arg from 'arg';
 
 const propFileName = 'tibco-cloud.properties';
@@ -30,7 +31,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     };
 }
 
-export var isWindows = process.platform == 'win32';
+const isWindows = process.platform == 'win32';
 
 // Main function
 export async function cli(args) {
@@ -46,7 +47,6 @@ export async function cli(args) {
         console.log('__filename: ' + __filename);
         console.log(' Platform: ' + process.platform);
         console.log('isWindows: ' + isWindows);
-
     }
     if(options.help){
         helptcli();
@@ -58,9 +58,7 @@ export async function cli(args) {
     if(options.task == 'new' || options.task == 'new-starter'){
         options.task = 'new-starter';
         var projectManagementMode = false;
-
     }else {
-
         // Test if tibco-cloud.properties exists
         const fs = require("file-system");
         if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
@@ -71,7 +69,6 @@ export async function cli(args) {
             }else{
                 cif = 'Create New tibco-cloud.properties file';
             }
-
             switch (cif) {
                 case 'Create New tibco-cloud.properties file':
                     fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
@@ -116,9 +113,8 @@ export async function cli(args) {
                     projectManagementMode = false;
                     break;
                 default:
-                    console.log('\x1b[34m%s\x1b[0m', "Ok I won't do anything :-(  ...");
+                    console.log('\x1b[36m%s\x1b[0m', "Ok I won't do anything :-(  ...");
                     process.exit();
-
             }
         } else {
             if (options.debug) {
@@ -186,13 +182,23 @@ function helptcli() {
         const cliTaskConfigCLI = require('./config-cli-task.json');
         var cTsks = cliTaskConfigCLI.cliTasks;
         for(var cliTask in cTsks){
-            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal) {
+        	var allowed = false;
+        	if(cTsks[cliTask].availableOnOs != null){
+        		//console.log('cTsks[cliTask].availableOnOs:' + cTsks[cliTask].availableOnOs);
+        		for(var allowedOS of cTsks[cliTask].availableOnOs){
+        			//console.log('OS:' + allowedOS);
+        			if(allowedOS == process.platform || allowedOS == 'all'){
+        				allowed = true;
+        			}
+        		}
+        	}
+            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
                 var str = cliTask;
-                var x = 20 - cliTask.length;
+                var x = 30 - cliTask.length;
                 for (var i = 0; i < x; i++){
                     str = ' ' + str;
                 }
-                console.log('\x1b[34m%s\x1b[0m', str + ':' , ' ' + cTsks[cliTask].description);
+                console.log('\x1b[36m%s\x1b[0m', str + ':' , ' ' + cTsks[cliTask].description);
             }
             // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
         }

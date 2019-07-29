@@ -1,104 +1,131 @@
 {
   "cliTasks": {
+   "test": {
+      "description": "Run Test",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "test",
+      "availableOnOs": ["win32","darwin"],
+      "availableOnTemplate": ["all"]
+    },
     "show-cloud": {
       "description": "Show Cloud Details",
       "enabled": true,
       "internal": false,
-      "gulpTask": "show-cloud"
+      "gulpTask": "show-cloud",
+      "availableInOs": ["all"]
     },
     "show-apps": {
       "description": "Show Applications of LiveApps WebApps",
       "enabled": true,
       "internal": false,
-      "gulpTask": "show-apps"
+      "gulpTask": "show-apps",
+      "availableOnOs": ["all"]
     },
     "show-application-links": {
       "description": "Show Links to Applications of LiveApps WebApps",
-      "enabled": false,
-      "gulpTask": "show-application-links"
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-application-links",
+      "availableOnOs": ["all"]
     },
     "change-region": {
       "description": "Change the Region in the cloud-properties file",
       "enabled": true,
       "internal": false,
-      "gulpTask": "change-region"
+      "gulpTask": "change-region",
+      "availableOnOs": ["darwin"]
     },
     "obfuscate": {
       "description": "Obfuscate a password and put it in the cloud-properties file",
       "enabled": true,
       "internal": false,
-      "gulpTask": "obfuscate"
+      "gulpTask": "obfuscate",
+      "availableOnOs": ["darwin"]
     },
     "start": {
       "description": "Start your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "start"
+      "gulpTask": "start",
+      "availableOnOs": ["all"]
     },
     "build": {
       "description": "Build your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "build"
+      "gulpTask": "build",
+      "availableOnOs": ["all"]
     },
     "deploy": {
       "description": "Deploy your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "deploy"
+      "gulpTask": "deploy",
+      "availableOnOs": ["all"]
     },
     "publish": {
       "description": "Publish your cloud starter project in the cloud",
       "enabled": false,
-      "gulpTask": "publish"
+      "internal": false,
+      "gulpTask": "publish",
+      "availableOnOs": ["all"]
     },
     "clean": {
       "description": "Clean the temporary folders",
       "enabled": true,
       "internal": true,
-      "gulpTask": "clean"
+      "gulpTask": "clean",
+      "availableOnOs": ["all"]
     },
     "build-deploy": {
       "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
-      "gulpTask": "build-deploy"
+      "gulpTask": "build-deploy",
+      "availableOnOs": ["all"]
     },
     "get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
       "enabled": true,
       "internal": true,
-      "gulpTask": "get-cloud-libs-from-git"
+      "gulpTask": "get-cloud-libs-from-git",
+      "availableOnOs": ["darwin"]
     },
     "inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
-      "gulpTask": "inject-lib-sources"
+      "gulpTask": "inject-lib-sources",
+      "availableOnOs": ["darwin"]
     },
     "undo-lib-sources": {
       "description": "Undo's the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
-      "gulpTask": "undo-lib-sources"
+      "gulpTask": "undo-lib-sources",
+      "availableOnOs": ["darwin"]
     },
     "wsu-list-tci": {
       "description": "[BETA] Get a list of TCI Services using the Web Scaffolding Utility(WSU)",
       "enabled": false,
       "internal": false,
-      "gulpTask": "wsu-list-tci"
+      "gulpTask": "wsu-list-tci",
+      "availableOnOs": ["darwin"]
     },
     "wsu-add-tci": {
       "description": "[BETA] Add a TCI Service with the Web Scaffolding Utility(WSU) ",
       "enabled": false,
       "internal": false,
-      "gulpTask": "wsu-add-tci"
+      "gulpTask": "wsu-add-tci",
+      "availableOnOs": ["darwin"]
     },
     "schematic-add": {
       "description": "Add a schematic into your project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "schematic-add"
+      "gulpTask": "schematic-add",
+      "availableOnOs": ["darwin"]
     },
 
 
@@ -106,32 +133,37 @@
       "description": "Quit the console",
       "enabled": true,
       "internal": true,
-      "gulpTask": ""
+      "gulpTask": "",
+      "availableOnOs": ["all"]
     },
     "exit": {
       "description": "Quit the console",
       "enabled": true,
       "internal": false,
-      "gulpTask": ""
+      "gulpTask": "",
+      "availableOnOs": ["all"]
     },
     "quit": {
       "description": "Quit the console",
       "enabled": true,
       "internal": true,
-      "gulpTask": ""
+      "gulpTask": "",
+      "availableOnOs": ["all"]
     },
-    "help-tcli": {
+    "help": {
       "description": "Display's help message",
       "enabled": true,
       "internal": false,
-      "gulpTask": "help-tcli"
+      "gulpTask": "help-tcli",
+      "availableOnOs": ["all"]
     },
     "repeat-last-task": {
       "NOTE" : "MAKE SURE THIS TASK IS LAST IN THE LIST !!!",
       "description": "Repeats the last executed task",
       "enabled": true,
       "internal": true,
-      "gulpTask": "repeat-last-task"
+      "gulpTask": "repeat-last-task",
+      "availableOnOs": ["all"]
     }
   }
 }
