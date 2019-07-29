@@ -4,16 +4,14 @@ const syncClient = require('sync-rest-client');
 const git = require('gulp-git');
 const fs = require('file-system');
 const fse = require('fs-extra');
-// const rimraf = require("rimraf");
 const del = require('del');
 const PropertiesReader = require('properties-reader');
 const propertiesF = PropertiesReader('tibco-cloud.properties');
 const propsF = propertiesF.path();
-
+const isWindows = process.platform == 'win32';
 
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
-    //var dir = './tmp';
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
@@ -480,9 +478,14 @@ askQuestion = async function (question, type = 'input') {
     return re;
 }
 
+testFunction = async function (propFile) {
+    var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+    return re;
+}
+
 // function to update the tenant
 updateRegion = async function (propFile) {
-    var re = await askMultipleChoiceQuestion('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+    var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     switch (re) {
         case 'US - Oregon':
             addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
@@ -532,10 +535,15 @@ checkPW = function () {
 
 var readline = require('readline');
 var Writable = require('stream').Writable;
-
+/*
 // Function to obfuscate a password
 obfuscate = function () {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
+    	
+    	var password = await askQuestion('Please provide the password...', 'password');
+    	console.log('\nObfuscated password is is: ' + obfuscatePW(password));
+    	resolve();
+    	/*
         var mutableStdout = new Writable({
             write: function (chunk, encoding, callback) {
                 if (!this.muted)
@@ -555,9 +563,10 @@ obfuscate = function () {
             rl.close();
             resolve();
         });
-        mutableStdout.muted = true;
+        mutableStdout.muted = true;* /
     });
 }
+*/
 
 obfuscatePW = function (toObfuscate){
     // TODO: use stronger obfuscation

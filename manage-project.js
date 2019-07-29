@@ -1,13 +1,15 @@
 // This file manages all the tasks within a project
 const gulp = require('gulp');
 //import functions
-require('./build/functions');
+require('./build/common-functions');
+require('./build/project-functions');
 // Read TIBCO cloud properties...
 const PropertiesReader = require('properties-reader');
 const propFileNameGulp = 'tibco-cloud.properties';
 const properties = PropertiesReader(propFileNameGulp);
 const props = properties.path();
-const version = '0.3.2';
+const version = '1.0.0';
+const isWindows = process.platform == 'win32';
 
 // Function to build the cloud starter
 function build() {
@@ -126,10 +128,24 @@ helptcli = function () {
         // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
         var cTsks = cliTaskConfig.cliTasks;
         for(cliTask in cTsks){
-            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal) {
-                console.log('\x1b[34m%s\x1b[0m', cliTask + ':' , ' ' + cTsks[cliTask].description);
+        	var allowed = false;
+        	if(cTsks[cliTask].availableOnOs != null){
+        		for(allowedOS of cTsks[cliTask].availableOnOs){
+        			// console.log('OS:' + allowedOS);
+        			if(allowedOS == process.platform || allowedOS == 'all'){
+        				allowed = true;
+        			}
+        		}
+        	}
+            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
+            	 var str = cliTask;
+                 var x = 30 - cliTask.length;
+                 for (var i = 0; i < x; i++){
+                     str = ' ' + str;
+                 }
+                console.log('\x1b[36m%s\x1b[0m', str + ':' , ' ' + cTsks[cliTask].description);
             }
-            // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
+            // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')'); \x1b[35m
         }
 
         resolve();
@@ -158,7 +174,8 @@ mainT = function () {
         console.log('[TIBCO CLOUD CLI - V '+version+'] ("exit" to quit / "help" to display tasks)');
         // checkPW();
         resolve();
-        var appRoot = process.env.PWD;
+        // var appRoot = process.env.PWD;
+        var appRoot = process.cwd();
         if (props.CloudLogin.pass == ''){
             // When password is empty ask it manually for the session.
             var pass = await askQuestion('Please provide your password: ', 'password');
@@ -176,9 +193,27 @@ test = function () {
         console.log('Test...');
         var now = new Date();
         console.log(now);
+        var answer = await askQuestion('Hoe gaat het ?');
+        console.log(answer);
+        var answer = await askQuestion('Hoe gaat het ?', 'password');
+        console.log(answer);
+        var answer = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+        console.log(answer);
+        var answer = await askMultipleChoiceQuestion('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+        console.log(answer);
+        console.log(testFunction());
         resolve();
     });
 };
+
+obfuscate = function () {
+    return new Promise(async function (resolve, reject) {
+    	
+    	var password = await askQuestion('Please provide the password...', 'password');
+    	console.log('\nObfuscated password is is: ' + obfuscatePW(password));
+    	resolve();
+    });
+}
 
 
 
@@ -254,10 +289,22 @@ const cliTaskConfig = require('./config-cli-task.json');
 // Comes from prop file now...
 // const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-region', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
 var gtasks = [];
+//var gtasks = determineEnabledTasks(cliTaskConfig);
+
+
 var cTsks = cliTaskConfig.cliTasks;
 for(cliTask in cTsks){
     // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
-    if(cTsks[cliTask].enabled) {
+	var allowed = false;
+	if(cTsks[cliTask].availableOnOs != null){
+		for(allowedOS of cTsks[cliTask].availableOnOs){
+			// console.log('OS:' + allowedOS);
+			if(allowedOS == process.platform || allowedOS == 'all'){
+				allowed = true;
+			}
+		}
+	}
+    if(cTsks[cliTask].enabled && allowed) {
         gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
     }
 }
@@ -297,7 +344,7 @@ promptGulp = function (stDir, cwdDir) {
 
             var com = selectedTask;
             if (com == 'q' || com == 'quit' || com == 'exit') {
-                console.log('\x1b[34m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
+                console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
             } else {
                 // Check if we need to repeat the last task
