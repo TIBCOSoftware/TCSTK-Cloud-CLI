@@ -13,7 +13,7 @@
       "enabled": true,
       "internal": false,
       "gulpTask": "show-cloud",
-      "availableInOs": ["all"]
+      "availableOnOs": ["all"]
     },
     "show-apps": {
       "description": "Show Applications of LiveApps WebApps",
