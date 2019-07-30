@@ -301,10 +301,12 @@ for(cliTask in cTsks){
 			// console.log('OS:' + allowedOS);
 			if(allowedOS == process.platform || allowedOS == 'all'){
 				allowed = true;
+				// console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
 			}
 		}
 	}
     if(cTsks[cliTask].enabled && allowed) {
+    	// console.log('Adding: ' + cliTask);
         gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
     }
 }
