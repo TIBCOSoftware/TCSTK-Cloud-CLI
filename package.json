@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "0.4.2",
+  "version": "0.4.6",
   "scripts": {
     "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
   },
@@ -16,8 +16,8 @@
     "file-system": "^2.2.2",
     "fs-extra": "^8.1.0",
     "fuzzy": "^0.1.3",
-    "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
+    "gulp": "^4.0.2",
     "gulp-cli": "^2.2.0",
     "gulp-git": "^2.9.0",
     "inquirer": "^6.5.0",
@@ -30,6 +30,9 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {},
+  "peerDependencies": {
+    "gulp": "^4.0.2"
+  },
   "bin": {
     "tcli": "bin/cloud-cli.js"
   },
