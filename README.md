@@ -38,6 +38,16 @@ These are the available TIBCO CLOUD CLI Tasks:
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
 
+
+```puml
+A -> B
+```
+
+```plantuml
+digraph Test {
+A -> B
+}
+```
 ---
 Copyright © 2019. TIBCO Software Inc.
 This file is subject to the license terms contained
