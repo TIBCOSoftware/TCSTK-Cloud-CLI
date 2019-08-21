@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "scripts": {
     "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
   },
@@ -41,7 +41,7 @@
   },
   "author": {
     "name": "TIBCO Labs",
-    "email": "hpeters@tibco.com",
+    "email": "tibcolabs@tibco.com",
     "url": "http://www.tibco.com"
   },
   "repository": {
