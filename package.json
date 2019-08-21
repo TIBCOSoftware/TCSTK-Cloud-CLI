@@ -47,5 +47,16 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI"
-  }
+  },
+  "homepage": "https://tibcosoftware.github.io/TCSToolkit/",
+  "keywords": [
+    "tibco",
+    "cloud",
+    "tci",
+    "liveapps",
+    "angular",
+    "cli",
+    "tcli"
+  ],
+  "license": "TIBCO"
 }
