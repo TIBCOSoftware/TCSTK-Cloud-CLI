@@ -8,16 +8,19 @@ tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]
 ```
 Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.
 
-new: Create new Cloud starter. 
-Usage] 
+### Create new Cloud starter:
+```
+tcli new
+```
+And anwer the questions, or provide the ansnwers inline:
 ```
 tcli new <name> [--template(-t)] <template-to-use>
 ```
---debug: Display debug information.
+* debug: Display debug information.
    
---createCP: Create a new tibco-cloud.properties file.
+* createCP: Create a new tibco-cloud.properties file.
 
---help: display help 
+* help: display help 
     
 These are the available TIBCO CLOUD CLI Tasks:
 
