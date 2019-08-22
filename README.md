@@ -1,6 +1,5 @@
 # TIBCO Cloud™ Starters Toolkit - Command Line Interface 
-Powered by [TIBCO Labs](https://community.tibco.com/wiki/tibco-labs)
-<img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>
+<img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>Powered by [TIBCO Labs](https://community.tibco.com/wiki/tibco-labs)
 
 Command Line Interface for creating TIBCO Cloud Starter Projects
 
