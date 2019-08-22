@@ -7,7 +7,7 @@ Command Line Interface for creating TIBCO Cloud Starter Projects
 ```
 tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]
 ```
-Note: When you just run "tcli" it will bring you in an interactive menu based on context.
+Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
 
 ### Create new Cloud starter:
 ```
@@ -30,15 +30,15 @@ These are the available TIBCO CLOUD CLI Tasks:
 |                    show-cloud  | Show Cloud Details |
  |                    show-apps |  Show Applications of LiveApps WebApps |
  |        show-application-links |  Show Links to Applications of LiveApps WebApps |
- |                 change-region |  Change the Region in the cloud-properties file |
- |                     obfuscate |  Obfuscate a password and put it in the cloud-properties file |
+ |                 change-region |  Change the Region in the tibco-cloud properties file |
+ |                     obfuscate |  Obfuscate a password and put it in the tibco-cloud properties file |
  |                         start |  Start your local cloud starter project |
  |                         build |  Build your local cloud starter project |
  |                        deploy |  Deploy your local cloud starter project |
  |                  build-deploy |  Builds and Deploys your local project to the cloud |
  |            inject-lib-sources |  Enables your project for Cloud Library Debugging |
- |              undo-lib-sources |  Undo's the enabling for Cloud Library Debugging |
- |                 schematic-add |  Add a schematic into your project |
+ |              undo-lib-sources |  Undo enabling your project for Cloud Library Debugging |
+ |                 schematic-add |  Add a component template (schematic) into your project |
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
 
