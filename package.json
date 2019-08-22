@@ -58,5 +58,6 @@
     "cli",
     "tcli"
   ],
-  "license": "OTHER"
+  "license": "OTHER",
+  "description": "TCSTK Component to provide commandline interaction to manage and develop your own TIBCO Cloud Starter"
 }
