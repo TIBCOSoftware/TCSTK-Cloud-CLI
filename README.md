@@ -1,6 +1,6 @@
 # TIBCO Cloud™ Starters Toolkit - Command Line Interface 
 Powered by [TIBCO Labs](https://community.tibco.com/wiki/tibco-labs)
-![](https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png | width=100)
+<img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>
 
 Command Line Interface for creating TIBCO Cloud Starter Projects
 
@@ -8,13 +8,13 @@ Command Line Interface for creating TIBCO Cloud Starter Projects
 ```
 tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]
 ```
-Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.
+Note: When you just run "tcli" it will bring you in an interactive menu based on context.
 
 ### Create new Cloud starter:
 ```
 tcli new
 ```
-And anwer the questions, or provide the ansnwers inline:
+And answer the questions, or provide the answers inline:
 ```
 tcli new <name> [--template(-t)] <template-to-use>
 ```
