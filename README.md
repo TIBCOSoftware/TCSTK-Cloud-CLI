@@ -43,8 +43,8 @@ These are the available TIBCO CLOUD CLI Tasks:
 
 
 ---
-For more information see the documentation page: 
-https://tibcosoftware.github.io/TCSToolkit/
+For more information see the [TCSTK Documentation](https://tibcosoftware.github.io/TCSToolkit/Angular/docs/1.%20Getting%20Started/)
+
 ---
 Copyright © 2019. TIBCO Software Inc.
 This file is subject to the license terms contained
