@@ -1,4 +1,6 @@
 # TIBCO Cloud™ Starters Toolkit - Command Line Interface 
+Powered by [TIBCO Labs](https://community.tibco.com/wiki/tibco-labs)
+![](https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png | width=100)
 
 Command Line Interface for creating TIBCO Cloud Starter Projects
 
@@ -44,7 +46,6 @@ These are the available TIBCO CLOUD CLI Tasks:
 
 ---
 For more information see the [TCSTK Documentation](https://tibcosoftware.github.io/TCSToolkit/Angular/docs/1.%20Getting%20Started/)
-
 ---
 Copyright © 2019. TIBCO Software Inc.
 This file is subject to the license terms contained
