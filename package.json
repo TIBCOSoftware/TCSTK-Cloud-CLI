@@ -1,13 +1,8 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "scripts": {
-    "pub": "npm publish --registry http://application-lb-npm-1392137160.eu-west-1.elb.amazonaws.com/#/"
-  },
-  "unusedDependencies": {
-    "@tibco-tcstk/web-scaffolding-utility": "0.0.3",
-    "fs": "0.0.1-security",
-    "swagger-client": "^3.9.0"
+    "pub": "npm publish"
   },
   "dependencies": {
     "arg": "^4.1.1",
@@ -40,12 +35,24 @@
     "access": "public"
   },
   "author": {
-    "name": "Hugo Peters",
-    "email": "hpeters@tibco.com",
+    "name": "TIBCO Labs",
+    "email": "tibcolabs@tibco.com",
     "url": "http://www.tibco.com"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI"
-  }
+  },
+  "homepage": "https://tibcosoftware.github.io/TCSToolkit/",
+  "keywords": [
+    "tibco",
+    "cloud",
+    "tci",
+    "liveapps",
+    "angular",
+    "cli",
+    "tcli"
+  ],
+  "license": "BSD3",
+  "description": "TCSTK Component to provide commandline interaction to manage and develop your own TIBCO Cloud Starter"
 }
