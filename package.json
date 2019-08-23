@@ -51,7 +51,21 @@
     "liveapps",
     "angular",
     "cli",
-    "tcli"
+    "tcli",
+    "cloud starter",
+    "starter",
+    "accelerator",
+    "live apps",
+    "connected",
+    "intelligence",
+    "connected intelligence cloud",
+    "cic",
+    "labs",
+    "tibco labs",
+    "analytics",
+    "framework",
+    "forms",
+    "custom forms"
   ],
   "license": "BSD3",
   "description": "TCSTK Component to provide commandline interaction to manage and develop your own TIBCO Cloud Starter"
