@@ -3,7 +3,7 @@
 
 Command Line Interface for creating TIBCO Cloud™ Starter Projects
 
-###Cloud CLI) Usage: 
+###TIBCO Cloud™ CLI) Usage: 
 ```
 tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]
 ```
