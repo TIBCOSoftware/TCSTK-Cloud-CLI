@@ -1,15 +1,15 @@
 # TIBCO Cloud™ Starters Toolkit - Command Line Interface 
-<img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>Powered by [TIBCO Labs](https://community.tibco.com/wiki/tibco-labs)
+<img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>Powered by [TIBCO Labs™](https://community.tibco.com/wiki/tibco-labs)
 
-Command Line Interface for creating TIBCO Cloud Starter Projects
+Command Line Interface for creating TIBCO Cloud™ Starter Projects
 
-###Cloud CLI) Usage: 
+###TIBCO Cloud™ CLI) Usage: 
 ```
 tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]
 ```
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
 
-### Create new Cloud starter:
+### Create new Tibco Cloud™ starter:
 ```
 tcli new
 ```
@@ -23,7 +23,7 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 * help: display help 
     
-These are the available TIBCO CLOUD CLI Tasks:
+These are the available TIBCO Cloud™ CLI Tasks:
 
 | TASK | Description |
 |------|:------------|
@@ -53,6 +53,6 @@ Copyright © 2019. TIBCO Software Inc.
 This file is subject to the license terms contained
 in the license file that is distributed with this file.
 
-Please see license.txt for details of license and dependent third party components referenced by this library, or it can be found here:
+Please see tpc.txt for details of license and dependent third party components referenced by this library, or it can be found here:
                                                                                                                                                                         
 https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/master/license.txt
