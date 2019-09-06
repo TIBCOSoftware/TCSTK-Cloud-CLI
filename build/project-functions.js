@@ -116,6 +116,8 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
 buildCloudStarterZip = function (cloudStarter) {
     return new Promise(function (resolve, reject) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
+        deleteFolder('./dist/' + cloudStarter);
+        deleteFile('./dist/' + cloudStarter + '.zip');
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
         //copyFile('./tmp/' + cloudStarter + '/tsconfig.build.json', './tmp/' + cloudStarter + '/tsconfig.json');
         run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
