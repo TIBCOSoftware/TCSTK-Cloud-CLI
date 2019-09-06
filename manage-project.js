@@ -247,7 +247,11 @@ showAvailableApps.description = 'Shows all the applications that are deployed in
 gulp.task('show-application-links', showLinks);
 showLinks.description = 'Shows all the links to the deployed applications (that have and index.html file).';
 
-gulp.task('build', build);
+gulp.task('clean-dist', cleanDist);
+gulp.task('buildZip', build);
+gulp.task('build', gulp.series('clean-dist', 'buildZip'));
+// gulp.task('build', build);
+
 build.description = 'Build the ZIP file for your project.';
 gulp.task('deploy', deploy);
 deploy.description = 'Deploys your application to the cloud.';
