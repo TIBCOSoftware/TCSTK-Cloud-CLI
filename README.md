@@ -44,7 +44,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 
 
 ---
-For more information see the [TCSTK Documentation](https://tibcosoftware.github.io/TCSToolkit/Angular/docs/1.%20Getting%20Started/)
+For more information see the [TCSTK Documentation](https://tibcosoftware.github.io/TCSToolkit/)
 ---
 
 # License
