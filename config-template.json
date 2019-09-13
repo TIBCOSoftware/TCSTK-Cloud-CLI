@@ -24,6 +24,27 @@
       "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
+      "gitPostCommands": [""],
+      "gitPostCommandsWin": [""],
+      "replacements": [
+        {
+          "from": "tcstk-case-manager-app",
+          "to": "@name"
+        },
+        {
+          "from": "Case Manager",
+          "to": "@name"
+        }
+      ]
+    },
+    "TCSTK-case-manager-app-git-rm-pl": {
+      "displayName": "Case Manager App (GIT) - Remove Package Lock",
+      "enabled": false,
+      "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
+      "useGit": true,
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
       "gitPostCommands": ["rm package-lock.json"],
       "gitPostCommandsWin": ["del package-lock.json"],
       "replacements": [
@@ -40,6 +61,23 @@
     "Form-Template-Git": {
       "displayName": "Form Template (GIT)",
       "enabled": true,
+      "templateFolder": "",
+      "useGit": true,
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": [""],
+      "gitPostCommandsWin": [""],
+      "replacements": [
+        {
+          "from": "custom-form-app",
+          "to": "@name"
+        }
+      ]
+    },
+    "Form-Template-Git-rm-pl": {
+      "displayName": "Form Template (GIT) - Remove Package Lock",
+      "enabled": false,
       "templateFolder": "",
       "useGit": true,
       "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
