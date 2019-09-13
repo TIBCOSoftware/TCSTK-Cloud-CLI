@@ -24,8 +24,8 @@
       "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
-      "gitPostCommands": [""],
-      "gitPostCommandsWin": [""],
+      "gitPostCommands": [],
+      "gitPostCommandsWin": [],
       "replacements": [
         {
           "from": "tcstk-case-manager-app",
@@ -66,8 +66,8 @@
       "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
       "gitTag": "LATEST",
       "removeGitFolder": true,
-      "gitPostCommands": [""],
-      "gitPostCommandsWin": [""],
+      "gitPostCommands": [],
+      "gitPostCommandsWin": [],
       "replacements": [
         {
           "from": "custom-form-app",
