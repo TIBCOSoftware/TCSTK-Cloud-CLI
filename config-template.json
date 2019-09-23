@@ -24,7 +24,7 @@
       "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
-      "gitPostCommands": [],
+      "gitPostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
       "gitPostCommandsWin": [],
       "replacements": [
         {
