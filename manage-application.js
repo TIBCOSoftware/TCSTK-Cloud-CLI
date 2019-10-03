@@ -7,6 +7,7 @@ const configApp = require('./config-template.json');
 var templatesToUse = [];
 const isWindows = process.platform == 'win32';
 
+
 // Funcation called from the cli to pick up info and call the create starter
 // function
 async function newStarter() {
