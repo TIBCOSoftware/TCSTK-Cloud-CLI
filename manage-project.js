@@ -8,7 +8,7 @@ const PropertiesReader = require('properties-reader');
 const propFileNameGulp = 'tibco-cloud.properties';
 const properties = PropertiesReader(propFileNameGulp);
 const props = properties.path();
-const version = '1.0.0';
+const version = require('./package.json').version;
 const isWindows = process.platform == 'win32';
 
 // Function to build the cloud starter
@@ -109,12 +109,8 @@ changeRegion = function () {
 
 openingMessage = function() {
     return new Promise(async function (resolve, reject) {
-        console.log('\x1b[35m%s\x1b[0m', '# |-------------------------------------------|');
-        console.log('\x1b[35m%s\x1b[0m', '# |  *** T I B C O    C L O U D   C L I ***   |');
-        console.log('\x1b[35m%s\x1b[0m', '# |            V' + version + '                         |');
-        console.log('\x1b[35m%s\x1b[0m', '# |-------------------------------------------|');
-        console.log('\x1b[35m%s\x1b[0m', '# |For more info see: https://cloud.tibco.com');
-        resolve();
+        displayOpeningMessage();
+        resolve()
     });
 }
 
@@ -171,7 +167,7 @@ start = function () {
 
 mainT = function () {
     return new Promise(async function (resolve, reject) {
-        console.log('[TIBCO CLOUD CLI - V '+version+'] ("exit" to quit / "help" to display tasks)');
+        console.log('[TIBCO CLOUD CLI - V'+version+'] ("exit" to quit / "help" to display tasks)');
         // checkPW();
         resolve();
         // var appRoot = process.env.PWD;
@@ -327,7 +323,7 @@ promptGulp = function (stDir, cwdDir) {
             type: 'autocomplete',
             name: 'command',
             suggestOnly: false,
-            message: '[TIBCO CLOUD CLI]: ',
+            message: '[TCLI - CLOUD STARTER (\x1b[36m'+ props.App_Name+'\x1b[0m)]: ',
             source: searchAnswer,
             pageSize: 4/*,
             validate: function (val) {

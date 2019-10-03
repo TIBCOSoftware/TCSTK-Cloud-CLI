@@ -1,8 +1,8 @@
 // File to manage the CLI Interaction
 require('./build/common-functions');
 import arg from 'arg';
-
 const propFileName = 'tibco-cloud.properties';
+const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
     //TODO: Add a non interactive verbose option
@@ -64,6 +64,9 @@ export async function cli(args) {
         if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
             var cif = '';
             if(!options.createCP) {
+                //TODO: Use the nice logo from manage project (re-use the code)
+                displayOpeningMessage();
+                console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI "+version+"]");
                 console.log('No TIBCO Cloud Properties file found...');
                 var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New tibco-cloud.properties file', 'Nothing']);
             }else{
