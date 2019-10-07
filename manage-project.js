@@ -71,7 +71,9 @@ function injectLibSources() {
         resolve();
     });
 }
+
 const packagesForLibSources = '';
+
 // Function to go back to the compiled versions of the libraries
 function undoLibSources() {
     return new Promise(function (resolve, reject) {
@@ -101,13 +103,13 @@ function undoLibSources() {
 
 // Function to change the tenant in the properties file
 changeRegion = function () {
-    return new Promise( async function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         await updateRegion(propFileNameGulp);
         resolve();
     });
 };
 
-openingMessage = function() {
+openingMessage = function () {
     return new Promise(async function (resolve, reject) {
         displayOpeningMessage();
         resolve()
@@ -123,23 +125,23 @@ helptcli = function () {
         log('INFO', 'These are the available TIBCO CLOUD CLI Tasks:');
         // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
         var cTsks = cliTaskConfig.cliTasks;
-        for(cliTask in cTsks){
-        	var allowed = false;
-        	if(cTsks[cliTask].availableOnOs != null){
-        		for(allowedOS of cTsks[cliTask].availableOnOs){
-        			// console.log('OS:' + allowedOS);
-        			if(allowedOS == process.platform || allowedOS == 'all'){
-        				allowed = true;
-        			}
-        		}
-        	}
-            if(cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
-            	 var str = cliTask;
-                 var x = 30 - cliTask.length;
-                 for (var i = 0; i < x; i++){
-                     str = ' ' + str;
-                 }
-                console.log('\x1b[36m%s\x1b[0m', str + ':' , ' ' + cTsks[cliTask].description);
+        for (cliTask in cTsks) {
+            var allowed = false;
+            if (cTsks[cliTask].availableOnOs != null) {
+                for (allowedOS of cTsks[cliTask].availableOnOs) {
+                    // console.log('OS:' + allowedOS);
+                    if (allowedOS == process.platform || allowedOS == 'all') {
+                        allowed = true;
+                    }
+                }
+            }
+            if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
+                var str = cliTask;
+                var x = 30 - cliTask.length;
+                for (var i = 0; i < x; i++) {
+                    str = ' ' + str;
+                }
+                console.log('\x1b[36m%s\x1b[0m', str + ':', ' ' + cTsks[cliTask].description);
             }
             // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')'); \x1b[35m
         }
@@ -167,12 +169,12 @@ start = function () {
 
 mainT = function () {
     return new Promise(async function (resolve, reject) {
-        console.log('[TIBCO CLOUD CLI - V'+version+'] ("exit" to quit / "help" to display tasks)');
+        console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
         // checkPW();
         resolve();
         // var appRoot = process.env.PWD;
         var appRoot = process.cwd();
-        if (props.CloudLogin.pass == ''){
+        if (props.CloudLogin.pass == '') {
             // When password is empty ask it manually for the session.
             var pass = await askQuestion('Please provide your password: ', 'password');
             properties.set('CloudLogin.pass', obfuscatePW(pass));
@@ -185,7 +187,7 @@ mainT = function () {
 const getAppOwner = false;
 
 test = function () {
-    return new Promise( async function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         console.log('Test...');
         var now = new Date();
         console.log(now);
@@ -204,13 +206,26 @@ test = function () {
 
 obfuscate = function () {
     return new Promise(async function (resolve, reject) {
-    	
-    	var password = await askQuestion('Please provide the password...', 'password');
-    	console.log('\nObfuscated password is is: ' + obfuscatePW(password));
-    	resolve();
+
+        var password = await askQuestion('Please provide the password...', 'password');
+        console.log('\nObfuscated password is is: ' + obfuscatePW(password));
+        resolve();
     });
 }
 
+viewGlobalConfig = function () {
+    return new Promise(async function (resolve, reject) {
+        displayGlobalConnectionConfig();
+        resolve();
+    });
+}
+
+updateGlobalConfig = function () {
+    return new Promise(async function (resolve, reject) {
+        updateGlobalConnectionConfig();
+        resolve();
+    });
+}
 
 
 //gulp.task('test-call-service', testCallService);
@@ -265,6 +280,11 @@ gulp.task('inject-lib-sources', gulp.series('clean', 'get-cloud-libs-from-git', 
 gulp.task('undo-lib-sources', undoLibSources);
 undoLibSources.description = 'UNDO task for inject-lib-sources, use this when you want to go back to normal mode';
 
+gulp.task('view-global-config', viewGlobalConfig);
+viewGlobalConfig.description = 'A task to View the Global Connection Configuration.';
+gulp.task('update-global-config', updateGlobalConfig);
+updateGlobalConfig.description = 'A task to Update the Global Connection Configuration.';
+
 
 /*
 TODO: Additional Cloud CLI Capabilities
@@ -293,20 +313,20 @@ var gtasks = [];
 
 
 var cTsks = cliTaskConfig.cliTasks;
-for(cliTask in cTsks){
+for (cliTask in cTsks) {
     // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
-	var allowed = false;
-	if(cTsks[cliTask].availableOnOs != null){
-		for(allowedOS of cTsks[cliTask].availableOnOs){
-			// console.log('OS:' + allowedOS);
-			if(allowedOS == process.platform || allowedOS == 'all'){
-				allowed = true;
-				// console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
-			}
-		}
-	}
-    if(cTsks[cliTask].enabled && allowed) {
-    	// console.log('Adding: ' + cliTask);
+    var allowed = false;
+    if (cTsks[cliTask].availableOnOs != null) {
+        for (allowedOS of cTsks[cliTask].availableOnOs) {
+            // console.log('OS:' + allowedOS);
+            if (allowedOS == process.platform || allowedOS == 'all') {
+                allowed = true;
+                // console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
+            }
+        }
+    }
+    if (cTsks[cliTask].enabled && allowed) {
+        // console.log('Adding: ' + cliTask);
         gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
     }
 }
@@ -323,7 +343,7 @@ promptGulp = function (stDir, cwdDir) {
             type: 'autocomplete',
             name: 'command',
             suggestOnly: false,
-            message: '[TCLI - CLOUD STARTER (\x1b[36m'+ props.App_Name+'\x1b[0m)]: ',
+            message: '[TCLI - CLOUD STARTER (\x1b[36m' + props.App_Name + '\x1b[0m)]: ',
             source: searchAnswer,
             pageSize: 4/*,
             validate: function (val) {
@@ -334,8 +354,8 @@ promptGulp = function (stDir, cwdDir) {
             //console.log('Command: ' + answers.command);
             let selectedTask = '';
             let selectedTaskConfig = {};
-            for(cliTask in cTsks){
-                if(answers.command.substr(0, answers.command.indexOf('(') - 1)  == cliTask){
+            for (cliTask in cTsks) {
+                if (answers.command.substr(0, answers.command.indexOf('(') - 1) == cliTask) {
                     selectedTask = cliTask;
                     selectedTaskConfig = cTsks[cliTask];
                 }
@@ -351,10 +371,10 @@ promptGulp = function (stDir, cwdDir) {
             } else {
                 // Check if we need to repeat the last task
                 var comToInject = selectedTaskConfig.gulpTask;
-                if (com == 'repeat-last-task'){
+                if (com == 'repeat-last-task') {
                     log('INFO', 'Repeating Last Task: ' + globalLastCommand);
                     comToInject = globalLastCommand;
-                }else {
+                } else {
                     globalLastCommand = com;
                 }
                 run('cd ' + stDir + ' && gulp ' + comToInject + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + props.CloudLogin.pass + '"');
@@ -363,7 +383,6 @@ promptGulp = function (stDir, cwdDir) {
         });
     });
 }
-
 
 
 const _ = require('lodash');
