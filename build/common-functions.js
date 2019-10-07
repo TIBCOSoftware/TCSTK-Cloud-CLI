@@ -297,10 +297,12 @@ global.ERROR = 'ERROR';
 let useDebug = false;
 
 setLogDebug = function(debug){
-	useDebug = debug;
+	// console.log('Setting debug to: ' + debug)
+	useDebug = (debug == 'true');
 }
 
 log = function (level, message) {
+	// console.log('LOG: ' ,useDebug , level, message);
 	if (!(level == DEBUG && !useDebug)) {
 		var timeStamp = new Date();
 		//console.log('(' + timeStamp + ')[' + level + ']  ' + message);
