@@ -163,7 +163,6 @@ createNewStarter = function (name, template) {
                 results = replace.sync(options);
                 // console.log('Replacement results:', results);
             }
-
             // console.log('Replacement results:', results);
             // TODO: provide all replacement values at once
             if (doReplace) {
@@ -171,12 +170,6 @@ createNewStarter = function (name, template) {
                     console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')', result.file);
                 }
             }
-
-
-
-
-
-
             console.log('\x1b[36m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
             run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
@@ -192,8 +185,6 @@ createNewStarter = function (name, template) {
                 }
             }
             console.log('\x1b[36m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
-
-
         } catch (error) {
             log(ERROR, 'Error occurred:', error);
         }
