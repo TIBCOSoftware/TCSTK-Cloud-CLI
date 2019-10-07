@@ -26,6 +26,8 @@
       "removeGitFolder": true,
       "gitPostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
       "gitPostCommandsWin": [],
+      "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
+      "PostCommandsWin": [],
       "replacements": [
         {
           "from": "tcstk-case-manager-app",
@@ -66,6 +68,8 @@
       "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
       "gitTag": "LATEST",
       "removeGitFolder": true,
+      "gitPostCommands": [],
+      "gitPostCommandsWin": [],
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
       "replacements": [

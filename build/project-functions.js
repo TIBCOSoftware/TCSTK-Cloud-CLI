@@ -55,13 +55,39 @@ run = function (command) {
 
 // Function that determines which cloud login method to use
 // function to login to the cloud
-var loginURL = propsF.Cloud_URL + propsF.loginURE;
+
 var loginC = null;
 var argv = require('yargs').argv;
 
+var cloudURL = propsF.Cloud_URL;
+var cloudHost = propsF.cloudHost;
+// Check if a global config exists and if it is required
+if(getGlobalConfig()){
+    const propsG = getGlobalConfig();
+    if(cloudURL == 'USE-GLOBAL') {
+        cloudURL = propsG.Cloud_URL;
+    }
+    if(cloudHost == 'USE-GLOBAL') {
+        cloudHost = propsG.cloudHost;
+    }
+}
+
+//Function to manage the login from the cloud
+var loginURL = cloudURL + propsF.loginURE;
 cLogin = function() {
-    // checkPW();
     var pass = propsF.CloudLogin.pass;
+    var tentantID = propsF.CloudLogin.tenantID;
+    var clientID = propsF.CloudLogin.clientID;
+    var email = propsF.CloudLogin.email;
+    //
+    if(getGlobalConfig()){
+        const propsG = getGlobalConfig();
+        if(pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+        if(tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
+        if(clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
+        if(email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
+    }
+
     if(pass == ''){
         pass = argv.pass;
         // console.log('Pass from args: ' + pass);
@@ -70,7 +96,7 @@ cLogin = function() {
         pass = Buffer.from(pass, 'base64').toString()
     }
     if (loginC == null) {
-        loginC = cloudLoginV3(propsF.CloudLogin.tenantID, propsF.CloudLogin.clientID, propsF.CloudLogin.email, pass, loginURL);
+        loginC = cloudLoginV3(tentantID, clientID ,email, pass, loginURL);
     }
     if (loginC == 'ERROR') {
         // TODO: exit the gulp task properly
@@ -80,8 +106,6 @@ cLogin = function() {
     // console.log("RETURN: " , loginC);
     return loginC;
 }
-
-
 
 
 // Function that logs into the cloud and returns a cookie
@@ -132,7 +156,7 @@ buildCloudStarterZip = function (cloudStarter) {
 }
 
 // function that shows all the availible applications in the cloud
-const getAppURL = propsF.Cloud_URL + propsF.appURE + '?%24top=200';
+const getAppURL = cloudURL + propsF.appURE + '?%24top=200';
 showAvailableApps = function (showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     //return new Promise(function (resolve, reject) {
@@ -194,11 +218,14 @@ showApps = function () {
 
 
 // Function to show claims for the configured user
-const getClaimsURL = propsF.Cloud_URL + propsF.Claims_URE;
+const getClaimsURL = cloudURL + propsF.Claims_URE;
 showClaims = function () {
     return new Promise(function (resolve, reject) {
         var lCookie = cLogin();
         log(DEBUG, 'Login Cookie: ', lCookie);
+
+
+
         var response = syncClient.get(getClaimsURL, {
             headers: {
                 "accept": "application/json",
@@ -226,7 +253,7 @@ getCloud = function(url) {
     return re;
 }
 
-const getApplicationDetailsURL = propsF.Cloud_URL + propsF.appURE;
+const getApplicationDetailsURL = cloudURL + propsF.appURE;
 //const getApplicationDetailsURL = 'https://eu.liveapps.cloud.tibco.com/webresource/v1/applications/AppMadeWithSchematic3/applicationVersions/1/artifacts/';
 getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
@@ -274,7 +301,7 @@ getAppLinks = function (showTable) {
             //console.log(appD.name);
             if (appD.name.includes("index.html")) {
                 // console.log('FOUND INDEX of ' + app.name + ': ' + appD.name);
-                var tempLink = propsF.Cloud_URL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
+                var tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
                 // console.log('LOCATION: ' + tempLink);
                 appTemp['LINK'] = tempLink;
             }
@@ -299,7 +326,7 @@ uploadApp = function (application) {
         // formData.setHeader("cookie", "tsc="+lCookie.tsc + "; domain=" + lCookie.domain);
         formData.append('appContents', require("fs").createReadStream('./dist/' + application + '.zip'));
         let query = require('https').request({
-            hostname: propsF.cloudHost,
+            hostname: cloudHost,
             path: uploadAppLocation,
             method: 'POST',
             headers: {
@@ -333,7 +360,7 @@ publishApp = function (application) {
         var lCookie = cLogin();
         // var lCookie = cloudLoginV3();
         // console.log('Login Cookie: ' , lCookie);
-        var publishLocation = propsF.Cloud_URL + 'webresource/v1/applications/' + application + '/';
+        var publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
         var response = syncClient.put(publishLocation, {
             headers: {
                 "accept": "application/json",
@@ -371,6 +398,7 @@ npmInstall = function (location, package) {
     });
 }
 
+/* Moved to Common
 // Function to add or update property to a file
 addOrUpdateProperty = function (location, property, value) {
     log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
@@ -403,6 +431,10 @@ addOrUpdateProperty = function (location, property, value) {
         console.error(err)
     }
 }
+*/
+
+/* Moved to Common
+
 const inquirerF = require('inquirer');
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
@@ -434,10 +466,10 @@ askMultipleChoiceQuestionSearch = async function (question, options) {
         suggestOnly: false,
         message: question,
         source: searchAnswerF,
-        pageSize: 4/*,
+        pageSize: 4/S,
             validate: function (val) {
                 return val ? true : 'Type something!';
-            }*/
+            }  S/
     }]).then((answers) => {
         console.log('answers: ' , answers);
         logO(DEBUG, answers);
@@ -465,8 +497,9 @@ searchAnswerF = function (answers, input) {
         }, _F.random(30, 60));
     });
 }
+*/
 
-
+/* Moved to Common
 // function to ask a question
 askQuestion = async function (question, type = 'input') {
     var re = 'result';
@@ -484,12 +517,14 @@ askQuestion = async function (question, type = 'input') {
     });
     return re;
 }
+*/
+
 
 testFunction = async function (propFile) {
     var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     return re;
 }
-
+/* Moved to Common
 // function to update the tenant
 updateRegion = async function (propFile) {
     var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
@@ -508,18 +543,22 @@ updateRegion = async function (propFile) {
             break;
     }
 }
+*/
+
 
 // Function to copy a directory
 copyDir = function (fromDir, toDir) {
     log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fse.copySync(fromDir, toDir, {overwrite: true});
 }
+/* Move to Global
 // Function to copy a file
 copyFile = function (fromFile, toFile) {
     log(INFO, 'Copying File from: ' + fromFile + ' to: ' + toFile);
     fs.copyFileSync(fromFile, toFile);
 }
 
+ */
 // Function to delete a file but does not fail when the file does not exits
 deleteFile = function (file) {
     log(INFO, 'Deleting File: ' + file);
@@ -575,10 +614,14 @@ obfuscate = function () {
 }
 */
 
+/* Moved to common
+
 obfuscatePW = function (toObfuscate){
     // TODO: use stronger obfuscation
     return '#' + Buffer.from(toObfuscate).toString('base64');
 }
+
+ */
 
 // Use WSU to generate TCI code
 wsuAddTci = function () {
@@ -615,8 +658,10 @@ schematicAdd = function () {
     });
 }
 
+// Set log debug level from local property
+setLogDebug(propsF.Use_Debug);
 
-
+/*
 // Log function
 const INFO = 'INFO';
 const DEBUG = 'DEBUG';
@@ -634,3 +679,4 @@ logO = function (level, message) {
         console.log(message);
     }
 }
+*/
