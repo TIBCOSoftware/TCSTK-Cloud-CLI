@@ -154,15 +154,53 @@ helptcli = function () {
 start = function () {
     return new Promise(async function (resolve, reject) {
         log('INFO', 'Starting: ' + props.App_Name);
-        if (props.cloudHost.includes('eu')) {
-            run('npm run serve_eu');
-        } else {
-            if (props.cloudHost.includes('au')) {
-                run('npm run serve_au');
-            } else {
-                run('npm run serve_us');
+        //TODO: Check if port 4200 is available, if not use 4201, 4202 etc.
+        let port = 4200;
+        const range = 50;
+        let portToUse = 0;
+        for (let i = 0; i < range ; i++){
+            let pAv = await isPortAvailable(port + i);
+            if(pAv){
+                portToUse = port + i;
+                i = range;
             }
         }
+        if(portToUse != 0){
+            log('INFO', 'Using Port: ' + portToUse);
+            if(portToUse == 4200){
+                if (props.cloudHost.includes('eu')) {
+                    run('npm run serve_eu');
+                } else {
+                    if (props.cloudHost.includes('au')) {
+                        run('npm run serve_au');
+                    } else {
+                        run('npm run serve_us');
+                    }
+                }
+            }   else {
+                if (props.cloudHost.includes('eu')) {
+                    run('ng serve --proxy-config proxy.conf.prod.eu.json --ssl true --source-map --aot --port ' + portToUse);
+                } else {
+                    if (props.cloudHost.includes('au')) {
+                        run('ng serve --proxy-config proxy.conf.prod.au.json --ssl true --source-map --aot --port ' + portToUse);
+                    } else {
+                        run('ng serve --proxy-config proxy.conf.prod.us.json --ssl true --source-map --aot --port ' + portToUse);
+                    }
+                }
+            }
+
+        } else {
+            log('ERROR', 'No available port found (started at ' + port + ', with range: ' + range + ')');
+        }
+
+
+        /*(async () => {
+           await isPortReachable(4200);*/
+
+       // })();
+
+
+
         resolve();
     });
 }

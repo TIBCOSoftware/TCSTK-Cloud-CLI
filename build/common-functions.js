@@ -289,6 +289,14 @@ determineEnabledTasks = function(cliTaskConfig){
 	return re;
 }
 
+isPortAvailable = async function(port){
+	log(DEBUG, 'Checking Port Availability: ' + port);
+	const tcpPortUsed = require('tcp-port-used');
+	const pUsed = await tcpPortUsed.check(port, '127.0.0.1');
+	return !pUsed;
+}
+
+
 //Common log function
 global.INFO = 'INFO';
 global.DEBUG = 'DEBUG';
