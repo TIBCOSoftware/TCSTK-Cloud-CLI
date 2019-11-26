@@ -7,6 +7,7 @@ const configApp = require('./config-template.json');
 var templatesToUse = [];
 const isWindows = process.platform == 'win32';
 
+
 // Funcation called from the cli to pick up info and call the create starter
 // function
 async function newStarter() {
@@ -72,7 +73,6 @@ async function newStarter() {
     log(INFO, 'Cloud Starter Template: ', stTempJson);
     return createNewStarter(starterName, stTempJson);
 }
-
 
 // function to ask a multiple choice question
 async function askMultipleChoiceQuestionAPP(question, options) {
@@ -141,6 +141,7 @@ createNewStarter = function (name, template) {
 			// + ' To: ' + toDir);
             copyDir(fromDir, toDir);
         }
+        //TODO: do this replace before post commands
         const replace = require('replace-in-file');
         try {
             var results = {};
@@ -162,7 +163,6 @@ createNewStarter = function (name, template) {
                 results = replace.sync(options);
                 // console.log('Replacement results:', results);
             }
-
             // console.log('Replacement results:', results);
             // TODO: provide all replacement values at once
             if (doReplace) {
@@ -170,12 +170,21 @@ createNewStarter = function (name, template) {
                     console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')', result.file);
                 }
             }
-            run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
             console.log('\x1b[36m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
+            run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
+                      // create a new tibco-cloud.properties file
+            // console.log(gitPostCom);
+            if(isWindows){
+                for (var postCom of template.PostCommandsWin) {
+                    run('cd ' + toDir + ' && ' + postCom);
+                }
+            }else{
+                for (var postCom of template.PostCommands) {
+                    run('cd ' + toDir + ' && ' + postCom);
+                }
+            }
             console.log('\x1b[36m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
-            // create a new tibco-cloud.properties file
-
         } catch (error) {
             log(ERROR, 'Error occurred:', error);
         }
@@ -215,8 +224,26 @@ copyDir = function (fromDir, toDir) {
     fseA.copySync(fromDir, toDir, {overwrite: true});
 }
 
+// Function to create a new starter, based on a template
+manageGlobalConfig = function (name, template) {
+    return new Promise(async function (resolve, reject) {
+        if(displayGlobalConnectionConfig()){
+            updateGC = await askMultipleChoiceQuestionAPP('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
+            if(updateGC == 'YES'){
+                updateGlobalConnectionConfig();
+            }
+        } else {
+            updateGlobalConnectionConfig();
+        }
+        resolve();
+    });
+}
+
+
 // Gulp task definition
 gulp.task('new-starter', newStarter);
+gulp.task('manage-global-config', manageGlobalConfig);
+
 
 const execSync = require('child_process').execSync;
 // Run an OS Command
@@ -241,6 +268,10 @@ run = function (command) {
     );
 }
 
+// Set log debug level from local property
+setLogDebug(configApp.useDebug);
+
+/*
 // Log function
 const INFO = 'INFO';
 const DEBUG = 'DEBUG';
@@ -260,3 +291,4 @@ logO = function (level, message) {
         console.log(message);
     }
 }
+*/

@@ -127,8 +127,20 @@
       "gulpTask": "schematic-add",
       "availableOnOs": ["all"]
     },
-
-
+    "view-global-config": {
+      "description": "View the global cloud connection configuration",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "view-global-config",
+      "availableOnOs": ["all"]
+    },
+    "update-global-config": {
+      "description": "Update the global cloud connection configuration",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "update-global-config",
+      "availableOnOs": ["all"]
+    },
     "q": {
       "description": "Quit the console",
       "enabled": true,

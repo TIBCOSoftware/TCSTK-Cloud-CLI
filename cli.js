@@ -1,8 +1,8 @@
 // File to manage the CLI Interaction
 require('./build/common-functions');
 import arg from 'arg';
-
 const propFileName = 'tibco-cloud.properties';
+const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
     //TODO: Add a non interactive verbose option
@@ -64,17 +64,30 @@ export async function cli(args) {
         if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
             var cif = '';
             if(!options.createCP) {
+                displayOpeningMessage();
+                console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI "+version+"]");
                 console.log('No TIBCO Cloud Properties file found...');
-                var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New tibco-cloud.properties file', 'Nothing']);
+                var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New tibco-cloud.properties file','Manage Global Cloud Connection Configuration', 'Nothing']);
             }else{
                 cif = 'Create New tibco-cloud.properties file';
             }
             switch (cif) {
                 case 'Create New tibco-cloud.properties file':
-                    fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
-                    require(__dirname + '/manage-project');
+                    // if we use a global config
+                    if(getGlobalConfig()){
+                        log(INFO, 'Using Global Connection Configuration...');
+                        fs.copyFileSync(__dirname + '/template/tibco-cloud_global.properties', cwdir + '/' + propFileName);
+                    } else {
+                        log(INFO, 'Using Local Connection Configuration...');
+                        fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
+                        await updateRegion(propFileName);
+                        await updateCloudLogin(propFileName);
+                    }
+
+
+                    // require(__dirname + '/manage-project');
                     // Select Tenant
-                    await updateRegion(propFileName);
+
                     // Get the AppName Automatically from the package.json
                     try {
                         if(fs.existsSync('package.json')) {
@@ -93,6 +106,8 @@ export async function cli(args) {
                     if(options.template){
                         addOrUpdateProperty(propFileName, 'App_Type', options.template);
                     }
+
+                    /*
                     // Client ID
                     log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
                     var cid = await askQuestion('What is your Client ID ?');
@@ -105,6 +120,12 @@ export async function cli(args) {
                     if(pass != '') {
                         addOrUpdateProperty(propFileName, 'CloudLogin.pass', obfuscatePW(pass));
                     }
+
+                     */
+                    break;
+                case 'Manage Global Cloud Connection Configuration':
+                    options.task = 'manage-global-config';
+                    projectManagementMode = false;
                     break;
                 case 'Create New Cloud Starter':
                     console.log('Creating new Cloud starter...');
@@ -133,10 +154,11 @@ export async function cli(args) {
         }
         // TODO: pass in commandline options
         // TODO: Maybe call run here to prevent two times asking of PW on new file
-        console.log('TASK: ' + options.task);
+
         if (options.task == '') {
             gulp.series('default')();
         } else {
+            console.log('TASK: ' + options.task);
             if (options.task == 'help') {
                 options.task = 'help-tcli';
             }

@@ -1,5 +1,24 @@
 {
   "templates": {
+  "TCSTK-base-template-git": {
+    "displayName": "Basic Cloud Starter Template (GIT)",
+    "enabled": true,
+    "templateFolder": "",
+    "useGit": true,
+    "git" : "https://github.com/hpeters83/TCSTK-Template",
+    "gitTag": "LATEST",
+    "removeGitFolder": true,
+    "gitPostCommands": [],
+    "gitPostCommandsWin": [],
+    "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
+    "PostCommandsWin": [],
+    "replacements": [
+      {
+        "from": "TCSTKTEMPLATE",
+        "to": "@name"
+      }
+    ]
+  },
     "TCSTK-case-manager-app": {
       "displayName": "Case Manager App",
       "enabled": false,
@@ -22,10 +41,12 @@
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": true,
       "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
-      "gitTag": "LATEST",
+      "gitTag": "ReleaseV1.0.12",
       "removeGitFolder": true,
-      "gitPostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
+      "gitPostCommands": [],
       "gitPostCommandsWin": [],
+      "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
+      "PostCommandsWin": [],
       "replacements": [
         {
           "from": "tcstk-case-manager-app",
@@ -68,6 +89,8 @@
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
+      "gitPostCommands": [],
+      "gitPostCommandsWin": [],
       "replacements": [
         {
           "from": "custom-form-app",
@@ -88,6 +111,24 @@
       "replacements": [
         {
           "from": "custom-form-app",
+          "to": "@name"
+        }
+      ]
+    },"TCSTK-spotfire-template-git": {
+      "displayName": "Spotfire Report Template (GIT)",
+      "enabled": true,
+      "templateFolder": "",
+      "useGit": true,
+      "git" : "https://github.com/hpeters83/TCSTK-Spotfire-Template",
+      "gitTag": "LATEST",
+      "removeGitFolder": true,
+      "gitPostCommands": [],
+      "gitPostCommandsWin": [],
+      "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib @tibco-tcstk/tc-spotfire-lib @tibco/spotfire-wrapper","npm install --save-dev @tibco-tcstk/component-template"],
+      "PostCommandsWin": [],
+      "replacements": [
+        {
+          "from": "TCSTKSPOTFIRETEMPLATE",
           "to": "@name"
         }
       ]
