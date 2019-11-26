@@ -5,7 +5,7 @@
     "enabled": true,
     "templateFolder": "",
     "useGit": true,
-    "git" : "https://github.com/hpeters83/TCSTK-Template",
+    "git" : "https://github.com/TIBCOSoftware/TCSTK-base-app",
     "gitTag": "LATEST",
     "removeGitFolder": true,
     "gitPostCommands": [],
@@ -116,7 +116,7 @@
       ]
     },"TCSTK-spotfire-template-git": {
       "displayName": "Spotfire Report Template (GIT)",
-      "enabled": true,
+      "enabled": false,
       "templateFolder": "",
       "useGit": true,
       "git" : "https://github.com/hpeters83/TCSTK-Spotfire-Template",
