@@ -41,7 +41,7 @@
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": true,
       "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
-      "gitTag": "ReleaseV1.0.12",
+      "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
