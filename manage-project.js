@@ -25,9 +25,12 @@ function deploy() {
     return new Promise(async function (resolve, reject) {
         await uploadApp(props.App_Name);
         log('INFO', "DONE DEPLOYING: " + props.App_Name);
-        log('INFO', "LOCATION: " + props.Cloud_URL + "webresource/apps/" + props.App_Name + "/index.html");
+        let cloudURLdisp = props.Cloud_URL;
+        if(cloudURLdisp == 'USE-GLOBAL') {
+            cloudURLdisp = propsG.Cloud_URL;
+        }
+        log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + props.App_Name + "/index.html");
         resolve();
-
     });
 }
 
@@ -36,10 +39,15 @@ function publish() {
     return new Promise(async function (resolve, reject) {
         await publishApp(props.App_Name);
         log('INFO', 'APP PUBLISHED: ' + props.App_Name);
-        log('INFO', "LOCATION: " + props.Cloud_URL + "webresource/apps/" + props.App_Name + "/index.html");
+        let cloudURLdisp = props.Cloud_URL;
+        if(cloudURLdisp == 'USE-GLOBAL') {
+            cloudURLdisp = propsG.Cloud_URL;
+        }
+        log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + props.App_Name + "/index.html");
         resolve();
     });
 }
+
 
 // Function to get the cloud library sources from GIT
 getCLgit = function () {
