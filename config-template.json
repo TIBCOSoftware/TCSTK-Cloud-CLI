@@ -2,7 +2,7 @@
   "templates": {
   "TCSTK-base-template-git": {
     "displayName": "Basic Cloud Starter Template (GIT)",
-    "enabled": true,
+    "enabled": false,
     "templateFolder": "",
     "useGit": true,
     "git" : "https://github.com/TIBCOSoftware/TCSTK-base-app",
