@@ -175,40 +175,34 @@ start = function () {
         }
         if(portToUse != 0){
             log('INFO', 'Using Port: ' + portToUse);
+            let myHost = props.cloudHost;
+            if(myHost == 'USE-GLOBAL'){
+                myHost =  propsG.cloudHost;
+            }
             if(portToUse == 4200){
-                if (props.cloudHost.includes('eu')) {
+                if (myHost.includes('eu')) {
                     run('npm run serve_eu');
                 } else {
-                    if (props.cloudHost.includes('au')) {
+                    if (myHost.includes('au')) {
                         run('npm run serve_au');
                     } else {
                         run('npm run serve_us');
                     }
                 }
             }   else {
-                if (props.cloudHost.includes('eu')) {
+                if (myHost.includes('eu')) {
                     run('ng serve --proxy-config proxy.conf.prod.eu.json --ssl true --source-map --aot --port ' + portToUse);
                 } else {
-                    if (props.cloudHost.includes('au')) {
+                    if (myHost.includes('au')) {
                         run('ng serve --proxy-config proxy.conf.prod.au.json --ssl true --source-map --aot --port ' + portToUse);
                     } else {
                         run('ng serve --proxy-config proxy.conf.prod.us.json --ssl true --source-map --aot --port ' + portToUse);
                     }
                 }
             }
-
         } else {
             log('ERROR', 'No available port found (started at ' + port + ', with range: ' + range + ')');
         }
-
-
-        /*(async () => {
-           await isPortReachable(4200);*/
-
-       // })();
-
-
-
         resolve();
     });
 }
