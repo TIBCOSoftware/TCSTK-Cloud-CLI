@@ -14,7 +14,7 @@
     "PostCommandsWin": [],
     "replacements": [
       {
-        "from": "TCSTKTEMPLATE",
+        "from": "TCSTKBaseApp",
         "to": "@name"
       }
     ]

@@ -140,20 +140,22 @@ cleanDist = function (){
     return deleteFolder('./dist/' + propsF.App_Name);
 }
 
+const { zip } = require('zip-a-folder');
 // Function that builds the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
-        // TODO: delete folder and then continue.
-        // deleteFolder('./dist/' + cloudStarter);
         deleteFile('./dist/' + cloudStarter + '.zip');
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
         //copyFile('./tmp/' + cloudStarter + '/tsconfig.build.json', './tmp/' + cloudStarter + '/tsconfig.json');
-        run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
+        log(INFO, 'Using zip a folder... ');
+        await zip('./dist/' + cloudStarter + '/', './dist/' + cloudStarter + '.zip');
+        // run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
         log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
         resolve();
     });
 }
+
 
 // function that shows all the availible applications in the cloud
 const getAppURL = cloudURL + propsF.appURE + '?%24top=200';

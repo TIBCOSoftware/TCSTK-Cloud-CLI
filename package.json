@@ -23,7 +23,8 @@
     "replace-in-file": "^4.1.1",
     "sync-rest-client": "^1.0.3",
     "tcp-port-used": "^1.0.1",
-    "yargs": "^13.3.0"
+    "yargs": "^13.3.0",
+    "zip-a-folder": "0.0.9"
   },
   "devDependencies": {},
   "peerDependencies": {
