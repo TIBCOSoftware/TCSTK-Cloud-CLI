@@ -140,7 +140,7 @@ cleanDist = function (){
     return deleteFolder('./dist/' + propsF.App_Name);
 }
 
-const { zip } = require('zip-a-folder');
+// const { zip } = require('zip-a-folder');
 // Function that builds the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
     return new Promise(async function (resolve, reject) {
@@ -148,11 +148,33 @@ buildCloudStarterZip = function (cloudStarter) {
         deleteFile('./dist/' + cloudStarter + '.zip');
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
         //copyFile('./tmp/' + cloudStarter + '/tsconfig.build.json', './tmp/' + cloudStarter + '/tsconfig.json');
-        log(INFO, 'Using zip a folder... ');
-        await zip('./dist/' + cloudStarter + '/', './dist/' + cloudStarter + '.zip');
-        // run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
+        //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud...
+        //log(INFO, 'Using zip a folder... ');
+        const folderToZip = './dist/' + cloudStarter + '/';
+        const fileForZip = './dist/' + cloudStarter + '.zip';
+
+       // await zip(folderToZip, fileForZip);
+
+        // var zipFolder = require('zip-folder');
+
+        //await zipFolder(folderToZip, fileForZip);
+        //var zipFolder = require('zip-folder');
+
+/*
+        zipFolder(folderToZip, fileForZip, function(err) {
+            if(err) {
+                console.log('oh no!', err);
+            } else {
+                console.log('EXCELLENT');
+                log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
+                resolve();
+            }
+        });
+*/
+        run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
         log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
         resolve();
+
     });
 }
 
