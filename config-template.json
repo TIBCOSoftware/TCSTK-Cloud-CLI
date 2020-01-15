@@ -115,11 +115,11 @@
         }
       ]
     },"TCSTK-spotfire-template-git": {
-      "displayName": "Spotfire Report Template (GIT)",
-      "enabled": false,
+      "displayName": "Analytics Application Template (GIT)",
+      "enabled": true,
       "templateFolder": "",
       "useGit": true,
-      "git" : "https://github.com/hpeters83/TCSTK-Spotfire-Template",
+      "git" : "https://github.com/TIBCOSoftware/TCSTK-analytics-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
