@@ -14,6 +14,10 @@
     "PostCommandsWin": [],
     "replacements": [
       {
+        "from": "tcstk-base-app",
+        "to": "@name"
+      },
+      {
         "from": "TCSTKBaseApp",
         "to": "@name"
       }
