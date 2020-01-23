@@ -6,7 +6,9 @@ const fs = require('file-system');
 const fse = require('fs-extra');
 const del = require('del');
 const PropertiesReader = require('properties-reader');
-const propertiesF = PropertiesReader('tibco-cloud.properties');
+const propFileName = 'tibco-cloud.properties';
+//const propertiesF = PropertiesReader('tibco-cloud.properties');
+const propertiesF = PropertiesReader(propFileName);
 const propsF = propertiesF.path();
 const isWindows = process.platform == 'win32';
 
@@ -62,33 +64,33 @@ var argv = require('yargs').argv;
 var cloudURL = propsF.Cloud_URL;
 var cloudHost = propsF.cloudHost;
 // Check if a global config exists and if it is required
-if(getGlobalConfig()){
+if (getGlobalConfig()) {
     const propsG = getGlobalConfig();
-    if(cloudURL == 'USE-GLOBAL') {
+    if (cloudURL == 'USE-GLOBAL') {
         cloudURL = propsG.Cloud_URL;
     }
-    if(cloudHost == 'USE-GLOBAL') {
+    if (cloudHost == 'USE-GLOBAL') {
         cloudHost = propsG.cloudHost;
     }
 }
 
 //Function to manage the login from the cloud
 var loginURL = cloudURL + propsF.loginURE;
-cLogin = function() {
+cLogin = function () {
     var pass = propsF.CloudLogin.pass;
     var tentantID = propsF.CloudLogin.tenantID;
     var clientID = propsF.CloudLogin.clientID;
     var email = propsF.CloudLogin.email;
     //
-    if(getGlobalConfig()){
+    if (getGlobalConfig()) {
         const propsG = getGlobalConfig();
-        if(pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-        if(tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
-        if(clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
-        if(email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
+        if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+        if (tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
+        if (clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
+        if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
     }
 
-    if(pass == ''){
+    if (pass == '') {
         pass = argv.pass;
         // console.log('Pass from args: ' + pass);
     }
@@ -96,7 +98,7 @@ cLogin = function() {
         pass = Buffer.from(pass, 'base64').toString()
     }
     if (loginC == null) {
-        loginC = cloudLoginV3(tentantID, clientID ,email, pass, loginURL);
+        loginC = cloudLoginV3(tentantID, clientID, email, pass, loginURL);
     }
     if (loginC == 'ERROR') {
         // TODO: exit the gulp task properly
@@ -136,7 +138,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     return re;
 }
 
-cleanDist = function (){
+cleanDist = function () {
     return deleteFolder('./dist/' + propsF.App_Name);
 }
 
@@ -153,24 +155,24 @@ buildCloudStarterZip = function (cloudStarter) {
         const folderToZip = './dist/' + cloudStarter + '/';
         const fileForZip = './dist/' + cloudStarter + '.zip';
 
-       // await zip(folderToZip, fileForZip);
+        // await zip(folderToZip, fileForZip);
 
         // var zipFolder = require('zip-folder');
 
         //await zipFolder(folderToZip, fileForZip);
         //var zipFolder = require('zip-folder');
 
-/*
-        zipFolder(folderToZip, fileForZip, function(err) {
-            if(err) {
-                console.log('oh no!', err);
-            } else {
-                console.log('EXCELLENT');
-                log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
-                resolve();
-            }
-        });
-*/
+        /*
+                zipFolder(folderToZip, fileForZip, function(err) {
+                    if(err) {
+                        console.log('oh no!', err);
+                    } else {
+                        console.log('EXCELLENT');
+                        log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
+                        resolve();
+                    }
+                });
+        */
         run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
         log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
         resolve();
@@ -247,9 +249,6 @@ showClaims = function () {
     return new Promise(function (resolve, reject) {
         var lCookie = cLogin();
         log(DEBUG, 'Login Cookie: ', lCookie);
-
-
-
         var response = syncClient.get(getClaimsURL, {
             headers: {
                 "accept": "application/json",
@@ -261,8 +260,318 @@ showClaims = function () {
     });
 };
 
+/*
 
-getCloud = function(url) {
+name: 'CLIe2e.liveapps.config.tibcolabs.client.context.PUBLIC',
+    content:
+     { json:
+        '{"applicationIds":[],"caseIconsFolderId":"CLIe2e_Icons","id":"7007"}' },
+    type: 'PUBLIC',
+    description: null,
+    sandboxId: '31',
+    scope: '',
+    attributes: [],
+    roles: [],
+    links: [],
+    id: '7007',
+    createdById: '265',
+    createdByName: 'Guest SEG',
+    createdDate: 1564059412958,
+    modifiedById: '265',
+    modifiedByName: 'Guest SEG',
+    modifiedDate: 1564059413173,
+    isOrphaned: false,
+    isAbandoned: false },
+
+
+
+
+
+ */
+
+const sharedStateBaseURL = cloudURL + 'clientstate/v1/';
+const sharedStateURL = sharedStateBaseURL + 'states';
+
+//const sharedStateDetailsURL = sharedStateBaseURL + 'states/';
+
+const SHARED_STATE_STEP_SIZE = 400;
+const SHARED_STATE_MAX_CALLS = 20;
+
+// Function to return a JSON with the shared state entries from a set scope
+getSharedState = function (showTable) {
+    var lCookie = cLogin();
+    log(DEBUG, 'Login Cookie: ', lCookie);
+    //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
+    let ALLsState = [];
+    var i = 0;
+    let moreStates = true;
+    while (moreStates && i < SHARED_STATE_MAX_CALLS) {
+        let start = i * SHARED_STATE_STEP_SIZE;
+        let end = (i + 1) * SHARED_STATE_STEP_SIZE;
+        //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
+        let sStateTemp = getCloud(sharedStateURL + '?%24top=' + SHARED_STATE_STEP_SIZE + '&%24skip=' + start);
+        if (sStateTemp.length < 1) {
+            moreStates = false;
+        }
+        //log(INFO, 'Got ' + sStateTemp.length);
+        ALLsState = ALLsState.concat(sStateTemp);
+        i++;
+        logLine('Got Shared States: ' + ALLsState.length);
+    }
+    console.log('');
+    log(INFO, 'Total Number of Shared State Entries: ' + ALLsState.length);
+    let ssScope = 'APPLICATION';
+    if (propsF.Shared_State_Scope == null) {
+        log(INFO, 'No Shared State Scope found; Adding APPLICATION to ' + propFileName);
+        addOrUpdateProperty(propFileName, 'Shared_State_Scope', 'APPLICATION');
+    } else {
+        ssScope = propsF.Shared_State_Scope;
+    }
+    if (ssScope == 'APPLICATION') {
+        ssScope = propsF.App_Name;
+    }
+    let sState = [];
+    log(INFO, 'Applying Filter) Shared State Scope: ' + ssScope);
+    if (ssScope != '*') {
+        for (var state in ALLsState) {
+            if (ALLsState[state].name.startsWith(ssScope)) {
+                sState.push(ALLsState[state]);
+            }
+        }
+    } else {
+        sState = ALLsState;
+    }
+    log(INFO, 'Filtered Shared State Entries: ' + sState.length);
+    //Sort shared state by old date till new
+    sState.sort(function (a, b) {
+        a = new Date(a.createdDate);
+        b = new Date(b.createdDate);
+        return a > b ? 1 : a < b ? -1 : 0;
+    });
+    var states = {};
+    for (var state in sState) {
+        var sTemp = {};
+        var appN = parseInt(state) + 1;
+        sTemp['ID'] = sState[state].id;
+        sTemp['NAME'] = sState[state].name;
+        sTemp['CREATED BY'] = sState[state].createdByName;
+        var created = new Date(sState[state].createdDate);
+        var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+        sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
+        states[appN] = sTemp;
+    }
+    if (showTable) {
+        console.table(states);
+    }
+    return sState;
+}
+
+// Display the shared state entries to a user
+showSharedState = function () {
+    return new Promise(function (resolve, reject) {
+        getSharedState(true);
+        resolve();
+    });
+};
+
+selectSharedState = async function (sharedStateEntries, question) {
+    // console.log('Shared State Entries: ' , sharedStateEntries);
+    var stateNames = [];
+    for (var state of sharedStateEntries) {
+        stateNames.push(state.name);
+    }
+    // console.log('Shared state names: ' , stateNames);
+    // Pick Item from the list
+    let answer = await askMultipleChoiceQuestionSearch(question, stateNames);
+    let re = {};
+    for (var state of sharedStateEntries) {
+        if (state.name == answer) {
+            re = state;
+        }
+    }
+    return re;
+
+
+}
+
+
+// Display the details of a shared state
+showSharedStateDetails = function () {
+    return new Promise(async function (resolve, reject) {
+        // Show Shared State list
+        const sStateList = getSharedState(true);
+        if (sStateList.length > 0) {
+            // Pick Item from the list
+            let selectedState = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
+            // Show details on the item
+            log(INFO, '---*** ' + selectedState.name + ' (' + selectedState.id + ')***--- \n', selectedState, '\n------------------------------');
+            log(INFO, '---*** CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')***--- \n', JSON.parse(selectedState.content.json), '\n------------------------------');
+
+            // Show Details:  /states/{id}
+
+            // Show Links From
+            // Show Links To
+
+            // Show Attributes
+            // Show Attribute Details
+
+            // Get Roles
+            // Show Role Details
+
+            // Show State Links
+            // Show State Link Details
+        } else {
+            log(ERROR, 'No Shared States available to show details of in the scope: ' + propsF.Shared_State_Scope)
+        }
+
+        resolve();
+    });
+};
+
+deleteSharedState = function (sharedStateID) {
+    const lCookie = cLogin();
+    log(DEBUG, 'Login Cookie: ', lCookie);
+    const response = syncClient.del(sharedStateURL + '/' + sharedStateID, {
+        headers: {
+            "accept": "application/json",
+            "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+        }
+    });
+    var re = response;
+    //let re = Object.assign({}, response.body);
+    //logO(INFO, re);
+    let ok = true;
+    if (re.body != null) {
+        if (re.body.errorMsg != null) {
+            log(ERROR, re.body.errorMsg);
+            ok = false;
+        }
+    }
+    if (ok) {
+        log(INFO, 'Successfully removed shared state with ID: ' + sharedStateID);
+    }
+}
+
+// Removes a Shared State Entry
+removeSharedStateEntry = function () {
+    return new Promise(async function (resolve, reject) {
+        // Show Shared State list
+        const sStateList = getSharedState(true);
+        if (sStateList.length > 0) {
+            // Pick Item from the list
+            let selectedState = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
+            log(INFO, 'Removing Shared State: ' + selectedState.name + ' (' + selectedState.id + ')');
+            // Ask if you really want to delete the selected shared state entry
+            const decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
+            // console.log(decision);
+            // Remove shared state entry
+            if (decision == 'YES') {
+                deleteSharedState(selectedState.id);
+                //deleteSharedState(8088);
+
+            } else {
+                log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
+            }
+        } else {
+            log(ERROR, 'No Shared States available to remove in the scope: ' + propsF.Shared_State_Scope)
+        }
+        resolve();
+    });
+};
+
+// Removes a Shared State Scope
+clearSharedStateScope = function () {
+    return new Promise(async function (resolve, reject) {
+        // Show Shared State list
+        const sStateList = getSharedState(true);
+        if (sStateList.length > 0) {
+            // Ask if you really want to delete this shared state scope
+            let decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: '+ propsF.Shared_State_Scope + ') ?', ['YES', 'NO']);
+            // If the scope is set to * then really double check...
+            if(propsF.Shared_State_Scope == '*'){
+                decision = 'NO';
+                const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
+                if(secondDecision == 'YES'){
+                    decision = 'YES';
+                }
+            }
+            // Remove shared state entries
+            if (decision == 'YES') {
+                for(sStateToDelete of sStateList){
+                    // Remove entries one by one
+                    log(INFO, 'REMOVING SHARED STATE - NAME: ' + sStateToDelete.name + ' ID: ' + sStateToDelete.id);
+                    deleteSharedState(sStateToDelete.id);
+                }
+            } else {
+                log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
+            }
+        } else {
+            log(ERROR, 'No Shared States available to remove in the scope: ' + propsF.Shared_State_Scope)
+        }
+        resolve();
+    });
+};
+
+// Shared state folder (picked up from configuration if exists)
+let SHARED_STATE_FOLDER = './Shared_State/';
+if(propsF.Shared_State_Folder != null){
+    SHARED_STATE_FOLDER = propsF.Shared_State_Folder;
+}
+
+// Export the Shared state scope to a folder
+exportSharedStateScope = function () {
+    return new Promise(function (resolve, reject) {
+        // Show Shared State List
+        let sharedStateEntries = getSharedState(true);
+        //TODO: HIER VERDER
+
+        // Check if folder exist
+
+        // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
+
+        // Get the details for every shared state entry
+
+        // And store them in a file / folder
+
+        resolve();
+    });
+};
+
+
+// Import the Shared state scope from a folder
+importSharedStateScope = function () {
+    return new Promise(function (resolve, reject) {
+
+        // Go Over Shared State files
+
+        // Provide the option to select one or upload all
+
+        // Check which shared states will be overwritten
+
+        // Provide a summary to the user
+
+        // Ask if you are sure to import the shared state ?
+
+        // Upload the shared states one by one
+
+        resolve();
+    });
+};
+
+// TODO: Create a shared state watcher (every time the file changes, the shared state is updated)
+
+watchSharedStateScope = function () {
+    return new Promise(function (resolve, reject) {
+
+        // TODO: Implement
+
+        resolve();
+    });
+};
+
+
+// Get details from a specific Cloud URL
+getCloud = function (url) {
     const lCookie = cLogin();
     log(DEBUG, 'Login Cookie: ', lCookie);
     const response = syncClient.get(url, {
@@ -318,9 +627,12 @@ getAppLinks = function (showTable) {
         appTemp['PUBLISHED VERSION'] = parseInt(app.publishedVersion);
         // console.log(app.name, app.publishedVersion);
         var tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
+        logLine("Processing App: (" + appN + '/' + apps.length + ')...');
+        /*
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write("Processing App: (" + appN + '/' + apps.length + ')...');
+        */
         for (appD of tempDet) {
             //console.log(appD.name);
             if (appD.name.includes("index.html")) {
@@ -396,7 +708,6 @@ publishApp = function (application) {
     });
 }
 
-
 // Get the TIBCO Cloud Starter Development Kit from GIT
 getGit = function (source, target, tag) {
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
@@ -422,167 +733,18 @@ npmInstall = function (location, package) {
     });
 }
 
-/* Moved to Common
-// Function to add or update property to a file
-addOrUpdateProperty = function (location, property, value) {
-    log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
-    // Check if file exists
-    const fs = require('fs');
-    try {
-        if (fs.existsSync(location)) {
-            //file exists
-            log(DEBUG, 'Property file found: ' + location);
-            // Check if file contains property
-            var data = fs.readFileSync(location, 'utf8');
-            var reg = new RegExp(property + '\\s*=\\s*(.*)');
-            if (data.search(reg) > -1) {
-                // We found the property
-                log(DEBUG, 'Property found: ' + property + ' We are updating it to: ' + value);
-                var regRes = new RegExp(property + '\\s*=\\s*(.*)');
-                var result = data.replace(regRes, property + '=' + value);
-                fs.writeFileSync(location, result, 'utf8');
-            } else {
-                // append prop to the end.
-                log(DEBUG, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
-                var result = data + '\n' + property + '=' + value;
-                fs.writeFileSync(location, result, 'utf8');
-            }
-
-        } else {
-            log(ERROR, 'Property File does not exist: ' + location);
-        }
-    } catch (err) {
-        console.error(err)
-    }
-}
-*/
-
-/* Moved to Common
-
-const inquirerF = require('inquirer');
-// function to ask a question
-askMultipleChoiceQuestion = async function (question, options) {
-    var re = 'result';
-    await inquirerF.prompt([{
-        type: 'list',
-        name: 'result',
-        message: question,
-        choices: options,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        logO(DEBUG, answers);
-        re = answers.result;
-    });
-    return re;
-}
-
-var gOptions = [];
-
-askMultipleChoiceQuestionSearch = async function (question, options) {
-    gOptions = options;
-    var re = 'result';
-    inquirerF.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-    await inquirerF.prompt([{
-        type: 'autocomplete',
-        name: 'command',
-        suggestOnly: false,
-        message: question,
-        source: searchAnswerF,
-        pageSize: 4/S,
-            validate: function (val) {
-                return val ? true : 'Type something!';
-            }  S/
-    }]).then((answers) => {
-        console.log('answers: ' , answers);
-        logO(DEBUG, answers);
-        re = answers.command;
-    });
-    return re;
-}
-
-
-
-const _F = require('lodash');
-const fuzzyF = require('fuzzy');
-
-//User interaction
-searchAnswerF = function (answers, input) {
-    input = input || '';
-    return new Promise(function (resolve) {
-        setTimeout(function () {
-            var fuzzyResult = fuzzyF.filter(input, gOptions);
-            resolve(
-                fuzzyResult.map(function (el) {
-                    return el.original;
-                })
-            );
-        }, _F.random(30, 60));
-    });
-}
-*/
-
-/* Moved to Common
-// function to ask a question
-askQuestion = async function (question, type = 'input') {
-    var re = 'result';
-    // console.log('Type: ' , type);
-    await inquirerF.prompt([{
-        type: type,
-        name: 'result',
-        message: question,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        logO(DEBUG, answers);
-        re = answers.result;
-    });
-    return re;
-}
-*/
-
-
+// Function to test features
 testFunction = async function (propFile) {
     var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     return re;
 }
-/* Moved to Common
-// function to update the tenant
-updateRegion = async function (propFile) {
-    var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
-    switch (re) {
-        case 'US - Oregon':
-            addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
-            addOrUpdateProperty(propFile, 'Cloud_URL', 'https://liveapps.cloud.tibco.com/');
-            break;
-        case 'EU - Ireland':
-            addOrUpdateProperty(propFile, 'cloudHost', 'eu.liveapps.cloud.tibco.com');
-            addOrUpdateProperty(propFile, 'Cloud_URL', 'https://eu.liveapps.cloud.tibco.com/');
-            break;
-        case 'AU - Sydney':
-            addOrUpdateProperty(propFile, 'cloudHost', 'au.liveapps.cloud.tibco.com');
-            addOrUpdateProperty(propFile, 'Cloud_URL', 'https://au.liveapps.cloud.tibco.com/');
-            break;
-    }
-}
-*/
-
 
 // Function to copy a directory
 copyDir = function (fromDir, toDir) {
     log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fse.copySync(fromDir, toDir, {overwrite: true});
 }
-/* Move to Global
-// Function to copy a file
-copyFile = function (fromFile, toFile) {
-    log(INFO, 'Copying File from: ' + fromFile + ' to: ' + toFile);
-    fs.copyFileSync(fromFile, toFile);
-}
 
- */
 // Function to delete a file but does not fail when the file does not exits
 deleteFile = function (file) {
     log(INFO, 'Deleting File: ' + file);
@@ -605,47 +767,6 @@ checkPW = function () {
 
 var readline = require('readline');
 var Writable = require('stream').Writable;
-/*
-// Function to obfuscate a password
-obfuscate = function () {
-    return new Promise(async function (resolve, reject) {
-    	
-    	var password = await askQuestion('Please provide the password...', 'password');
-    	console.log('\nObfuscated password is is: ' + obfuscatePW(password));
-    	resolve();
-    	/*
-        var mutableStdout = new Writable({
-            write: function (chunk, encoding, callback) {
-                if (!this.muted)
-                    process.stdout.write(chunk, encoding);
-                callback();
-            }
-        });
-        mutableStdout.muted = false;
-        var rl = readline.createInterface({
-            input: process.stdin,
-            output: mutableStdout,
-            terminal: true
-        });
-        log(INFO, 'Please provide the password...')
-        rl.question('Password: ', (password) => {
-            console.log('\nObfuscated password is is: ' + obfuscatePW(password));
-            rl.close();
-            resolve();
-        });
-        mutableStdout.muted = true;* /
-    });
-}
-*/
-
-/* Moved to common
-
-obfuscatePW = function (toObfuscate){
-    // TODO: use stronger obfuscation
-    return '#' + Buffer.from(toObfuscate).toString('base64');
-}
-
- */
 
 // Use WSU to generate TCI code
 wsuAddTci = function () {
@@ -669,7 +790,7 @@ wsuListTci = function () {
 }
 //TODO: either inspect or get from config
 
-const possibleSchematics = ["case-cockpit","home-cockpit","custom-form-creator","custom-form-action","custom-form-casedata"];
+const possibleSchematics = ["case-cockpit", "home-cockpit", "custom-form-creator", "custom-form-action", "custom-form-casedata"];
 
 schematicAdd = function () {
     return new Promise(async function (resolve, reject) {
@@ -677,30 +798,10 @@ schematicAdd = function () {
         var sType = await askMultipleChoiceQuestion('What type of schematic would you like to add ?', possibleSchematics);
         var sName = await askQuestion('What is the name of your schematic ?');
         //TODO: Add choice for the type of schematic
-        run('ng generate @tibco-tcstk/component-template:'+sType+' ' + sName);
+        run('ng generate @tibco-tcstk/component-template:' + sType + ' ' + sName);
         resolve();
     });
 }
 
 // Set log debug level from local property
 setLogDebug(propsF.Use_Debug);
-
-/*
-// Log function
-const INFO = 'INFO';
-const DEBUG = 'DEBUG';
-const ERROR = 'ERROR';
-const useDebug = (propsF.Use_Debug == 'true');
-log = function (level, message) {
-    if (!(level == DEBUG && !useDebug)) {
-        var timeStamp = new Date();
-        //console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-        console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
-    }
-}
-logO = function (level, message) {
-    if (!(level == DEBUG && !useDebug)) {
-        console.log(message);
-    }
-}
-*/

@@ -118,7 +118,7 @@ askMultipleChoiceQuestionSearch = async function (question, options) {
                 return val ? true : 'Type something!';
             }*/
 	}]).then((answers) => {
-		console.log('answers: ' , answers);
+		// console.log('answers: ' , answers);
 		logO(DEBUG, answers);
 		re = answers.command;
 	});
@@ -314,11 +314,23 @@ log = function (level, message) {
 	if (!(level == DEBUG && !useDebug)) {
 		var timeStamp = new Date();
 		//console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-		console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
+
+		if(level == global.ERROR){
+			console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + '): ' ,'\x1b[31m' , message);
+		} else {
+			console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
+		}
 	}
 }
 logO = function (level, message) {
 	if (!(level == DEBUG && !useDebug)) {
 		console.log(message);
 	}
+}
+
+//Function to log on one line...
+logLine = function (message) {
+	process.stdout.clearLine();
+	process.stdout.cursorTo(0);
+	process.stdout.write(message);
 }

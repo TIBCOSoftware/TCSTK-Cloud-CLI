@@ -141,6 +141,55 @@
       "gulpTask": "update-global-config",
       "availableOnOs": ["all"]
     },
+    "show-shared-state": {
+      "description": "Show the shared state contents",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-shared-state",
+      "availableOnOs": ["all"]
+    },
+    "show-shared-state-details": {
+      "description": "Shows the details of one Shared State entry.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-shared-state-details",
+      "availableOnOs": ["all"]
+    },
+    "clear-shared-state-entry": {
+      "description": "Removes one Shared State entry.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "clear-shared-state-entry",
+      "availableOnOs": ["all"]
+    },
+    "clear-shared-state-scope": {
+      "description": "Removes all shared state entries in the configured scope.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "clear-shared-state-scope",
+      "availableOnOs": ["all"]
+    },
+    "export-shared-state-scope": {
+      "description": "Downloads all shared state entries from the configured scope to the local file system.",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "export-shared-state-scope",
+      "availableOnOs": ["all"]
+    },
+    "import-shared-state-scope": {
+      "description": "Uploads one entry or the configured scope from the local file system to the shared state.",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "import-shared-state-scope",
+      "availableOnOs": ["all"]
+    },
+    "watch-shared-state-scope": {
+      "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "watch-shared-state-scope",
+      "availableOnOs": ["all"]
+    },
     "q": {
       "description": "Quit the console",
       "enabled": true,

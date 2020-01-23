@@ -325,6 +325,36 @@ viewGlobalConfig.description = 'A task to View the Global Connection Configurati
 gulp.task('update-global-config', updateGlobalConfig);
 updateGlobalConfig.description = 'A task to Update the Global Connection Configuration.';
 
+gulp.task('show-shared-state', showSharedState);
+showSharedState.description = 'Show the Shared State contents.';
+
+gulp.task('show-shared-state-details', showSharedStateDetails);
+showSharedStateDetails.description = 'Shows the details of one Shared State entry.';
+
+gulp.task('clear-shared-state-entry', removeSharedStateEntry);
+removeSharedStateEntry.description = 'Removes one Shared State entry.';
+
+gulp.task('clear-shared-state-scope', clearSharedStateScope);
+clearSharedStateScope.description = 'Removes all shared state entries in the configured scope.';
+
+gulp.task('export-shared-state-scope', exportSharedStateScope);
+exportSharedStateScope.description = 'Downloads all shared state entries from the configured scope to the local file system.';
+
+gulp.task('import-shared-state-scope', importSharedStateScope);
+importSharedStateScope.description = 'Uploads one entry or the configured scope from the local file system to the shared state.';
+
+gulp.task('watch-shared-state-scope', watchSharedStateScope);
+watchSharedStateScope.description = 'Monitors the local shared state and when changes are detected it is uploaded to the cloud.';
+
+
+
+
+
+
+
+
+
+
 
 /*
 TODO: Additional Cloud CLI Capabilities
