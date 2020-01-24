@@ -1,10 +1,8 @@
 // Package Definitions
-const execSync = require('child_process').execSync;
 const syncClient = require('sync-rest-client');
 const git = require('gulp-git');
 const fs = require('file-system');
 const fse = require('fs-extra');
-const del = require('del');
 const PropertiesReader = require('properties-reader');
 const propFileName = 'tibco-cloud.properties';
 //const propertiesF = PropertiesReader('tibco-cloud.properties');
@@ -12,12 +10,15 @@ const propertiesF = PropertiesReader(propFileName);
 const propsF = propertiesF.path();
 const isWindows = process.platform == 'win32';
 
+/* Moved To Common
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
 }
+*/
+
 
 // Clean temp folder
 cleanTemp = function () {
@@ -25,6 +26,7 @@ cleanTemp = function () {
     return deleteFolder(propsF.Workspace_TMPFolder);
 }
 
+/* Moved To Common
 // Delete a folder
 deleteFolder = function (folder) {
     log(INFO, 'Deleting Folder: ' + folder);
@@ -32,8 +34,10 @@ deleteFolder = function (folder) {
         folder
     ]);
 }
+*/
 
 
+/* Moved To Common
 // Run an OS Command
 run = function (command) {
     return new Promise(function (resolve, reject) {
@@ -54,7 +58,7 @@ run = function (command) {
         })
     );
 }
-
+*/
 // Function that determines which cloud login method to use
 // function to login to the cloud
 
@@ -77,6 +81,7 @@ if (getGlobalConfig()) {
 //Function to manage the login from the cloud
 var loginURL = cloudURL + propsF.loginURE;
 cLogin = function () {
+    //TODO: Set a timer, if login was too long ago login again...
     var pass = propsF.CloudLogin.pass;
     var tentantID = propsF.CloudLogin.tenantID;
     var clientID = propsF.CloudLogin.clientID;
@@ -297,6 +302,26 @@ const sharedStateURL = sharedStateBaseURL + 'states';
 const SHARED_STATE_STEP_SIZE = 400;
 const SHARED_STATE_MAX_CALLS = 20;
 
+// Shared state scope (picked up from configuration if exists)
+let SHARED_STATE_SCOPE = 'APPLICATION';
+if (propsF.Shared_State_Scope != null) {
+    SHARED_STATE_SCOPE = propsF.Shared_State_Scope;
+} else {
+    log(INFO, 'No Shared State Scope Property found; Adding APPLICATION to ' + propFileName);
+    addOrUpdateProperty(propFileName, 'Shared_State_Scope', 'APPLICATION');
+}
+
+// Shared state scope (picked up from configuration if exists)
+let SHARED_STATE_DOUBLE_CHECK = 'YES';
+if (propsF.Shared_State_Double_Check != null) {
+    SHARED_STATE_DOUBLE_CHECK = propsF.Shared_State_Double_Check;
+} else {
+    log(INFO, 'No Shared State Scope Double Check Property found; Adding YES to ' + propFileName);
+    addOrUpdateProperty(propFileName, 'Shared_State_Double_Check', 'YES');
+}
+const DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() == 'no'));
+
+
 // Function to return a JSON with the shared state entries from a set scope
 getSharedState = function (showTable) {
     var lCookie = cLogin();
@@ -320,21 +345,14 @@ getSharedState = function (showTable) {
     }
     console.log('');
     log(INFO, 'Total Number of Shared State Entries: ' + ALLsState.length);
-    let ssScope = 'APPLICATION';
-    if (propsF.Shared_State_Scope == null) {
-        log(INFO, 'No Shared State Scope found; Adding APPLICATION to ' + propFileName);
-        addOrUpdateProperty(propFileName, 'Shared_State_Scope', 'APPLICATION');
-    } else {
-        ssScope = propsF.Shared_State_Scope;
-    }
-    if (ssScope == 'APPLICATION') {
-        ssScope = propsF.App_Name;
+    if (SHARED_STATE_SCOPE == 'APPLICATION') {
+        SHARED_STATE_SCOPE = propsF.App_Name;
     }
     let sState = [];
-    log(INFO, 'Applying Filter) Shared State Scope: ' + ssScope);
-    if (ssScope != '*') {
+    log(INFO, 'Applying Filter) Shared State Scope: ' + SHARED_STATE_SCOPE);
+    if (SHARED_STATE_SCOPE != '*') {
         for (var state in ALLsState) {
-            if (ALLsState[state].name.startsWith(ssScope)) {
+            if (ALLsState[state].name.startsWith(SHARED_STATE_SCOPE)) {
                 sState.push(ALLsState[state]);
             }
         }
@@ -358,6 +376,11 @@ getSharedState = function (showTable) {
         var created = new Date(sState[state].createdDate);
         var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
         sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
+        sTemp['MODIFIED BY'] = sState[state].modifiedByName;
+        var modified = new Date(sState[state].modifiedDate);
+        sTemp['LAST MODIFIED'] = modified.toLocaleDateString("en-US", options);
+
+
         states[appN] = sTemp;
     }
     if (showTable) {
@@ -404,8 +427,8 @@ showSharedStateDetails = function () {
             // Pick Item from the list
             let selectedState = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
             // Show details on the item
-            log(INFO, '---*** ' + selectedState.name + ' (' + selectedState.id + ')***--- \n', selectedState, '\n------------------------------');
-            log(INFO, '---*** CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')***--- \n', JSON.parse(selectedState.content.json), '\n------------------------------');
+            log(INFO, 'CONTEXT:' + selectedState.name + ' (' + selectedState.id + ')\n', selectedState, '\n------------------------------');
+            log(INFO, 'JSON CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')\n', JSON.parse(selectedState.content.json), '\n------------------------------');
 
             // Show Details:  /states/{id}
 
@@ -462,7 +485,10 @@ removeSharedStateEntry = function () {
             let selectedState = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
             log(INFO, 'Removing Shared State: ' + selectedState.name + ' (' + selectedState.id + ')');
             // Ask if you really want to delete the selected shared state entry
-            const decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
+            let decision = 'YES';
+            if (DO_SHARED_STATE_DOUBLE_CHECK) {
+                decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
+            }
             // console.log(decision);
             // Remove shared state entry
             if (decision == 'YES') {
@@ -486,18 +512,22 @@ clearSharedStateScope = function () {
         const sStateList = getSharedState(true);
         if (sStateList.length > 0) {
             // Ask if you really want to delete this shared state scope
-            let decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: '+ propsF.Shared_State_Scope + ') ?', ['YES', 'NO']);
+            let decision = 'YES';
+
+            if (DO_SHARED_STATE_DOUBLE_CHECK) {
+                decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: ' + propsF.Shared_State_Scope + ') ?', ['YES', 'NO']);
+            }
             // If the scope is set to * then really double check...
-            if(propsF.Shared_State_Scope == '*'){
+            if (propsF.Shared_State_Scope == '*') {
                 decision = 'NO';
                 const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
-                if(secondDecision == 'YES'){
+                if (secondDecision == 'YES') {
                     decision = 'YES';
                 }
             }
             // Remove shared state entries
             if (decision == 'YES') {
-                for(sStateToDelete of sStateList){
+                for (sStateToDelete of sStateList) {
                     // Remove entries one by one
                     log(INFO, 'REMOVING SHARED STATE - NAME: ' + sStateToDelete.name + ' ID: ' + sStateToDelete.id);
                     deleteSharedState(sStateToDelete.id);
@@ -514,60 +544,230 @@ clearSharedStateScope = function () {
 
 // Shared state folder (picked up from configuration if exists)
 let SHARED_STATE_FOLDER = './Shared_State/';
-if(propsF.Shared_State_Folder != null){
+if (propsF.Shared_State_Folder != null) {
     SHARED_STATE_FOLDER = propsF.Shared_State_Folder;
+} else {
+    addOrUpdateProperty(propFileName, 'Shared_State_Folder', SHARED_STATE_FOLDER);
 }
 
+const jsonfile = require('jsonfile');
 // Export the Shared state scope to a folder
 exportSharedStateScope = function () {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         // Show Shared State List
         let sharedStateEntries = getSharedState(true);
-        //TODO: HIER VERDER
-
-        // Check if folder exist
-
-        // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
-
-        // Get the details for every shared state entry
-
-        // And store them in a file / folder
-
+        let decision = 'YES';
+        if (DO_SHARED_STATE_DOUBLE_CHECK) {
+            decision = await askMultipleChoiceQuestion('Are you sure you want to export all the states above ?', ['YES', 'NO']);
+        }
+        if (decision == 'YES') {
+            // Check if folder exist
+            mkdirIfNotExist(SHARED_STATE_FOLDER);
+            mkdirIfNotExist(SHARED_STATE_FOLDER + 'CONTENT/');
+            // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
+            const storeOptions = {spaces: 2, EOL: '\r\n'};
+            for (let sSEntry of sharedStateEntries) {
+                let writeContentSeparate = false;
+                let contentObject = {};
+                let contextFileName = SHARED_STATE_FOLDER + sSEntry.name + '.json';
+                let contentFileName = SHARED_STATE_FOLDER + 'CONTENT/' + sSEntry.name + '.CONTENT.json';
+                if (sSEntry.content != null) {
+                    if (sSEntry.content.json != null) {
+                        try {
+                            // Get the details for every shared state entry
+                            contentObject = JSON.parse(sSEntry.content.json);
+                            sSEntry.content.json = {'FILESTORE': contentFileName};
+                            writeContentSeparate = true;
+                            // And store them in a file / folder
+                            jsonfile.writeFileSync(contentFileName, contentObject, storeOptions);
+                            log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                        } catch (e) {
+                            log(ERROR, 'Parse Error on: ' + sSEntry.name + 'Writing directly...');
+                        }
+                    }
+                }
+                jsonfile.writeFileSync(SHARED_STATE_FOLDER + sSEntry.name + '.json', sSEntry, storeOptions);
+                log(INFO, '[STORED CONTEXT]: ' + contextFileName);
+                if (!writeContentSeparate) {
+                    log(ERROR, 'Stored all in: ' + contextFileName)
+                }
+            }
+        } else {
+            log(INFO, 'Don\'t worry I have not exported anything :-) ... ');
+        }
         resolve();
     });
 };
 
+// Load shared state contents from a file
+importSharedStateFile = function (ssFile) {
+    log(DEBUG, 'Importing: ' + ssFile);
+    var contentContextFile = fs.readFileSync(ssFile);
+    var ssObject = {};
+    try {
+        ssObject = JSON.parse(contentContextFile);
+    } catch (e) {
+        log(ERROR, 'Parse Error on: ' + ssFile);
+        log(ERROR, e);
+        process.exit();
+    }
+    if(ssObject.content != null){
+        if(ssObject.content.json != null){
+            if(ssObject.content.json['FILESTORE'] != null){
+                const contentFile = ssObject.content.json['FILESTORE'];
+                log(INFO, 'Getting content from: ' + contentFile);
+                var contentContentFile = fs.readFileSync(contentFile, "utf8");
+                // console.log('GOT: ' , contentContentFile);
+                try {
+                    ssObject.content.json = contentContentFile;
+                } catch (e) {
+                    log(ERROR, 'Parse Error on: ' + contentFile);
+                    log(ERROR, e);
+                    process.exit();
+                }
+                ssObject.content.json = ssObject.content.json;
+            }
+        }
+    }
+    // console.log(ssObject);
+    return ssObject;
+}
+
+putSharedState = function (sharedStateObject){
+    if(sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}){
+        log(DEBUG, 'POSTING Shared State', sharedStateObject);
+        const lCookie = cLogin();
+        log(DEBUG, 'Login Cookie: ', lCookie);
+        const response = syncClient.put(encodeURI(sharedStateURL) , {
+            headers: {
+                "accept": "application/json",
+                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+            },
+            payload: [sharedStateObject]
+        });
+        //console.log(response.body);
+        log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
+        var re = response;
+        // TODO: Check for errors, and if the state does not exist use post..
+    } else {
+        log(ERROR, 'NOT Posting Empty Shared State: ', sharedStateObject )
+    }
+}
 
 // Import the Shared state scope from a folder
 importSharedStateScope = function () {
-    return new Promise(function (resolve, reject) {
-
-        // Go Over Shared State files
-
-        // Provide the option to select one or upload all
-
-        // Check which shared states will be overwritten
-
-        // Provide a summary to the user
-
-        // Ask if you are sure to import the shared state ?
-
-        // Upload the shared states one by one
-
-        resolve();
-    });
+    return new Promise(async function (resolve, reject) {
+            let importOptions = [];
+            // Go Over Shared State files
+            var states = {};
+            let it = 1;
+            fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
+                if (file != 'CONTENT') {
+                    importOptions.push(file);
+                    var sTemp = {};
+                    var appN = it;
+                    sTemp['FILE'] = file;
+                    states[appN] = sTemp;
+                    it++;
+                }
+            });
+            if (importOptions.length > 0) {
+                log(INFO, 'Shared states found in: ' + SHARED_STATE_FOLDER);
+                console.table(states);
+                importOptions.unshift('ALL SHARED STATES');
+                // Provide the option to select one or upload all
+                let answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions);
+                if (answer == 'ALL SHARED STATES') {
+                    // Import all shared states
+                    for(curState of importOptions){
+                        if(curState != 'ALL SHARED STATES'){
+                            // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
+                            putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
+                        }
+                    }
+                } else {
+                    putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + answer));
+                }
+            } else {
+                log(ERROR, 'No Shared States found for import in: ' + SHARED_STATE_FOLDER);
+            }
+            // TODO: Check which shared states will be overwritten
+            // Provide a summary to the user
+            // Ask if you are sure to import the shared state ?
+            // Upload the shared states one by one
+            resolve();
+        }
+    );
 };
 
-// TODO: Create a shared state watcher (every time the file changes, the shared state is updated)
+//wrapper function around the watcher on shared state
+watchSharedStateScopeMain = function() {
+    return new Promise(async function (resolve, reject) {
+        //const commandSTDO = 'cd ' + __dirname  + '/../ && gulp watch-shared-state-scope-do --cwd "' + process.cwd() + '" --gulpfile "' + __dirname + '/../manage-project.js" --pass "' + propsF.CloudLogin.pass + '"';
+        const commandSTDO = 'tcli watch-shared-state-scope-do';
+        const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state scope ?', ['YES', 'NO']);
+        if(decision == 'YES'){
+            exportSharedStateScope().then(() => {
+                run(commandSTDO);
+                resolve();
+            })
+        } else {
+            run (commandSTDO);
+            resolve();
+        }
+    });
+}
 
+//A shared state watcher (every time the file changes, the shared state is updated)
+const chokidar = require('chokidar');
 watchSharedStateScope = function () {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
+        //Do the login now, so it does not have to be done later
+        cLogin();
+        log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
+        const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
+            // console.log(event, path);
+            if(event == 'change'){
+                if(path.includes('/CONTENT/')){
+                    log(INFO, 'CONTENT File UPDATED: ' + path);
+                    const contextFile = path.replace('/CONTENT/' , '/').replace('.CONTENT.', '.');
+                    // console.log(contextFile);
+                    if (doesFileExist(contextFile)) {
+                        putSharedState(importSharedStateFile(contextFile));
+                    } else {
+                        log(ERROR, 'Can\'t find context file: ' + contextFile);
+                    }
+                } else {
+                    log(INFO, 'CONTEXT File UPDATED: ' + path);
+                    log(INFO, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
+                    //putSharedState(importSharedStateFile(path));
+                }
+            }
 
-        // TODO: Implement
+        });
 
-        resolve();
+        const readline = require('readline');
+        readline.emitKeypressEvents(process.stdin);
+        process.stdin.setRawMode(true);
+        process.stdin.on('keypress', (str, key) => {
+            if (key.ctrl && key.name === 'c') {
+                process.exit();
+            }
+            // console.log(key);
+            // console.log(key.name);
+            if (key.name == 'escape' || key.name === 'q') {
+                // console.log('ESCAPE...');
+                resolve();
+                watcher.close().then(() => {
+                    log(INFO, 'Stopped Listening for File changes...');
+                    process.exit();
+                });
+            }
+        });
+        console.log('Press Escape key or the \'q\'-key to stop listening for file changes...');
     });
 };
+
 
 
 // Get details from a specific Cloud URL

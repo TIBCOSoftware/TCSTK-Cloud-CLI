@@ -80,12 +80,10 @@ copyFile = function (fromFile, toFile) {
 	fs.copyFileSync(fromFile, toFile);
 }
 
-
-
-const inquirerF = require('inquirer');
+let inquirerF = require('inquirer');
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
-	var re = 'result';
+	let re = 'result';
 	await inquirerF.prompt([{
 		type: 'list',
 		name: 'result',
@@ -97,12 +95,16 @@ askMultipleChoiceQuestion = async function (question, options) {
 	}]).then((answers) => {
 		logO(DEBUG, answers);
 		re = answers.result;
+		//return answers.result;
 	});
+	//let name = require.resolve('inquirer');
+	//delete require.cache[name];
+	//console.log(re);
 	return re;
 }
 
 var gOptions = [];
-
+// Ask a question to a user, and allow the user to search through a possilbe set of options
 askMultipleChoiceQuestionSearch = async function (question, options) {
 	gOptions = options;
 	var re = 'result';
@@ -125,8 +127,6 @@ askMultipleChoiceQuestionSearch = async function (question, options) {
 	return re;
 }
 
-
-
 const _F = require('lodash');
 const fuzzyF = require('fuzzy');
 
@@ -145,6 +145,7 @@ searchAnswerF = function (answers, input) {
 	});
 }
 
+// Update the cloud login properties
 updateCloudLogin = async function(propFile){
 	// Client ID
 	log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
@@ -162,6 +163,7 @@ updateCloudLogin = async function(propFile){
 	}
 }
 
+// Obfuscate a password
 obfuscatePW = function (toObfuscate){
 	// TODO: use stronger obfuscation
 	return '#' + Buffer.from(toObfuscate).toString('base64');
@@ -240,8 +242,7 @@ askQuestion = async function (question, type = 'input') {
 	return re;
 }
 
-
-
+// Get the global configuration
 getGlobalConfig = function(){
 	// const globalTCpropFile = __dirname + '/../../common/global-tibco-cloud.properties';
 	if (doesFileExist(globalTCpropFile)) {
@@ -253,6 +254,46 @@ getGlobalConfig = function(){
 	}
 }
 
+// Run an OS Command
+const execSync = require('child_process').execSync;
+run = function (command) {
+	return new Promise(function (resolve, reject) {
+		log(DEBUG, 'Executing Command: ' + command);
+		try {
+			execSync(
+				command,
+				{stdio: 'inherit'}
+			);
+		} catch (err) {
+			reject(err);
+		}
+		resolve();
+	}).catch(
+		(reason => {
+			logO(ERROR, reason);
+			process.exit(1);
+		})
+	);
+}
+
+// Delete a folder
+const del = require('del');
+deleteFolder = function (folder) {
+	log(INFO, 'Deleting Folder: ' + folder);
+	return del([
+		folder
+	]);
+}
+
+const fs = require('file-system');
+// Create a directory if it does not exists
+mkdirIfNotExist = function (dir) {
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir);
+	}
+}
+
+// Check if a file exists
 doesFileExist = function(checkFile){
 	const fsCom = require('fs');
 	log(DEBUG, "Checking if file exists: " + checkFile);
@@ -309,16 +350,16 @@ setLogDebug = function(debug){
 	useDebug = (debug == 'true');
 }
 
-log = function (level, message) {
+log = function (level, ...message) {
 	// console.log('LOG: ' ,useDebug , level, message);
 	if (!(level == DEBUG && !useDebug)) {
 		var timeStamp = new Date();
 		//console.log('(' + timeStamp + ')[' + level + ']  ' + message);
 
 		if(level == global.ERROR){
-			console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + '): ' ,'\x1b[31m' , message);
+			console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + '): ' ,'\x1b[31m' , ...message);
 		} else {
-			console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , message);
+			console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , ...message);
 		}
 	}
 }
@@ -334,3 +375,5 @@ logLine = function (message) {
 	process.stdout.cursorTo(0);
 	process.stdout.write(message);
 }
+
+

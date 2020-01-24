@@ -171,23 +171,30 @@
     },
     "export-shared-state-scope": {
       "description": "Downloads all shared state entries from the configured scope to the local file system.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "export-shared-state-scope",
       "availableOnOs": ["all"]
     },
     "import-shared-state-scope": {
       "description": "Uploads one entry or the configured scope from the local file system to the shared state.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "import-shared-state-scope",
       "availableOnOs": ["all"]
     },
     "watch-shared-state-scope": {
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "watch-shared-state-scope",
+      "availableOnOs": ["all"]
+    },
+    "watch-shared-state-scope-do": {
+      "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
+      "enabled": true,
+      "internal": true,
+      "gulpTask": "watch-shared-state-scope-do",
       "availableOnOs": ["all"]
     },
     "q": {

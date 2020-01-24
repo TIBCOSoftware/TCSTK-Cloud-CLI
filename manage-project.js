@@ -343,9 +343,10 @@ exportSharedStateScope.description = 'Downloads all shared state entries from th
 gulp.task('import-shared-state-scope', importSharedStateScope);
 importSharedStateScope.description = 'Uploads one entry or the configured scope from the local file system to the shared state.';
 
-gulp.task('watch-shared-state-scope', watchSharedStateScope);
-watchSharedStateScope.description = 'Monitors the local shared state and when changes are detected it is uploaded to the cloud.';
+gulp.task('watch-shared-state-scope', watchSharedStateScopeMain);
+watchSharedStateScopeMain.description = 'Monitors the local shared state and when changes are detected it is uploaded to the cloud.';
 
+gulp.task('watch-shared-state-scope-do', watchSharedStateScope);
 
 
 
