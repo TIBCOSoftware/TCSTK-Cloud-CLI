@@ -138,7 +138,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         logO(DEBUG, re.domain);
         logO(DEBUG, re.tsc);
         logO(DEBUG, re);
-        log(INFO, 'Login Successful...');
+        log(INFO, 'Login Successful of ' + email + ' ...');
     }
     return re;
 }
