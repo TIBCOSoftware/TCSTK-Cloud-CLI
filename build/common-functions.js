@@ -49,7 +49,7 @@ displayGlobalConnectionConfig = function(){
 
 			console.table(globalConfig);
 		} else {
-			log(ERROR,'No Global Configuration Set...');
+			log(INFO,'No Global Configuration Set...');
 		}
 
 	// Returns true if the global file exists and false if it does not exists.
@@ -249,7 +249,7 @@ getGlobalConfig = function(){
 		const PropertiesReader = require('properties-reader');
 		return propsG = PropertiesReader(globalTCpropFile).path();
 	} else {
-		log(ERROR,'No Global Configuration Set...');
+		log(INFO,'No Global Configuration Set...');
 		return false;
 	}
 }
