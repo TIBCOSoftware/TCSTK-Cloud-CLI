@@ -190,6 +190,13 @@
       "gulpTask": "watch-shared-state-scope",
       "availableOnOs": ["all"]
     },
+    "update-tcli": {
+      "description": "Update the Cloud CLI",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "update-tcli",
+      "availableOnOs": ["all"]
+    },
     "q": {
       "description": "Quit the console",
       "enabled": true,

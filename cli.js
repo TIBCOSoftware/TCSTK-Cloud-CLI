@@ -16,7 +16,11 @@ function parseArgumentsIntoOptions(rawArgs) {
             '--createCP': Boolean,
             '-c': '--createCP',
             '--help': Boolean,
-            '-h':'--help'
+            '-h':'--help',
+            '--version': Boolean,
+            '-v':'--version',
+            '--update': Boolean,
+            '-u':'--update',
         },
         {
             argv: rawArgs.slice(2),
@@ -27,6 +31,8 @@ function parseArgumentsIntoOptions(rawArgs) {
         debug: args['--debug'] || false,
         help: args['--help'] || false,
         createCP: args['--createCP'] || false,
+        version: args['--version'] || false,
+        update: args['--update'] || false,
         task: args._[0] || ''
     };
 }
@@ -51,9 +57,19 @@ export async function cli(args) {
     if(options.help){
         helptcli();
         process.exit(0);
-        //TODO: Reuse Help Function
         //options.task = 'help-tcli';
     }
+    if(options.version){
+        console.log('TIBCO Cloud CLI Version: ' + require('./package.json').version);
+        process.exit(0);
+    }
+    if(options.update){
+        // console.log('TIBCO Cloud CLI Version: ' + require('./package.json').version);
+        // options.task = 'update-tcli';
+        updateTCLI();
+        process.exit(0);
+    }
+
     var projectManagementMode = true;
     if(options.task == 'new' || options.task == 'new-starter'){
         options.task = 'new-starter';

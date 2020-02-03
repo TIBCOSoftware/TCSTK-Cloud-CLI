@@ -348,6 +348,8 @@ watchSharedStateScopeMain.description = 'Monitors the local shared state and whe
 
 gulp.task('watch-shared-state-scope-do', watchSharedStateScope);
 
+gulp.task('update-tcli', updateTCLI);
+watchSharedStateScopeMain.description = 'Update the Cloud CLI.';
 
 
 

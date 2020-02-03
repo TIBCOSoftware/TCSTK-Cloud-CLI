@@ -189,6 +189,13 @@ updateRegion = async function (propFile) {
 	}
 }
 
+updateTCLI = function(){
+	log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../package.json').version);
+	run('npm -g install @tibco-tcstk/cloud-cli');
+	log(INFO, 'New Cloud CLI Version: ');
+	run('tcli -v')
+}
+
 // Function to add or update property to a file
 addOrUpdateProperty = function (location, property, value) {
 	log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
