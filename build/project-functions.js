@@ -952,7 +952,7 @@ deleteFile = function (file) {
         fs.unlinkSync(file);
         //file removed
     } catch (err) {
-        log(ERROR, 'Maybe file does not exist ?... (' + err.code + ')');
+        log(INFO, 'Could not delete file, maybe file does not exist ?... (' + err.code + ')');
         //console.log(err)
     }
 }

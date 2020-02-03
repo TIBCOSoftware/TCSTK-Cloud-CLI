@@ -8,63 +8,63 @@
       "availableOnOs": ["win32","darwin"],
       "availableOnTemplate": ["all"]
     },
-    "show-cloud": {
+    "1. show-cloud": {
       "description": "Show Cloud Details",
       "enabled": true,
       "internal": false,
       "gulpTask": "show-cloud",
       "availableOnOs": ["all"]
     },
-    "show-apps": {
+    "2. show-apps": {
       "description": "Show Applications of LiveApps WebApps",
       "enabled": true,
       "internal": false,
       "gulpTask": "show-apps",
       "availableOnOs": ["all"]
     },
-    "show-application-links": {
+    "3. show-application-links": {
       "description": "Show Links to Applications of LiveApps WebApps",
       "enabled": true,
       "internal": false,
       "gulpTask": "show-application-links",
       "availableOnOs": ["all"]
     },
-    "change-region": {
+    "4. change-region": {
       "description": "Change the Region in the cloud-properties file",
       "enabled": true,
       "internal": false,
       "gulpTask": "change-region",
       "availableOnOs": ["darwin"]
     },
-    "obfuscate": {
+    "5. obfuscate": {
       "description": "Obfuscate a password and put it in the cloud-properties file",
       "enabled": true,
       "internal": false,
       "gulpTask": "obfuscate",
       "availableOnOs": ["darwin"]
     },
-    "start": {
+    "6. start": {
       "description": "Start your local cloud starter project",
       "enabled": true,
       "internal": false,
       "gulpTask": "start",
       "availableOnOs": ["all"]
     },
-    "build": {
+    "7. build": {
       "description": "Build your local cloud starter project",
       "enabled": true,
       "internal": false,
       "gulpTask": "build",
       "availableOnOs": ["all"]
     },
-    "deploy": {
+    "8. deploy": {
       "description": "Deploy your local cloud starter project",
       "enabled": true,
       "internal": false,
       "gulpTask": "deploy",
       "availableOnOs": ["all"]
     },
-    "publish": {
+    "9. publish": {
       "description": "Publish your cloud starter project in the cloud",
       "enabled": false,
       "internal": false,
@@ -78,28 +78,28 @@
       "gulpTask": "clean",
       "availableOnOs": ["all"]
     },
-    "build-deploy": {
+    "10. build-deploy": {
       "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
       "gulpTask": "build-deploy",
       "availableOnOs": ["all"]
     },
-    "get-cloud-libs-from-git": {
+    "11. get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
       "enabled": true,
       "internal": true,
       "gulpTask": "get-cloud-libs-from-git",
       "availableOnOs": ["darwin"]
     },
-    "inject-lib-sources": {
+    "12. inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
       "gulpTask": "inject-lib-sources",
       "availableOnOs": ["darwin"]
     },
-    "undo-lib-sources": {
+    "13. undo-lib-sources": {
       "description": "Undo's the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
@@ -120,81 +120,74 @@
       "gulpTask": "wsu-add-tci",
       "availableOnOs": ["darwin"]
     },
-    "schematic-add": {
+    "14. schematic-add": {
       "description": "Add a schematic into your project",
       "enabled": true,
       "internal": false,
       "gulpTask": "schematic-add",
       "availableOnOs": ["all"]
     },
-    "view-global-config": {
+    "15. view-global-config": {
       "description": "View the global cloud connection configuration",
       "enabled": true,
       "internal": false,
       "gulpTask": "view-global-config",
       "availableOnOs": ["all"]
     },
-    "update-global-config": {
+    "16. update-global-config": {
       "description": "Update the global cloud connection configuration",
       "enabled": true,
       "internal": false,
       "gulpTask": "update-global-config",
       "availableOnOs": ["all"]
     },
-    "show-shared-state": {
+    "17. show-shared-state": {
       "description": "Show the shared state contents",
       "enabled": true,
       "internal": false,
       "gulpTask": "show-shared-state",
       "availableOnOs": ["all"]
     },
-    "show-shared-state-details": {
+    "18. show-shared-state-details": {
       "description": "Shows the details of one Shared State entry.",
       "enabled": true,
       "internal": false,
       "gulpTask": "show-shared-state-details",
       "availableOnOs": ["all"]
     },
-    "clear-shared-state-entry": {
+    "19. clear-shared-state-entry": {
       "description": "Removes one Shared State entry.",
       "enabled": true,
       "internal": false,
       "gulpTask": "clear-shared-state-entry",
       "availableOnOs": ["all"]
     },
-    "clear-shared-state-scope": {
+    "20. clear-shared-state-scope": {
       "description": "Removes all shared state entries in the configured scope.",
       "enabled": true,
       "internal": false,
       "gulpTask": "clear-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "export-shared-state-scope": {
+    "21. export-shared-state-scope": {
       "description": "Downloads all shared state entries from the configured scope to the local file system.",
       "enabled": true,
       "internal": false,
       "gulpTask": "export-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "import-shared-state-scope": {
+    "22. import-shared-state-scope": {
       "description": "Uploads one entry or the configured scope from the local file system to the shared state.",
       "enabled": true,
       "internal": false,
       "gulpTask": "import-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "watch-shared-state-scope": {
+    "23. watch-shared-state-scope": {
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
       "enabled": true,
       "internal": false,
       "gulpTask": "watch-shared-state-scope",
-      "availableOnOs": ["all"]
-    },
-    "watch-shared-state-scope-do": {
-      "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
-      "enabled": true,
-      "internal": true,
-      "gulpTask": "watch-shared-state-scope-do",
       "availableOnOs": ["all"]
     },
     "q": {
