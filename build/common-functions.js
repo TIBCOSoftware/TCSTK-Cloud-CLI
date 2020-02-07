@@ -196,6 +196,13 @@ updateTCLI = function(){
 	run('tcli -v')
 }
 
+updateTCLIwrapper = function() {
+	return new Promise(async function (resolve, reject) {
+		updateTCLI();
+		resolve();
+	});
+}
+
 // Function to add or update property to a file
 addOrUpdateProperty = function (location, property, value) {
 	log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
