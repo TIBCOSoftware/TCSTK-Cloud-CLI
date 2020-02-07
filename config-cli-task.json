@@ -64,14 +64,14 @@
       "gulpTask": "deploy",
       "availableOnOs": ["all"]
     },
-    "9. publish": {
+    "publish": {
       "description": "Publish your cloud starter project in the cloud",
       "enabled": false,
       "internal": false,
       "gulpTask": "publish",
       "availableOnOs": ["all"]
     },
-    "clean": {
+    "9. clean": {
       "description": "Clean the temporary folders",
       "enabled": true,
       "internal": true,
