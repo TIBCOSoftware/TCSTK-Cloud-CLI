@@ -174,7 +174,7 @@ export async function cli(args) {
         if (options.task == '') {
             gulp.series('default')();
         } else {
-            console.log('TASK: ' + options.task);
+            // console.log('TASK: ' + options.task);
             if (options.task == 'help') {
                 options.task = 'help-tcli';
             }

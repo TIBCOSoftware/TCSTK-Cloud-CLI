@@ -10,58 +10,14 @@ const propertiesF = PropertiesReader(propFileName);
 const propsF = propertiesF.path();
 const isWindows = process.platform == 'win32';
 
-/* Moved To Common
-// Create a directory if it does not exists
-mkdirIfNotExist = function (dir) {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-}
-*/
-
-
 // Clean temp folder
 cleanTemp = function () {
     log(INFO, 'Cleaning Temp Directory: ' + propsF.Workspace_TMPFolder);
     return deleteFolder(propsF.Workspace_TMPFolder);
 }
 
-/* Moved To Common
-// Delete a folder
-deleteFolder = function (folder) {
-    log(INFO, 'Deleting Folder: ' + folder);
-    return del([
-        folder
-    ]);
-}
-*/
-
-
-/* Moved To Common
-// Run an OS Command
-run = function (command) {
-    return new Promise(function (resolve, reject) {
-        log(DEBUG, 'Executing Command: ' + command);
-        try {
-            execSync(
-                command,
-                {stdio: 'inherit'}
-            );
-        } catch (err) {
-            reject(err);
-        }
-        resolve();
-    }).catch(
-        (reason => {
-            logO(ERROR, reason);
-            process.exit(1);
-        })
-    );
-}
-*/
 // Function that determines which cloud login method to use
 // function to login to the cloud
-
 var loginC = null;
 var argv = require('yargs').argv;
 
@@ -265,40 +221,9 @@ showClaims = function () {
     });
 };
 
-/*
-
-name: 'CLIe2e.liveapps.config.tibcolabs.client.context.PUBLIC',
-    content:
-     { json:
-        '{"applicationIds":[],"caseIconsFolderId":"CLIe2e_Icons","id":"7007"}' },
-    type: 'PUBLIC',
-    description: null,
-    sandboxId: '31',
-    scope: '',
-    attributes: [],
-    roles: [],
-    links: [],
-    id: '7007',
-    createdById: '265',
-    createdByName: 'Guest SEG',
-    createdDate: 1564059412958,
-    modifiedById: '265',
-    modifiedByName: 'Guest SEG',
-    modifiedDate: 1564059413173,
-    isOrphaned: false,
-    isAbandoned: false },
-
-
-
-
-
- */
-
+//TODO: Move this to prop file
 const sharedStateBaseURL = cloudURL + 'clientstate/v1/';
 const sharedStateURL = sharedStateBaseURL + 'states';
-
-//const sharedStateDetailsURL = sharedStateBaseURL + 'states/';
-
 const SHARED_STATE_STEP_SIZE = 400;
 const SHARED_STATE_MAX_CALLS = 20;
 
@@ -379,8 +304,6 @@ getSharedState = function (showTable) {
         sTemp['MODIFIED BY'] = sState[state].modifiedByName;
         var modified = new Date(sState[state].modifiedDate);
         sTemp['LAST MODIFIED'] = modified.toLocaleDateString("en-US", options);
-
-
         states[appN] = sTemp;
     }
     if (showTable) {
@@ -413,8 +336,6 @@ selectSharedState = async function (sharedStateEntries, question) {
         }
     }
     return re;
-
-
 }
 
 
@@ -431,6 +352,7 @@ showSharedStateDetails = function () {
             log(INFO, 'JSON CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')\n', JSON.parse(selectedState.content.json), '\n------------------------------');
 
             // Show Details:  /states/{id}
+            // TODO: Think about:
 
             // Show Links From
             // Show Links To
@@ -745,7 +667,6 @@ watchSharedStateScope = function () {
             }
 
         });
-
         const readline = require('readline');
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
@@ -767,8 +688,6 @@ watchSharedStateScope = function () {
         console.log('Press Escape key or the \'q\'-key to stop listening for file changes...');
     });
 };
-
-
 
 // Get details from a specific Cloud URL
 getCloud = function (url) {
