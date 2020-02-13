@@ -4,16 +4,16 @@ const git = require('gulp-git');
 const fs = require('file-system');
 const fse = require('fs-extra');
 const PropertiesReader = require('properties-reader');
-const propFileName = 'tibco-cloud.properties';
+//const propFileName = 'tibco-cloud.properties';
 //const propertiesF = PropertiesReader('tibco-cloud.properties');
-const propertiesF = PropertiesReader(propFileName);
-const propsF = propertiesF.path();
+//const propertiesF = PropertiesReader(propFileName);
+//const getProp( = propertiesF.path();
 const isWindows = process.platform == 'win32';
 
 // Clean temp folder
 cleanTemp = function () {
-    log(INFO, 'Cleaning Temp Directory: ' + propsF.Workspace_TMPFolder);
-    return deleteFolder(propsF.Workspace_TMPFolder);
+    log(INFO, 'Cleaning Temp Directory: ' + getProp('Workspace_TMPFolder'));
+    return deleteFolder(getProp('Workspace_TMPFolder'));
 }
 
 // Function that determines which cloud login method to use
@@ -21,9 +21,10 @@ cleanTemp = function () {
 var loginC = null;
 var argv = require('yargs').argv;
 
-var cloudURL = propsF.Cloud_URL;
-var cloudHost = propsF.cloudHost;
+var cloudURL = getProp('Cloud_URL');
+var cloudHost = getProp('cloudHost');
 // Check if a global config exists and if it is required
+//TODO: Manage global config in common functions
 if (getGlobalConfig()) {
     const propsG = getGlobalConfig();
     if (cloudURL == 'USE-GLOBAL') {
@@ -35,14 +36,15 @@ if (getGlobalConfig()) {
 }
 
 //Function to manage the login from the cloud
-var loginURL = cloudURL + propsF.loginURE;
+var loginURL = cloudURL + getProp('loginURE');
 cLogin = function () {
     //TODO: Set a timer, if login was too long ago login again...
-    var pass = propsF.CloudLogin.pass;
-    var tentantID = propsF.CloudLogin.tenantID;
-    var clientID = propsF.CloudLogin.clientID;
-    var email = propsF.CloudLogin.email;
+    var pass = getProp('CloudLogin.pass');
+    var tentantID = getProp('CloudLogin.tenantID');
+    var clientID = getProp('CloudLogin.clientID');
+    var email = getProp('CloudLogin.email');
     //
+    //TODO: Manage global config in common functions
     if (getGlobalConfig()) {
         const propsG = getGlobalConfig();
         if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
@@ -100,7 +102,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
 }
 
 cleanDist = function () {
-    return deleteFolder('./dist/' + propsF.App_Name);
+    return deleteFolder('./dist/' + getProp('App_Name'));
 }
 
 // const { zip } = require('zip-a-folder');
@@ -143,7 +145,7 @@ buildCloudStarterZip = function (cloudStarter) {
 
 
 // function that shows all the availible applications in the cloud
-const getAppURL = cloudURL + propsF.appURE + '?%24top=200';
+const getAppURL = cloudURL + getProp('appURE') + '?%24top=200';
 showAvailableApps = function (showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     //return new Promise(function (resolve, reject) {
@@ -205,7 +207,7 @@ showApps = function () {
 
 
 // Function to show claims for the configured user
-const getClaimsURL = cloudURL + propsF.Claims_URE;
+const getClaimsURL = cloudURL + getProp('Claims_URE');
 showClaims = function () {
     return new Promise(function (resolve, reject) {
         var lCookie = cLogin();
@@ -229,20 +231,20 @@ const SHARED_STATE_MAX_CALLS = 20;
 
 // Shared state scope (picked up from configuration if exists)
 let SHARED_STATE_SCOPE = 'APPLICATION';
-if (propsF.Shared_State_Scope != null) {
-    SHARED_STATE_SCOPE = propsF.Shared_State_Scope;
+if (getProp('Shared_State_Scope') != null) {
+    SHARED_STATE_SCOPE = getProp('Shared_State_Scope');
 } else {
-    log(INFO, 'No Shared State Scope Property found; Adding APPLICATION to ' + propFileName);
-    addOrUpdateProperty(propFileName, 'Shared_State_Scope', 'APPLICATION');
+    log(INFO, 'No Shared State Scope Property found; Adding APPLICATION to ' + getPropFileName());
+    addOrUpdateProperty(getPropFileName(), 'Shared_State_Scope', 'APPLICATION');
 }
 
 // Shared state scope (picked up from configuration if exists)
 let SHARED_STATE_DOUBLE_CHECK = 'YES';
-if (propsF.Shared_State_Double_Check != null) {
-    SHARED_STATE_DOUBLE_CHECK = propsF.Shared_State_Double_Check;
+if (getProp('Shared_State_Double_Check') != null) {
+    SHARED_STATE_DOUBLE_CHECK = getProp('Shared_State_Double_Check');
 } else {
-    log(INFO, 'No Shared State Scope Double Check Property found; Adding YES to ' + propFileName);
-    addOrUpdateProperty(propFileName, 'Shared_State_Double_Check', 'YES');
+    log(INFO, 'No Shared State Scope Double Check Property found; Adding YES to ' + getPropFileName());
+    addOrUpdateProperty(getPropFileName(), 'Shared_State_Double_Check', 'YES');
 }
 const DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() == 'no'));
 
@@ -271,7 +273,7 @@ getSharedState = function (showTable) {
     console.log('');
     log(INFO, 'Total Number of Shared State Entries: ' + ALLsState.length);
     if (SHARED_STATE_SCOPE == 'APPLICATION') {
-        SHARED_STATE_SCOPE = propsF.App_Name;
+        SHARED_STATE_SCOPE = getProp('App_Name');
     }
     let sState = [];
     log(INFO, 'Applying Filter) Shared State Scope: ' + SHARED_STATE_SCOPE);
@@ -366,7 +368,7 @@ showSharedStateDetails = function () {
             // Show State Links
             // Show State Link Details
         } else {
-            log(ERROR, 'No Shared States available to show details of in the scope: ' + propsF.Shared_State_Scope)
+            log(ERROR, 'No Shared States available to show details of in the scope: ' + getProp('Shared_State_Scope'))
         }
 
         resolve();
@@ -421,7 +423,7 @@ removeSharedStateEntry = function () {
                 log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
             }
         } else {
-            log(ERROR, 'No Shared States available to remove in the scope: ' + propsF.Shared_State_Scope)
+            log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
         }
         resolve();
     });
@@ -437,10 +439,10 @@ clearSharedStateScope = function () {
             let decision = 'YES';
 
             if (DO_SHARED_STATE_DOUBLE_CHECK) {
-                decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: ' + propsF.Shared_State_Scope + ') ?', ['YES', 'NO']);
+                decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: ' + getProp('Shared_State_Scope') + ') ?', ['YES', 'NO']);
             }
             // If the scope is set to * then really double check...
-            if (propsF.Shared_State_Scope == '*') {
+            if (getProp('Shared_State_Scope') == '*') {
                 decision = 'NO';
                 const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
                 if (secondDecision == 'YES') {
@@ -458,7 +460,7 @@ clearSharedStateScope = function () {
                 log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
             }
         } else {
-            log(ERROR, 'No Shared States available to remove in the scope: ' + propsF.Shared_State_Scope)
+            log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
         }
         resolve();
     });
@@ -466,10 +468,10 @@ clearSharedStateScope = function () {
 
 // Shared state folder (picked up from configuration if exists)
 let SHARED_STATE_FOLDER = './Shared_State/';
-if (propsF.Shared_State_Folder != null) {
-    SHARED_STATE_FOLDER = propsF.Shared_State_Folder;
+if (getProp('Shared_State_Folder') != null) {
+    SHARED_STATE_FOLDER = getProp('Shared_State_Folder');
 } else {
-    addOrUpdateProperty(propFileName, 'Shared_State_Folder', SHARED_STATE_FOLDER);
+    addOrUpdateProperty(getPropFileName(), 'Shared_State_Folder', SHARED_STATE_FOLDER);
 }
 
 const jsonfile = require('jsonfile');
@@ -625,7 +627,7 @@ importSharedStateScope = function () {
 //wrapper function around the watcher on shared state
 watchSharedStateScopeMain = function() {
     return new Promise(async function (resolve, reject) {
-        //const commandSTDO = 'cd ' + __dirname  + '/../ && gulp watch-shared-state-scope-do --cwd "' + process.cwd() + '" --gulpfile "' + __dirname + '/../manage-project.js" --pass "' + propsF.CloudLogin.pass + '"';
+        //const commandSTDO = 'cd ' + __dirname  + '/../ && gulp watch-shared-state-scope-do --cwd "' + process.cwd() + '" --gulpfile "' + __dirname + '/../manage-project.js" --pass "' + getProp('CloudLogin.pass + '"';
         const commandSTDO = 'tcli watch-shared-state-scope-do';
         const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state scope ?', ['YES', 'NO']);
         if(decision == 'YES'){
@@ -705,7 +707,7 @@ getCloud = function (url) {
     return re;
 }
 
-const getApplicationDetailsURL = cloudURL + propsF.appURE;
+const getApplicationDetailsURL = cloudURL + getProp('appURE');
 //const getApplicationDetailsURL = 'https://eu.liveapps.cloud.tibco.com/webresource/v1/applications/AppMadeWithSchematic3/applicationVersions/1/artifacts/';
 getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
@@ -878,7 +880,7 @@ deleteFile = function (file) {
 
 
 checkPW = function () {
-    if (propsF.CloudLogin.pass == null || propsF.CloudLogin.pass == '') {
+    if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
         log(ERROR, 'Please provide your password to login to the tibco cloud in the file tibco-cloud.properties (for property: CloudLogin.pass)');
         process.exit();
     }
@@ -900,7 +902,7 @@ wsuListTci = function () {
     return new Promise(async function (resolve, reject) {
         var wsu = require('@tibco-tcstk/web-scaffolding-utility');
         console.log(wsu.API.getVersion());
-        wsu.API.login(propsF.CloudLogin.clientID, propsF.CloudLogin.email, propsF.CloudLogin.pass);
+        wsu.API.login(getProp('CloudLogin.clientID'), getProp('CloudLogin.email'), getProp('CloudLogin.pass'));
         // console.log(wsu.API.getArtefactList("TCI").createTable());
         var afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
         console.table(afList.createTable());
@@ -923,4 +925,4 @@ schematicAdd = function () {
 }
 
 // Set log debug level from local property
-setLogDebug(propsF.Use_Debug);
+setLogDebug(getProp('Use_Debug'));

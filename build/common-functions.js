@@ -72,6 +72,61 @@ updateGlobalConnectionConfig = async function(){
 
 }
 
+// Function to get an indexed object wiht a String
+indexObj = function (obj,is, value) {
+	if (typeof is == 'string')
+		return indexObj(obj,is.split('.'), value);
+	else if (is.length==1 && value!==undefined)
+		return obj[is[0]] = value;
+	else if (is.length==0)
+		return obj;
+	else
+		return indexObj(obj[is[0]],is.slice(1), value);
+}
+
+// Function to get a property
+getProp = function(propName){
+	log(DEBUG, 'Getting Property: ' + propName);
+	if(propsGl == null) {
+		propertiesGl = PropertiesReader(propFileNameGl);
+		propsGl = propertiesGl.path();
+	}
+	let re;
+	if(propsGl != null){
+		re = indexObj(propsGl, propName);
+		log(DEBUG, 'Returning Property: ' , re);
+		if(re == 'USE-GLOBAL'){
+			if (doesFileExist(globalTCpropFile)) {
+				if (globalProperties == null){
+					globalProperties = PropertiesReader(globalTCpropFile).path();
+				}
+				re =  indexObj(globalProperties, propName);
+				log(DEBUG, 'Got Property From Global: ' , re);
+			} else {
+				log(DEBUG,'No Global Configuration Set...');
+				return false;
+			}
+		}
+	} else {
+		log(ERROR, 'Property file not set yet...')
+	}
+	return re;
+}
+
+let globalProperties;
+let propFileNameGl;
+let propertiesGl;
+let propsGl;
+const PropertiesReader = require('properties-reader');
+
+setPropFileName = function(propFileName){
+	propFileNameGl = propFileName;
+	log(DEBUG, 'Usring Property File: ' + propFileNameGl);
+}
+
+getPropFileName = function () {
+	return propFileNameGl;
+}
 
 // Function to copy a file
 copyFile = function (fromFile, toFile) {
@@ -257,6 +312,7 @@ askQuestion = async function (question, type = 'input') {
 }
 
 // Get the global configuration
+// TODO: Get rid of this function
 getGlobalConfig = function(){
 	// const globalTCpropFile = __dirname + '/../../common/global-tibco-cloud.properties';
 	if (doesFileExist(globalTCpropFile)) {

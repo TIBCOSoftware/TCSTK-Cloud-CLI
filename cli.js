@@ -1,7 +1,7 @@
 // File to manage the CLI Interaction
 require('./build/common-functions');
 import arg from 'arg';
-const propFileName = 'tibco-cloud.properties';
+let propFileName;
 const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
@@ -21,6 +21,8 @@ function parseArgumentsIntoOptions(rawArgs) {
             '-v':'--version',
             '--update': Boolean,
             '-u':'--update',
+            '--propfile': String,
+            '-p': '--propfile',
         },
         {
             argv: rawArgs.slice(2),
@@ -33,6 +35,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         createCP: args['--createCP'] || false,
         version: args['--version'] || false,
         update: args['--update'] || false,
+        propfile: args['--propfile'] || 'tibco-cloud.properties',
         task: args._[0] || ''
     };
 }
@@ -44,9 +47,12 @@ export async function cli(args) {
     let options = parseArgumentsIntoOptions(args);
     var appRoot = process.env.PWD;
     var cwdir = process.cwd();
+    propFileName = options.propfile;
+    setPropFileName(propFileName);
     if (options.debug) {
-        console.log('Options: ', options);
-        console.log('   Task: '+ options.task);
+        console.log(' Options: ', options);
+        console.log('    Task: '+ options.task);
+        console.log('PropFile: '+ options.propfile);
         console.log('Project Root: ' + appRoot);
         console.log('Current Working Directory: ' + cwdir);
         console.log('__dirname: ' + __dirname);
@@ -83,15 +89,16 @@ export async function cli(args) {
                 displayOpeningMessage();
                 console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI "+version+"]");
                 console.log('No TIBCO Cloud Properties file found...');
-                var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New tibco-cloud.properties file','Manage Global Cloud Connection Configuration', 'Nothing']);
+                var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New TIBCO Cloud properties file','Manage Global Cloud Connection Configuration', 'Nothing']);
             }else{
-                cif = 'Create New tibco-cloud.properties file';
+                cif = 'Create New TIBCO Cloud properties file';
             }
             switch (cif) {
-                case 'Create New tibco-cloud.properties file':
+                case 'Create New TIBCO Cloud properties file':
                     // if we use a global config
                     if(getGlobalConfig()){
                         log(INFO, 'Using Global Connection Configuration...');
+                        console.log(__dirname + '/template/tibco-cloud_global.properties')
                         fs.copyFileSync(__dirname + '/template/tibco-cloud_global.properties', cwdir + '/' + propFileName);
                     } else {
                         log(INFO, 'Using Local Connection Configuration...');
@@ -122,22 +129,6 @@ export async function cli(args) {
                     if(options.template){
                         addOrUpdateProperty(propFileName, 'App_Type', options.template);
                     }
-
-                    /*
-                    // Client ID
-                    log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
-                    var cid = await askQuestion('What is your Client ID ?');
-                    addOrUpdateProperty(propFileName, 'CloudLogin.clientID', cid);
-                    // Username & Password (obfuscate)
-                    var email = await askQuestion('What is your User Name (Email) ?');
-                    addOrUpdateProperty(propFileName, 'CloudLogin.email', email);
-                    log('INFO', 'Your password will be obfuscated, but is not unbreakable (press enter to skip and enter manually later)');
-                    var pass = await askQuestion('What is your Password ?', 'password');
-                    if(pass != '') {
-                        addOrUpdateProperty(propFileName, 'CloudLogin.pass', obfuscatePW(pass));
-                    }
-
-                     */
                     break;
                 case 'Manage Global Cloud Connection Configuration':
                     options.task = 'manage-global-config';

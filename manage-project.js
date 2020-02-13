@@ -4,18 +4,18 @@ const gulp = require('gulp');
 require('./build/common-functions');
 require('./build/project-functions');
 // Read TIBCO cloud properties...
-const PropertiesReader = require('properties-reader');
-const propFileNameGulp = 'tibco-cloud.properties';
-const properties = PropertiesReader(propFileNameGulp);
-const props = properties.path();
+//const PropertiesReader = require('properties-reader');
+//const propFileNameGulp = 'tibco-cloud.properties';
+//const properties = PropertiesReader(propFileNameGulp);
+//const getProp( = properties.path();
 const version = require('./package.json').version;
 const isWindows = process.platform == 'win32';
 
 // Function to build the cloud starter
 function build() {
     return new Promise(function (resolve, reject) {
-        log('INFO', 'Building... ' + props.App_Name);
-        buildCloudStarterZip(props.App_Name);
+        log('INFO', 'Building... ' + getProp('App_Name'));
+        buildCloudStarterZip(getProp('App_Name'));
         resolve();
     });
 };
@@ -23,13 +23,14 @@ function build() {
 // Function to delpoy the cloud starter
 function deploy() {
     return new Promise(async function (resolve, reject) {
-        await uploadApp(props.App_Name);
-        log('INFO', "DONE DEPLOYING: " + props.App_Name);
-        let cloudURLdisp = props.Cloud_URL;
+        await uploadApp(getProp('App_Name'));
+        log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
+        let cloudURLdisp = getProp('Cloud_URL');
+        /*
         if(cloudURLdisp == 'USE-GLOBAL') {
-            cloudURLdisp = propsG.Cloud_URL;
-        }
-        log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + props.App_Name + "/index.html");
+            cloudURLdisp = getProp('Cloud_URL');
+        }*/
+        log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
         resolve();
     });
 }
@@ -37,13 +38,14 @@ function deploy() {
 // Function to publish the cloud starter
 function publish() {
     return new Promise(async function (resolve, reject) {
-        await publishApp(props.App_Name);
-        log('INFO', 'APP PUBLISHED: ' + props.App_Name);
-        let cloudURLdisp = props.Cloud_URL;
+        await publishApp(getProp('App_Name'));
+        log('INFO', 'APP PUBLISHED: ' + getProp('App_Name'));
+        let cloudURLdisp = getProp('Cloud_URL');
+        /*
         if(cloudURLdisp == 'USE-GLOBAL') {
-            cloudURLdisp = propsG.Cloud_URL;
-        }
-        log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + props.App_Name + "/index.html");
+            cloudURLdisp = getProp(G.Cloud_URL;
+        }*/
+        log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
         resolve();
     });
 }
@@ -51,7 +53,7 @@ function publish() {
 
 // Function to get the cloud library sources from GIT
 getCLgit = function () {
-    return getGit(props.GIT_Source_TCSTLocation, props.TCSTLocation, props.GIT_Tag_TCST);
+    return getGit(getProp('GIT_Source_TCSTLocation'), getProp('TCSTLocation'), getProp('GIT_Tag_TCST'));
 }
 
 // Function that injects the sources of the library into this project
@@ -71,7 +73,7 @@ function injectLibSources() {
         copyFile('./tsconfig.debug.json', './tsconfig.json');
         copyFile('./angular.debug.json', './angular.json');
         //copyFile('./package.debug.json', './package.json');
-        run('npm uninstall ' + props.TCSTDebugPackages);
+        run('npm uninstall ' + getProp('TCSTDebugPackages'));
         //do NPM install
         //npmInstall('./');
         npmInstall('./', 'lodash-es');
@@ -103,7 +105,7 @@ function undoLibSources() {
         deleteFolder('./projects/tibco-tcstk/tc-liveapps-lib');
         deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
         //FIX: just install those npm packages (instead of removing the entire package.json file...)
-        run('npm install ' + props.TCSTDebugPackages);
+        run('npm install ' + getProp('TCSTDebugPackages'));
         // npmInstall('./');
         resolve();
     });
@@ -112,7 +114,7 @@ function undoLibSources() {
 // Function to change the tenant in the properties file
 changeRegion = function () {
     return new Promise(async function (resolve, reject) {
-        await updateRegion(propFileNameGulp);
+        await updateRegion(getPropFileName());
         resolve();
     });
 };
@@ -161,7 +163,7 @@ helptcli = function () {
 // Start Cloudstarter Locally
 start = function () {
     return new Promise(async function (resolve, reject) {
-        log('INFO', 'Starting: ' + props.App_Name);
+        log('INFO', 'Starting: ' + getProp('App_Name'));
         //TODO: Check if port 4200 is available, if not use 4201, 4202 etc.
         let port = 4200;
         const range = 50;
@@ -175,10 +177,11 @@ start = function () {
         }
         if(portToUse != 0){
             log('INFO', 'Using Port: ' + portToUse);
-            let myHost = props.cloudHost;
+            let myHost = getProp('cloudHost');
+            /*
             if(myHost == 'USE-GLOBAL'){
-                myHost =  propsG.cloudHost;
-            }
+                myHost =  getProp(G.cloudHost;
+            }*/
             if(portToUse == 4200){
                 if (myHost.includes('eu')) {
                     run('npm run serve_eu');
@@ -214,7 +217,7 @@ mainT = function () {
         resolve();
         // var appRoot = process.env.PWD;
         var appRoot = process.cwd();
-        if (props.CloudLogin.pass == '') {
+        if (getProp('CloudLogin.pass') == '') {
             // When password is empty ask it manually for the session.
             var pass = await askQuestion('Please provide your password: ', 'password');
             properties.set('CloudLogin.pass', obfuscatePW(pass));
@@ -416,7 +419,7 @@ promptGulp = function (stDir, cwdDir) {
             type: 'autocomplete',
             name: 'command',
             suggestOnly: false,
-            message: '[TCLI - CLOUD STARTER (\x1b[36m' + props.App_Name + '\x1b[0m)]: ',
+            message: '[TCLI - CLOUD STARTER (\x1b[36m' + getProp('App_Name') + '\x1b[0m)]: ',
             source: searchAnswer,
             pageSize: 4/*,
             validate: function (val) {
@@ -450,7 +453,10 @@ promptGulp = function (stDir, cwdDir) {
                 } else {
                     globalLastCommand = com;
                 }
-                run('cd ' + stDir + ' && gulp ' + comToInject + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + props.CloudLogin.pass + '"');
+                //run('cd ' + stDir + ' && gulp ' + comToInject + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + getProp('CloudLogin.pass') + '"');
+                // console.log('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\'');
+                run('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\'');
+
                 return promptGulp(stDir, cwdDir);
             }
         });
