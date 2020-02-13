@@ -1,7 +1,7 @@
 // This file manages the applications
 require('./build/common-functions');
 const gulp = require('gulp');
-const inquirerA = require('inquirer');
+//const inquirerA = require('inquirer');
 const configApp = require('./config-template.json');
 // var templatesToUse = ['Template1', 'Template2', 'TCSTK-case-manager-app'];
 var templatesToUse = [];
@@ -55,10 +55,10 @@ async function newStarter() {
         }
     }
     if (starterName == '') {
-        starterName = await askQuestionAPP('What is the name of your cloud starter ?');
+        starterName = await askQuestion('What is the name of your cloud starter ?');
     }
     if (starterTemplate == '') {
-        starterTemplate = await askMultipleChoiceQuestionAPP('Which Template would you like to use for your cloud starter ?', templatesToUse);
+        starterTemplate = await askMultipleChoiceQuestion('Which Template would you like to use for your cloud starter ?', templatesToUse);
     }
     log(INFO, '    Cloud Starter Name: ' + starterName);
     var stTempJson = {};
@@ -75,6 +75,7 @@ async function newStarter() {
 }
 
 // function to ask a multiple choice question
+/* Moved to Global
 async function askMultipleChoiceQuestionAPP(question, options) {
     var re = 'result';
     await inquirerA.prompt([{
@@ -107,7 +108,7 @@ askQuestionAPP = async function (question, type = 'input') {
         re = answers.result;
     });
     return re;
-}
+}*/
 
 // Function to create a new starter, based on a template
 createNewStarter = function (name, template) {
@@ -228,7 +229,7 @@ copyDir = function (fromDir, toDir) {
 manageGlobalConfig = function (name, template) {
     return new Promise(async function (resolve, reject) {
         if(displayGlobalConnectionConfig()){
-            updateGC = await askMultipleChoiceQuestionAPP('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
+            updateGC = await askMultipleChoiceQuestion('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
             if(updateGC == 'YES'){
                 updateGlobalConnectionConfig();
             }
@@ -244,7 +245,7 @@ manageGlobalConfig = function (name, template) {
 gulp.task('new-starter', newStarter);
 gulp.task('manage-global-config', manageGlobalConfig);
 
-
+/* Moved to Global
 const execSync = require('child_process').execSync;
 // Run an OS Command
 run = function (command) {
@@ -267,28 +268,7 @@ run = function (command) {
         })
     );
 }
+*/
 
 // Set log debug level from local property
 setLogDebug(configApp.useDebug);
-
-/*
-// Log function
-const INFO = 'INFO';
-const DEBUG = 'DEBUG';
-const ERROR = 'ERROR';
-// const useDebug = (configApp.useDebug == 'true');
-log = function (level, message) {
-    var useDebug = configApp.useDebug;
-    if (!(level == DEBUG && !useDebug)) {
-        var timeStamp = new Date();
-        // console.log('(' + timeStamp + ')[' + level + '] ' + message);
-        console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ', message);
-    }
-}
-logO = function (level, message) {
-    var useDebug = configApp.useDebug;
-    if (!(level == DEBUG && !useDebug)) {
-        console.log(message);
-    }
-}
-*/

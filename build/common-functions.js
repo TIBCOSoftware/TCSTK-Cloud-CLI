@@ -84,6 +84,12 @@ indexObj = function (obj,is, value) {
 		return indexObj(obj[is[0]],is.slice(1), value);
 }
 
+const PropertiesReader = require('properties-reader');
+let globalProperties;
+let propFileNameGl;
+let propertiesGl;
+let propsGl;
+let globalMultipleFileName;
 // Function to get a property
 getProp = function(propName){
 	log(DEBUG, 'Getting Property: ' + propName);
@@ -113,20 +119,25 @@ getProp = function(propName){
 	return re;
 }
 
-let globalProperties;
-let propFileNameGl;
-let propertiesGl;
-let propsGl;
-const PropertiesReader = require('properties-reader');
-
 setPropFileName = function(propFileName){
 	propFileNameGl = propFileName;
 	log(DEBUG, 'Usring Property File: ' + propFileNameGl);
 }
-
 getPropFileName = function () {
 	return propFileNameGl;
 }
+setMultipleFileName = function(mFileName){
+	globalMultipleFileName = mFileName;
+	log(DEBUG, 'Usring Multiple File: ' + globalMultipleFileName);
+}
+getMultipleFileName = function () {
+	return globalMultipleFileName;
+}
+
+trim = function (value){
+	return value.replace(/^\s*/, "").replace(/\s*$/, "");
+}
+
 
 // Function to copy a file
 copyFile = function (fromFile, toFile) {
@@ -136,6 +147,24 @@ copyFile = function (fromFile, toFile) {
 }
 
 let inquirerF = require('inquirer');
+// function to ask a question
+askQuestion = async function (question, type = 'input') {
+	var re = 'result';
+	// console.log('Type: ' , type);
+	await inquirerF.prompt([{
+		type: type,
+		name: 'result',
+		message: question,
+		filter: function (val) {
+			return val;
+		}
+	}]).then((answers) => {
+		logO(DEBUG, answers);
+		re = answers.result;
+	});
+	return re;
+}
+
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
 	let re = 'result';
@@ -293,23 +322,7 @@ addOrUpdateProperty = function (location, property, value) {
 
 
 
-// function to ask a question
-askQuestion = async function (question, type = 'input') {
-	var re = 'result';
-	// console.log('Type: ' , type);
-	await inquirerF.prompt([{
-		type: type,
-		name: 'result',
-		message: question,
-		filter: function (val) {
-			return val;
-		}
-	}]).then((answers) => {
-		logO(DEBUG, answers);
-		re = answers.result;
-	});
-	return re;
-}
+
 
 // Get the global configuration
 // TODO: Get rid of this function
