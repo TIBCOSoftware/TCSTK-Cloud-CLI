@@ -1,16 +1,13 @@
 // This file manages the applications
 require('./build/common-functions');
 const gulp = require('gulp');
-
 let mFile = '';
 
-
-
+// Function to process the multiple property file
 processMultipleFile = function(propfileName){
     return new Promise(async function (resolve, reject) {
-        setLogDebug('true');
+        // setLogDebug('true');
         mFile = getMultipleFileName();
-
         log(INFO, '- Managing Multiple, Using file: ' + mFile);
         // Go Over All Starters
         const cloudStarters = getMProp('Cloud_Starters');
@@ -24,10 +21,10 @@ processMultipleFile = function(propfileName){
             const currLoc = getMProp( currentStarter + '_Location');
             log(INFO, logS + ' Location: ' + currLoc);
             const environments = getMProp(currentStarter + '_Environments');
-            log(INFO, logS + '  Environments: ' + environments);
+            log(INFO, logS + ' Environments: ' + environments);
             const environmentsA = environments.split(',');
             for(var j = 0; j < environmentsA.length; j++) {
-                const currentEnvironment = trim(environmentsA[i]);
+                const currentEnvironment = trim(environmentsA[j]);
                 const logSE = logS + '[ENVIRONMENT: ' + currentEnvironment + ']';
                 const propFile = getMProp(currentEnvironment + '_PropertyFile');
                 log(INFO, logSE + ' Property File: ' + propFile);
@@ -38,15 +35,15 @@ processMultipleFile = function(propfileName){
                 for(var k = 0; k < tasksA.length; k++) {
                     const currentTask = trim(tasksA[k]);
                     let tObj = JSON.parse(currentTask);
-                    console.log(tObj);
+                    // console.log(tObj);
                     let logT = logSE;
                     let command = 'cd ' + currLoc + ' && ';
                     if(tObj.T != null){
-                        logT += '['+ (k+1) + '] [TCLI TASK]';
+                        logT += '['+ (k+1) + ']   [TCLI TASK]';
                         command += 'tcli -p ' + propFile + ' ' + tObj.T;
                     }
                     if(tObj.O != null){
-                        logT += '['+ (k+1) + '] [OS TASK]';
+                        logT += '['+ (k+1) + ']     [OS TASK]';
                         command += tObj.O;
                     }
                     if(tObj.S != null){
@@ -63,11 +60,14 @@ processMultipleFile = function(propfileName){
 }
 
 
+
+
+
 // Gulp task definition
 gulp.task('run-multiple', processMultipleFile);
 
 
-// TODO: Get Multiple Property
+// TODO: Move this to global (merge with other property function)
 let propsM;
 
 getMProp = function(property){

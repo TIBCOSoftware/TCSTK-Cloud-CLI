@@ -270,6 +270,23 @@ updateGlobalConfig = function () {
     });
 }
 
+replaceStrinInFileWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        const rFrom = getProp('Replace_FROM');
+        const rTo = getProp('Replace_TO');
+        const rPat = getProp('Replace_PATTERN');
+
+        if( rFrom == null || rTo == null || rPat == null){
+            log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...');
+        } else {
+            log(INFO, 'Replacing From: ' , rFrom, ' To: ' , rTo, ' Pattern: ' , rPat);
+            replaceInFile(rFrom,rTo,rPat);
+        }
+
+        resolve();
+    });
+}
+
 
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
@@ -354,6 +371,8 @@ gulp.task('watch-shared-state-scope-do', watchSharedStateScope);
 gulp.task('update-tcli', updateTCLIwrapper);
 updateTCLIwrapper.description = 'Update the Cloud CLI.';
 
+gulp.task('replace-string-in-file', replaceStrinInFileWrapper);
+replaceStrinInFileWrapper.description = 'Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties';
 
 
 

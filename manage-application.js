@@ -70,7 +70,8 @@ async function newStarter() {
 
         }
     }
-    log(INFO, 'Cloud Starter Template: ', stTempJson);
+    log(INFO, 'Cloud Starter Template: ', stTempJson.displayName);
+    log(DEBUG, 'Cloud Starter Template: ', stTempJson);
     return createNewStarter(starterName, stTempJson);
 }
 
@@ -119,7 +120,7 @@ createNewStarter = function (name, template) {
             getGit(template.git, toDir, template.gitTag);
             // remove git folder
             if (template.removeGitFolder) {
-            	console.log('Is Windows: ' + isWindows);
+            	log(DEBUG, 'Is Windows: ' + isWindows);
             	if(isWindows){
             		run('cd ' + toDir + ' && rmdir /q /s .git');
             	} else {
@@ -143,17 +144,22 @@ createNewStarter = function (name, template) {
             copyDir(fromDir, toDir);
         }
         //TODO: do this replace before post commands
-        const replace = require('replace-in-file');
+        //use common function for replace
+
+
+        // const replace = require('replace-in-file');
         try {
-            var results = {};
-            var doReplace = false;
+            //var results = {};
+            //var doReplace = false;
             for (var rep of template.replacements) {
-                doReplace = true;
+                // doReplace = true;
                 log(DEBUG, 'Replacing from: ' + rep.from + " to: " + rep.to);
                 var repTo = rep.to;
                 if (rep.to == "@name") {
                     repTo = name;
                 }
+                replaceInFile(rep.from, repTo, toDir + '/**');
+                /*
                 const regex = new RegExp(rep.from, 'g');
                 const options = {
                     files: toDir + '/**',
@@ -162,15 +168,18 @@ createNewStarter = function (name, template) {
                     countMatches: true
                 };
                 results = replace.sync(options);
+
+                 */
                 // console.log('Replacement results:', results);
             }
             // console.log('Replacement results:', results);
             // TODO: provide all replacement values at once
+            /*
             if (doReplace) {
                 for (result of results) {
                     console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')', result.file);
                 }
-            }
+            }*/
             console.log('\x1b[36m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
             run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');

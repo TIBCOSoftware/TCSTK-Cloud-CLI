@@ -56,6 +56,27 @@ displayGlobalConnectionConfig = function(){
 	return re;
 }
 
+// Function to replace string in file
+const replace = require('replace-in-file');
+replaceInFile = function(from, to, filePattern) {
+	const patternToUse =  filePattern || './**';
+	const regex = new RegExp(from, 'g');
+	const options = {
+		files: patternToUse,
+		from: regex,
+		to: to,
+		countMatches: true
+	};
+	let results = replace.sync(options);
+	for (result of results) {
+		if(result.numReplacements > 0) {
+			log(INFO, '\x1b[0m[REPLACED] [FROM: |\x1b[32m' + from + '\x1b[0m|] [TO: |\x1b[32m' + to + '\x1b[0m|]', '(Number of Replacements: ' + result.numReplacements + ')', result.file);
+		}
+	}
+	return results;
+}
+
+
 // function to set the global connection configuration
 updateGlobalConnectionConfig = async function(){
 	console.log('Update Connection Config: ');

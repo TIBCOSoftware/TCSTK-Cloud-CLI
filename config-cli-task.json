@@ -190,6 +190,13 @@
       "gulpTask": "watch-shared-state-scope",
       "availableOnOs": ["all"]
     },
+    "replace-string-in-file": {
+      "description": "Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "replace-string-in-file",
+      "availableOnOs": ["all"]
+    },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,
