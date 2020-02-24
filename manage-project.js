@@ -270,19 +270,32 @@ updateGlobalConfig = function () {
     });
 }
 
-replaceStrinInFileWrapper = function () {
+replaceStringInFileOne = function (prefix) {
+    const rFrom = getProp(prefix + 'Replace_FROM');
+    const rTo = getProp(prefix + 'Replace_TO');
+    const rPat = getProp(prefix + 'Replace_PATTERN');
+
+    if( rFrom == null || rTo == null || rPat == null){
+        log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...');
+    } else {
+        log(INFO, 'Replacing From: ' , rFrom, ' To: ' , rTo, ' Pattern: ' , rPat);
+        replaceInFile(rFrom,rTo,rPat);
+    }
+}
+
+
+replaceStringInFileWrapper = function () {
     return new Promise(async function (resolve, reject) {
-        const rFrom = getProp('Replace_FROM');
-        const rTo = getProp('Replace_TO');
-        const rPat = getProp('Replace_PATTERN');
-
-        if( rFrom == null || rTo == null || rPat == null){
-            log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...');
+        const rMul = getProp('Replace_MULTIPLE');
+        if(rMul == null){
+            replaceStringInFileOne('');
         } else {
-            log(INFO, 'Replacing From: ' , rFrom, ' To: ' , rTo, ' Pattern: ' , rPat);
-            replaceInFile(rFrom,rTo,rPat);
+            const replaceA = rMul.split(',');
+            for(var i = 0; i < replaceA.length; i++) {
+                const currentRep = trim(replaceA[i]);
+                replaceStringInFileOne(currentRep);
+            }
         }
-
         resolve();
     });
 }
@@ -371,8 +384,8 @@ gulp.task('watch-shared-state-scope-do', watchSharedStateScope);
 gulp.task('update-tcli', updateTCLIwrapper);
 updateTCLIwrapper.description = 'Update the Cloud CLI.';
 
-gulp.task('replace-string-in-file', replaceStrinInFileWrapper);
-replaceStrinInFileWrapper.description = 'Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties';
+gulp.task('replace-string-in-file', replaceStringInFileWrapper);
+replaceStringInFileWrapper.description = 'Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties';
 
 
 
