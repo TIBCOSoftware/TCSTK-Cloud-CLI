@@ -911,7 +911,7 @@ wsuListTci = function () {
 }
 //TODO: either inspect or get from config
 
-const possibleSchematics = ["case-cockpit", "home-cockpit", "custom-form-creator", "custom-form-action", "custom-form-casedata"];
+const possibleSchematics = ["case-cockpit", "home-cockpit", "custom-form-creator", "custom-form-action", "custom-form-casedata", "spotfire-component-basic"];
 
 schematicAdd = function () {
     return new Promise(async function (resolve, reject) {
