@@ -59,13 +59,8 @@ processMultipleFile = function(propfileName){
     });
 }
 
-
-
-
-
 // Gulp task definition
 gulp.task('run-multiple', processMultipleFile);
-
 
 // TODO: Move this to global (merge with other property function)
 let propsM;

@@ -42,7 +42,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         update: args['--update'] || false,
         propfile: args['--propfile'] || 'tibco-cloud.properties',
         doMultiple: args['--multiple'] || false,
-        multipleFile: args['--multipleFile'] || 'multiple.properties',
+        multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
         task: args._[0] || ''
     };
 }
@@ -52,8 +52,8 @@ const isWindows = process.platform == 'win32';
 // Main function
 export async function cli(args) {
     let options = parseArgumentsIntoOptions(args);
-    var appRoot = process.env.PWD;
-    var cwdir = process.cwd();
+    const appRoot = process.env.PWD;
+    const cwdir = process.cwd();
     propFileName = options.propfile;
     setPropFileName(propFileName);
     setMultipleFileName(options.multipleFile);
@@ -104,18 +104,23 @@ export async function cli(args) {
         } else {
             // Test if tibco-cloud.properties exists
             const fs = require("file-system");
+            const tCreate = 'Create New Cloud Starter';
+            const tCProp = 'Create New TIBCO Cloud properties file';
+            const tManageG = 'Manage Global Cloud Connection Configuration';
+            const tMultiple = 'Create New Multiple Properties file';
+            const tNothing = 'Nothing';
             if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
                 var cif = '';
                 if (!options.createCP) {
                     displayOpeningMessage();
                     console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + version + "]");
                     console.log('No TIBCO Cloud Properties file found...');
-                    var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', ['Create New Cloud Starter', 'Create New TIBCO Cloud properties file', 'Manage Global Cloud Connection Configuration', 'Nothing']);
+                    var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
                 } else {
-                    cif = 'Create New TIBCO Cloud properties file';
+                    cif = tCProp;
                 }
                 switch (cif) {
-                    case 'Create New TIBCO Cloud properties file':
+                    case tCProp:
                         // if we use a global config
                         if (getGlobalConfig()) {
                             log(INFO, 'Using Global Connection Configuration...');
@@ -127,11 +132,6 @@ export async function cli(args) {
                             await updateRegion(propFileName);
                             await updateCloudLogin(propFileName);
                         }
-
-
-                        // require(__dirname + '/manage-project');
-                        // Select Tenant
-
                         // Get the AppName Automatically from the package.json
                         try {
                             if (fs.existsSync('package.json')) {
@@ -151,11 +151,15 @@ export async function cli(args) {
                             addOrUpdateProperty(propFileName, 'App_Type', options.template);
                         }
                         break;
-                    case 'Manage Global Cloud Connection Configuration':
+                    case tMultiple:
+                        options.task = 'create-multiple-property-file';
+                        projectManagementMode = false;
+                        break;
+                    case tManageG:
                         options.task = 'manage-global-config';
                         projectManagementMode = false;
                         break;
-                    case 'Create New Cloud Starter':
+                    case tCreate:
                         console.log('Creating new Cloud starter...');
                         // Use different Gulp file to create a new cloud starter
                         options.task = 'new-starter';

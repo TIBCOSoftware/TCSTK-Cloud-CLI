@@ -75,42 +75,6 @@ async function newStarter() {
     return createNewStarter(starterName, stTempJson);
 }
 
-// function to ask a multiple choice question
-/* Moved to Global
-async function askMultipleChoiceQuestionAPP(question, options) {
-    var re = 'result';
-    await inquirerA.prompt([{
-        type: 'list',
-        name: 'result',
-        message: question,
-        choices: options,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        logO(DEBUG, answers);
-        re = answers.result;
-    });
-    return re;
-}
-
-// function to ask a question
-askQuestionAPP = async function (question, type = 'input') {
-    var re = 'result';
-    await inquirerA.prompt([{
-        type: type,
-        name: 'result',
-        message: question,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        logO(DEBUG, answers);
-        re = answers.result;
-    });
-    return re;
-}*/
-
 // Function to create a new starter, based on a template
 createNewStarter = function (name, template) {
     return new Promise(async function (resolve, reject) {
@@ -139,15 +103,8 @@ createNewStarter = function (name, template) {
             }
         } else {
             var fromDir = __dirname + template.templateFolder;
-            // console.log('Copying template ' + template + ' From: ' + fromDir
-			// + ' To: ' + toDir);
             copyDir(fromDir, toDir);
         }
-        //TODO: do this replace before post commands
-        //use common function for replace
-
-
-        // const replace = require('replace-in-file');
         try {
             //var results = {};
             //var doReplace = false;
@@ -159,32 +116,11 @@ createNewStarter = function (name, template) {
                     repTo = name;
                 }
                 replaceInFile(rep.from, repTo, toDir + '/**');
-                /*
-                const regex = new RegExp(rep.from, 'g');
-                const options = {
-                    files: toDir + '/**',
-                    from: regex,
-                    to: repTo,
-                    countMatches: true
-                };
-                results = replace.sync(options);
-
-                 */
-                // console.log('Replacement results:', results);
             }
-            // console.log('Replacement results:', results);
-            // TODO: provide all replacement values at once
-            /*
-            if (doReplace) {
-                for (result of results) {
-                    console.log('\x1b[35m%s\x1b[0m', '[REPLACED]', '(' + result.numReplacements + ')', result.file);
-                }
-            }*/
             console.log('\x1b[36m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
             run('cd ' + name + ' && npm install');
             run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
-                      // create a new tibco-cloud.properties file
-            // console.log(gitPostCom);
+            // create a new tibco-cloud.properties file
             if(isWindows){
                 for (var postCom of template.PostCommandsWin) {
                     run('cd ' + toDir + ' && ' + postCom);
@@ -249,35 +185,19 @@ manageGlobalConfig = function (name, template) {
     });
 }
 
+// Wrapper to create a multiple prop file
+createMultiplePropertyFileWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        await createMultiplePropertyFile();
+        resolve();
+    });
+}
+
 
 // Gulp task definition
 gulp.task('new-starter', newStarter);
 gulp.task('manage-global-config', manageGlobalConfig);
-
-/* Moved to Global
-const execSync = require('child_process').execSync;
-// Run an OS Command
-run = function (command) {
-    return new Promise(function (resolve, reject) {
-        log(DEBUG, 'Executing Command: ' + command);
-        // console.log('Executing Command: ' + command);
-        try {
-            execSync(
-                command,
-                {stdio: 'inherit'}
-            );
-        } catch (err) {
-            reject(err);
-        }
-        resolve();
-    }).catch(
-        (reason => {
-            logO(ERROR, reason);
-            process.exit(1);
-        })
-    );
-}
-*/
+gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
 
 // Set log debug level from local property
 setLogDebug(configApp.useDebug);

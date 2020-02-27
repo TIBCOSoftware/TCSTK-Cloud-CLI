@@ -270,6 +270,7 @@ updateGlobalConfig = function () {
     });
 }
 
+// Function to replace a string in a file
 replaceStringInFileOne = function (prefix) {
     const rFrom = getProp(prefix + 'Replace_FROM');
     const rTo = getProp(prefix + 'Replace_TO');
@@ -283,7 +284,7 @@ replaceStringInFileOne = function (prefix) {
     }
 }
 
-
+// Function to replace multiple strings in files
 replaceStringInFileWrapper = function () {
     return new Promise(async function (resolve, reject) {
         const rMul = getProp('Replace_MULTIPLE');
@@ -300,6 +301,13 @@ replaceStringInFileWrapper = function () {
     });
 }
 
+// Wrapper to create a multiple prop file
+createMultiplePropertyFileWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        await createMultiplePropertyFile();
+        resolve();
+    });
+}
 
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
@@ -311,16 +319,11 @@ gulp.task('help-tcli', helptcli);
 helptcli.description = 'Displays this message';
 gulp.task('main', mainT);
 gulp.task('opening', openingMessage);
-
-
 gulp.task('default', gulp.series('opening', 'main'));
-// gulp.task('default', test);
 gulp.task('start', start);
 start.description = 'Starts the cloud starter locally';
-
 gulp.task('change-region', changeRegion);
 changeRegion.description = 'Change the tenant to login to';
-
 gulp.task('obfuscate', obfuscate);
 obfuscate.description = 'Obfuscates a Password';
 mainT.description = 'Displays this message';
@@ -330,11 +333,9 @@ gulp.task('show-apps', showApps);
 showAvailableApps.description = 'Shows all the applications that are deployed in the cloud and their versions.';
 gulp.task('show-application-links', showLinks);
 showLinks.description = 'Shows all the links to the deployed applications (that have and index.html file).';
-
 gulp.task('clean-dist', cleanDist);
 gulp.task('buildZip', build);
 gulp.task('build', gulp.series('clean-dist', 'buildZip'));
-// gulp.task('build', build);
 
 build.description = 'Build the ZIP file for your project.';
 gulp.task('deploy', deploy);
@@ -389,28 +390,21 @@ replaceStringInFileWrapper.description = 'Replace string in file following the R
 
 
 
-
+gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
+createMultiplePropertyFileWrapper.description = 'Creating an initial property file to manage multiple cloud starters and environments.';
 
 
 
 
 /*
 TODO: Additional Cloud CLI Capabilities
-
 - List properties
-- Add Schematics
-- Revert app to older version (revert and publish)
-- Show Shared State
-- Remove Shared State
+- Revert app to older version (revert and publish
 - List TCI Endpoints
 - List Cloud Event Channels
 - List Spotfire Reports
-- Swap between different tennants (EU / US / AUS)
-
 -- perhaps provide a gate into the various CLI's
-
 -- Get the token from the cloud
-
  */
 
 const cliTaskConfig = require('./config-cli-task.json');

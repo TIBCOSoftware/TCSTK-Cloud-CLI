@@ -155,10 +155,36 @@ getMultipleFileName = function () {
 	return globalMultipleFileName;
 }
 
+// Function to trim string
 trim = function (value){
 	return value.replace(/^\s*/, "").replace(/\s*$/, "");
 }
 
+// Function to create a new multiple prop file
+createMultiplePropertyFile = async function () {
+	// 'manage-multiple-cloud-starters.properties'
+	let mPropFileName = 'manage-multiple-cloud-starters.properties';
+	let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (\x1b[34mDefault: manage-multiple-cloud-starters\033[0m) ?');
+	console.log('nameAnsw: ' + nameAnsw);
+	if(nameAnsw != null && nameAnsw != ''){
+		mPropFileName = nameAnsw + '.properties';
+	}
+	const targetFile = process.cwd() + '/' + mPropFileName;
+	let doWrite = true;
+	if (doesFileExist(targetFile)) {
+		const doOverWrite = await askMultipleChoiceQuestion('The property file: \x1b[34m' + mPropFileName + '\033[0m already exists, do you want to Overwrite it ?', ['YES','NO']);
+		if(doOverWrite == 'NO'){
+			doWrite = false;
+			log(INFO, 'OK, I won\'t do anything :-)');
+		}
+	}
+	if(doWrite) {
+		log(INFO, 'Creating new multiple property file: ' + mPropFileName );
+		copyFile(__dirname + '/../template/multiple.properties', targetFile);
+		//'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
+		log(INFO, 'Now configure the multiple propety file and then run "\x1b[34mtcli -m\033[0m" (for default propety name) or "\x1b[34mtcli -m <propfile name>\033[0m" to execute...');
+	}
+}
 
 // Function to copy a file
 copyFile = function (fromFile, toFile) {
