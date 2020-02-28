@@ -477,7 +477,7 @@ promptGulp = function (stDir, cwdDir) {
                     log('INFO', 'Repeating Last Task: ' + globalLastCommand);
                     comToInject = globalLastCommand;
                 } else {
-                    globalLastCommand = com;
+                    globalLastCommand = comToInject;
                 }
                 //run('cd ' + stDir + ' && gulp ' + comToInject + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + getProp('CloudLogin.pass') + '"');
                 // console.log('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\'');
