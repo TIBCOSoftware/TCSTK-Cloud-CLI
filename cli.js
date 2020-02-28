@@ -204,8 +204,13 @@ export async function cli(args) {
             // Check if the task exists...
             const cliTaskConfigCLI = require('./config-cli-task.json');
             var cTsks = cliTaskConfigCLI.cliTasks;
-            let taskArray = new Array();
+            let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple'];
             let taskExist = false;
+            for (var cliTask of taskArray) {
+                if (cliTask == options.task) {
+                    taskExist = true;
+                }
+            }
             for (var cliTask in cTsks) {
                 if(cliTask == options.task){
                     taskExist = true;
