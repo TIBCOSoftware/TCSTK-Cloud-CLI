@@ -7,7 +7,6 @@ const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
     //TODO: Add a non interactive verbose option
-    //TODO: Provide the template and the name of a new app in-line
     const args = arg(
         {
             '--debug': Boolean,
@@ -28,6 +27,8 @@ function parseArgumentsIntoOptions(rawArgs) {
             '-m': '--multiple',
             '--multipleFile': String,
             '-f': '--multipleFile',
+            '-s': '--surpressStart',
+            '--surpressStart': Boolean,
         },
         {
             argv: rawArgs.slice(2),
@@ -43,6 +44,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         propfile: args['--propfile'] || 'tibco-cloud.properties',
         doMultiple: args['--multiple'] || false,
         multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
+        surpressStart: args['--surpressStart'] || false,
         task: args._[0] || ''
     };
 }
@@ -51,7 +53,7 @@ const isWindows = process.platform == 'win32';
 
 // Main function
 export async function cli(args) {
-    let options = parseArgumentsIntoOptions(args);
+    const options = parseArgumentsIntoOptions(args);
     const appRoot = process.env.PWD;
     const cwdir = process.cwd();
     propFileName = options.propfile;
@@ -119,7 +121,7 @@ export async function cli(args) {
                     displayOpeningMessage();
                     console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + version + "]");
                     console.log('No TIBCO Cloud Properties file found...');
-                    var cif = await askMultipleChoiceQuestionCLI('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
+                    var cif = await askMultipleChoiceQuestion('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
                 } else {
                     cif = tCProp;
                 }
@@ -199,29 +201,29 @@ export async function cli(args) {
             if (options.task == 'help') {
                 options.task = 'help-tcli';
             }
-            gulp.series(options.task)();
+            // Check if the task exists...
+            const cliTaskConfigCLI = require('./config-cli-task.json');
+            var cTsks = cliTaskConfigCLI.cliTasks;
+            let taskArray = new Array();
+            let taskExist = false;
+            for (var cliTask in cTsks) {
+                if(cliTask == options.task){
+                    taskExist = true;
+                }
+                //console.log(cTsks[cliTask].gulpTask);
+                taskArray.push(cTsks[cliTask].gulpTask);
+            }
+            if(!taskExist){
+                log(ERROR, 'TASK: ' + options.task + ' does not exist...');
+                var stringSimilarity = require('string-similarity');
+                var matches = stringSimilarity.findBestMatch(options.task, taskArray);
+                log(INFO, 'Did you mean ? \x1b[34m' + taskArray[matches.bestMatchIndex]);
+
+            } else {
+                gulp.series(options.task)();
+            }
         }
     }
-}
-
-const inquirerC = require('inquirer');
-
-// function to ask a question
-async function askMultipleChoiceQuestionCLI(question, options) {
-    var re = 'result';
-    await inquirerC.prompt([{
-        type: 'list',
-        name: 'result',
-        message: question,
-        choices: options,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        //logO(DEBUG, answers);
-        re = answers.result;
-    });
-    return re;
 }
 
 // Display commandline usage

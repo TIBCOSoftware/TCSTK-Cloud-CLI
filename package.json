@@ -23,6 +23,7 @@
     "lodash": "^4.17.15",
     "properties-reader": "^0.3.1",
     "replace-in-file": "^4.3.1",
+    "string-similarity": "^4.0.1",
     "sync-rest-client": "^1.0.3",
     "tcp-port-used": "^1.0.1",
     "yargs": "^13.3.0"

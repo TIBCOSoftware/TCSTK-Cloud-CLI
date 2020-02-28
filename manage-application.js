@@ -25,6 +25,7 @@ async function newStarter() {
     // console.log(process.argv);
     var starterName = '';
     var starterTemplate = '';
+    let doStart = true;
     for (arg in process.argv) {
         // console.log(process.argv[arg]);
         if (process.argv[arg] == 'new') {
@@ -53,7 +54,11 @@ async function newStarter() {
                 }
             }
         }
+        if (process.argv[arg] == '--surpressStart' || process.argv[arg] == '-s') {
+            doStart = false;
+        }
     }
+    // console.log('doStart: ' + doStart);
     if (starterName == '') {
         starterName = await askQuestion('What is the name of your cloud starter ?');
     }
@@ -72,11 +77,11 @@ async function newStarter() {
     }
     log(INFO, 'Cloud Starter Template: ', stTempJson.displayName);
     log(DEBUG, 'Cloud Starter Template: ', stTempJson);
-    return createNewStarter(starterName, stTempJson);
+    return createNewStarter(starterName, stTempJson, doStart);
 }
 
 // Function to create a new starter, based on a template
-createNewStarter = function (name, template) {
+createNewStarter = function (name, template, doStart) {
     return new Promise(async function (resolve, reject) {
         var toDir = process.cwd() + '/' + name;
         if (template.useGit) {
@@ -117,7 +122,7 @@ createNewStarter = function (name, template) {
                 }
                 replaceInFile(rep.from, repTo, toDir + '/**');
             }
-            console.log('\x1b[36m%s\x1b[0m', 'Installing NPM packages for ' + name + '...');
+            log(INFO, '\x1b[34mInstalling NPM packages for ' + name + '...\033[0m');
             run('cd ' + name + ' && npm install');
             run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
             // create a new tibco-cloud.properties file
@@ -130,8 +135,13 @@ createNewStarter = function (name, template) {
                     run('cd ' + toDir + ' && ' + postCom);
                 }
             }
-            console.log('\x1b[36m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
-        } catch (error) {
+            if(doStart){
+                log(INFO, '\x1b[34m Cloud Starter ' + name + ' Created Successfully !!!\033[0m');
+                run('cd ' + toDir + ' && tcli');
+            } else {
+                console.log('\x1b[36m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)');
+            }
+         } catch (error) {
             log(ERROR, 'Error occurred:', error);
         }
         resolve();

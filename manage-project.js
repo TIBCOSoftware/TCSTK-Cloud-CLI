@@ -234,6 +234,7 @@ test = function () {
         console.log('Test...');
         var now = new Date();
         console.log(now);
+       /*
         var answer = await askQuestion('Hoe gaat het ?');
         console.log(answer);
         var answer = await askQuestion('Hoe gaat het ?', 'password');
@@ -243,6 +244,7 @@ test = function () {
         var answer = await askMultipleChoiceQuestion('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
         console.log(answer);
         console.log(testFunction());
+        */
         resolve();
     });
 };
