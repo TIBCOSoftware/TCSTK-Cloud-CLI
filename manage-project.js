@@ -481,8 +481,14 @@ promptGulp = function (stDir, cwdDir) {
                 }
                 //run('cd ' + stDir + ' && gulp ' + comToInject + ' --cwd "' + cwdDir + '" --gulpfile "' + stDir + '/manage-project.js" --pass "' + getProp('CloudLogin.pass') + '"');
                 // console.log('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\'');
-                run('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\'');
-
+                let additionalArugments = '';
+                for (arg in process.argv) {
+                    // console.log(process.argv[arg]);
+                    if (process.argv[arg] == '--debug' || process.argv[arg] == '-d') {
+                        additionalArugments = '-d';
+                    }
+                }
+                run('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\' ' + additionalArugments);
                 return promptGulp(stDir, cwdDir);
             }
         });
