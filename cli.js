@@ -212,7 +212,7 @@ export async function cli(args) {
                 }
             }
             for (var cliTask in cTsks) {
-                if(cliTask == options.task){
+                if(cTsks[cliTask].gulpTask == options.task){
                     taskExist = true;
                 }
                 //console.log(cTsks[cliTask].gulpTask);
@@ -223,7 +223,6 @@ export async function cli(args) {
                 var stringSimilarity = require('string-similarity');
                 var matches = stringSimilarity.findBestMatch(options.task, taskArray);
                 log(INFO, 'Did you mean ? \x1b[34m' + taskArray[matches.bestMatchIndex]);
-
             } else {
                 gulp.series(options.task)();
             }
