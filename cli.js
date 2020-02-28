@@ -215,7 +215,7 @@ export async function cli(args) {
                 if(cTsks[cliTask].gulpTask == options.task){
                     taskExist = true;
                 }
-                //console.log(cTsks[cliTask].gulpTask);
+                // console.log(cTsks[cliTask].gulpTask);
                 taskArray.push(cTsks[cliTask].gulpTask);
             }
             if(!taskExist){
@@ -240,9 +240,15 @@ function helptcli() {
     console.log('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]');
     console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
     console.log('new: Create new Cloud starter. Usage] tcli new <name> [--template(-t)] <template-to-use>');
-    console.log('   --debug: Display debug information.');
-    console.log('--createCP: Create a new tibco-cloud.properties file.');
-    console.log('    --help: display this help ');
+    console.log('        --debug: Display debug information.');
+    console.log('     --createCP: Create a new tibco-cloud.properties file.');
+    console.log('         --help: display this help ');
+    console.log('      --version: display the version number');
+    console.log('       --update: update the tcli');
+    console.log('     --propfile: when specified tcli will use a different property file then the default tibco-cloud.properties');
+    console.log('     --multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud starters and many different configured environments at the same time.');
+    console.log(' --multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties');
+    console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.');
     console.log('These are the available TIBCO CLOUD CLI Tasks:');
     // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
     const cliTaskConfigCLI = require('./config-cli-task.json');
