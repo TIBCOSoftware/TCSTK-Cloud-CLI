@@ -71,12 +71,13 @@ export async function cli(args) {
         console.log('multipleFile: ' + options.multipleFile);
 
     }
+    // Show help
     if (options.help) {
         helptcli();
         process.exit(0);
         //options.task = 'help-tcli';
     }
-
+    // Run multiple management
     if (options.doMultiple) {
         var gulp = require('gulp');
         require(__dirname + '/manage-multiple');
@@ -84,10 +85,13 @@ export async function cli(args) {
         // process.exit(0);
     }
 
+    // Show the version
     if (options.version) {
         console.log('TIBCO Cloud CLI Version: ' + require('./package.json').version);
         process.exit(0);
     }
+
+    // Update the TCLI
     if (options.update) {
         // console.log('TIBCO Cloud CLI Version: ' + require('./package.json').version);
         // options.task = 'update-tcli';
@@ -176,7 +180,6 @@ export async function cli(args) {
             }
         }
     }
-
 
     if (!options.createCP && !options.doMultiple) {
         // Start the specified Gulp Task
