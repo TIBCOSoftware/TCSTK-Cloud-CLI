@@ -400,7 +400,8 @@ run = function (command) {
 		resolve();
 	}).catch(
 		(reason => {
-			logO(ERROR, reason);
+			logO(DEBUG, reason);
+			log(ERROR, 'Error Running command: ' + command);
 			process.exit(1);
 		})
 	);
@@ -487,7 +488,7 @@ log = function (level, ...message) {
 		//console.log('(' + timeStamp + ')[' + level + ']  ' + message);
 
 		if(level == global.ERROR){
-			console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m' , ...message , '\033[0m');
+			console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')' ,'\x1b[31m' , ...message , '\033[0m');
 		} else {
 			console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , ...message, '\033[0m');
 		}

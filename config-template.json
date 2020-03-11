@@ -93,8 +93,8 @@
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
-      "gitPostCommands": [],
-      "gitPostCommandsWin": [],
+      "PostCommands": [],
+      "PostCommandsWin": [],
       "replacements": [
         {
           "from": "custom-form-app",
