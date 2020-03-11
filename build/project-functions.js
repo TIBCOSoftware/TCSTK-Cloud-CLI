@@ -909,17 +909,14 @@ wsuListTci = function () {
         resolve();
     });
 }
-//TODO: either inspect or get from config
 
-const possibleSchematics = ["case-cockpit", "home-cockpit", "custom-form-creator", "custom-form-action", "custom-form-casedata", "spotfire-component-basic"];
-
+const posSchematics = require('../config-schematics').schematicConfig;
 schematicAdd = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Adding Schematic...');
-        var sType = await askMultipleChoiceQuestion('What type of schematic would you like to add ?', possibleSchematics);
+        var sType = await askMultipleChoiceQuestion('What type of schematic would you like to add ?', posSchematics.descriptions);
         var sName = await askQuestion('What is the name of your schematic ?');
-        //TODO: Add choice for the type of schematic
-        run('ng generate @tibco-tcstk/component-template:' + sType + ' ' + sName);
+        run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
         resolve();
     });
 }

@@ -175,6 +175,9 @@
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
+      "gitPostCommandsWin": [],
+      "PostCommands": [],
+      "PostCommandsWin": [],
       "replacements": [
         {
           "from": "Find-Me",

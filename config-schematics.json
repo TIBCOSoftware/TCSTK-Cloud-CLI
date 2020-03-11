@@ -1,0 +1,24 @@
+{
+  "schematicConfig": {
+    "names": [
+      "case-cockpit",
+      "home-cockpit",
+      "analytics-cockpit",
+      "custom-form-creator",
+      "custom-form-action",
+      "custom-form-casedata",
+      "spotfire-component-basic",
+      "spotfire-component-config"
+    ],
+    "descriptions": [
+      "               case-cockpit: A New Custom Case Cockpit.",
+      "               home-cockpit: New Custom Home Cockpit.",
+      "          analytics-cockpit: A custom analytics Cockpit with LiveApps Mapping Configuration.",
+      "        custom-form-creator: New Custom Form (Creator).",
+      "         custom-form-action: New Custom Form (Action).",
+      "       custom-form-casedata: New Custom Form (Case Data).",
+      "   spotfire-component-basic: New Spotfire Component.",
+      "  spotfire-component-config: New Spotfire Component with Configuration."
+    ]
+  }
+}
