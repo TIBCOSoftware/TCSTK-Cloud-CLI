@@ -917,6 +917,8 @@ schematicAdd = function () {
         var sType = await askMultipleChoiceQuestion('What type of schematic would you like to add ?', posSchematics.descriptions);
         var sName = await askQuestion('What is the name of your schematic ?');
         run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
+        // TODO: run npm install only after certain schematics.
+        run('npm install');
         resolve();
     });
 }

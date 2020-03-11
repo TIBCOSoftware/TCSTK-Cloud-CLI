@@ -1,5 +1,6 @@
 {
   "schematicConfig": {
+    "_NOTE": "MAKE SURE THE ODER OF BOTH ARRAYS BELOW MATCHES !",
     "names": [
       "case-cockpit",
       "home-cockpit",
@@ -12,13 +13,13 @@
     ],
     "descriptions": [
       "               case-cockpit: A New Custom Case Cockpit.",
-      "               home-cockpit: New Custom Home Cockpit.",
-      "          analytics-cockpit: A custom analytics Cockpit with LiveApps Mapping Configuration.",
+      "               home-cockpit: A New Custom Home Cockpit.",
+      "          analytics-cockpit: A New Custom Analytics Cockpit (with LiveApps Mapping Configuration).",
       "        custom-form-creator: New Custom Form (Creator).",
       "         custom-form-action: New Custom Form (Action).",
       "       custom-form-casedata: New Custom Form (Case Data).",
       "   spotfire-component-basic: New Spotfire Component.",
-      "  spotfire-component-config: New Spotfire Component with Configuration."
+      "  spotfire-component-config: New Spotfire Component (with Configuration)."
     ]
   }
 }
