@@ -2,8 +2,8 @@
   "schematicConfig": {
     "_NOTE": "MAKE SURE THE ODER OF BOTH ARRAYS BELOW MATCHES !",
     "names": [
-      "case-cockpit",
       "home-cockpit",
+      "case-cockpit",
       "analytics-cockpit",
       "custom-form-creator",
       "custom-form-action",
@@ -12,8 +12,8 @@
       "spotfire-component-config"
     ],
     "descriptions": [
-      "               case-cockpit: A New Custom Case Cockpit.",
       "               home-cockpit: A New Custom Home Cockpit.",
+      "               case-cockpit: A New Custom Case Cockpit.",
       "          analytics-cockpit: A New Custom Analytics Cockpit (with LiveApps Mapping Configuration).",
       "        custom-form-creator: New Custom Form (Creator).",
       "         custom-form-action: New Custom Form (Action).",
