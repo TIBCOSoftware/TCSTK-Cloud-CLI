@@ -20,6 +20,15 @@
       "       custom-form-casedata: New Custom Form (Case Data).",
       "   spotfire-component-basic: New Spotfire Component.",
       "  spotfire-component-config: New Spotfire Component (with Configuration)."
+    ], "doRunNPM": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true
     ]
   }
 }

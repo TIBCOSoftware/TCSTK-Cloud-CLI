@@ -918,7 +918,10 @@ schematicAdd = function () {
         var sName = await askQuestion('What is the name of your schematic ?');
         run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
         // TODO: run npm install only after certain schematics.
-        run('npm install');
+        log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
+        if(posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]){
+            run('npm install');
+        }
         resolve();
     });
 }
