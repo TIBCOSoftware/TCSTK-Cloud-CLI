@@ -190,18 +190,25 @@
       "gulpTask": "watch-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "create-multiple-property-file": {
+    "24. create-multiple-property-file": {
       "description": "Creating an initial property file to manage multiple cloud starters and environments.",
       "enabled": true,
       "internal": false,
       "gulpTask": "create-multiple-property-file",
       "availableOnOs": ["all"]
     },
-    "replace-string-in-file": {
+    "25. replace-string-in-file": {
       "description": "Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties",
       "enabled": true,
       "internal": false,
       "gulpTask": "replace-string-in-file",
+      "availableOnOs": ["all"]
+    },
+    "26. delete-app": {
+      "description": "Delete a LiveApps WebApp",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "delete-app",
       "availableOnOs": ["all"]
     },
     "update-tcli": {

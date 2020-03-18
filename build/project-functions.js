@@ -206,6 +206,7 @@ showApps = function () {
 }
 
 
+
 // Function to show claims for the configured user
 const getClaimsURL = cloudURL + getProp('Claims_URE');
 showClaims = function () {
@@ -222,6 +223,19 @@ showClaims = function () {
         resolve();
     });
 };
+
+doDeleteApp = function (appToDelete) {
+    const lCookie = cLogin();
+    const location = cloudURL + 'webresource/v1/applications/' + appToDelete + '/';
+    const response = syncClient.del(location, {
+        headers: {
+            "accept": "application/json",
+            "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+        }
+    });
+    return response;
+}
+
 
 //TODO: Move this to prop file
 const sharedStateBaseURL = cloudURL + 'clientstate/v1/';
@@ -702,13 +716,10 @@ getCloud = function (url) {
         }
     });
     var re = response.body;
-    //let re = Object.assign({}, response.body);
-    //logO(INFO, re);
     return re;
 }
 
 const getApplicationDetailsURL = cloudURL + getProp('appURE');
-//const getApplicationDetailsURL = 'https://eu.liveapps.cloud.tibco.com/webresource/v1/applications/AppMadeWithSchematic3/applicationVersions/1/artifacts/';
 getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     var details = {};
@@ -741,7 +752,7 @@ getAppLinks = function (showTable) {
     var appLinkTable = {};
     var apps = showAvailableApps(false);
     var i = 1;
-    for (app of apps) {
+    for (let app of apps) {
         var appTemp = {};
         appTemp['APP NAME'] = app.name;
         var appN = i++;
@@ -754,13 +765,21 @@ getAppLinks = function (showTable) {
         process.stdout.cursorTo(0);
         process.stdout.write("Processing App: (" + appN + '/' + apps.length + ')...');
         */
-        for (appD of tempDet) {
-            //console.log(appD.name);
-            if (appD.name.includes("index.html")) {
-                // console.log('FOUND INDEX of ' + app.name + ': ' + appD.name);
-                var tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
-                // console.log('LOCATION: ' + tempLink);
-                appTemp['LINK'] = tempLink;
+        if(isIterable(tempDet)){
+            for (let appD of tempDet) {
+                //console.log(appD.name);
+                if (appD.name.includes("index.html")) {
+                    // console.log('FOUND INDEX of ' + app.name + ': ' + appD.name);
+                    const tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
+                    // console.log('LOCATION: ' + tempLink);
+                    appTemp['LINK'] = tempLink;
+                }
+            }
+        } else {
+            if(app.name && tempDet.errorMsg){
+                log(ERROR, 'App: ' + app.name + ', Error: ' + tempDet.errorMsg);
+            } else {
+                log(ERROR, 'Something is wrong with ', app , tempDet);
             }
         }
         appLinkTable[appN] = appTemp;
@@ -770,6 +789,14 @@ getAppLinks = function (showTable) {
         console.table(appLinkTable);
     }
     return appLinkTable;
+}
+
+isIterable = function (obj) {
+    // checks for null and undefined
+    if (obj == null) {
+        return false;
+    }
+    return typeof obj[Symbol.iterator] === 'function';
 }
 
 // Function to upload a zip to the LiveApps ContentManagment API

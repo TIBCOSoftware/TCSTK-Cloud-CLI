@@ -35,6 +35,41 @@ function deploy() {
     });
 }
 
+// Function to delete a WebApplication
+function deleteApp() {
+    return new Promise(async function (resolve, reject) {
+        // Get the list of applications
+        log(INFO, 'Getting Applications...');
+        const appArray = new Array();
+        appArray.push('NONE');
+        let deleteApp = false;
+        const apps = showAvailableApps(true);
+        for (let app of apps) {
+            appArray.push(app.name);
+        }
+        const appToDelete = await askMultipleChoiceQuestionSearch('Which APP Would you like to delete ? ', appArray);
+        if(appToDelete != 'NONE'){
+            const confirm = await askMultipleChoiceQuestion ('Are you sure you want to delete ? ' + appToDelete, ['YES','NO']);
+            if(confirm == 'YES'){
+                deleteApp = true;
+            }
+        }
+        if(deleteApp){
+            log(INFO, 'Deleting ' + appToDelete + '...');
+            const da = doDeleteApp(appToDelete);
+            if(da.body.message){
+                log(INFO, da.body.message);
+            }else {
+                log(ERROR, da);
+            }
+        } else {
+            log(INFO, 'Ok I won\'t do anything...');
+        }
+        resolve();
+    });
+}
+
+
 // Function to publish the cloud starter
 function publish() {
     return new Promise(async function (resolve, reject) {
@@ -106,7 +141,6 @@ function undoLibSources() {
         deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
         //FIX: just install those npm packages (instead of removing the entire package.json file...)
         run('npm install ' + getProp('TCSTDebugPackages'));
-        // npmInstall('./');
         resolve();
     });
 }
@@ -133,7 +167,6 @@ helptcli = function () {
         var cwdir = process.cwd();
         run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
         log('INFO', 'These are the available TIBCO CLOUD CLI Tasks:');
-        // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
         var cTsks = cliTaskConfig.cliTasks;
         for (cliTask in cTsks) {
             var allowed = false;
@@ -153,7 +186,6 @@ helptcli = function () {
                 }
                 console.log('\x1b[36m%s\x1b[0m', str + ':', ' ' + cTsks[cliTask].description);
             }
-            // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')'); \x1b[35m
         }
 
         resolve();
@@ -234,17 +266,6 @@ test = function () {
         console.log('Test...');
         var now = new Date();
         console.log(now);
-       /*
-        var answer = await askQuestion('Hoe gaat het ?');
-        console.log(answer);
-        var answer = await askQuestion('Hoe gaat het ?', 'password');
-        console.log(answer);
-        var answer = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
-        console.log(answer);
-        var answer = await askMultipleChoiceQuestion('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
-        console.log(answer);
-        console.log(testFunction());
-        */
         resolve();
     });
 };
@@ -335,6 +356,10 @@ gulp.task('show-apps', showApps);
 showAvailableApps.description = 'Shows all the applications that are deployed in the cloud and their versions.';
 gulp.task('show-application-links', showLinks);
 showLinks.description = 'Shows all the links to the deployed applications (that have and index.html file).';
+gulp.task('delete-app', deleteApp);
+deleteApp.description = 'elete a LiveApps WebApp.';
+
+
 gulp.task('clean-dist', cleanDist);
 gulp.task('buildZip', build);
 gulp.task('build', gulp.series('clean-dist', 'buildZip'));

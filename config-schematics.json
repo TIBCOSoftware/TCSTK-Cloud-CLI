@@ -1,6 +1,6 @@
 {
   "schematicConfig": {
-    "_NOTE": "MAKE SURE THE ODER OF BOTH ARRAYS BELOW MATCHES !",
+    "_NOTE": "MAKE SURE THE ODER OF THE ARRAYS BELOW MATCHES !",
     "names": [
       "home-cockpit",
       "case-cockpit",
@@ -20,7 +20,8 @@
       "       custom-form-casedata: New Custom Form (Case Data).",
       "   spotfire-component-basic: New Spotfire Component.",
       "  spotfire-component-config: New Spotfire Component (with Configuration)."
-    ], "doRunNPM": [
+    ],
+    "doRunNPM": [
       false,
       false,
       true,
