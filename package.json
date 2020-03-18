@@ -2,7 +2,7 @@
   "name": "@tibco-tcstk/cloud-cli",
   "version": "1.2.2",
   "scripts": {
-    "postinstall": "echo THANK YOU FOR USING THE TIBCO CLOUD CLI !!!",
+    "postinstall": "./message.js",
     "pub": "npm publish"
   },
   "dependencies": {
