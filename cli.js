@@ -52,7 +52,7 @@ function parseArgumentsIntoOptions(rawArgs) {
 const isWindows = process.platform == 'win32';
 
 // Main function
-export async function cliRun(args) {
+export async function cli(args) {
     const options = parseArgumentsIntoOptions(args);
     const appRoot = process.env.PWD;
     const cwdir = process.cwd();
