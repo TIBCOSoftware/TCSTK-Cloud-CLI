@@ -332,6 +332,61 @@ createMultiplePropertyFileWrapper = function () {
     });
 }
 
+// Function to
+showLiveAppsWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        const decision = await askMultipleChoiceQuestion('Do you want to count the cases ?', ['YES', 'NO']);
+        if (decision == 'YES') {
+            showLiveApps(true, true);
+        }else {
+            showLiveApps(true, false);
+        }
+        resolve();
+    });
+}
+
+// Function to
+exportLiveAppsDataWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        exportLiveAppsData();
+        resolve();
+    });
+}
+
+// Function to
+importLiveAppsDataWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        importLiveAppsData();
+        resolve();
+    });
+}
+
+// Function to
+csvToJsonLiveAppsDataWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        csvToJsonLiveAppsData();
+        resolve();
+    });
+}
+
+// Function to
+jsonToCsvLiveAppsDataWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        jsonToCsvLiveAppsData();
+        resolve();
+    });
+}
+
+exportLiveAppsCaseTypeWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        exportLiveAppsCaseType();
+        resolve();
+    });
+}
+
+
+
+
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
 //gulp.task('test-wsu', testWSU);
@@ -352,12 +407,26 @@ obfuscate.description = 'Obfuscates a Password';
 mainT.description = 'Displays this message';
 gulp.task('show-cloud', showClaims);
 showClaims.description = 'Shows basic information on your cloud login. (use this to test your cloud login details)';
-gulp.task('show-apps', showApps);
+gulp.task('show-cloud-starters', showApps);
 showAvailableApps.description = 'Shows all the applications that are deployed in the cloud and their versions.';
-gulp.task('show-application-links', showLinks);
+gulp.task('show-cloud-starter-links', showLinks);
 showLinks.description = 'Shows all the links to the deployed applications (that have and index.html file).';
-gulp.task('delete-app', deleteApp);
-deleteApp.description = 'elete a LiveApps WebApp.';
+gulp.task('delete-cloud-starter', deleteApp);
+deleteApp.description = 'Delete a Cloud Starter.';
+
+gulp.task('show-live-apps-cases', showLiveAppsWrapper);
+showLiveAppsWrapper.description = 'Show Live Apps';
+gulp.task('export-live-apps-cases', exportLiveAppsDataWrapper);
+exportLiveAppsDataWrapper.description = 'Export Data from Live Apps';
+gulp.task('import-live-apps-cases', importLiveAppsDataWrapper);
+importLiveAppsDataWrapper.description = 'Import Data to Live Apps';
+gulp.task('csv-to-json-liveapps-data', csvToJsonLiveAppsDataWrapper);
+csvToJsonLiveAppsDataWrapper.description = 'Convert CSV to JSON for LiveApps data';
+gulp.task('json-to-csv-liveapps-data', jsonToCsvLiveAppsDataWrapper);
+jsonToCsvLiveAppsDataWrapper.description = 'Convert JSON to CSV for LiveApps data';
+gulp.task('export-live-apps-case-type', exportLiveAppsCaseTypeWrapper);
+exportLiveAppsCaseTypeWrapper.description = 'Export the details of a Live Apps Case Type';
+
 
 
 gulp.task('clean-dist', cleanDist);

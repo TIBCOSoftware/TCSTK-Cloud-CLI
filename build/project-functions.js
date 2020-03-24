@@ -206,7 +206,6 @@ showApps = function () {
 }
 
 
-
 // Function to show claims for the configured user
 const getClaimsURL = cloudURL + getProp('Claims_URE');
 showClaims = function () {
@@ -549,9 +548,9 @@ importSharedStateFile = function (ssFile) {
         log(ERROR, e);
         process.exit();
     }
-    if(ssObject.content != null){
-        if(ssObject.content.json != null){
-            if(ssObject.content.json['FILESTORE'] != null){
+    if (ssObject.content != null) {
+        if (ssObject.content.json != null) {
+            if (ssObject.content.json['FILESTORE'] != null) {
                 const contentFile = ssObject.content.json['FILESTORE'];
                 log(INFO, 'Getting content from: ' + contentFile);
                 var contentContentFile = fs.readFileSync(contentFile, "utf8");
@@ -571,12 +570,12 @@ importSharedStateFile = function (ssFile) {
     return ssObject;
 }
 
-putSharedState = function (sharedStateObject){
-    if(sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}){
+putSharedState = function (sharedStateObject) {
+    if (sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
         const lCookie = cLogin();
         log(DEBUG, 'Login Cookie: ', lCookie);
-        const response = syncClient.put(encodeURI(sharedStateURL) , {
+        const response = syncClient.put(encodeURI(sharedStateURL), {
             headers: {
                 "accept": "application/json",
                 "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
@@ -588,7 +587,7 @@ putSharedState = function (sharedStateObject){
         var re = response;
         // TODO: Check for errors, and if the state does not exist use post..
     } else {
-        log(ERROR, 'NOT Posting Empty Shared State: ', sharedStateObject )
+        log(ERROR, 'NOT Posting Empty Shared State: ', sharedStateObject)
     }
 }
 
@@ -617,8 +616,8 @@ importSharedStateScope = function () {
                 let answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions);
                 if (answer == 'ALL SHARED STATES') {
                     // Import all shared states
-                    for(curState of importOptions){
-                        if(curState != 'ALL SHARED STATES'){
+                    for (curState of importOptions) {
+                        if (curState != 'ALL SHARED STATES') {
                             // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
                             putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
                         }
@@ -639,18 +638,18 @@ importSharedStateScope = function () {
 };
 
 //wrapper function around the watcher on shared state
-watchSharedStateScopeMain = function() {
+watchSharedStateScopeMain = function () {
     return new Promise(async function (resolve, reject) {
         //const commandSTDO = 'cd ' + __dirname  + '/../ && gulp watch-shared-state-scope-do --cwd "' + process.cwd() + '" --gulpfile "' + __dirname + '/../manage-project.js" --pass "' + getProp('CloudLogin.pass + '"';
         const commandSTDO = 'tcli watch-shared-state-scope-do';
         const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state scope ?', ['YES', 'NO']);
-        if(decision == 'YES'){
+        if (decision == 'YES') {
             exportSharedStateScope().then(() => {
                 run(commandSTDO);
                 resolve();
             })
         } else {
-            run (commandSTDO);
+            run(commandSTDO);
             resolve();
         }
     });
@@ -665,10 +664,10 @@ watchSharedStateScope = function () {
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
             // console.log(event, path);
-            if(event == 'change'){
-                if(path.includes('/CONTENT/')){
+            if (event == 'change') {
+                if (path.includes('/CONTENT/')) {
                     log(INFO, 'CONTENT File UPDATED: ' + path);
-                    const contextFile = path.replace('/CONTENT/' , '/').replace('.CONTENT.', '.');
+                    const contextFile = path.replace('/CONTENT/', '/').replace('.CONTENT.', '.');
                     // console.log(contextFile);
                     if (doesFileExist(contextFile)) {
                         putSharedState(importSharedStateFile(contextFile));
@@ -765,7 +764,7 @@ getAppLinks = function (showTable) {
         process.stdout.cursorTo(0);
         process.stdout.write("Processing App: (" + appN + '/' + apps.length + ')...');
         */
-        if(isIterable(tempDet)){
+        if (isIterable(tempDet)) {
             for (let appD of tempDet) {
                 //console.log(appD.name);
                 if (appD.name.includes("index.html")) {
@@ -776,10 +775,10 @@ getAppLinks = function (showTable) {
                 }
             }
         } else {
-            if(app.name && tempDet.errorMsg){
+            if (app.name && tempDet.errorMsg) {
                 log(ERROR, 'App: ' + app.name + ', Error: ' + tempDet.errorMsg);
             } else {
-                log(ERROR, 'Something is wrong with ', app , tempDet);
+                log(ERROR, 'Something is wrong with ', app, tempDet);
             }
         }
         appLinkTable[appN] = appTemp;
@@ -855,6 +854,168 @@ publishApp = function (application) {
         resolve();
     });
 }
+
+// Function to call liveApps
+
+callURL = function (url, method, postRequest, contentType, doLog) {
+    const lCookie = cLogin();
+    const cMethod = method || 'GET';
+    let cdoLog = true;
+    if(doLog != null){
+        cdoLog = doLog;
+    }
+    const cType = contentType || 'application/json';
+    let body = null;
+    if (cMethod === 'POST') {
+        if (cType === 'application/json') {
+            body = JSON.stringify(postRequest);
+        } else {
+            body = postRequest;
+        }
+    }
+    const header = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+    }
+    if(cdoLog) {
+        log(INFO, '--- CALLING SERVICE ---');
+        log(INFO, '-     URL: ' + url);
+        log(INFO, '-  METHOD: ' + cMethod);
+        log(INFO, '- CONTENT: ' + cType);
+    }
+    if (method === 'POST') {
+        if(cdoLog) {
+            log(INFO, '-    BODY: ' + body);
+        }
+        var response = syncClient.post(encodeURI(url), {
+            headers: header,
+            payload: body
+        });
+    } else {
+        var response = syncClient.get(encodeURI(url), {
+            headers: header
+        });
+
+    }
+    if (response.body.errorMsg != null) {
+        log(ERROR, response.body.errorMsg);
+        return null;
+    } else {
+        return response.body;
+    }
+}
+
+let globalProductionSandbox = null;
+getProductionSandbox =  function () {
+    if(!globalProductionSandbox) {
+        const claims = callURL(getClaimsURL);
+        for (let sb of claims.sandboxes) {
+            if (sb.type === 'Production') {
+                globalProductionSandbox = sb.id;
+            }
+        }
+        log(INFO, 'SANDBOX ID: ' + globalProductionSandbox);
+    }
+    return globalProductionSandbox;
+}
+
+
+const getTypesURL = cloudURL + 'case/v1/types'; // getProp('Claims_URE');
+// Function to
+showLiveApps = function (doShowTable, doCountCases) {
+    // https://eu.liveapps.cloud.tibco.com/case/v1/types?%24sandbox=31
+
+    //TODO: Call can be optimized by only requesting the basics
+    const caseTypes = callURL(getTypesURL + '?$sandbox=' + getProductionSandbox() + '&$top=1000');
+    log(DEBUG, 'Case Types: ' , caseTypes)
+
+    // TODO: HIER VERDER
+    /*
+    1. DONE Rename Naar Show Cases
+    2. DONE Ask if you want to count cases
+    3. DONE Do not show logs (ws calls) for counting the cases
+    4. DONE Show an app detail indicator
+    5. (maybe) get case owner
+
+     */
+
+    var cases = {};
+    for (var curCase in caseTypes) {
+        var caseTemp = {};
+        var appN = parseInt(curCase) + 1;
+        //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
+        caseTemp['CASE NAME'] = caseTypes[curCase].name;
+        caseTemp['APPLICATION ID'] = caseTypes[curCase].applicationId;
+        caseTemp['VERSION'] = caseTypes[curCase].applicationVersion;
+        caseTemp['IS CASE'] = caseTypes[curCase].isCase;
+        if(doCountCases) {
+            logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
+            caseTemp['NUMBER OF CASES'] = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true', 'GET',null,null,false);
+        }
+        //https://eu.liveapps.cloud.tibco.com/?%24sandbox=31&%24filter=applicationId%20eq%202880&%24count=true
+        cases[appN] = caseTemp;
+
+    }
+    //logO(INFO,apps);
+    if (doShowTable) console.table(cases);
+    return caseTypes;
+
+
+}
+
+// Shared state folder (picked up from configuration if exists)
+let CASE_FOLDER = './Cases/';
+if (getProp('Case_Folder') != null) {
+    CASE_FOLDER = getProp('Case_Folder');
+} else {
+    addOrUpdateProperty(getPropFileName(), 'Case_Folder', CASE_FOLDER);
+}
+
+exportLiveAppsCaseType =  async function () {
+    const cTypes = showLiveApps(true, false);
+    let cTypeArray = new Array();
+    for (var curCase in cTypes) {
+        cTypeArray.push(cTypes[curCase].name);
+    }
+    let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
+    let fName = await askQuestion('What file name would you like to export to ? (press enter for default)')
+    for (var curCase in cTypes) {
+        if(typeForExport == cTypes[curCase].name){
+            const storeOptions = {spaces: 2, EOL: '\r\n'};
+            mkdirIfNotExist(CASE_FOLDER);
+            let fileName = CASE_FOLDER + fName;
+            if(fName == ''){
+                fileName = CASE_FOLDER + cTypes[curCase].name + '.type.json';
+            }
+            jsonfile.writeFileSync(fileName, cTypes[curCase], storeOptions);
+            log(INFO, 'Case Type File Stored: ' + fileName)
+        };
+    }
+
+
+}
+
+// Function to
+exportLiveAppsData = function () {
+
+}
+
+// Function to
+importLiveAppsData = function () {
+
+}
+
+// Function to
+csvToJsonLiveAppsData = function () {
+
+}
+
+// Function to
+jsonToCsvLiveAppsData = function () {
+
+}
+
 
 // Get the TIBCO Cloud Starter Development Kit from GIT
 getGit = function (source, target, tag) {
@@ -946,7 +1107,7 @@ schematicAdd = function () {
         run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
         // TODO: run npm install only after certain schematics.
         log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
-        if(posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]){
+        if (posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]) {
             run('npm install');
         }
         resolve();

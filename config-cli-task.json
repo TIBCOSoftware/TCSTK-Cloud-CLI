@@ -15,18 +15,18 @@
       "gulpTask": "show-cloud",
       "availableOnOs": ["all"]
     },
-    "2. show-apps": {
+    "2. show-cloud-starters": {
       "description": "Show Applications of LiveApps WebApps",
       "enabled": true,
       "internal": false,
-      "gulpTask": "show-apps",
+      "gulpTask": "show-cloud-starters",
       "availableOnOs": ["all"]
     },
-    "3. show-application-links": {
+    "3. show-cloud-starter-links": {
       "description": "Show Links to Applications of LiveApps WebApps",
       "enabled": true,
       "internal": false,
-      "gulpTask": "show-application-links",
+      "gulpTask": "show-cloud-starter-links",
       "availableOnOs": ["all"]
     },
     "4. change-region": {
@@ -204,13 +204,56 @@
       "gulpTask": "replace-string-in-file",
       "availableOnOs": ["all"]
     },
-    "26. delete-app": {
+    "26. delete-cloud-starter": {
       "description": "Delete a LiveApps WebApp",
       "enabled": true,
       "internal": false,
-      "gulpTask": "delete-app",
+      "gulpTask": "delete-cloud-starter",
       "availableOnOs": ["all"]
     },
+    "27. show-live-apps-cases": {
+      "description": "Show Live Apps Cases",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-live-apps-cases",
+      "availableOnOs": ["all"]
+    },
+    "28. export-live-apps-case-type": {
+      "description": "Export the details of a Live Apps Case Type",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "export-live-apps-case-type",
+      "availableOnOs": ["all"]
+    },
+    "29. export-live-apps-cases": {
+      "description": "Export Data from Live Apps",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "export-live-apps-cases",
+      "availableOnOs": ["all"]
+    },
+    "30. import-live-apps-cases": {
+      "description": "Import Cases to Live Apps",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "import-live-apps-cases",
+      "availableOnOs": ["all"]
+    },
+    "csv-to-json-live-apps-data": {
+      "description": "Convert CSV to JSON for LiveApps data",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "csv-to-json-liveapps-data",
+      "availableOnOs": ["all"]
+    },
+    "json-to-csv-liveapps-data": {
+      "description": "Convert JSON to CSV for LiveApps data",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "json-to-csv-liveapps-data",
+      "availableOnOs": ["all"]
+    },
+
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,
