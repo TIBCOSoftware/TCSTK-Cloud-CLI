@@ -227,7 +227,7 @@
     },
     "29. export-live-apps-cases": {
       "description": "Export Data from Live Apps",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "export-live-apps-cases",
       "availableOnOs": ["all"]

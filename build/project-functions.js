@@ -861,7 +861,7 @@ callURL = function (url, method, postRequest, contentType, doLog) {
     const lCookie = cLogin();
     const cMethod = method || 'GET';
     let cdoLog = true;
-    if(doLog != null){
+    if (doLog != null) {
         cdoLog = doLog;
     }
     const cType = contentType || 'application/json';
@@ -878,14 +878,14 @@ callURL = function (url, method, postRequest, contentType, doLog) {
         "Content-Type": "application/json",
         "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
     }
-    if(cdoLog) {
+    if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '-     URL: ' + url);
         log(INFO, '-  METHOD: ' + cMethod);
         log(INFO, '- CONTENT: ' + cType);
     }
     if (method === 'POST') {
-        if(cdoLog) {
+        if (cdoLog) {
             log(INFO, '-    BODY: ' + body);
         }
         var response = syncClient.post(encodeURI(url), {
@@ -907,8 +907,8 @@ callURL = function (url, method, postRequest, contentType, doLog) {
 }
 
 let globalProductionSandbox = null;
-getProductionSandbox =  function () {
-    if(!globalProductionSandbox) {
+getProductionSandbox = function () {
+    if (!globalProductionSandbox) {
         const claims = callURL(getClaimsURL);
         for (let sb of claims.sandboxes) {
             if (sb.type === 'Production') {
@@ -928,17 +928,9 @@ showLiveApps = function (doShowTable, doCountCases) {
 
     //TODO: Call can be optimized by only requesting the basics
     const caseTypes = callURL(getTypesURL + '?$sandbox=' + getProductionSandbox() + '&$top=1000');
-    log(DEBUG, 'Case Types: ' , caseTypes)
+    log(DEBUG, 'Case Types: ', caseTypes)
 
-    // TODO: HIER VERDER
-    /*
-    1. DONE Rename Naar Show Cases
-    2. DONE Ask if you want to count cases
-    3. DONE Do not show logs (ws calls) for counting the cases
-    4. DONE Show an app detail indicator
-    5. (maybe) get case owner
-
-     */
+    // TODO: (maybe) get case owner
 
     var cases = {};
     for (var curCase in caseTypes) {
@@ -949,14 +941,16 @@ showLiveApps = function (doShowTable, doCountCases) {
         caseTemp['APPLICATION ID'] = caseTypes[curCase].applicationId;
         caseTemp['VERSION'] = caseTypes[curCase].applicationVersion;
         caseTemp['IS CASE'] = caseTypes[curCase].isCase;
-        if(doCountCases) {
+        if (doCountCases) {
             logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
-            caseTemp['NUMBER OF CASES'] = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true', 'GET',null,null,false);
+            caseTemp['NUMBER OF CASES'] = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true', 'GET', null, null, false);
         }
+
         //https://eu.liveapps.cloud.tibco.com/?%24sandbox=31&%24filter=applicationId%20eq%202880&%24count=true
         cases[appN] = caseTemp;
 
     }
+    console.log('\n');
     //logO(INFO,apps);
     if (doShowTable) console.table(cases);
     return caseTypes;
@@ -972,33 +966,108 @@ if (getProp('Case_Folder') != null) {
     addOrUpdateProperty(getPropFileName(), 'Case_Folder', CASE_FOLDER);
 }
 
-exportLiveAppsCaseType =  async function () {
+/*
+getCaseType = async function(question){
+    const cTypes = showLiveApps(true, false);
+    let cTypeArray = new Array();
+    for (var curCase in cTypes) {
+        cTypeArray.push(cTypes[curCase].name);
+    }
+    let choosenCT = await askMultipleChoiceQuestionSearch(question, cTypeArray);
+    let re = { 'choosenCT' : choosenCT,
+        'cTypes' : cTypes };
+    return re;
+}*/
+
+const storeOptions = {spaces: 2, EOL: '\r\n'};
+exportLiveAppsCaseType = async function () {
     const cTypes = showLiveApps(true, false);
     let cTypeArray = new Array();
     for (var curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-    let fName = await askQuestion('What file name would you like to export to ? (press enter for default)')
+
+    let fName = await askQuestion('What file name would you like to export to ? (press enter for default)');
     for (var curCase in cTypes) {
-        if(typeForExport == cTypes[curCase].name){
-            const storeOptions = {spaces: 2, EOL: '\r\n'};
+        if (typeForExport == cTypes[curCase].name) {
+
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
-            if(fName == ''){
+            if (fName == '') {
                 fileName = CASE_FOLDER + cTypes[curCase].name + '.type.json';
             }
             jsonfile.writeFileSync(fileName, cTypes[curCase], storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
-        };
+        }
+        ;
     }
-
-
 }
 
-// Function to
-exportLiveAppsData = function () {
+const exportCaseStepSize = 30;
+// Function to export case data
+exportLiveAppsData = async function () {
+    const cTypes = showLiveApps(true, false);
+    let cTypeArray = new Array();
+    for (var curCase in cTypes) {
+        cTypeArray.push(cTypes[curCase].name);
+    }
+    let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
+    let fName = await askQuestion('What Folder like to export to ? (press enter for default)');
+    let allCases = new Array();
+    for (let curCase in cTypeArray) {
+        if (cTypeArray[curCase] == typeForExport) {
+            // count cases
+            const numberOfCasesForExport = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true', 'GET', null, null, false);
+            log(INFO, 'Number of cases for export: ' + numberOfCasesForExport);
+            const typeIdString = ' and typeId eq 1';
+            // get cases in batch sizes
+            for (let i = 0; i <= numberOfCasesForExport; i = i + exportCaseStepSize) {
+                let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+                // console.log('Export Batch', exportBatch);
+                logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
+                allCases = allCases.concat(exportBatch);
+            }
+            log(INFO, 'Number of Exported Cases: ' + allCases.length);
+            // Write Cases
+            let cfName = CASE_FOLDER + fName;
+            if (fName == '') {
+                //TODO: Add date to the end of this
+                cfName = CASE_FOLDER + 'Export-' + typeForExport + '/';
+            }
+            mkdirIfNotExist(cfName);
+            mkdirIfNotExist(cfName + 'CONTENT/');
+            for (let exCase of allCases) {
+                let contextFileName = cfName + typeForExport + '-' + exCase.caseReference + '.json';
+                let writeContentSeparate = false;
+                let contentObject = {};
+                //let contextFileName = CASE_FOLDER + sSEntry.name + '.json';
+                let contentFileName = cfName + 'CONTENT/' + typeForExport + '-' + exCase.caseReference + '.CONTENT.json';
+                if (exCase.casedata != null) {
+                    try {
+                        // Get the details for every shared state entry
+                        contentObject = JSON.parse(exCase.casedata);
+                        exCase.casedata = {'FILESTORE': contentFileName};
+                        writeContentSeparate = true;
+                        // And store them in a file / folder
+                        jsonfile.writeFileSync(contentFileName, contentObject, storeOptions);
+                        log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                    } catch (e) {
+                        log(ERROR, 'Parse Error on: ' + exCase.name + 'Writing directly...');
+                    }
+                    jsonfile.writeFileSync(contextFileName, exCase, storeOptions);
+                    // log(INFO, 'Exported Case To: ' + cfName);
+                    log(INFO, '[STORED CONTEXT]: ' + contextFileName);
+                    if (writeContentSeparate) {
+                        log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                    } else {
+                        log(ERROR, 'Stored all in: ' + contextFileName);
+                    }
+                }
+            }
 
+        }
+    }
 }
 
 // Function to
