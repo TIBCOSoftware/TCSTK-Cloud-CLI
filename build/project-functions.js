@@ -1048,10 +1048,10 @@ exportLiveAppsData = async function () {
                         // Get the details for every shared state entry
                         contentObject = JSON.parse(exCase.casedata);
                         exCase.casedata = {'FILESTORE': contentFileName};
-                        writeContentSeparate = true;
                         // And store them in a file / folder
                         jsonfile.writeFileSync(contentFileName, contentObject, storeOptions);
-                        log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                        writeContentSeparate = true;
+                        //log(INFO, '[STORED CONTENT]: ' + contentFileName);
                     } catch (e) {
                         log(ERROR, 'Parse Error on: ' + exCase.name + 'Writing directly...');
                     }
