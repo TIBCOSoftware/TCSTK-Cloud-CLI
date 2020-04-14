@@ -50,6 +50,7 @@ function parseArgumentsIntoOptions(rawArgs) {
 }
 
 const isWindows = process.platform == 'win32';
+const dirDelimiter = isWindows ? '\\' : '/';
 
 // Main function
 export async function cli(args) {
@@ -115,7 +116,7 @@ export async function cli(args) {
             const tManageG = 'Manage Global Cloud Connection Configuration';
             const tMultiple = 'Create New Multiple Properties file';
             const tNothing = 'Nothing';
-            if (!fs.existsSync(cwdir + '/' + propFileName) || options.createCP) {
+            if (!fs.existsSync(cwdir + dirDelimiter + propFileName) || options.createCP) {
                 var cif = '';
                 if (!options.createCP) {
                     displayOpeningMessage();

@@ -584,7 +584,7 @@ promptGulp = function (stDir, cwdDir) {
                         additionalArugments = '-d';
                     }
                 }
-                run('tcli ' + comToInject + ' -p \'' + getPropFileName() + '\' ' + additionalArugments);
+                run('tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments);
                 return promptGulp(stDir, cwdDir);
             }
         });
