@@ -995,7 +995,7 @@ exportLiveAppsCaseType = async function () {
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
             if (fName == '') {
-                fileName = CASE_FOLDER + cTypes[curCase].name + '.type.json';
+                fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion  + '.type.json';
             }
             jsonfile.writeFileSync(fileName, cTypes[curCase], storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
