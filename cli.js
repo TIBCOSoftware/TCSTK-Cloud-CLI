@@ -27,8 +27,10 @@ function parseArgumentsIntoOptions(rawArgs) {
             '-m': '--multiple',
             '--multipleFile': String,
             '-f': '--multipleFile',
-            '-s': '--surpressStart',
             '--surpressStart': Boolean,
+            '-s': '--surpressStart',
+            '--pass': String
+
         },
         {
             argv: rawArgs.slice(2),
@@ -45,7 +47,8 @@ function parseArgumentsIntoOptions(rawArgs) {
         doMultiple: args['--multiple'] || false,
         multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
         surpressStart: args['--surpressStart'] || false,
-        task: args._[0] || ''
+        task: args._[0] || '',
+        pass: args['--pass'] || ''
     };
 }
 
@@ -72,8 +75,20 @@ export async function cli(args) {
         console.log('isWindows: ' + isWindows);
         console.log('doMultiple: ' + options.doMultiple);
         console.log('multipleFile: ' + options.multipleFile);
+        console.log('pass: ' + options.pass);
+
 
     }
+    if(options.pass != ''){
+        // This call sets the properties object, to be able to add a property to it.
+        getProp('CloudLogin.pass');
+        if (options.pass.charAt(0) == '#') {
+            setProperty('CloudLogin.pass', options.pass);
+        } else {
+            setProperty('CloudLogin.pass', obfuscatePW(options.pass));
+        }
+    }
+
     // Show help
     if (options.help) {
         helptcli();

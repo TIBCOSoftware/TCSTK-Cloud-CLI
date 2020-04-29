@@ -252,7 +252,8 @@ mainT = function () {
         if (getProp('CloudLogin.pass') == '') {
             // When password is empty ask it manually for the session.
             var pass = await askQuestion('Please provide your password: ', 'password');
-            properties.set('CloudLogin.pass', obfuscatePW(pass));
+            // properties.set('CloudLogin.pass', obfuscatePW(pass));
+            setProperty('CloudLogin.pass', obfuscatePW(pass));
         }
 
         await promptGulp(__dirname, appRoot);
@@ -580,9 +581,13 @@ promptGulp = function (stDir, cwdDir) {
                 let additionalArugments = '';
                 for (arg in process.argv) {
                     // console.log(process.argv[arg]);
+                    // TODO: Should not all arguments be propagated >?
                     if (process.argv[arg] == '--debug' || process.argv[arg] == '-d') {
-                        additionalArugments = '-d';
+                        additionalArugments += ' -d ';
                     }
+                }
+                if(getProp('CloudLogin.pass') !== ''){
+                    additionalArugments += '--pass "' + getProp('CloudLogin.pass') + '"';
                 }
                 run('tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments);
                 return promptGulp(stDir, cwdDir);

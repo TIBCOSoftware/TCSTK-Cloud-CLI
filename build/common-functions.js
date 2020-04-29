@@ -140,6 +140,25 @@ getProp = function(propName){
 	return re;
 }
 
+setProperty = function(name, value){
+	console.log('BEFORE propsGl: ' , propsGl);
+	log(DEBUG, 'Setting Property) Name: ' , name , ' Value: ', value);
+	set(name, value, propsGl);
+	console.log('AFTER propsGl: ' , propsGl);
+}
+
+function set(path, value, obj) {
+	var schema = obj;  // a moving reference to internal objects within obj
+	var pList = path.split('.');
+	var len = pList.length;
+	for(var i = 0; i < len-1; i++) {
+		var elem = pList[i];
+		if( !schema[elem] ) schema[elem] = {}
+		schema = schema[elem];
+	}
+	schema[pList[len-1]] = value;
+}
+
 setPropFileName = function(propFileName){
 	propFileNameGl = propFileName;
 	log(DEBUG, 'Usring Property File: ' + propFileNameGl);
