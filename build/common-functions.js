@@ -141,10 +141,10 @@ getProp = function(propName){
 }
 
 setProperty = function(name, value){
-	console.log('BEFORE propsGl: ' , propsGl);
+	//console.log('BEFORE propsGl: ' , propsGl);
 	log(DEBUG, 'Setting Property) Name: ' , name , ' Value: ', value);
 	set(name, value, propsGl);
-	console.log('AFTER propsGl: ' , propsGl);
+	//console.log('AFTER propsGl: ' , propsGl);
 }
 
 function set(path, value, obj) {
