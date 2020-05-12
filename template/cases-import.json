@@ -1,0 +1,25 @@
+{
+  "import-steps" : ["create-cases", "action-cases"],
+  "create-cases": {
+    "process-id": "16529",
+    "applicationId": "3524",
+    "type": "CREATOR",
+    "name": "",
+    "data": "cases-to-import",
+    "sleep": 0
+  },
+  "action-cases": {
+    "process-id": "16813",
+    "applicationId": "3524",
+    "type": "ACTION",
+    "name" : "",
+    "data": "cases-to-action",
+    "sleep": 0
+  },
+  "cases-to-import" :{
+    "FILESTORE": "./createCases.json"
+  },
+  "cases-to-action" : {
+    "FILESTORE": "./actionCases.json"
+  }
+}

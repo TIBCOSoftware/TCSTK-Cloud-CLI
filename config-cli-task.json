@@ -234,7 +234,7 @@
     },
     "30. import-live-apps-cases": {
       "description": "Import Cases to Live Apps",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "import-live-apps-cases",
       "availableOnOs": ["all"]

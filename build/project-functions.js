@@ -900,6 +900,8 @@ callURL = function (url, method, postRequest, contentType, doLog) {
     }
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
+        log(ERROR, response.body);
+
         return null;
     } else {
         return response.body;
@@ -995,7 +997,7 @@ exportLiveAppsCaseType = async function () {
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
             if (fName == '') {
-                fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion  + '.type.json';
+                fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion + '.type.json';
             }
             jsonfile.writeFileSync(fileName, cTypes[curCase], storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
@@ -1070,9 +1072,92 @@ exportLiveAppsData = async function () {
     }
 }
 
-// Function to
-importLiveAppsData = function () {
+//TODO: Add Export Feature to one file. (Just the data and to use for import)
 
+//TODO: Create a generator for the input feature. (based on the template and ask to add steps)
+//TODO: Make sure you are not overwriting a current import file.
+
+// Function to Import LiveApps Case Data based on Config File
+importLiveAppsData = async function () {
+    //TODO: Choose import file (if there are more)
+
+    log(INFO, ' -- Importing Case Data --- ');
+    const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
+    const impConf = require(importFolder + 'import.json');
+    const cSteps = impConf['import-steps'];
+    log(INFO, 'Configured Steps: ', cSteps);
+
+    //TODO: check if data of all steps has the same size
+    //TODO: Check if there is a creator (how to map the caseID)
+    //TODO: Check if the first step is a creator
+    //
+    //TODO: Show Summary Table (Step Number, Step Name, SandboxID, Application Name, Application ID, Process Type, Process Name, Process ID, Sleep Time)
+    //
+
+    //Loop over all the data
+    if (impConf[impConf[impConf['import-steps'][0]].data].FILESTORE != null) {
+        dataForImport = jsonfile.readFileSync(importFolder + impConf[impConf[impConf['import-steps'][0]].data].FILESTORE)
+    } else {
+        dataForImport = impConf[impConf['import-steps'][0]].data;
+    }
+    const numberOfImports = dataForImport.length;
+    log(INFO, 'Number of Imports: ' + numberOfImports);
+
+    //TODO: Add are you sure ?
+    const sBid = getProductionSandbox();
+    for (let i = 0; i < numberOfImports; i++) {
+        //Loop over all cases
+        let caseRef = '';
+        for (let impStep of impConf['import-steps']) {
+            const stepConf = impConf[impStep];
+            log(INFO, '           Step: ' + impStep);
+            log(INFO, '     Process ID: ' + stepConf['process-id']);
+            log(INFO, ' Application ID: ' + stepConf.applicationId);
+            //Option to point to file for importing data
+            let dataForImport = [];
+            //TODO: put this in seperate function
+            if (impConf[stepConf.data].FILESTORE != null) {
+                // console.log(impConf[stepConf.data].FILESTORE);
+                dataForImport = jsonfile.readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
+            } else {
+                dataForImport = impConf[stepConf.data];
+            }
+
+            // for(let dataToImport of dataForImport){
+            const dataToImport = dataForImport[i];
+            // TODO: Add option to provide process name and type and then look up the application ID an process ID
+            if (stepConf.type.toString().toLowerCase() == 'creator') {
+                log(INFO, 'Creating LiveApps Case (' + i + ')');
+                let postRequest = {
+                    id: stepConf['process-id'],
+                    sandboxId: sBid,
+                    applicationId: stepConf.applicationId,
+                    data: JSON.stringify(dataToImport)
+                }
+                //console.log(postRequest);
+                const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
+                log(INFO, 'Response: ', response);
+                //Get Case ID
+                caseRef = response.caseReference;
+            }
+            if (stepConf.type.toString().toLowerCase() == 'action') {
+                log(INFO, 'Actioning LiveApps Case (' + i + ') Ref ' + caseRef);
+                let postRequest = {
+                    id: stepConf['process-id'],
+                    sandboxId: sBid,
+                    applicationId: stepConf.applicationId,
+                    data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
+                    caseReference: caseRef
+                }
+                const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
+                // log(INFO, 'Response: ' , response);
+
+            }
+            if (stepConf.sleep && stepConf.sleep > 0) {
+                await sleep(stepConf.sleep)
+            }
+        }
+    }
 }
 
 // Function to

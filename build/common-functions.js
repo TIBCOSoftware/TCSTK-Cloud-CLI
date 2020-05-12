@@ -488,6 +488,14 @@ isPortAvailable = async function(port){
 }
 
 
+sleep = async function(ms) {
+	//TODO: Add moving dots..
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
+
 //Common log function
 global.INFO = 'INFO';
 global.DEBUG = 'DEBUG';
