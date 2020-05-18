@@ -215,6 +215,7 @@ start = function () {
                 myHost =  getProp(G.cloudHost;
             }*/
             if(portToUse == 4200){
+                // TODO: Fix bug, can not read includes of undefined (no global config, and no password)
                 if (myHost.includes('eu')) {
                     run('npm run serve_eu');
                 } else {

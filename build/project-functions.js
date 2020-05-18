@@ -84,6 +84,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         payload: postForm
     });
     var re = '';
+    console.log(response.body);
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
         re = 'ERROR';
@@ -1015,7 +1016,8 @@ exportLiveAppsData = async function () {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-    let fName = await askQuestion('What Folder like to export to ? (press enter for default)');
+    let fName = await askQuestion('What Folder like to export to ? (press enter for default, date get\'s added...)');
+    // let oneFileStore = await askMultipleChoiceQuestion('Do you also want to store all contents in one file ? (this is used for import)', ['YES', 'NO']);
     let allCases = new Array();
     for (let curCase in cTypeArray) {
         if (cTypeArray[curCase] == typeForExport) {
@@ -1034,11 +1036,14 @@ exportLiveAppsData = async function () {
             // Write Cases
             let cfName = CASE_FOLDER + fName;
             if (fName == '') {
-                //TODO: Add date to the end of this
-                cfName = CASE_FOLDER + 'Export-' + typeForExport + '/';
+                //Add date to the end of this
+                const today = new Date();
+                const dayAddition = '(' + today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '_h' + today.getHours() + 'm' +today.getMinutes() + ')';
+                cfName = CASE_FOLDER + 'Export-' + typeForExport + dayAddition + '/';
             }
             mkdirIfNotExist(cfName);
             mkdirIfNotExist(cfName + 'CONTENT/');
+            let AllCaseArray = [];
             for (let exCase of allCases) {
                 let contextFileName = cfName + typeForExport + '-' + exCase.caseReference + '.json';
                 let writeContentSeparate = false;
@@ -1049,6 +1054,7 @@ exportLiveAppsData = async function () {
                     try {
                         // Get the details for every shared state entry
                         contentObject = JSON.parse(exCase.casedata);
+                        AllCaseArray.push(contentObject);
                         exCase.casedata = {'FILESTORE': contentFileName};
                         // And store them in a file / folder
                         jsonfile.writeFileSync(contentFileName, contentObject, storeOptions);
@@ -1067,7 +1073,11 @@ exportLiveAppsData = async function () {
                     }
                 }
             }
-
+            //if(oneFileStore == 'YES'){
+            let AllCaseFileName = cfName + 'CONTENT/' + typeForExport + '-ALL.CONTENT.json';
+            jsonfile.writeFileSync(AllCaseFileName, AllCaseArray, storeOptions);
+            log(INFO, '[STORED ALL CONTENT]: ' + AllCaseFileName);
+            //}
         }
     }
 }
@@ -1079,7 +1089,7 @@ exportLiveAppsData = async function () {
 
 // Function to Import LiveApps Case Data based on Config File
 importLiveAppsData = async function () {
-    //TODO: Choose import file (if there are more)
+    //TODO: Choose import file (if there are more) --> Starts with import && ends with json
 
     log(INFO, ' -- Importing Case Data --- ');
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
@@ -1122,8 +1132,6 @@ importLiveAppsData = async function () {
             } else {
                 dataForImport = impConf[stepConf.data];
             }
-
-            // for(let dataToImport of dataForImport){
             const dataToImport = dataForImport[i];
             // TODO: Add option to provide process name and type and then look up the application ID an process ID
             if (stepConf.type.toString().toLowerCase() == 'creator') {
@@ -1142,10 +1150,13 @@ importLiveAppsData = async function () {
             }
             if (stepConf.type.toString().toLowerCase() == 'action') {
                 log(INFO, 'Actioning LiveApps Case (' + i + ') Ref ' + caseRef);
+
+
                 let postRequest = {
                     id: stepConf['process-id'],
                     sandboxId: sBid,
                     applicationId: stepConf.applicationId,
+                    /*TODO: look at bug .replace is not a function */
                     data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
                     caseReference: caseRef
                 }

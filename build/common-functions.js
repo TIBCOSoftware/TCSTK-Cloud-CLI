@@ -396,7 +396,7 @@ getGlobalConfig = function(){
 	// const globalTCpropFile = __dirname + '/../../common/global-tibco-cloud.properties';
 	if (doesFileExist(globalTCpropFile)) {
 		const PropertiesReader = require('properties-reader');
-		return propsG = PropertiesReader(globalTCpropFile).path();
+		return PropertiesReader(globalTCpropFile).path();
 	} else {
 		log(INFO,'No Global Configuration Set...');
 		return false;
