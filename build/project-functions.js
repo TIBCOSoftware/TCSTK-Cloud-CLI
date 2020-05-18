@@ -242,7 +242,7 @@ showCloudInfo = function () {
         nvs  = createTableValue('LAST NAME' , response.body.lastName, nvs);
         nvs  = createTableValue('EMAIL' , response.body.email, nvs);
         for(var i = 0; i < response.body.sandboxes.length ; i++){
-            nvs  = createTableValue('SANBOX ' + i , response.body.sandboxes[i].type, nvs);
+            nvs  = createTableValue('SANDBOX ' + i , response.body.sandboxes[i].type, nvs);
         }
         // TODO: display groups
         console.table(nvs);

@@ -3,6 +3,11 @@
 
 Command Line Interface for creating TIBCO Cloud™ Starter Projects
 
+### TIBCO Cloud™ CLI) Installation:
+```
+npm install -g gulp-cli @tibco-tcstk/cloud-cli
+``` 
+
 ###TIBCO Cloud™ CLI) Usage: 
 ```
 tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m)] [--multipleFile(-f)] [--surpressStart(-s)]
