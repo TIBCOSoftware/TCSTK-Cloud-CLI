@@ -47,7 +47,7 @@
       "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
-      "gitPostCommands": [],
+      "gitPostCommands": ["rm package-lock.json"],
       "gitPostCommandsWin": [],
       "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
       "PostCommandsWin": [],

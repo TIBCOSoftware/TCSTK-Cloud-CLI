@@ -89,6 +89,9 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         log(ERROR, response.body.errorMsg);
         re = 'ERROR';
     } else {
+        if(response.body.orgName){
+            setOrganization(response.body.orgName);
+        }
         var loginCookie = response.headers['set-cookie'];
         logO(DEBUG, loginCookie);
         var rxd = /domain=(.*?);/g;
@@ -98,6 +101,18 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         logO(DEBUG, re.tsc);
         logO(DEBUG, re);
         log(INFO, 'Login Successful of ' + email + ' ...');
+    }
+    return re;
+}
+
+getRegion = function(){
+    let re = 'US';
+    let myHost = getProp('cloudHost').toString().toUpperCase();
+    if (myHost.includes('EU.')) {
+        re = 'EU';
+    }
+    if (myHost.includes('AU.')) {
+        re = 'AU';
     }
     return re;
 }
@@ -209,7 +224,7 @@ showApps = function () {
 
 // Function to show claims for the configured user
 const getClaimsURL = cloudURL + getProp('Claims_URE');
-showClaims = function () {
+showCloudInfo = function () {
     return new Promise(function (resolve, reject) {
         var lCookie = cLogin();
         log(DEBUG, 'Login Cookie: ', lCookie);
@@ -219,10 +234,33 @@ showClaims = function () {
                 "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
             }
         });
+        log(INFO, 'ORGANIZATION: ' + getOrganization())
         logO(INFO, response.body);
+
+
+        let nvs = createTableValue('REGION' , getRegion());
+        nvs = createTableValue('ORGANIZATION' , getOrganization(), nvs);
+        nvs  = createTableValue('FIRST NAME' , response.body.firstName, nvs);
+        nvs  = createTableValue('LAST NAME' , response.body.lastName, nvs);
+        nvs  = createTableValue('EMAIL' , response.body.email, nvs);
+        for(var i = 0; i < response.body.sandboxes.length ; i++){
+            nvs  = createTableValue('SANBOX ' + i , response.body.sandboxes[i].type, nvs);
+        }
+        // TODO: display groups
+        console.table(nvs);
         resolve();
     });
 };
+
+createTableValue = function(name, value, table){
+    table = table || [];
+    var entry = {};
+    entry['NAME'] = name;
+    entry['VALUE'] = value;
+    table[table.length] = entry;
+    return table;
+
+}
 
 doDeleteApp = function (appToDelete) {
     const lCookie = cLogin();

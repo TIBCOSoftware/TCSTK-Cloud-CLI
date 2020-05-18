@@ -137,7 +137,19 @@ getProp = function(propName){
 	} else {
 		log(ERROR, 'Property file not set yet...')
 	}
+
 	return re;
+}
+
+// Function to get and set the Organization (after login)
+let OrganizationGl = '';
+getOrganization = function(){
+	console.log('Returning org: ' + OrganizationGl);
+	return OrganizationGl;
+}
+setOrganization = function(org){
+	console.log('Setting org: ' + org);
+	OrganizationGl = org;
 }
 
 setProperty = function(name, value){

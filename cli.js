@@ -29,8 +29,8 @@ function parseArgumentsIntoOptions(rawArgs) {
             '-f': '--multipleFile',
             '--surpressStart': Boolean,
             '-s': '--surpressStart',
-            '--pass': String
-
+            '--pass': String,
+            '--org': String
         },
         {
             argv: rawArgs.slice(2),
@@ -48,7 +48,8 @@ function parseArgumentsIntoOptions(rawArgs) {
         multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
         surpressStart: args['--surpressStart'] || false,
         task: args._[0] || '',
-        pass: args['--pass'] || ''
+        pass: args['--pass'] || '',
+        org: args['--org'] || ''
     };
 }
 
@@ -76,8 +77,7 @@ export async function cli(args) {
         console.log('doMultiple: ' + options.doMultiple);
         console.log('multipleFile: ' + options.multipleFile);
         console.log('pass: ' + options.pass);
-
-
+        console.log('org: ' + options.org);
     }
     if(options.pass != ''){
         // This call sets the properties object, to be able to add a property to it.
@@ -87,6 +87,9 @@ export async function cli(args) {
         } else {
             setProperty('CloudLogin.pass', obfuscatePW(options.pass));
         }
+    }
+    if(options.org != ''){
+        setOrganization(options.org);
     }
 
     // Show help

@@ -407,8 +407,8 @@ changeRegion.description = 'Change the tenant to login to';
 gulp.task('obfuscate', obfuscate);
 obfuscate.description = 'Obfuscates a Password';
 mainT.description = 'Displays this message';
-gulp.task('show-cloud', showClaims);
-showClaims.description = 'Shows basic information on your cloud login. (use this to test your cloud login details)';
+gulp.task('show-cloud', showCloudInfo);
+showCloudInfo.description = 'Shows basic information on your cloud login. (use this to test your cloud login details)';
 gulp.task('show-cloud-starters', showApps);
 showAvailableApps.description = 'Shows all the applications that are deployed in the cloud and their versions.';
 gulp.task('show-cloud-starter-links', showLinks);
@@ -539,11 +539,15 @@ promptGulp = function (stDir, cwdDir) {
     log('DEBUG', 'PromtGulp) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+        let pMes = '[TCLI - CLOUD STARTER (\x1b[36m' + getRegion() + ' - ' + getProp('App_Name') + '\x1b[0m)]: ';
+        if(getOrganization() != ''){
+            pMes = '[TCLI - CLOUD STARTER (\x1b[36m' + getRegion() + '(' + getOrganization() + ') - ' + getProp('App_Name') + '\x1b[0m)]: ';
+        }
         inquirer.prompt([{
             type: 'autocomplete',
             name: 'command',
             suggestOnly: false,
-            message: '[TCLI - CLOUD STARTER (\x1b[36m' + getProp('App_Name') + '\x1b[0m)]: ',
+            message: pMes,
             source: searchAnswer,
             pageSize: 4/*,
             validate: function (val) {
@@ -587,10 +591,15 @@ promptGulp = function (stDir, cwdDir) {
                         additionalArugments += ' -d ';
                     }
                 }
-                if(getProp('CloudLogin.pass') !== ''){
-                    additionalArugments += '--pass "' + getProp('CloudLogin.pass') + '"';
+                if(getProp('CloudLogin.pass').toString() !== ''){
+                    additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
                 }
-                run('tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments);
+                if(getOrganization() !== ''){
+                    additionalArugments += ' --org "' + getOrganization() + '"';
+                }
+                let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
+                // console.log('commandTcli: ' + commandTcli)
+                run(commandTcli);
                 return promptGulp(stDir, cwdDir);
             }
         });
