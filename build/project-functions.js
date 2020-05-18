@@ -84,7 +84,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         payload: postForm
     });
     var re = '';
-    console.log(response.body);
+    //console.log(response.body);
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
         re = 'ERROR';
