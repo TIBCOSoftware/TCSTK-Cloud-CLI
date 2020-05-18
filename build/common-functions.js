@@ -144,11 +144,11 @@ getProp = function(propName){
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
 getOrganization = function(){
-	console.log('Returning org: ' + OrganizationGl);
+	log(DEBUG, 'Returning org: ' + OrganizationGl);
 	return OrganizationGl;
 }
 setOrganization = function(org){
-	console.log('Setting org: ' + org);
+	log(DEBUG, 'Setting org: ' + org);
 	OrganizationGl = org;
 }
 
@@ -173,14 +173,14 @@ function set(path, value, obj) {
 
 setPropFileName = function(propFileName){
 	propFileNameGl = propFileName;
-	log(DEBUG, 'Usring Property File: ' + propFileNameGl);
+	log(DEBUG, 'Using Property File: ' + propFileNameGl);
 }
 getPropFileName = function () {
 	return propFileNameGl;
 }
 setMultipleFileName = function(mFileName){
 	globalMultipleFileName = mFileName;
-	log(DEBUG, 'Usring Multiple File: ' + globalMultipleFileName);
+	log(DEBUG, 'Using Multiple File: ' + globalMultipleFileName);
 }
 getMultipleFileName = function () {
 	return globalMultipleFileName;
