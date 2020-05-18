@@ -234,10 +234,8 @@ showCloudInfo = function () {
                 "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
             }
         });
-        log(INFO, 'ORGANIZATION: ' + getOrganization())
-        logO(INFO, response.body);
-
-
+        //log(INFO, 'ORGANIZATION: ' + getOrganization())
+        //logO(INFO, response.body);
         let nvs = createTableValue('REGION' , getRegion());
         nvs = createTableValue('ORGANIZATION' , getOrganization(), nvs);
         nvs  = createTableValue('FIRST NAME' , response.body.firstName, nvs);
