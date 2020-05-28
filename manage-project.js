@@ -57,10 +57,18 @@ function deleteApp() {
         if(deleteApp){
             log(INFO, 'Deleting ' + appToDelete + '...');
             const da = doDeleteApp(appToDelete);
-            if(da.body.message){
-                log(INFO, da.body.message);
-            }else {
-                log(ERROR, da);
+            if(da){
+                if(da.body){
+                    if(da.body.message){
+                        log(INFO, da.body.message);
+                    }else {
+                        log(ERROR, 'Error On Delete: ' + da.body);
+                    }
+                } else {
+                    log(ERROR, 'No Body Returned on Delete:  ' + da);
+                }
+            } else {
+                log(ERROR, 'UNKNOWN ERROR ON DELETING APP...');
             }
         } else {
             log(INFO, 'Ok I won\'t do anything...');
