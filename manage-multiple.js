@@ -23,6 +23,9 @@ processMultipleFile = function(propfileName){
             const environments = getMProp(currentStarter + '_Environments');
             log(INFO, logS + ' Environments: ' + environments);
             const environmentsA = environments.split(',');
+            // TODO: Allow for a pre environment command (like git pulls or build)
+
+
             for(var j = 0; j < environmentsA.length; j++) {
                 const currentEnvironment = trim(environmentsA[j]);
                 const logSE = logS + '[ENVIRONMENT: ' + currentEnvironment + ']';

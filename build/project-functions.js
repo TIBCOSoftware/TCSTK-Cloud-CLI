@@ -3,11 +3,7 @@ const syncClient = require('sync-rest-client');
 const git = require('gulp-git');
 const fs = require('file-system');
 const fse = require('fs-extra');
-const PropertiesReader = require('properties-reader');
-//const propFileName = 'tibco-cloud.properties';
-//const propertiesF = PropertiesReader('tibco-cloud.properties');
-//const propertiesF = PropertiesReader(propFileName);
-//const getProp( = propertiesF.path();
+const jsonfile = require('jsonfile');
 const isWindows = process.platform == 'win32';
 
 // Clean temp folder
@@ -121,41 +117,100 @@ cleanDist = function () {
     return deleteFolder('./dist/' + getProp('App_Name'));
 }
 
+// Add Descriptor
+let ADD_DESCRIPTOR = 'YES';
+if (getProp('Add_Descriptor') != null) {
+    ADD_DESCRIPTOR = getProp('Add_Descriptor');
+} else {
+    log(INFO, 'No Add_Descriptor Property found; Adding Add_Descriptor to ' + getPropFileName());
+    addOrUpdateProperty(getPropFileName(), 'Add_Descriptor', 'YES');
+}
+// Add Descriptor
+let ADD_DESCRIPTOR_TIMESTAMP = 'YES';
+if (getProp('Add_Descriptor_Timestamp') != null) {
+    ADD_DESCRIPTOR_TIMESTAMP = getProp('Add_Descriptor_Timestamp');
+} else {
+    log(INFO, 'No Add_Descriptor_Timestamp Property found; Adding Add_Descriptor_Timestamp to ' + getPropFileName());
+    addOrUpdateProperty(getPropFileName(), 'Add_Descriptor_Timestamp', 'YES');
+}
+// Add Descriptor
+let DESCRIPTOR_FILE = './src/assets/cloudstarter.json';
+if (getProp('Descriptor_File') != null) {
+    DESCRIPTOR_FILE = getProp('Descriptor_File');
+} else {
+    log(INFO, 'No Descriptor_File Property found; Adding Descriptor_File to ' + getPropFileName());
+    addOrUpdateProperty(getPropFileName(), 'Descriptor_File', './src/assets/cloudstarter.json');
+}
+
+generateCloudDescriptor = function(){
+    log(INFO, 'Adding descriptor file: ' + DESCRIPTOR_FILE + ' Adding Timestamp: ' + ADD_DESCRIPTOR_TIMESTAMP);
+    // Get the version from the JSON File
+    const workdir = process.cwd();
+    const packageJson = workdir + '/package.json';
+    if(doesFileExist(packageJson)){
+        let now = "";
+        if(ADD_DESCRIPTOR_TIMESTAMP === 'YES'){
+            now = (new Date()).getTime();
+        }
+        const pJsonObj = require(packageJson);
+        let name = "";
+        if(pJsonObj.name){
+            name = pJsonObj.name;
+        }
+        let version = "";
+        if(pJsonObj.version){
+            version = pJsonObj.version;
+        }
+        let description = "";
+        if(pJsonObj.description){
+            description = pJsonObj.description;
+        }
+        let csObject = {
+            cloudstarter : {
+                name: name,
+                version: version + now,
+                description: description
+            }
+        }
+        log(INFO, 'Adding Cloud Starter Descriptor: ' , csObject);
+        const storeOptions = {spaces: 2, EOL: '\r\n'};
+        jsonfile.writeFileSync(DESCRIPTOR_FILE, csObject, storeOptions);
+
+    } else {
+        log(ERROR, packageJson + ' File not found...');
+    }
+
+
+
+
+
+
+
+
+    // Possibly add timestamp
+
+    //TODO: Possibly use a descriptor template
+    //TODO: Possibly add dependencies into the file
+}
+
+
 // const { zip } = require('zip-a-folder');
 // Function that builds the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
     return new Promise(async function (resolve, reject) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
         deleteFile('./dist/' + cloudStarter + '.zip');
+        //Add the cloudstarter.json file
+        if(getProp('Add_Descriptor') === 'YES'){
+            generateCloudDescriptor();
+        }
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
-        //copyFile('./tmp/' + cloudStarter + '/tsconfig.build.json', './tmp/' + cloudStarter + '/tsconfig.json');
         //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud...
-        //log(INFO, 'Using zip a folder... ');
-        const folderToZip = './dist/' + cloudStarter + '/';
-        const fileForZip = './dist/' + cloudStarter + '.zip';
-
-        // await zip(folderToZip, fileForZip);
-
-        // var zipFolder = require('zip-folder');
-
-        //await zipFolder(folderToZip, fileForZip);
-        //var zipFolder = require('zip-folder');
-
-        /*
-                zipFolder(folderToZip, fileForZip, function(err) {
-                    if(err) {
-                        console.log('oh no!', err);
-                    } else {
-                        console.log('EXCELLENT');
-                        log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
-                        resolve();
-                    }
-                });
-        */
+        //const folderToZip = './dist/' + cloudStarter + '/';
+        //const fileForZip = './dist/' + cloudStarter + '.zip';
         run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
         log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
         resolve();
-
     });
 }
 
@@ -524,7 +579,7 @@ if (getProp('Shared_State_Folder') != null) {
     addOrUpdateProperty(getPropFileName(), 'Shared_State_Folder', SHARED_STATE_FOLDER);
 }
 
-const jsonfile = require('jsonfile');
+
 // Export the Shared state scope to a folder
 exportSharedStateScope = function () {
     return new Promise(async function (resolve, reject) {

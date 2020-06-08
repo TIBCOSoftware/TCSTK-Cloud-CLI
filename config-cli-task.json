@@ -253,6 +253,13 @@
       "gulpTask": "json-to-csv-liveapps-data",
       "availableOnOs": ["all"]
     },
+    "31. generate-cloud-descriptor": {
+      "description": "Generates the configured Public Cloud Descriptor",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "generate-cloud-descriptor",
+      "availableOnOs": ["all"]
+    },
 
     "update-tcli": {
       "description": "Update the Cloud CLI",

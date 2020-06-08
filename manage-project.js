@@ -394,6 +394,12 @@ exportLiveAppsCaseTypeWrapper = function () {
     });
 }
 
+generateCloudDescriptorWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        generateCloudDescriptor();
+        resolve();
+    });
+}
 
 
 
@@ -493,6 +499,9 @@ updateTCLIwrapper.description = 'Update the Cloud CLI.';
 
 gulp.task('replace-string-in-file', replaceStringInFileWrapper);
 replaceStringInFileWrapper.description = 'Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties';
+
+gulp.task('generate-cloud-descriptor', generateCloudDescriptorWrapper);
+generateCloudDescriptorWrapper.description = 'Generates the configured Public Cloud Descriptor';
 
 
 
