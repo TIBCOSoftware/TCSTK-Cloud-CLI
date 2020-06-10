@@ -149,8 +149,10 @@ generateCloudDescriptor = function(){
     const packageJson = workdir + '/package.json';
     if(doesFileExist(packageJson)){
         let now = "";
+        let buildOn = "";
         if(ADD_DESCRIPTOR_TIMESTAMP === 'YES'){
             now = (new Date()).getTime();
+            buildOn = new Date();
         }
         const pJsonObj = require(packageJson);
         let name = "";
@@ -169,6 +171,7 @@ generateCloudDescriptor = function(){
             cloudstarter : {
                 name: name,
                 version: version + now,
+                build_date: buildOn,
                 description: description
             }
         }
