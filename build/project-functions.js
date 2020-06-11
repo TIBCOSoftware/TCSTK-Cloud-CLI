@@ -301,6 +301,7 @@ showCloudInfo = function () {
         nvs  = createTableValue('EMAIL' , response.body.email, nvs);
         for(var i = 0; i < response.body.sandboxes.length ; i++){
             nvs  = createTableValue('SANDBOX ' + i , response.body.sandboxes[i].type, nvs);
+            nvs  = createTableValue('SANDBOX ' + i + ' ID', response.body.sandboxes[i].id, nvs);
         }
         // TODO: display groups
         console.table(nvs);
