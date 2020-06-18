@@ -25,12 +25,13 @@ function deploy() {
     return new Promise(async function (resolve, reject) {
         await uploadApp(getProp('App_Name'));
         log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
-        let cloudURLdisp = getProp('Cloud_URL');
+        showAppLinkInfo();
         /*
-        if(cloudURLdisp == 'USE-GLOBAL') {
-            cloudURLdisp = getProp('Cloud_URL');
-        }*/
+        let cloudURLdisp = getProp('Cloud_URL');
         log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
+        if(getProp('Add_Descriptor') == 'YES'){
+            log('INFO', "DESCRIPTOR LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + getProp('Descriptor_File').replace('./src', ''));
+        }*/
         resolve();
     });
 }
@@ -83,12 +84,13 @@ function publish() {
     return new Promise(async function (resolve, reject) {
         await publishApp(getProp('App_Name'));
         log('INFO', 'APP PUBLISHED: ' + getProp('App_Name'));
-        let cloudURLdisp = getProp('Cloud_URL');
+        showAppLinkInfo();
         /*
-        if(cloudURLdisp == 'USE-GLOBAL') {
-            cloudURLdisp = getProp(G.Cloud_URL;
-        }*/
+        let cloudURLdisp = getProp('Cloud_URL');
         log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
+        if(getProp('Add_Descriptor') == 'YES'){
+            log('INFO', "DESCRIPTOR LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + getProp('Descriptor_File').replace('./src', ''));
+        }*/
         resolve();
     });
 }

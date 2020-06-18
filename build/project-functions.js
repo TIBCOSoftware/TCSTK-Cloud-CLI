@@ -182,20 +182,19 @@ generateCloudDescriptor = function(){
     } else {
         log(ERROR, packageJson + ' File not found...');
     }
-
-
-
-
-
-
-
-
     // Possibly add timestamp
-
     //TODO: Possibly use a descriptor template
     //TODO: Possibly add dependencies into the file
 }
 
+// Function to display the location on the deployed cloudstarter and possilby the descriptor.
+showAppLinkInfo = function() {
+    let cloudURLdisp = getProp('Cloud_URL');
+    log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
+    if(getProp('Add_Descriptor') == 'YES'){
+        log('INFO', "DESCRIPTOR LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + getProp('Descriptor_File').replace('./src', ''));
+    }
+}
 
 // const { zip } = require('zip-a-folder');
 // Function that builds the zip for deployment
