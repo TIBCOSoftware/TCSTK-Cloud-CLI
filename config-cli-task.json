@@ -232,7 +232,14 @@
       "gulpTask": "export-live-apps-cases",
       "availableOnOs": ["all"]
     },
-    "30. import-live-apps-cases": {
+    "30. generate-live-apps-import-configuration": {
+      "description": "Generate the Live Apps Import configuration file",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "generate-live-apps-import-configuration",
+      "availableOnOs": ["all"]
+    },
+    "31. import-live-apps-cases": {
       "description": "Import Cases to Live Apps",
       "enabled": true,
       "internal": false,
@@ -253,7 +260,7 @@
       "gulpTask": "json-to-csv-liveapps-data",
       "availableOnOs": ["all"]
     },
-    "31. generate-cloud-descriptor": {
+    "32. generate-cloud-descriptor": {
       "description": "Generates the configured Public Cloud Descriptor",
       "enabled": true,
       "internal": false,

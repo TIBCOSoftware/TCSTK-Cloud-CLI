@@ -196,7 +196,7 @@ createMultiplePropertyFile = async function () {
 	// 'manage-multiple-cloud-starters.properties'
 	let mPropFileName = 'manage-multiple-cloud-starters.properties';
 	let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (\x1b[34mDefault: manage-multiple-cloud-starters\033[0m) ?');
-	console.log('nameAnsw: ' + nameAnsw);
+	// console.log('nameAnsw: ' + nameAnsw);
 	if(nameAnsw != null && nameAnsw != ''){
 		mPropFileName = nameAnsw + '.properties';
 	}

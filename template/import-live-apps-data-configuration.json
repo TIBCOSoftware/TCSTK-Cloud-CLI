@@ -1,4 +1,5 @@
 {
+  "la-application-name" : "<APP-NAME>",
   "import-steps" : ["create-cases", "action-cases"],
   "create-cases": {
     "process-id": "16529",

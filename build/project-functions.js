@@ -85,7 +85,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         log(ERROR, response.body.errorMsg);
         re = 'ERROR';
     } else {
-        if(response.body.orgName){
+        if (response.body.orgName) {
             setOrganization(response.body.orgName);
         }
         var loginCookie = response.headers['set-cookie'];
@@ -101,7 +101,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     return re;
 }
 
-getRegion = function(){
+getRegion = function () {
     let re = 'US';
     let myHost = getProp('cloudHost').toString().toUpperCase();
     if (myHost.includes('EU.')) {
@@ -142,40 +142,40 @@ if (getProp('Descriptor_File') != null) {
     addOrUpdateProperty(getPropFileName(), 'Descriptor_File', './src/assets/cloudstarter.json');
 }
 
-generateCloudDescriptor = function(){
+generateCloudDescriptor = function () {
     log(INFO, 'Adding descriptor file: ' + DESCRIPTOR_FILE + ' Adding Timestamp: ' + ADD_DESCRIPTOR_TIMESTAMP);
     // Get the version from the JSON File
     const workdir = process.cwd();
     const packageJson = workdir + '/package.json';
-    if(doesFileExist(packageJson)){
+    if (doesFileExist(packageJson)) {
         let now = "";
         let buildOn = "";
-        if(ADD_DESCRIPTOR_TIMESTAMP === 'YES'){
+        if (ADD_DESCRIPTOR_TIMESTAMP === 'YES') {
             now = (new Date()).getTime();
             buildOn = new Date();
         }
         const pJsonObj = require(packageJson);
         let name = "";
-        if(pJsonObj.name){
+        if (pJsonObj.name) {
             name = pJsonObj.name;
         }
         let version = "";
-        if(pJsonObj.version){
+        if (pJsonObj.version) {
             version = pJsonObj.version;
         }
         let description = "";
-        if(pJsonObj.description){
+        if (pJsonObj.description) {
             description = pJsonObj.description;
         }
         let csObject = {
-            cloudstarter : {
+            cloudstarter: {
                 name: name,
                 version: version + now,
                 build_date: buildOn,
                 description: description
             }
         }
-        log(INFO, 'Adding Cloud Starter Descriptor: ' , csObject);
+        log(INFO, 'Adding Cloud Starter Descriptor: ', csObject);
         const storeOptions = {spaces: 2, EOL: '\r\n'};
         jsonfile.writeFileSync(DESCRIPTOR_FILE, csObject, storeOptions);
 
@@ -188,10 +188,10 @@ generateCloudDescriptor = function(){
 }
 
 // Function to display the location on the deployed cloudstarter and possilby the descriptor.
-showAppLinkInfo = function() {
+showAppLinkInfo = function () {
     let cloudURLdisp = getProp('Cloud_URL');
     log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
-    if(getProp('Add_Descriptor') == 'YES'){
+    if (getProp('Add_Descriptor') == 'YES') {
         log('INFO', "DESCRIPTOR LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + getProp('Descriptor_File').replace('./src', ''));
     }
 }
@@ -203,7 +203,7 @@ buildCloudStarterZip = function (cloudStarter) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
         deleteFile('./dist/' + cloudStarter + '.zip');
         //Add the cloudstarter.json file
-        if(getProp('Add_Descriptor') === 'YES'){
+        if (getProp('Add_Descriptor') === 'YES') {
             generateCloudDescriptor();
         }
         run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
@@ -293,14 +293,14 @@ showCloudInfo = function () {
         });
         //log(INFO, 'ORGANIZATION: ' + getOrganization())
         //logO(INFO, response.body);
-        let nvs = createTableValue('REGION' , getRegion());
-        nvs = createTableValue('ORGANIZATION' , getOrganization(), nvs);
-        nvs  = createTableValue('FIRST NAME' , response.body.firstName, nvs);
-        nvs  = createTableValue('LAST NAME' , response.body.lastName, nvs);
-        nvs  = createTableValue('EMAIL' , response.body.email, nvs);
-        for(var i = 0; i < response.body.sandboxes.length ; i++){
-            nvs  = createTableValue('SANDBOX ' + i , response.body.sandboxes[i].type, nvs);
-            nvs  = createTableValue('SANDBOX ' + i + ' ID', response.body.sandboxes[i].id, nvs);
+        let nvs = createTableValue('REGION', getRegion());
+        nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
+        nvs = createTableValue('FIRST NAME', response.body.firstName, nvs);
+        nvs = createTableValue('LAST NAME', response.body.lastName, nvs);
+        nvs = createTableValue('EMAIL', response.body.email, nvs);
+        for (var i = 0; i < response.body.sandboxes.length; i++) {
+            nvs = createTableValue('SANDBOX ' + i, response.body.sandboxes[i].type, nvs);
+            nvs = createTableValue('SANDBOX ' + i + ' ID', response.body.sandboxes[i].id, nvs);
         }
         // TODO: display groups
         console.table(nvs);
@@ -308,7 +308,7 @@ showCloudInfo = function () {
     });
 };
 
-createTableValue = function(name, value, table){
+createTableValue = function (name, value, table) {
     table = table || [];
     var entry = {};
     entry['NAME'] = name;
@@ -1132,7 +1132,7 @@ exportLiveAppsData = async function () {
             if (fName == '') {
                 //Add date to the end of this
                 const today = new Date();
-                const dayAddition = '(' + today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '_h' + today.getHours() + 'm' +today.getMinutes() + ')';
+                const dayAddition = '(' + today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '_h' + today.getHours() + 'm' + today.getMinutes() + ')';
                 cfName = CASE_FOLDER + 'Export-' + typeForExport + dayAddition + '/';
             }
             mkdirIfNotExist(cfName);
@@ -1176,18 +1176,44 @@ exportLiveAppsData = async function () {
     }
 }
 
-//TODO: Add Export Feature to one file. (Just the data and to use for import)
+//DONE: Add Export Feature to one file. (Just the data and to use for import)
 
-//TODO: Create a generator for the input feature. (based on the template and ask to add steps)
-//TODO: Make sure you are not overwriting a current import file.
+createLAImportFile = async function () {
+    log(INFO, ' -- Generate Live Aps Import Configuration file --- ');
+    //TODO: Create a generator for the input feature. (based on the template and ask to add steps)
+    //TODO: Make sure you are not overwriting a current import file.
+    // Check if default file exists:
+    const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
+    let impConfFileName = 'import-live-apps-data-configuration.json';
+    let nameAnsw = await askQuestion('Please specify a name for the Live Apps Import Config file (\x1b[34mDefault: import-live-apps-data-configuration\033[0m) ?');
+    if (nameAnsw != null && nameAnsw != '') {
+        impConfFileName = nameAnsw + '.properties';
+    }
+    const targetFile = importFolder + impConfFileName;
+    let doWrite = true;
+    if (doesFileExist(targetFile)) {
+        const doOverWrite = await askMultipleChoiceQuestion('The property file: \x1b[34m' + impConfFileName + '\033[0m already exists, do you want to Overwrite it ?', ['YES', 'NO']);
+        if (doOverWrite == 'NO') {
+            doWrite = false;
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    }
+    if (doWrite) {
+        mkdirIfNotExist(CASE_FOLDER);
+        mkdirIfNotExist(importFolder);
+        log(INFO, 'Creating new Live Aps Import Configuration file: ' + impConfFileName);
+        copyFile(__dirname + '/../template/import-live-apps-data-configuration.json', targetFile);
+        // log(INFO, 'Now configure the multiple propety file and then run "\x1b[34mtcli -m\033[0m" (for default propety name) or "\x1b[34mtcli -m <propfile name>\033[0m" to execute...');
+    }
+}
 
 // Function to Import LiveApps Case Data based on Config File
 importLiveAppsData = async function () {
     //TODO: Choose import file (if there are more) --> Starts with import && ends with json
 
-    log(INFO, ' -- Importing Case Data --- ');
+    log(INFO, ' -- Gathering Import Configuration --- ');
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
-    const impConf = require(importFolder + 'import.json');
+    const impConf = require(importFolder + 'import-live-apps-data-configuration.json');
     const cSteps = impConf['import-steps'];
     log(INFO, 'Configured Steps: ', cSteps);
 
@@ -1195,7 +1221,6 @@ importLiveAppsData = async function () {
     //TODO: Check if there is a creator (how to map the caseID)
     //TODO: Check if the first step is a creator
     //
-    //TODO: Show Summary Table (Step Number, Step Name, SandboxID, Application Name, Application ID, Process Type, Process Name, Process ID, Sleep Time)
     //
 
     //Loop over all the data
@@ -1205,61 +1230,139 @@ importLiveAppsData = async function () {
         dataForImport = impConf[impConf['import-steps'][0]].data;
     }
     const numberOfImports = dataForImport.length;
-    log(INFO, 'Number of Imports: ' + numberOfImports);
 
-    //TODO: Add are you sure ?
     const sBid = getProductionSandbox();
-    for (let i = 0; i < numberOfImports; i++) {
-        //Loop over all cases
-        let caseRef = '';
-        for (let impStep of impConf['import-steps']) {
-            const stepConf = impConf[impStep];
-            log(INFO, '           Step: ' + impStep);
-            log(INFO, '     Process ID: ' + stepConf['process-id']);
-            log(INFO, ' Application ID: ' + stepConf.applicationId);
-            //Option to point to file for importing data
-            let dataForImport = [];
-            //TODO: put this in seperate function
-            if (impConf[stepConf.data].FILESTORE != null) {
-                // console.log(impConf[stepConf.data].FILESTORE);
-                dataForImport = jsonfile.readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
-            } else {
-                dataForImport = impConf[stepConf.data];
+    let importAppName = '';
+    let importAppId = '';
+    let numberOfImportSteps = 0;
+    if (impConf['la-application-name'] != null) {
+        importAppName = impConf['la-application-name'];
+        log(INFO, 'Getting App Id for LA Application ' + importAppName);
+        const apps = showLiveApps(false, false);
+        //console.log(apps);
+        let appData = {};
+        for (let app of apps) {
+            if (app.name == importAppName) {
+                importAppId = app.applicationId;
+                appData = app;
             }
-            const dataToImport = dataForImport[i];
-            // TODO: Add option to provide process name and type and then look up the application ID an process ID
-            if (stepConf.type.toString().toLowerCase() == 'creator') {
-                log(INFO, 'Creating LiveApps Case (' + i + ')');
-                let postRequest = {
-                    id: stepConf['process-id'],
-                    sandboxId: sBid,
-                    applicationId: stepConf.applicationId,
-                    data: JSON.stringify(dataToImport)
+        }
+        numberOfImportSteps = impConf['import-steps'].length;
+        for (let step of impConf['import-steps']) {
+            const stepConf = impConf[step];
+            //console.log(stepConf)
+            impConf[step].applicationId = importAppId;
+            if (stepConf.type == 'CREATOR') {
+                // Look in the creators
+                if (appData.creators != null) {
+                    for (let creator of appData.creators) {
+                        if (creator.name == stepConf.name) {
+                            impConf[step]['process-id'] = creator.id;
+                        }
+                    }
                 }
-                //console.log(postRequest);
-                const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
-                log(INFO, 'Response: ', response);
-                //Get Case ID
-                caseRef = response.caseReference;
             }
-            if (stepConf.type.toString().toLowerCase() == 'action') {
-                log(INFO, 'Actioning LiveApps Case (' + i + ') Ref ' + caseRef);
-
-
-                let postRequest = {
-                    id: stepConf['process-id'],
-                    sandboxId: sBid,
-                    applicationId: stepConf.applicationId,
-                    /*TODO: look at bug .replace is not a function */
-                    data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
-                    caseReference: caseRef
+            if (stepConf.type == 'ACTION') {
+                // Look in the creators
+                if (appData.actions != null) {
+                    for (let action of appData.actions) {
+                        if (action.name == stepConf.name) {
+                            impConf[step]['process-id'] = action.id;
+                        }
+                    }
                 }
-                const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
-                // log(INFO, 'Response: ' , response);
-
             }
-            if (stepConf.sleep && stepConf.sleep > 0) {
-                await sleep(stepConf.sleep)
+        }
+
+    }
+    // console.log(impConf);
+
+    log(INFO, '\x1b[34m                   -- IMPORT SUMMARY --- ');
+    log(INFO, '\x1b[34m -       Number of Imports: ' + numberOfImports);
+    log(INFO, '\x1b[34m -              Sandbox ID: ' + sBid);
+    log(INFO, '\x1b[34m -         Import App Name: ' + importAppName);
+    log(INFO, '\x1b[34m -           Import App ID: ' + importAppId);
+    log(INFO, '\x1b[34m -  Number of Import Steps: ' + numberOfImportSteps);
+    let stepN = 1;
+    for (let step of impConf['import-steps']) {
+        const stepConf = impConf[step];
+        log(INFO, '\x1b[33m -                    STEP: ' + stepN);
+        log(INFO, '\x1b[34m -                    NAME: ' + stepConf.name);
+        log(INFO, '\x1b[34m -                    TYPE: ' + stepConf.type);
+        log(INFO, '\x1b[34m -              PROCESS ID: ' + stepConf['process-id']);
+        log(INFO, '\x1b[34m -              SLEEP TIME: ' + stepConf['sleep']);
+        stepN++;
+    }
+
+    log(INFO, '\033[0m');
+
+
+    //TODO: Show Summary Table (Step Number, Step Name, SandboxID, Application Name, Application ID, Process Type, Process Name, Process ID, Sleep Time)
+
+    //TODO: CHANGE THIS TO TRUE
+    let runImport = true;
+    const doOverWrite = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
+    if (doOverWrite == 'NO') {
+        runImport = false;
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+
+
+    if (runImport) {
+        for (let i = 0; i < numberOfImports; i++) {
+            //Loop over all cases
+            let caseRef = '';
+            for (let impStep of impConf['import-steps']) {
+                const stepConf = impConf[impStep];
+                // TODO: Add option to provide process name and type and then look up the application ID an process ID
+                log(INFO, '           Step: ' + impStep);
+                log(INFO, '     Process ID: ' + stepConf['process-id']);
+                log(INFO, ' Application ID: ' + stepConf.applicationId);
+                //Option to point to file for importing data
+                let dataForImport = [];
+                //TODO: put this in seperate function
+                if (impConf[stepConf.data].FILESTORE != null) {
+                    // console.log(impConf[stepConf.data].FILESTORE);
+                    dataForImport = jsonfile.readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
+                } else {
+                    dataForImport = impConf[stepConf.data];
+                }
+                const dataToImport = dataForImport[i];
+
+
+                if (stepConf.type.toString().toLowerCase() == 'creator') {
+                    log(INFO, 'Creating LiveApps Case (' + i + ')');
+                    let postRequest = {
+                        id: stepConf['process-id'],
+                        sandboxId: sBid,
+                        applicationId: stepConf.applicationId,
+                        data: JSON.stringify(dataToImport)
+                    }
+                    //console.log(postRequest);
+                    const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
+                    log(INFO, 'Response: ', response);
+                    //Get Case ID
+                    caseRef = response.caseReference;
+                }
+                if (stepConf.type.toString().toLowerCase() == 'action') {
+                    log(INFO, 'Actioning LiveApps Case (' + i + ') Ref ' + caseRef);
+
+
+                    let postRequest = {
+                        id: stepConf['process-id'],
+                        sandboxId: sBid,
+                        applicationId: stepConf.applicationId,
+                        /*TODO: look at bug .replace is not a function */
+                        data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
+                        caseReference: caseRef
+                    }
+                    const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
+                    // log(INFO, 'Response: ' , response);
+
+                }
+                if (stepConf.sleep && stepConf.sleep > 0) {
+                    await sleep(stepConf.sleep)
+                }
             }
         }
     }

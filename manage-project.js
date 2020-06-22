@@ -307,14 +307,16 @@ updateGlobalConfig = function () {
 
 // Function to replace a string in a file
 replaceStringInFileOne = function (prefix) {
-    const rFrom = getProp(prefix + 'Replace_FROM');
-    const rTo = getProp(prefix + 'Replace_TO');
+    let rFrom = getProp(prefix + 'Replace_FROM');
+    let rTo = getProp(prefix + 'Replace_TO');
     const rPat = getProp(prefix + 'Replace_PATTERN');
 
     if( rFrom == null || rTo == null || rPat == null){
         log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...');
     } else {
-        log(INFO, 'Replacing From: ' , rFrom, ' To: ' , rTo, ' Pattern: ' , rPat);
+        rFrom = rFrom.trim();
+        rTo = rTo.trim();
+        log(INFO, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ' , rPat);
         replaceInFile(rFrom,rTo,rPat);
     }
 }
@@ -361,6 +363,13 @@ showLiveAppsWrapper = function () {
 exportLiveAppsDataWrapper = function () {
     return new Promise(async function (resolve, reject) {
         exportLiveAppsData();
+        resolve();
+    });
+}
+
+generateLiveAppsImportConfiguration = function () {
+    return new Promise(async function (resolve, reject) {
+        createLAImportFile();
         resolve();
     });
 }
@@ -487,6 +496,10 @@ clearSharedStateScope.description = 'Removes all shared state entries in the con
 
 gulp.task('export-shared-state-scope', exportSharedStateScope);
 exportSharedStateScope.description = 'Downloads all shared state entries from the configured scope to the local file system.';
+
+
+gulp.task('generate-live-apps-import-configuration', generateLiveAppsImportConfiguration);
+generateLiveAppsImportConfiguration.description = 'Generate the Live Apps Import configuration file.';
 
 gulp.task('import-shared-state-scope', importSharedStateScope);
 importSharedStateScope.description = 'Uploads one entry or the configured scope from the local file system to the shared state.';
