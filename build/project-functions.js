@@ -1147,7 +1147,7 @@ exportLiveAppsData = async function () {
                 if (exCase.casedata != null) {
                     try {
                         // Get the details for every shared state entry
-                        contentObject = JSON.parse(exCase.casedata);
+                        contentObject = JSON.parse( ' {  "' + cTypes[curCase].name + '" : ' + exCase.casedata + '}');
                         AllCaseArray.push(contentObject);
                         exCase.casedata = {'FILESTORE': contentFileName};
                         // And store them in a file / folder
@@ -1169,6 +1169,8 @@ exportLiveAppsData = async function () {
             }
             //if(oneFileStore == 'YES'){
             let AllCaseFileName = cfName + 'CONTENT/' + typeForExport + '-ALL.CONTENT.json';
+            //TODO: Put the app name around the AllCaseArray
+
             jsonfile.writeFileSync(AllCaseFileName, AllCaseArray, storeOptions);
             log(INFO, '[STORED ALL CONTENT]: ' + AllCaseFileName);
             //}
@@ -1284,6 +1286,8 @@ importLiveAppsData = async function () {
     log(INFO, '\x1b[34m -           Import App ID: ' + importAppId);
     log(INFO, '\x1b[34m -  Number of Import Steps: ' + numberOfImportSteps);
     let stepN = 1;
+    //Show Summary Table (Step Number, Step Name, SandboxID, Application Name, Application ID, Process Type, Process Name, Process ID, Sleep Time)
+
     for (let step of impConf['import-steps']) {
         const stepConf = impConf[step];
         log(INFO, '\x1b[33m -                    STEP: ' + stepN);
@@ -1297,9 +1301,7 @@ importLiveAppsData = async function () {
     log(INFO, '\033[0m');
 
 
-    //TODO: Show Summary Table (Step Number, Step Name, SandboxID, Application Name, Application ID, Process Type, Process Name, Process ID, Sleep Time)
 
-    //TODO: CHANGE THIS TO TRUE
     let runImport = true;
     const doOverWrite = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
     if (doOverWrite == 'NO') {
