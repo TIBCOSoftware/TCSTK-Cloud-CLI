@@ -1,0 +1,23 @@
+{
+  "cloud-solution-name" : "GatherSmart",
+  "cloud-components" : ["flogo", "liveapps", "spotfire"],
+  "flogo": {
+    "flows": ""
+
+  },
+  "liveapps": {
+    "apps": ""
+  },
+  "spotfire" :{
+    "reports": ""
+  },
+  "cloud-orgs" : {
+    "org1": {
+      "name": "",
+      "_note" : "this can also be a pointer to other file(s)",
+      "properties" : {
+
+      }
+    }
+  }
+}

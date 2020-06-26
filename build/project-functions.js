@@ -736,7 +736,9 @@ importSharedStateScope = function () {
 watchSharedStateScopeMain = function () {
     return new Promise(async function (resolve, reject) {
         //const commandSTDO = 'cd ' + __dirname  + '/../ && gulp watch-shared-state-scope-do --cwd "' + process.cwd() + '" --gulpfile "' + __dirname + '/../manage-project.js" --pass "' + getProp('CloudLogin.pass + '"';
-        const commandSTDO = 'tcli watch-shared-state-scope-do';
+        // console.log('propFileNameGl: ' + getPropFileName());
+        //TODO: What if the password is not specified in properties file, needs to be send...
+        const commandSTDO = 'tcli watch-shared-state-scope-do -p "' + getPropFileName() + '"';
         const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state scope ?', ['YES', 'NO']);
         if (decision == 'YES') {
             exportSharedStateScope().then(() => {
@@ -1104,7 +1106,7 @@ exportLiveAppsCaseType = async function () {
 const exportCaseStepSize = 30;
 // Function to export case data
 exportLiveAppsData = async function () {
-    const cTypes = showLiveApps(true, false);
+    const cTypes = showLiveApps(true, true);
     let cTypeArray = new Array();
     for (var curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
@@ -1278,7 +1280,7 @@ importLiveAppsData = async function () {
 
     }
     // console.log(impConf);
-
+    showCloudInfo();
     log(INFO, '\x1b[34m                   -- IMPORT SUMMARY --- ');
     log(INFO, '\x1b[34m -       Number of Imports: ' + numberOfImports);
     log(INFO, '\x1b[34m -              Sandbox ID: ' + sBid);
