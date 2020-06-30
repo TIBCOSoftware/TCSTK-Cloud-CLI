@@ -4,7 +4,7 @@ const gulp = require('gulp');
 let mFile = '';
 
 // Function to process the multiple property file
-processMultipleFile = function(propfileName){
+processMultipleFile = function (propfileName) {
     return new Promise(async function (resolve, reject) {
         // setLogDebug('true');
         mFile = getMultipleFileName();
@@ -13,12 +13,12 @@ processMultipleFile = function(propfileName){
         const cloudStarters = getMProp('Cloud_Starters');
         log(INFO, '- Looping over Configured Starters: ' + cloudStarters);
         const cloudStartersA = cloudStarters.split(',');
-        for(var i = 0; i < cloudStartersA.length; i++) {
+        for (var i = 0; i < cloudStartersA.length; i++) {
             const currentStarter = trim(cloudStartersA[i]);
-            const logS = '[STARTER: ' + currentStarter +']';
+            const logS = '[STARTER: ' + currentStarter + ']';
             // log(INFO, logS);
             // Per Starter Go Over the Configured Environments
-            const currLoc = getMProp( currentStarter + '_Location');
+            const currLoc = getMProp(currentStarter + '_Location');
             log(INFO, logS + ' Location: ' + currLoc);
             const environments = getMProp(currentStarter + '_Environments');
             log(INFO, logS + ' Environments: ' + environments);
@@ -26,7 +26,7 @@ processMultipleFile = function(propfileName){
             // TODO: Allow for a pre environment command (like git pulls or build)
 
 
-            for(var j = 0; j < environmentsA.length; j++) {
+            for (var j = 0; j < environmentsA.length; j++) {
                 const currentEnvironment = trim(environmentsA[j]);
                 const logSE = logS + '[ENVIRONMENT: ' + currentEnvironment + ']';
                 const propFile = getMProp(currentEnvironment + '_PropertyFile');
@@ -35,25 +35,30 @@ processMultipleFile = function(propfileName){
                 const tasks = getMProp(currentEnvironment + '_Tasks');
                 log(INFO, logSE + ' Tasks: ' + tasks);
                 const tasksA = tasks.split(',');
-                for(var k = 0; k < tasksA.length; k++) {
+                for (var k = 0; k < tasksA.length; k++) {
                     const currentTask = trim(tasksA[k]);
                     let tObj = JSON.parse(currentTask);
                     // console.log(tObj);
                     let logT = logSE;
                     let command = 'cd ' + currLoc + ' && ';
-                    if(tObj.T != null){
-                        logT += '['+ (k+1) + ']   [TCLI TASK]';
-                        command += 'tcli -p ' + propFile + ' ' + tObj.T;
+                    if (tObj.T != null) {
+                        logT += '[' + (k + 1) + ']   [TCLI TASK]';
+                        //TODO: USE Absolute path ? We can't for the moment, since -p option only takes relative path.
+                        //const absPropFile = process.env.PWD + '/' + propFile;
+                        //console.log('absPropFile: ' + absPropFile)
+                        //command += 'tcli -p "' + absPropFile + '" ' + tObj.T;
+                        command += 'tcli -p "' + propFile + '" ' + tObj.T;
                     }
-                    if(tObj.O != null){
-                        logT += '['+ (k+1) + ']     [OS TASK]';
+                    if (tObj.O != null) {
+                        logT += '[' + (k + 1) + ']     [OS TASK]';
                         command += tObj.O;
                     }
-                    if(tObj.S != null){
-                        logT += '['+ (k+1) + '] [SCRIPT TASK]' + tObj.S;
+                    if (tObj.S != null) {
+                        logT += '[' + (k + 1) + '] [SCRIPT TASK]' + tObj.S;
                         command += 'node ' + tObj.S;
                     }
                     log(INFO, logT + ' Command: ' + command);
+                    command = replaceAtSign(command, currLoc + propFile);
                     run(command);
                 }
             }
@@ -68,34 +73,54 @@ gulp.task('run-multiple', processMultipleFile);
 // TODO: Move this to global (merge with other property function)
 let propsM;
 
-getMProp = function(property){
+getMProp = function (property) {
     log(DEBUG, 'Getting Property: |' + property + '|');
-    if(propsM == null) {
+    if (propsM == null) {
         const PropertiesReader = require('properties-reader');
         propsM = PropertiesReader(mFile).path();
         //console.log(propsM);
     }
     let re;
-    if(propsM != null){
+    if (propsM != null) {
         re = indexObj(propsM, property);
-        if(re != null) {
+        if (re != null) {
             re = replaceDollar(re);
         }
     } else {
         log(ERROR, 'Property file not set yet...')
     }
-    log(DEBUG, 'Returning Property('+property+'): ' , re);
+    log(DEBUG, 'Returning Property(' + property + '): ', re);
     return re;
 }
 
 
-replaceDollar = function (content){
-    if(content.includes('${') && content.includes('}')){
+replaceDollar = function (content) {
+    if (content.includes('${') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('${') + 2, content.indexOf('${') + 2 + content.substring(content.indexOf('${') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: ' + subProp);
-        content = content.replace(/\${.*?\}/ , getMProp(subProp));
+        content = content.replace(/\${.*?\}/, getMProp(subProp));
         log(DEBUG, 'Replaced: ' + content);
         content = replaceDollar(content);
     }
     return content;
+}
+
+replaceAtSign = function (content, propFile) {
+    if (content.includes('@{') && content.includes('}')) {
+        const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
+        log(DEBUG, 'Looking for subprop: ' + subProp);
+        content = content.replace(/@{.*?\}/, getPropFromFile(subProp, propFile));
+        log(DEBUG, 'Replaced: ' + content);
+        content = replaceDollar(content);
+    }
+    return content;
+}
+
+getPropFromFile = function (property, file) {
+    log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
+    const PropertiesReader = require('properties-reader');
+    const propsToGet = PropertiesReader(file).path();
+    const re = indexObj(propsToGet, property);
+    log(DEBUG, 'Returning Property(' + property + '): ', re);
+    return re;
 }
