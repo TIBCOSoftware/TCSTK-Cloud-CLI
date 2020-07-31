@@ -1224,8 +1224,6 @@ importLiveAppsData = async function () {
     //TODO: check if data of all steps has the same size
     //TODO: Check if there is a creator (how to map the caseID)
     //TODO: Check if the first step is a creator
-    //
-    //
 
     //Loop over all the data
     if (impConf[impConf[impConf['import-steps'][0]].data].FILESTORE != null) {
