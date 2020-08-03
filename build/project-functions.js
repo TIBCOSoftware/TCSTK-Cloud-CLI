@@ -206,7 +206,9 @@ buildCloudStarterZip = function (cloudStarter) {
         if (getProp('Add_Descriptor') === 'YES') {
             generateCloudDescriptor();
         }
-        run('ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL);
+        const buildCommand = 'ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL;
+        log(INFO, 'Building Cloudstarter Using Command: ' + buildCommand);
+        run(buildCommand);
         //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud...
         //const folderToZip = './dist/' + cloudStarter + '/';
         //const fileForZip = './dist/' + cloudStarter + '.zip';
