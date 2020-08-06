@@ -23,6 +23,8 @@ function build() {
 // Function to delpoy the cloud starter
 function deploy() {
     return new Promise(async function (resolve, reject) {
+        log(INFO, 'Deploying ' + getProp('App_Name') + ' to:');
+        showCloudInfo();
         await uploadApp(getProp('App_Name'));
         log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
         showAppLinkInfo();
