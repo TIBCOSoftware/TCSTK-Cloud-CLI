@@ -267,7 +267,13 @@
       "gulpTask": "generate-cloud-descriptor",
       "availableOnOs": ["all"]
     },
-
+    "33. update-cloud-packages": {
+      "description": "Updates the NPM packges in the @tibco-tcstk scope in your project.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "update-cloud-packages",
+      "availableOnOs": ["all"]
+    },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,

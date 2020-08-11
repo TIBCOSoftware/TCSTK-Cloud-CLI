@@ -1,6 +1,8 @@
 // This file does not depend on any other files
 // All inputs are provided as input to the functions
-const globalTCpropFile = __dirname + '/../../common/global-tibco-cloud.properties';
+const globalTCpropFolder = __dirname + '/../../common/';
+const globalTCpropFile = globalTCpropFolder + 'global-tibco-cloud.properties';
+const colors = require('colors');
 
 // Display opening
 displayOpeningMessage = function() {
@@ -79,12 +81,16 @@ replaceInFile = function(from, to, filePattern) {
 
 // function to set the global connection configuration
 updateGlobalConnectionConfig = async function(){
-	console.log('Update Connection Config: ');
+	log(INFO,'Update Connection Config: ');
 	// update the config.
 	// Check if the global propfile exists, if not create one
 	if (!doesFileExist(globalTCpropFile)) {
 		// Create Global config from template
 		copyFile(__dirname + '/../template/global-tibco-cloud.properties', globalTCpropFile);
+	}
+	if (!doesFileExist(globalTCpropFolder + 'package.json')) {
+		copyFile(__dirname + '/../template/package-common.json', globalTCpropFolder + 'package.json');
+		log(INFO,'Inserted package.json...');
 	}
 	// Get Cloud Environment
 	await updateRegion(globalTCpropFile);
@@ -246,6 +252,7 @@ askQuestion = async function (question, type = 'input') {
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
 	let re = 'result';
+	// console.log('Asking Question: ' , question);
 	await inquirerF.prompt([{
 		type: 'list',
 		name: 'result',
@@ -258,6 +265,8 @@ askMultipleChoiceQuestion = async function (question, options) {
 		logO(DEBUG, answers);
 		re = answers.result;
 		//return answers.result;
+	}).catch(error => {
+		log(ERROR, error);
 	});
 	//let name = require.resolve('inquirer');
 	//delete require.cache[name];
@@ -355,8 +364,16 @@ updateTCLI = function(){
 	log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../package.json').version);
 	run('npm -g install @tibco-tcstk/cloud-cli');
 	log(INFO, 'New Cloud CLI Version: ');
-	run('tcli -v')
+	run('tcli -v');
 }
+
+updateCloudPackages = function(){
+	log(INFO, 'Updating all packages starting with @tibco-tcstk in your package.json');
+	// TODO: Investigate if we can install update-by-scope in node_modules of the cli
+	run('npm install -g update-by-scope && npx update-by-scope @tibco-tcstk npm install');
+	log(INFO, colors.blue('Done Updating Cloud Packages...'));
+}
+
 
 updateTCLIwrapper = function() {
 	return new Promise(async function (resolve, reject) {

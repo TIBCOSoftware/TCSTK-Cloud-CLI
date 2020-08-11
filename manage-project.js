@@ -414,6 +414,14 @@ generateCloudDescriptorWrapper = function () {
     });
 }
 
+updateCloudPackagesWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        updateCloudPackages();
+        resolve();
+    });
+}
+
+
 
 
 //gulp.task('test-call-service', testCallService);
@@ -508,8 +516,10 @@ importSharedStateScope.description = 'Uploads one entry or the configured scope 
 
 gulp.task('watch-shared-state-scope', watchSharedStateScopeMain);
 watchSharedStateScopeMain.description = 'Monitors the local shared state and when changes are detected it is uploaded to the cloud.';
-
 gulp.task('watch-shared-state-scope-do', watchSharedStateScope);
+
+gulp.task('update-cloud-packages', updateCloudPackagesWrapper);
+updateCloudPackagesWrapper.description = 'Updates the NPM packges in the @tibco-tcstk scope in your project.';
 
 gulp.task('update-tcli', updateTCLIwrapper);
 updateTCLIwrapper.description = 'Update the Cloud CLI.';

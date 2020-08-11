@@ -135,14 +135,12 @@ export async function cli(args) {
             const tMultiple = 'Create New Multiple Properties file';
             const tNothing = 'Nothing';
             if (!fs.existsSync(cwdir + dirDelimiter + propFileName) || options.createCP) {
-                var cif = '';
+                var cif = tCProp;
                 if (!options.createCP) {
                     displayOpeningMessage();
                     console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + version + "]");
                     console.log('No TIBCO Cloud Properties file found...');
-                    var cif = await askMultipleChoiceQuestion('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
-                } else {
-                    cif = tCProp;
+                    cif = await askMultipleChoiceQuestion('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
                 }
                 switch (cif) {
                     case tCProp:
