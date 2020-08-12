@@ -2,7 +2,7 @@
 // All inputs are provided as input to the functions
 const globalTCpropFolder = __dirname + '/../../common/';
 const globalTCpropFile = globalTCpropFolder + 'global-tibco-cloud.properties';
-const colors = require('colors');
+// const colors = require('colors');
 
 // Display opening
 displayOpeningMessage = function() {
@@ -59,7 +59,6 @@ displayGlobalConnectionConfig = function(){
 }
 
 // Function to replace string in file
-const replace = require('replace-in-file');
 replaceInFile = function(from, to, filePattern) {
 	const patternToUse =  filePattern || './**';
 	const regex = new RegExp(from, 'g');
@@ -69,6 +68,7 @@ replaceInFile = function(from, to, filePattern) {
 		to: to,
 		countMatches: true
 	};
+	const replace = require('replace-in-file');
 	let results = replace.sync(options);
 	for (result of results) {
 		if(result.numReplacements > 0) {
@@ -230,9 +230,10 @@ copyFile = function (fromFile, toFile) {
 	fs.copyFileSync(fromFile, toFile);
 }
 
-let inquirerF = require('inquirer');
+
 // function to ask a question
 askQuestion = async function (question, type = 'input') {
+	let inquirerF = require('inquirer');
 	var re = 'result';
 	// console.log('Type: ' , type);
 	await inquirerF.prompt([{
@@ -251,6 +252,7 @@ askQuestion = async function (question, type = 'input') {
 
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
+	let inquirerF = require('inquirer');
 	let re = 'result';
 	// console.log('Asking Question: ' , question);
 	await inquirerF.prompt([{
@@ -277,6 +279,7 @@ askMultipleChoiceQuestion = async function (question, options) {
 var gOptions = [];
 // Ask a question to a user, and allow the user to search through a possilbe set of options
 askMultipleChoiceQuestionSearch = async function (question, options) {
+	let inquirerF = require('inquirer');
 	gOptions = options;
 	var re = 'result';
 	inquirerF.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
@@ -298,11 +301,10 @@ askMultipleChoiceQuestionSearch = async function (question, options) {
 	return re;
 }
 
-const _F = require('lodash');
-const fuzzyF = require('fuzzy');
-
 //User interaction
 searchAnswerF = function (answers, input) {
+	const _F = require('lodash');
+	const fuzzyF = require('fuzzy');
 	input = input || '';
 	return new Promise(function (resolve) {
 		setTimeout(function () {
@@ -371,6 +373,7 @@ updateCloudPackages = function(){
 	log(INFO, 'Updating all packages starting with @tibco-tcstk in your package.json');
 	// TODO: Investigate if we can install update-by-scope in node_modules of the cli
 	run('npm install -g update-by-scope && npx update-by-scope @tibco-tcstk npm install');
+	const colors = require('colors');
 	log(INFO, colors.blue('Done Updating Cloud Packages...'));
 }
 
@@ -433,8 +436,8 @@ getGlobalConfig = function(){
 }
 
 // Run an OS Command
-const execSync = require('child_process').execSync;
 run = function (command) {
+	const execSync = require('child_process').execSync;
 	return new Promise(function (resolve, reject) {
 		log(DEBUG, 'Executing Command: ' + command);
 		try {
@@ -456,17 +459,17 @@ run = function (command) {
 }
 
 // Delete a folder
-const del = require('del');
 deleteFolder = function (folder) {
+	const del = require('del');
 	log(INFO, 'Deleting Folder: ' + folder);
 	return del([
 		folder
 	]);
 }
 
-const fs = require('file-system');
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
+	const fs = require('file-system');
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir);
 	}

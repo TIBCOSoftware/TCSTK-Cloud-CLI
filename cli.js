@@ -3,7 +3,7 @@ require('./build/common-functions');
 import arg from 'arg';
 
 let propFileName;
-const version = require('./package.json').version;
+//const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
     //TODO: Add a non interactive verbose option
@@ -58,6 +58,7 @@ const dirDelimiter = isWindows ? '\\' : '/';
 
 // Main function
 export async function cli(args) {
+    //console.log('start');
     const options = parseArgumentsIntoOptions(args);
     const appRoot = process.env.PWD;
     const cwdir = process.cwd();
@@ -138,7 +139,7 @@ export async function cli(args) {
                 var cif = tCProp;
                 if (!options.createCP) {
                     displayOpeningMessage();
-                    console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + version + "]");
+                    console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + require('./package.json').version + "]");
                     console.log('No TIBCO Cloud Properties file found...');
                     cif = await askMultipleChoiceQuestion('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
                 }

@@ -1,8 +1,8 @@
 // Package Definitions
+//TODO: For startup speed, move these to when they are used.
 const syncClient = require('sync-rest-client');
-const git = require('gulp-git');
 const fs = require('file-system');
-const fse = require('fs-extra');
+//const fse = require('fs-extra');
 const jsonfile = require('jsonfile');
 const isWindows = process.platform == 'win32';
 
@@ -755,8 +755,8 @@ watchSharedStateScopeMain = function () {
 }
 
 //A shared state watcher (every time the file changes, the shared state is updated)
-const chokidar = require('chokidar');
 watchSharedStateScope = function () {
+    const chokidar = require('chokidar');
     return new Promise(async function (resolve, reject) {
         //Do the login now, so it does not have to be done later
         cLogin();
@@ -955,7 +955,6 @@ publishApp = function (application) {
 }
 
 // Function to call liveApps
-
 callURL = function (url, method, postRequest, contentType, doLog) {
     const lCookie = cLogin();
     const cMethod = method || 'GET';
@@ -1385,6 +1384,7 @@ jsonToCsvLiveAppsData = function () {
 
 // Get the TIBCO Cloud Starter Development Kit from GIT
 getGit = function (source, target, tag) {
+    const git = require('gulp-git');
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
     // git clone --branch bp-baseV1 https://github.com/TIBCOSoftware/TCSDK-Angular
     if (tag == 'LATEST') {
@@ -1416,6 +1416,7 @@ testFunction = async function (propFile) {
 
 // Function to copy a directory
 copyDir = function (fromDir, toDir) {
+    const fse = require('fs-extra');
     log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fse.copySync(fromDir, toDir, {overwrite: true});
 }
@@ -1440,8 +1441,8 @@ checkPW = function () {
     }
 }
 
-var readline = require('readline');
-var Writable = require('stream').Writable;
+//var readline = require('readline');
+//var Writable = require('stream').Writable;
 
 // Use WSU to generate TCI code
 wsuAddTci = function () {
