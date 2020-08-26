@@ -3,7 +3,6 @@
   "cloud-components" : ["flogo", "liveapps", "spotfire"],
   "flogo": {
     "flows": ""
-
   },
   "liveapps": {
     "apps": ""
@@ -16,7 +15,6 @@
       "name": "",
       "_note" : "this can also be a pointer to other file(s)",
       "properties" : {
-
       }
     }
   }

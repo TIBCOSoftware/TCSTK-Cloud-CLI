@@ -1150,7 +1150,7 @@ exportLiveAppsData = async function () {
                 if (exCase.casedata != null) {
                     try {
                         // Get the details for every shared state entry
-                        contentObject = JSON.parse( ' {  "' + cTypes[curCase].name + '" : ' + exCase.casedata + '}');
+                        contentObject = JSON.parse(' {  "' + cTypes[curCase].name + '" : ' + exCase.casedata + '}');
                         AllCaseArray.push(contentObject);
                         exCase.casedata = {'FILESTORE': contentFileName};
                         // And store them in a file / folder
@@ -1302,7 +1302,6 @@ importLiveAppsData = async function () {
     log(INFO, '\033[0m');
 
 
-
     let runImport = true;
     const doOverWrite = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
     if (doOverWrite == 'NO') {
@@ -1331,8 +1330,6 @@ importLiveAppsData = async function () {
                     dataForImport = impConf[stepConf.data];
                 }
                 const dataToImport = dataForImport[i];
-
-
                 if (stepConf.type.toString().toLowerCase() == 'creator') {
                     log(INFO, 'Creating LiveApps Case (' + i + ')');
                     let postRequest = {
@@ -1347,10 +1344,24 @@ importLiveAppsData = async function () {
                     //Get Case ID
                     caseRef = response.caseReference;
                 }
+                /* TODO: TEST this... */
                 if (stepConf.type.toString().toLowerCase() == 'action') {
+                    if (stepConf.caseref) {
+                        if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
+                            if (caseRef == '') {
+                                log(ERROR, 'Caseref to be configured from creator but no caseref is set...');
+                            }
+                        } else {
+                            const _F = require('lodash');
+                            caseRef = _F.get(dataToImport, stepConf.caseref);
+                            log(INFO, 'Using CaseRef: ' + caseRef);
+                            if (stepConf['delete-caseref'].toLowerCase() == 'true') {
+                                _F.unset(dataToImport, stepConf.caseref);
+                            }
+                        }
+                    }
+                    //console.log('Data to Import:', dataToImport);
                     log(INFO, 'Actioning LiveApps Case (' + i + ') Ref ' + caseRef);
-
-
                     let postRequest = {
                         id: stepConf['process-id'],
                         sandboxId: sBid,
@@ -1364,7 +1375,8 @@ importLiveAppsData = async function () {
 
                 }
                 if (stepConf.sleep && stepConf.sleep > 0) {
-                    await sleep(stepConf.sleep)
+                    log(INFO, 'Sleeping for ' + stepConf.sleep + ' ms...');
+                    await sleep(stepConf.sleep);
                 }
             }
         }

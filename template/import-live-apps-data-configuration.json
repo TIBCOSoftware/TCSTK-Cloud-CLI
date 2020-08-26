@@ -1,20 +1,25 @@
 {
   "la-application-name" : "<APP-NAME>",
   "import-steps" : ["create-cases", "action-cases"],
+  "number-of-threads": 1,
   "create-cases": {
-    "process-id": "16529",
-    "applicationId": "3524",
+    "process-id": "<OPTIONAL-PROCESS-ID>",
+    "applicationId": "<OPTIONAL-APPLICATION-ID>",
     "type": "CREATOR",
-    "name": "",
+    "name": "<NAME-OF-CREATOR>",
     "data": "cases-to-import",
     "sleep": 0
   },
   "action-cases": {
-    "process-id": "16813",
-    "applicationId": "3524",
+    "process-id": "<OPTIONAL-PROCESS-ID>",
+    "applicationId": "<OPTIONAL-APPLICATION-ID>",
     "type": "ACTION",
-    "name" : "",
+    "name" : "<NAME-OF-ACTION>",
     "data": "cases-to-action",
+    "caseref_NOTE": "When only running an action use the selector, when using a creator use the FROM-CREATOR keyword.",
+    "caseref": "<OPTIONS: FROM-CREATOR | APP.selector>",
+    "delete-caseref_NOTE": "If true it will not send this data to LiveApps, default is false.",
+    "delete-caseref": "true",
     "sleep": 0
   },
   "cases-to-import" :{
