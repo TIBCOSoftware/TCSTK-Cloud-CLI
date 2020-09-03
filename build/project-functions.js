@@ -196,8 +196,16 @@ showAppLinkInfo = function () {
     }
 }
 
-// const { zip } = require('zip-a-folder');
-// Function that builds the zip for deployment
+// Check for Build Command
+let BUILD_COMMAND = 'HASHROUTING';
+if (getProp('BUILD_COMMAND') != null) {
+    BUILD_COMMAND = getProp('BUILD_COMMAND');
+} else {
+    log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
+    addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
+}
+
+
 buildCloudStarterZip = function (cloudStarter) {
     return new Promise(async function (resolve, reject) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
@@ -206,10 +214,20 @@ buildCloudStarterZip = function (cloudStarter) {
         if (getProp('Add_Descriptor') === 'YES') {
             generateCloudDescriptor();
         }
-        const buildCommand = 'ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL;
-        log(INFO, 'Building Cloudstarter Using Command: ' + buildCommand);
+        //hashrouting build configurable
+        let buildCommand = BUILD_COMMAND;
+        let bType = 'CUSTOM';
+        if(BUILD_COMMAND === 'HASHROUTING'){
+            bType = 'HASHROUTING';
+            buildCommand = 'ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL;
+        }
+        if(BUILD_COMMAND === 'NON-HASHROUTING'){
+            bType = 'NON-HASHROUTING';
+            buildCommand = 'ng build --prod --base-href ' + csURL + ' --deploy-url ' + csURL;
+        }
+        log(INFO, 'Building Cloudstarter Using Command(Type: ' + bType + '): ' + buildCommand);
         run(buildCommand);
-        //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud...
+        //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud... (perhaps use no compression)
         //const folderToZip = './dist/' + cloudStarter + '/';
         //const fileForZip = './dist/' + cloudStarter + '.zip';
         run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');

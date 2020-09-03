@@ -385,8 +385,8 @@ updateTCLIwrapper = function() {
 	});
 }
 
-// Function to add or update property to a file
-addOrUpdateProperty = function (location, property, value) {
+// Function to add or update property to a file, and possibly adds a comment if the property does not exists
+addOrUpdateProperty = function (location, property, value, comment) {
 	log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
 	// Check if file exists
 	const fs = require('fs');
@@ -406,6 +406,9 @@ addOrUpdateProperty = function (location, property, value) {
 			} else {
 				// append prop to the end.
 				log(DEBUG, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
+				if(comment){
+					data = data + '\n# ' + comment
+				}
 				var result = data + '\n' + property + '=' + value;
 				fs.writeFileSync(location, result, 'utf8');
 			}
