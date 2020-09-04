@@ -2,6 +2,8 @@
 require('./build/common-functions');
 const gulp = require('gulp');
 let mFile = '';
+const colors = require('colors');
+
 
 // Function to process the multiple property file
 processMultipleFile = function (propfileName) {
@@ -9,13 +11,21 @@ processMultipleFile = function (propfileName) {
         // setLogDebug('true');
         mFile = getMultipleFileName();
         log(INFO, '- Managing Multiple, Using file: ' + mFile);
-        // Go Over All Starters
-        const cloudStarters = getMProp('Cloud_Starters');
-        log(INFO, '- Looping over Configured Starters: ' + cloudStarters);
+        // Go Over All Cloud Starter Jobs
+        let cloudStarters = getMProp('Cloud_Starter_JOBS');
+        if(cloudStarters == null){
+            //Try to get from old definition for backwards compatibility.
+            cloudStarters = getMProp('Cloud_Starters');
+            if(cloudStarters != null){
+                log(WARNING, "Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...");
+            }
+        }
+
+        log(INFO, '- Looping over Configured Starter JOBS: ' + cloudStarters);
         const cloudStartersA = cloudStarters.split(',');
         for (var i = 0; i < cloudStartersA.length; i++) {
             const currentStarter = trim(cloudStartersA[i]);
-            const logS = '[STARTER: ' + currentStarter + ']';
+            const logS = colors.blue('[STARTER JOB: ' + currentStarter + ']');
             // log(INFO, logS);
             // Per Starter Go Over the Configured Environments
             const currLoc = getMProp(currentStarter + '_Location');
@@ -28,7 +38,7 @@ processMultipleFile = function (propfileName) {
 
             for (var j = 0; j < environmentsA.length; j++) {
                 const currentEnvironment = trim(environmentsA[j]);
-                const logSE = logS + '[ENVIRONMENT: ' + currentEnvironment + ']';
+                const logSE = logS + colors.green(' [JOB: ' + currentEnvironment + '] ');
                 const propFile = getMProp(currentEnvironment + '_PropertyFile');
                 log(INFO, logSE + ' Property File: ' + propFile);
                 // Per Environment Run the Configured Tasks
@@ -42,7 +52,7 @@ processMultipleFile = function (propfileName) {
                     let logT = logSE;
                     let command = 'cd ' + currLoc + ' && ';
                     if (tObj.T != null) {
-                        logT += '[' + (k + 1) + ']   [TCLI TASK]';
+                        logT += colors.brightCyan('[' + (k + 1) + '] [TCLI TASK]');
                         //TODO: USE Absolute path ? We can't for the moment, since -p option only takes relative path.
                         //const absPropFile = process.env.PWD + '/' + propFile;
                         //console.log('absPropFile: ' + absPropFile)
@@ -50,11 +60,11 @@ processMultipleFile = function (propfileName) {
                         command += 'tcli -p "' + propFile + '" ' + tObj.T;
                     }
                     if (tObj.O != null) {
-                        logT += '[' + (k + 1) + ']     [OS TASK]';
+                        logT += colors.brightCyan('[' + (k + 1) + '] [OS TASK]');
                         command += tObj.O;
                     }
                     if (tObj.S != null) {
-                        logT += '[' + (k + 1) + '] [SCRIPT TASK]' + tObj.S;
+                        logT += colors.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]' + tObj.S);
                         command += 'node ' + tObj.S;
                     }
                     log(INFO, logT + ' Command: ' + command);

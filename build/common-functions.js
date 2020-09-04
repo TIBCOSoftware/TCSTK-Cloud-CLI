@@ -2,7 +2,7 @@
 // All inputs are provided as input to the functions
 const globalTCpropFolder = __dirname + '/../../common/';
 const globalTCpropFile = globalTCpropFolder + 'global-tibco-cloud.properties';
-// const colors = require('colors');
+const colors = require('colors');
 
 // Display opening
 displayOpeningMessage = function() {
@@ -373,7 +373,7 @@ updateCloudPackages = function(){
 	log(INFO, 'Updating all packages starting with @tibco-tcstk in your package.json');
 	// TODO: Investigate if we can install update-by-scope in node_modules of the cli
 	run('npm install -g update-by-scope && npx update-by-scope @tibco-tcstk npm install');
-	const colors = require('colors');
+	//const colors = require('colors');
 	log(INFO, colors.blue('Done Updating Cloud Packages...'));
 }
 
@@ -533,6 +533,7 @@ sleep = async function(ms) {
 
 //Common log function
 global.INFO = 'INFO';
+global.WARNING = 'WARNING';
 global.DEBUG = 'DEBUG';
 global.ERROR = 'ERROR';
 //const useDebug = (propsF.Use_Debug == 'true');
@@ -552,7 +553,12 @@ log = function (level, ...message) {
 		if(level == global.ERROR){
 			console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')' ,'\x1b[31m' , ...message , '\033[0m');
 		} else {
-			console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , ...message, '\033[0m');
+			if(level == global.WARNING){
+				console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ' , ...message));
+			} else {
+				console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' , ...message, '\033[0m');
+			}
+
 		}
 	}
 }
