@@ -982,7 +982,8 @@ publishApp = function (application) {
 }
 
 // Function to call liveApps
-callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL) {
+callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse) {
+    const reResponse = returnResponse || false;
     const lCookie = cLogin(tenant, customLoginURL);
     const cMethod = method || 'GET';
     let cdoLog = true;
@@ -999,8 +1000,8 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
         }
     }
     const header = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
+        "accept": 'application/json',
+        "Content-Type": cType,
         "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
     }
     if (cdoLog) {
@@ -1029,6 +1030,9 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
 
         return null;
     } else {
+        if(reResponse){
+            return response;
+        }
         return response.body;
     }
 }
@@ -1523,10 +1527,9 @@ schematicAdd = function () {
 
 showTCI = function () {
     return new Promise(async function (resolve, reject) {
-        // TODO: Implement
         log(INFO, 'Getting TCI Apps...');
-        const appEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/api/v1/apps';
-        const loginEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/idm/v3/login-oauth';
+        const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
+        const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
         const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint);
         // TODO: Move to global config file
         let config = {
@@ -1564,7 +1567,7 @@ showTCI = function () {
                 ]
         };
         let tObject = createTable(response, config, true);
-        //console.log('Table Object: ', tObject);
+        log(DEBUG, 'TCI Object: ', tObject);
         //console.log(response[0]);
         resolve();
     });
@@ -1572,8 +1575,59 @@ showTCI = function () {
 
 showSpotfire = function () {
     return new Promise(async function (resolve, reject) {
-        // TODO: Implement
-        console.log('TODO: Implement');
+        log(INFO, 'Getting Spotfire Reports...');
+        // TODO: Login (perhaps LiveApps and then re-authorize...)
+        var lCookie = cLogin();
+        // log(INFO, 'Login Cookie: ', lCookie);
+        const postForm = 'opaque-for-tenant=SPOTFIRE';
+        // const postForm = 'opaque-for-tenant=TCE';
+        const reAuthEndpoint = 'https://' + getCurrentRegion(true) + 'liveapps.cloud.tibco.com/idm/v1/reauthorize';
+        const reAuthResponse = callURL(reAuthEndpoint, 'POST', postForm, 'application/x-www-form-urlencoded', true);
+        // console.log('reAuthResponse: ', reAuthResponse);
+        log(INFO, 'Redirect URL: ', reAuthResponse.location);
+        const postFormC = 'token=' + reAuthResponse.token;
+        const reAuthResponseC = callURL(reAuthResponse.location, 'POST', postFormC, 'application/x-www-form-urlencoded', true, null, null, true);
+        //console.log('reAuthResponseC: ', reAuthResponseC);
+        var loginCookie = reAuthResponseC.headers['set-cookie'];
+        // log(INFO, loginCookie);
+        var rxd = /domain=(.*?);/g;
+        // var rxt = /tsc=(.*?);/g;
+        let newCookie = {"domain": rxd.exec(loginCookie)[1]};
+        log(INFO, 'New Domain Cookie: ', newCookie.domain);
+        //logO(INFO, newCookie.tsc);
+        // TODO: POST ON
+        //https://spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo
+        /* REQUEST:
+        {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]}
+
+           RESPONSE: (See sfFolderResponse.json)
+         */
+
+
+
+        //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';
+        //https://account.cloud.tibco.com/idm/v1/reauthorize
+        /*
+        const loginEndpoint = 'https://account.cloud.tibco.com/idm/v1/reauthorize';
+        const appEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/api/v1/apps';
+
+        //1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747
+
+        const response = callURL(appEndpoint, 'GET', null, null, true, 'SPOTFIRE', loginEndpoint);
+        // TODO: Move to global config file
+        let config = {
+            entries:
+                [
+                    {
+                        header: "Name",
+                        field: "name"
+                    }
+                ]
+        };
+        let tObject = createTable(response, config, true);
+        log(DEBUG, 'SPOTFIRE Object: ', tObject);
+        //console.log(response[0]);
+        */
         resolve();
     });
 }
