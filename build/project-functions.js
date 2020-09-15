@@ -33,10 +33,19 @@ if (getGlobalConfig()) {
 
 //Function to manage the login from the cloud
 var loginURL = cloudURL + getProp('loginURE');
-cLogin = function () {
+cLogin = function (tenant, customLoginURL) {
+    var setLoginURL = loginURL;
+    if (customLoginURL) {
+        setLoginURL = customLoginURL;
+    }
+
+    var tentantID = getProp('CloudLogin.tenantID');
+    if (tenant) {
+        tentantID = tenant;
+    }
     //TODO: Set a timer, if login was too long ago login again...
     var pass = getProp('CloudLogin.pass');
-    var tentantID = getProp('CloudLogin.tenantID');
+
     var clientID = getProp('CloudLogin.clientID');
     var email = getProp('CloudLogin.email');
     //
@@ -57,7 +66,7 @@ cLogin = function () {
         pass = Buffer.from(pass, 'base64').toString()
     }
     if (loginC == null) {
-        loginC = cloudLoginV3(tentantID, clientID, email, pass, loginURL);
+        loginC = cloudLoginV3(tentantID, clientID, email, pass, setLoginURL);
     }
     if (loginC == 'ERROR') {
         // TODO: exit the gulp task properly
@@ -217,11 +226,11 @@ buildCloudStarterZip = function (cloudStarter) {
         //hashrouting build configurable
         let buildCommand = BUILD_COMMAND;
         let bType = 'CUSTOM';
-        if(BUILD_COMMAND === 'HASHROUTING'){
+        if (BUILD_COMMAND === 'HASHROUTING') {
             bType = 'HASHROUTING';
             buildCommand = 'ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL;
         }
-        if(BUILD_COMMAND === 'NON-HASHROUTING'){
+        if (BUILD_COMMAND === 'NON-HASHROUTING') {
             bType = 'NON-HASHROUTING';
             buildCommand = 'ng build --prod --base-href ' + csURL + ' --deploy-url ' + csURL;
         }
@@ -973,8 +982,8 @@ publishApp = function (application) {
 }
 
 // Function to call liveApps
-callURL = function (url, method, postRequest, contentType, doLog) {
-    const lCookie = cLogin();
+callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL) {
+    const lCookie = cLogin(tenant, customLoginURL);
     const cMethod = method || 'GET';
     let cdoLog = true;
     if (doLog != null) {
@@ -1510,6 +1519,65 @@ schematicAdd = function () {
         resolve();
     });
 }
+
+
+showTCI = function () {
+    return new Promise(async function (resolve, reject) {
+        // TODO: Implement
+        log(INFO, 'Getting TCI Apps...');
+        const appEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/api/v1/apps';
+        const loginEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/idm/v3/login-oauth';
+        const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint);
+        // TODO: Move to global config file
+        let config = {
+            entries:
+                [
+                    {
+                        header: "Name",
+                        field: "name"
+                    },
+                    {
+                        header: "Type",
+                        field: "type.val"
+                    },
+                    {
+                        header: "Visibility",
+                        field: "endpointVisibility"
+                    },
+                    {
+                        header: "publishStage",
+                        field: "publishStage"
+                    },
+                    {
+                        header: "Last Modified",
+                        field: "modifiedTime",
+                        format: "DATE"
+                    },
+                    {
+                        header: "Status",
+                        field: "appInitialStatus"
+                    },
+                    {
+                        header: "Instances",
+                        field: "desiredInstanceCount"
+                    }
+                ]
+        };
+        let tObject = createTable(response, config, true);
+        //console.log('Table Object: ', tObject);
+        //console.log(response[0]);
+        resolve();
+    });
+}
+
+showSpotfire = function () {
+    return new Promise(async function (resolve, reject) {
+        // TODO: Implement
+        console.log('TODO: Implement');
+        resolve();
+    });
+}
+
 
 // Set log debug level from local property
 setLogDebug(getProp('Use_Debug'));

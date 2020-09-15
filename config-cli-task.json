@@ -274,6 +274,27 @@
       "gulpTask": "update-cloud-packages",
       "availableOnOs": ["all"]
     },
+    "34. show-tci-apps": {
+      "description": "List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "show-tci-apps",
+      "availableOnOs": ["all"]
+    },
+    "35. show-spotfire-reports": {
+      "description": "List all Spotfire Analytical Reports.",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "show-spotfire-reports",
+      "availableOnOs": ["all"]
+    },
+    "36. describe-cloud": {
+      "description": "A combination of show-cloud, show-tci-apps, show-spotfire-reports, show-live-apps-cases & show-cloud-starters.",
+      "enabled": false,
+      "internal": false,
+      "gulpTask": "describe-cloud",
+      "availableOnOs": ["all"]
+    },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,

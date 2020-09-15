@@ -421,8 +421,19 @@ updateCloudPackagesWrapper = function () {
     });
 }
 
+showTCIWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        showTCI();
+        resolve();
+    });
+}
 
-
+showSpotfireReportsWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        showSpotfire();
+        resolve();
+    });
+}
 
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
@@ -464,7 +475,14 @@ jsonToCsvLiveAppsDataWrapper.description = 'Convert JSON to CSV for LiveApps dat
 gulp.task('export-live-apps-case-type', exportLiveAppsCaseTypeWrapper);
 exportLiveAppsCaseTypeWrapper.description = 'Export the details of a Live Apps Case Type';
 
+gulp.task('show-tci-apps', showTCIWrapper);
+showTCIWrapper.description = 'List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).';
 
+gulp.task('show-spotfire-reports', showSpotfireReportsWrapper);
+showSpotfireReportsWrapper.description = 'List all Spotfire Analytical Reports.';
+
+//TODO: Create sepearate wrapper task, with display and make it non-interactive
+gulp.task('describe-cloud', gulp.series('show-cloud', 'show-tci-apps', 'show-spotfire-reports', 'show-live-apps-cases', 'show-cloud-starters'));
 
 gulp.task('clean-dist', cleanDist);
 gulp.task('buildZip', build);
