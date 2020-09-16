@@ -71,7 +71,7 @@ cLogin = function (tenant, customLoginURL) {
     if (loginC == 'ERROR') {
         // TODO: exit the gulp task properly
         log(INFO, 'Error Exiting..');
-        process.exit();
+        process.exit(1);
     }
     // console.log("RETURN: " , loginC);
     return loginC;
@@ -1573,28 +1573,66 @@ showTCI = function () {
     });
 }
 
+//var art = require('ascii-art');
+//https://www.npmjs.com/package/ascii-art-font
+
 showSpotfire = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Getting Spotfire Reports...');
+        //art.style('Getting Spotfire Reports...', 'bold')
         // TODO: Login (perhaps LiveApps and then re-authorize...)
         var lCookie = cLogin();
         // log(INFO, 'Login Cookie: ', lCookie);
-        const postForm = 'opaque-for-tenant=SPOTFIRE';
-        // const postForm = 'opaque-for-tenant=TCE';
+        const postForm = 'opaque-for-tenant=SPOTFIRE&resumeURL=' + encodeURIComponent('https://localhost:4200/?firstOpen=false');
+        //const postForm = 'opaque-for-tenant=TCE';
         const reAuthEndpoint = 'https://' + getCurrentRegion(true) + 'liveapps.cloud.tibco.com/idm/v1/reauthorize';
-        const reAuthResponse = callURL(reAuthEndpoint, 'POST', postForm, 'application/x-www-form-urlencoded', true);
-        // console.log('reAuthResponse: ', reAuthResponse);
+        const reAuthResponsePlain = callURL(reAuthEndpoint, 'POST', postForm, 'application/x-www-form-urlencoded', true, null, null, true);
+        var loginCookieTSC = reAuthResponsePlain.headers['set-cookie'];
+        console.log('loginCookieTSC: ', loginCookieTSC);
+        let newCookie = {};
+        var rxt = /tsc=(.*?);/g;
+        newCookie["tsc"] = rxt.exec(loginCookieTSC)[1];
+        log(INFO, 'New TSC Cookie: ', newCookie.tsc);
+        const reAuthResponse = reAuthResponsePlain.body;
         log(INFO, 'Redirect URL: ', reAuthResponse.location);
         const postFormC = 'token=' + reAuthResponse.token;
-        const reAuthResponseC = callURL(reAuthResponse.location, 'POST', postFormC, 'application/x-www-form-urlencoded', true, null, null, true);
+
+
+        const headerL = {
+            "accept": 'application/json',
+            "Content-Type": 'application/x-www-form-urlencoded',
+            "cookie": "tsc=" + newCookie.tsc + ';'
+        }
+        //let bodyL =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+        let  reAuthResponseC = syncClient.post(reAuthResponse.location, {
+            headers: headerL,
+            payload: postFormC
+        });
+
+
+        //const reAuthResponseC = callURL(reAuthResponse.location, 'POST', postFormC, 'application/x-www-form-urlencoded', true, null, null, true);
         //console.log('reAuthResponseC: ', reAuthResponseC);
         var loginCookie = reAuthResponseC.headers['set-cookie'];
         // log(INFO, loginCookie);
         var rxd = /domain=(.*?);/g;
         // var rxt = /tsc=(.*?);/g;
-        let newCookie = {"domain": rxd.exec(loginCookie)[1]};
+        newCookie["domain"] = rxd.exec(loginCookie)[1];
         log(INFO, 'New Domain Cookie: ', newCookie.domain);
         //logO(INFO, newCookie.tsc);
+
+        const header = {
+            "accept": 'application/json',
+            "Content-Type": 'application/json',
+            "cookie": "tsc=" + newCookie.tsc + "; domain=" + newCookie.domain
+        }
+      let body =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+      let  responseFolder = syncClient.post(encodeURI('https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo'), {
+                headers: header,
+                payload: body
+            });
+      console.log(responseFolder.toJSON());
+
+
         // TODO: POST ON
         //https://spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo
         /* REQUEST:

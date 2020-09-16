@@ -466,7 +466,11 @@ getGlobalConfig = function () {
 }
 
 // Run an OS Command
-run = function (command) {
+run = function (command, failOnError) {
+    let doFail = true;
+    if(failOnError != null){
+        doFail = failOnError;
+    }
     const execSync = require('child_process').execSync;
     return new Promise(function (resolve, reject) {
         log(DEBUG, 'Executing Command: ' + command);
@@ -474,18 +478,24 @@ run = function (command) {
             execSync(
                 command,
                 {stdio: 'inherit'}
-            );
+            )
         } catch (err) {
+            // console.log('Got Error ' , err);
+            // logO(DEBUG, reason);
+            log(ERROR, 'Error Running command: ' + err.message);
+            if(doFail){
+                process.exit(1);
+            }
             reject(err);
         }
         resolve();
-    }).catch(
+    })/*.catch(
         (reason => {
             logO(DEBUG, reason);
             log(ERROR, 'Error Running command: ' + command);
             process.exit(1);
         })
-    );
+    );*/
 }
 
 // Delete a folder

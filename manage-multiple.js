@@ -21,6 +21,13 @@ processMultipleFile = function (propfileName) {
             }
         }
 
+        let failOnError = getMProp('Fail_On_Error');
+        if(failOnError == null){
+            log(INFO, 'No Fail_On_Error Property found; Adding Fail_On_Error to ' + mFile);
+            addOrUpdateProperty(mFile, 'Fail_On_Error', 'YES', 'Indicator if script needs to fail when an error occurs (Options: YES | NO)');
+            failOnError = 'YES';
+        }
+        const doFailOnError = !(failOnError.toLowerCase() == 'no');
         log(INFO, '- Looping over Configured Starter JOBS: ' + cloudStarters);
         const cloudStartersA = cloudStarters.split(',');
         for (var i = 0; i < cloudStartersA.length; i++) {
@@ -34,8 +41,6 @@ processMultipleFile = function (propfileName) {
             log(INFO, logS + ' Environments: ' + environments);
             const environmentsA = environments.split(',');
             // TODO: Allow for a pre environment command (like git pulls or build)
-
-
             for (var j = 0; j < environmentsA.length; j++) {
                 const currentEnvironment = trim(environmentsA[j]);
                 const logSE = logS + colors.green(' [JOB: ' + currentEnvironment + '] ');
@@ -69,7 +74,7 @@ processMultipleFile = function (propfileName) {
                     }
                     log(INFO, logT + ' Command: ' + command);
                     command = replaceAtSign(command, currLoc + propFile);
-                    run(command);
+                    run(command, doFailOnError);
                 }
             }
         }
