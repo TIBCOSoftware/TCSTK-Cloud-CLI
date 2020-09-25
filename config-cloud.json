@@ -1,0 +1,6 @@
+{
+  "endpoints": {
+    "_note": "ALL ENDPOINTS START AFTER THE REGION",
+    "accountInfo" : "account.cloud.tibco.com/tsc-ws/v1/my-accounts/info"
+  }
+}

@@ -262,7 +262,7 @@ mainT = function () {
         resolve();
         // var appRoot = process.env.PWD;
         var appRoot = process.cwd();
-        if (getProp('CloudLogin.pass') == '') {
+        if (getProp('CloudLogin.pass') == '' && !isOauthUsed()) {
             // When password is empty ask it manually for the session.
             var pass = await askQuestion('Please provide your password: ', 'password');
             // properties.set('CloudLogin.pass', obfuscatePW(pass));
@@ -286,7 +286,6 @@ test = function () {
 
 obfuscate = function () {
     return new Promise(async function (resolve, reject) {
-
         var password = await askQuestion('Please provide the password...', 'password');
         console.log('\nObfuscated password is is: ' + obfuscatePW(password));
         resolve();

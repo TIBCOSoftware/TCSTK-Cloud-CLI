@@ -598,6 +598,19 @@ createTable = function (arrayObject, config, doShowTable ) {
     return tableObject;
 }
 
+isOauthUsed = function() {
+    let re = false;
+    if(getProp('CloudLogin.OAuthKey') != undefined) {
+        if (getProp('CloudLogin.OAuthKey').trim() != '') {
+            re = true
+        }
+    }
+    console.log('Is Oauth used: ' , re);
+    return re;
+}
+
+
+
 
 //Common log function
 global.INFO = 'INFO';

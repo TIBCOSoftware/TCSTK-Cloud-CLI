@@ -5,6 +5,7 @@ const fs = require('file-system');
 //const fse = require('fs-extra');
 const jsonfile = require('jsonfile');
 const isWindows = process.platform == 'win32';
+const clURI = require('./../config-cloud.json').endpoints;
 
 // Clean temp folder
 cleanTemp = function () {
@@ -15,6 +16,7 @@ cleanTemp = function () {
 // Function that determines which cloud login method to use
 // function to login to the cloud
 var loginC = null;
+var useOAuth = false;
 var argv = require('yargs').argv;
 
 var cloudURL = getProp('Cloud_URL');
@@ -31,49 +33,72 @@ if (getGlobalConfig()) {
     }
 }
 
+
+
 //Function to manage the login from the cloud
 var loginURL = cloudURL + getProp('loginURE');
+let doOAuthNotify = true;
 cLogin = function (tenant, customLoginURL) {
-    var setLoginURL = loginURL;
-    if (customLoginURL) {
-        setLoginURL = customLoginURL;
-    }
+    if(getProp('CloudLogin.OAuthKey') != undefined){
+        if(getProp('CloudLogin.OAuthKey').trim() != '') {
+            useOAuth = true;
+            // Getting the organization info
+            if (getOrganization() == null || getOrganization().trim() == '') {
+                // Setting this to temp so it breaks the call stack
+                setOrganization('TEMP');
+                var response = callURL('https://' + getCurrentRegion() + clURI.accountInfo);
+                log(DEBUG, 'Got Account info: ', response);
+                if (response.selectedAccount) {
+                    setOrganization(response.selectedAccount.displayName);
+                }
+            } else {
+                if(doOAuthNotify){
+                    log(INFO, 'Using OAUTH for Authentication...');
+                    doOAuthNotify = false;
+                }
+            }
+        }
+    } else {
+        var setLoginURL = loginURL;
+        if (customLoginURL) {
+            setLoginURL = customLoginURL;
+        }
 
-    var tentantID = getProp('CloudLogin.tenantID');
-    if (tenant) {
-        tentantID = tenant;
-    }
-    //TODO: Set a timer, if login was too long ago login again...
-    var pass = getProp('CloudLogin.pass');
+        var tentantID = getProp('CloudLogin.tenantID');
+        if (tenant) {
+            tentantID = tenant;
+        }
+        //TODO: Set a timer, if login was too long ago login again...
+        var pass = getProp('CloudLogin.pass');
+        var clientID = getProp('CloudLogin.clientID');
+        var email = getProp('CloudLogin.email');
+        //
+        //TODO: Manage global config in common functions
+        if (getGlobalConfig()) {
+            const propsG = getGlobalConfig();
+            if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+            if (tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
+            if (clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
+            if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
+        }
 
-    var clientID = getProp('CloudLogin.clientID');
-    var email = getProp('CloudLogin.email');
-    //
-    //TODO: Manage global config in common functions
-    if (getGlobalConfig()) {
-        const propsG = getGlobalConfig();
-        if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-        if (tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
-        if (clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
-        if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
+        if (pass == '') {
+            pass = argv.pass;
+            // console.log('Pass from args: ' + pass);
+        }
+        if (pass.charAt(0) == '#') {
+            pass = Buffer.from(pass, 'base64').toString()
+        }
+        if (loginC == null) {
+            loginC = cloudLoginV3(tentantID, clientID, email, pass, setLoginURL);
+        }
+        if (loginC == 'ERROR') {
+            // TODO: exit the gulp task properly
+            log(INFO, 'Error Exiting..');
+            process.exit(1);
+        }
+        // console.log("RETURN: " , loginC);
     }
-
-    if (pass == '') {
-        pass = argv.pass;
-        // console.log('Pass from args: ' + pass);
-    }
-    if (pass.charAt(0) == '#') {
-        pass = Buffer.from(pass, 'base64').toString()
-    }
-    if (loginC == null) {
-        loginC = cloudLoginV3(tentantID, clientID, email, pass, setLoginURL);
-    }
-    if (loginC == 'ERROR') {
-        // TODO: exit the gulp task properly
-        log(INFO, 'Error Exiting..');
-        process.exit(1);
-    }
-    // console.log("RETURN: " , loginC);
     return loginC;
 }
 
@@ -105,7 +130,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         logO(DEBUG, re.domain);
         logO(DEBUG, re.tsc);
         logO(DEBUG, re);
-        log(INFO, 'Login Successful of ' + email + ' ...');
+        log(INFO, 'Login Successful of ' + email + '(' + tenantID + ')...');
     }
     return re;
 }
@@ -198,6 +223,7 @@ generateCloudDescriptor = function () {
 
 // Function to display the location on the deployed cloudstarter and possilby the descriptor.
 showAppLinkInfo = function () {
+    //TODO: Get from global file
     let cloudURLdisp = getProp('Cloud_URL');
     log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
     if (getProp('Add_Descriptor') == 'YES') {
@@ -249,30 +275,21 @@ buildCloudStarterZip = function (cloudStarter) {
 // function that shows all the availible applications in the cloud
 const getAppURL = cloudURL + getProp('appURE') + '?%24top=200';
 showAvailableApps = function (showTable) {
+    //TODO: Use table config
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
-    //return new Promise(function (resolve, reject) {
-    var lCookie = cLogin();
-    //log(INFO, 'Login Cookie: ', lCookie);
-    var response = syncClient.get(getAppURL, {
-        headers: {
-            "accept": "application/json",
-            "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-        }
-    });
-    //console.log(response.body);
-    //console.table(response.body);
+    var response = callURL(getAppURL);
     var apps = {};
-    for (var app in response.body) {
+    for (var app in response) {
         var appTemp = {};
         var appN = parseInt(app) + 1;
-        //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
-        appTemp['APP NAME'] = response.body[app].name;
-        //appTemp['LINK'] = 'https://eu.liveapps.cloud.tibco.com/webresource/apps/'+response.body[app].name+'/index.html';
+        //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
+        appTemp['APP NAME'] = response[app].name;
+        //appTemp['LINK'] = 'https://eu.liveapps.cloud.tibco.com/webresource/apps/'+response[app].name+'/index.html';
         // TODO: Use the API (get artifacts) to find an index.htm(l) and provide highest
         // TODO: Use right eu / us link
-        var publV = parseInt(response.body[app].publishedVersion);
+        var publV = parseInt(response[app].publishedVersion);
         appTemp['PUBLISHED VERSION'] = publV;
-        var latestV = parseInt(response.body[app].latestVersion);
+        var latestV = parseInt(response[app].latestVersion);
         appTemp['LATEST VERSION'] = latestV;
         //appTemp['PUBLISHED / LATEST VERSION'] = '(' + publV + '/' + latestV + ')';
         var latestDeployed = false;
@@ -281,12 +298,12 @@ showAvailableApps = function (showTable) {
         }
         appTemp['LATEST DEPLOYED'] = latestDeployed;
         apps[appN] = appTemp;
-        var created = new Date(response.body[app].creationDate);
+        var created = new Date(response[app].creationDate);
         var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
         var optionsT = {hour: 'numeric'};
         appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
         //appTemp['CREATED TIME'] = created.toLocaleTimeString();
-        var lastModified = new Date(response.body[app].lastModifiedDate);
+        var lastModified = new Date(response[app].lastModifiedDate);
         //appTemp['LAST MODIFIED'] = lastModified.toLocaleDateString("en-US", options);
         //appTemp['LAST MODIFIED TIME'] = lastModified.toLocaleTimeString();
         var now = new Date();
@@ -295,7 +312,7 @@ showAvailableApps = function (showTable) {
     }
     //logO(INFO,apps);
     if (doShowTable) console.table(apps);
-    return response.body;
+    return response;
     // resolve();
     // });
 };
@@ -312,24 +329,15 @@ showApps = function () {
 const getClaimsURL = cloudURL + getProp('Claims_URE');
 showCloudInfo = function () {
     return new Promise(function (resolve, reject) {
-        var lCookie = cLogin();
-        log(DEBUG, 'Login Cookie: ', lCookie);
-        var response = syncClient.get(getClaimsURL, {
-            headers: {
-                "accept": "application/json",
-                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-            }
-        });
-        //log(INFO, 'ORGANIZATION: ' + getOrganization())
-        //logO(INFO, response.body);
+        var response = callURL(getClaimsURL);
         let nvs = createTableValue('REGION', getRegion());
         nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
-        nvs = createTableValue('FIRST NAME', response.body.firstName, nvs);
-        nvs = createTableValue('LAST NAME', response.body.lastName, nvs);
-        nvs = createTableValue('EMAIL', response.body.email, nvs);
-        for (var i = 0; i < response.body.sandboxes.length; i++) {
-            nvs = createTableValue('SANDBOX ' + i, response.body.sandboxes[i].type, nvs);
-            nvs = createTableValue('SANDBOX ' + i + ' ID', response.body.sandboxes[i].id, nvs);
+        nvs = createTableValue('FIRST NAME', response.firstName, nvs);
+        nvs = createTableValue('LAST NAME', response.lastName, nvs);
+        nvs = createTableValue('EMAIL', response.email, nvs);
+        for (var i = 0; i < response.sandboxes.length; i++) {
+            nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
+            nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
         }
         // TODO: display groups
         console.table(nvs);
@@ -344,7 +352,6 @@ createTableValue = function (name, value, table) {
     entry['VALUE'] = value;
     table[table.length] = entry;
     return table;
-
 }
 
 doDeleteApp = function (appToDelete) {
@@ -398,7 +405,9 @@ getSharedState = function (showTable) {
         let start = i * SHARED_STATE_STEP_SIZE;
         let end = (i + 1) * SHARED_STATE_STEP_SIZE;
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
-        let sStateTemp = getCloud(sharedStateURL + '?%24top=' + SHARED_STATE_STEP_SIZE + '&%24skip=' + start);
+        //TODO: Also get Shared shared states (+ '&filter=type%20eq%20SHARED')
+        //TODO: Rename scope for shared state
+        let sStateTemp = callURL(sharedStateURL + '?%24top=' + SHARED_STATE_STEP_SIZE + '&%24skip=' + start);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -831,6 +840,8 @@ watchSharedStateScope = function () {
 };
 
 // Get details from a specific Cloud URL
+
+/*
 getCloud = function (url) {
     const lCookie = cLogin();
     log(DEBUG, 'Login Cookie: ', lCookie);
@@ -842,14 +853,14 @@ getCloud = function (url) {
     });
     var re = response.body;
     return re;
-}
+}*/
 
 const getApplicationDetailsURL = cloudURL + getProp('appURE');
 getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     var details = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
-    const appDet = getCloud(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?%24top=200');
+    const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?$top=200', 'GET',null,null,false);
     //logO(INFO, appDet);
     var i = 0;
     for (var det in appDet) {
@@ -873,7 +884,7 @@ showLinks = function () {
 
 //Get Links to all the applications
 getAppLinks = function (showTable) {
-    log(INFO, 'Getting Application Links...');
+    log(INFO, 'Getting Cloud Starter Links...');
     var appLinkTable = {};
     var apps = showAvailableApps(false);
     var i = 1;
@@ -885,14 +896,9 @@ getAppLinks = function (showTable) {
         // console.log(app.name, app.publishedVersion);
         var tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
         logLine("Processing App: (" + appN + '/' + apps.length + ')...');
-        /*
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-        process.stdout.write("Processing App: (" + appN + '/' + apps.length + ')...');
-        */
         if (isIterable(tempDet)) {
             for (let appD of tempDet) {
-                //console.log(appD.name);
+                // console.log(appD.name);
                 if (appD.name.includes("index.html")) {
                     // console.log('FOUND INDEX of ' + app.name + ': ' + appD.name);
                     const tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
@@ -981,7 +987,7 @@ publishApp = function (application) {
     });
 }
 
-// Function to call liveApps
+// Function to call the Tibco Cloud
 callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse) {
     const reResponse = returnResponse || false;
     const lCookie = cLogin(tenant, customLoginURL);
@@ -999,11 +1005,17 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
             body = postRequest;
         }
     }
-    const header = {
-        "accept": 'application/json',
-        "Content-Type": cType,
-        "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
+
+    const header = {};
+    header["accept"] = 'application/json';
+    header["Content-Type"] = cType;
+    // Check if we need to provide the OAUTH token
+    if(useOAuth){
+        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAuthKey');
+    } else {
+        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
     }
+
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '-     URL: ' + url);
@@ -1027,7 +1039,6 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
         log(ERROR, response.body);
-
         return null;
     } else {
         if(reResponse){
@@ -1578,12 +1589,99 @@ showTCI = function () {
 
 showSpotfire = function () {
     return new Promise(async function (resolve, reject) {
+        const loginEndpoint = 'https://' + getCurrentRegion(true) + 'account.cloud.tibco.com/idm/v3/login-oauth';
+        //const appEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/manifest';
+        //const appEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/pub/headerConfig';
+        //https://account.cloud.tibco.com/tsc-ws/v2/whoami
+        const appEndpoint = 'https://' + getCurrentRegion() + 'account.cloud.tibco.com/tsc-ws/v2/whoami';
+
+
+        //const response = callURL(appEndpoint, 'GET', null, null, true, 'SPOTFIRE', loginEndpoint, false);
+        //console.log('response: ' , response);
+
+
+
+        const request =  {"folderId":"7002532b-0a61-408a-aca6-9bc6a4a23522","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+        const folderEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo';
+        const response = callURL(folderEndpoint, 'POST', request, null, true, null, null, true);
+        // console.log('Response ', response.headers);
+
+
+        var loginCookieTSC = response.headers['set-cookie'];
+        console.log('loginCookieTSC: ', loginCookieTSC);
+        let newCookie = {};
+        var rxt = /AWSALB=(.*?);/g;
+        newCookie["AWSALB"] = rxt.exec(loginCookieTSC)[1];
+
+        rxt = /AWSALBCORS=(.*?);/g;
+        newCookie["AWSALBCORS"] = rxt.exec(loginCookieTSC)[1];
+
+        rxt = /XSRF-TOKEN=(.*?);/g;
+        newCookie["XSRF-TOKEN"] = rxt.exec(loginCookieTSC)[1];
+
+        rxt = /JSESSIONID=(.*?);/g;
+        newCookie["JSESSIONID"] = rxt.exec(loginCookieTSC)[1];
+
+        log(INFO, 'New Cookie: ', newCookie);
+
+
+        const headerL = {
+            "accept": 'application/json',
+            "Content-Type": 'application/x-www-form-urlencoded',
+            "cookie": "AWSALB=" + newCookie.AWSALB + ';' + "AWSALBCORS=" + newCookie.AWSALBCORS + ';' + "JSESSIONID=" + newCookie.JSESSIONID + ';' + "XSRF-TOKEN=" + newCookie['XSRF-TOKEN'] + ';'
+        }
+        //let bodyL =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+        let  reAuthResponseC = syncClient.post(folderEndpoint, {
+            headers: headerL,
+            payload: request
+        });
+        console.log(reAuthResponseC.toJSON());
+
+        /*
+            'AWSALB=HtRybCeEO5c7mD2mss4xBkIWzPT1BR12hYq+cse4AUQCVeYXGylzCxKJ8UzlP92g0C+qK3FEztSdV2YtYfRtD43BqLJ7LaVG0GPzHUuoJI3pLcJ1aODjsRPuOdwD; Expires=Tue, 29 Sep 2020 15:55:18 GMT; Path=/',
+    'AWSALBCORS=HtRybCeEO5c7mD2mss4xBkIWzPT1BR12hYq+cse4AUQCVeYXGylzCxKJ8UzlP92g0C+qK3FEztSdV2YtYfRtD43BqLJ7LaVG0GPzHUuoJI3pLcJ1aODjsRPuOdwD; Expires=Tue, 29 Sep 2020 15:55:18 GMT; Path=/; SameSite=None',
+    'JSESSIONID=B84AED80E2A0CB5371ECBB2CD800B65B.ec2amaz-s6g324e-srv; Path=/spotfire; Secure; HttpOnly; SameSite=None',
+    'XSRF-TOKEN=c2613215606578f3f8f1a051967cc1c8; Path=/; Secure; SameSite=None'
+
+
+         */
+
+        /* REQUEST:
+
+
+         */
+
+
+
+        //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';
+
+
+        // SPOTFIRE (POST)
+        // https://account.cloud.tibco.com/idm/v3/login-oauth
+        /*
+        var SCookie = cLogin('SPOTFIRE', 'https://account.cloud.tibco.com/idm/v3/login-oauth');
+        console.log('SCookie: ' , SCookie);*/
+        /*
+        var S1response = syncClient.get('https://spotfire-next.cloud.tibco.com/spotfire/manifest', {
+            headers: {
+                "accept": "application/json",
+                "cookie": "tsc=" + SCookie.tsc + "; domain=" + SCookie.domain
+            }
+        });
+        console.log(S1response);*/
+
+        // https://spotfire.cloud.tibco.com/spotfire/manifest
+        /*
+            pm.environment.set("XSRFToken", pm.cookies.get("XSRF-TOKEN"));
+         */
+
+        /*
         log(INFO, 'Getting Spotfire Reports...');
         //art.style('Getting Spotfire Reports...', 'bold')
         // TODO: Login (perhaps LiveApps and then re-authorize...)
         var lCookie = cLogin();
         // log(INFO, 'Login Cookie: ', lCookie);
-        const postForm = 'opaque-for-tenant=SPOTFIRE&resumeURL=' + encodeURIComponent('https://localhost:4200/?firstOpen=false');
+        const postForm = 'opaque-for-tenant=SPOTFIRE';
         //const postForm = 'opaque-for-tenant=TCE';
         const reAuthEndpoint = 'https://' + getCurrentRegion(true) + 'liveapps.cloud.tibco.com/idm/v1/reauthorize';
         const reAuthResponsePlain = callURL(reAuthEndpoint, 'POST', postForm, 'application/x-www-form-urlencoded', true, null, null, true);
@@ -1631,7 +1729,7 @@ showSpotfire = function () {
                 payload: body
             });
       console.log(responseFolder.toJSON());
-
+*/
 
         // TODO: POST ON
         //https://spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo
