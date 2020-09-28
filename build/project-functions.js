@@ -273,7 +273,7 @@ buildCloudStarterZip = function (cloudStarter) {
 
 
 // function that shows all the availible applications in the cloud
-const getAppURL = cloudURL + getProp('appURE') + '?%24top=200';
+const getAppURL = cloudURL + getProp('appURE') + '?$top=200';
 showAvailableApps = function (showTable) {
     //TODO: Use table config
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
@@ -409,7 +409,7 @@ getSharedState = function (showTable) {
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         //TODO: Also get Shared shared states (+ '&filter=type%20eq%20SHARED')
         //TODO: Rename scope for shared state
-        let sStateTemp = callURL(sharedStateURL + '?%24top=' + SHARED_STATE_STEP_SIZE + '&%24skip=' + start, null,null,null,false);
+        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start, null,null,null,false);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
