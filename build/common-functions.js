@@ -605,7 +605,7 @@ isOauthUsed = function() {
             re = true
         }
     }
-    console.log('Is Oauth used: ' , re);
+    // console.log('Is Oauth used: ' , re);
     return re;
 }
 

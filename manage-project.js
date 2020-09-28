@@ -51,28 +51,26 @@ function deleteApp() {
             appArray.push(app.name);
         }
         const appToDelete = await askMultipleChoiceQuestionSearch('Which APP Would you like to delete ? ', appArray);
-        if(appToDelete != 'NONE'){
-            const confirm = await askMultipleChoiceQuestion ('Are you sure you want to delete ? ' + appToDelete, ['YES','NO']);
-            if(confirm == 'YES'){
+        if (appToDelete != 'NONE') {
+            const confirm = await askMultipleChoiceQuestion('Are you sure you want to delete ? ' + appToDelete, ['YES', 'NO']);
+            if (confirm == 'YES') {
                 deleteApp = true;
             }
         }
-        if(deleteApp){
+        if (deleteApp) {
             log(INFO, 'Deleting ' + appToDelete + '...');
             const da = doDeleteApp(appToDelete);
-            if(da){
-                if(da.body){
-                    if(da.body.message){
-                        log(INFO, da.body.message);
-                    }else {
-                        log(ERROR, 'Error On Delete: ' + da.body);
-                    }
+
+            if (da) {
+                if (da.message) {
+                    log(INFO, da.message);
                 } else {
-                    log(ERROR, 'No Body Returned on Delete:  ' + da);
+                    log(ERROR, 'Error On Delete: ', da);
                 }
             } else {
-                log(ERROR, 'UNKNOWN ERROR ON DELETING APP...');
+                log(ERROR, 'No Body Returned on Delete:  ', da);
             }
+
         } else {
             log(INFO, 'Ok I won\'t do anything...');
         }
@@ -212,21 +210,21 @@ start = function () {
         let port = 4200;
         const range = 50;
         let portToUse = 0;
-        for (let i = 0; i < range ; i++){
+        for (let i = 0; i < range; i++) {
             let pAv = await isPortAvailable(port + i);
-            if(pAv){
+            if (pAv) {
                 portToUse = port + i;
                 i = range;
             }
         }
-        if(portToUse != 0){
+        if (portToUse != 0) {
             log('INFO', 'Using Port: ' + portToUse);
             let myHost = getProp('cloudHost');
             /*
             if(myHost == 'USE-GLOBAL'){
                 myHost =  getProp(G.cloudHost;
             }*/
-            if(portToUse == 4200){
+            if (portToUse == 4200) {
                 // TODO: Fix bug, can not read includes of undefined (no global config, and no password)
                 if (myHost.includes('eu')) {
                     run('npm run serve_eu');
@@ -237,7 +235,7 @@ start = function () {
                         run('npm run serve_us');
                     }
                 }
-            }   else {
+            } else {
                 if (myHost.includes('eu')) {
                     run('ng serve --proxy-config proxy.conf.prod.eu.json --ssl true --source-map --aot --port ' + portToUse);
                 } else {
@@ -312,13 +310,13 @@ replaceStringInFileOne = function (prefix) {
     let rTo = getProp(prefix + 'Replace_TO');
     const rPat = getProp(prefix + 'Replace_PATTERN');
 
-    if( rFrom == null || rTo == null || rPat == null){
+    if (rFrom == null || rTo == null || rPat == null) {
         log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...');
     } else {
         rFrom = rFrom.trim();
         rTo = rTo.trim();
-        log(INFO, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ' , rPat);
-        replaceInFile(rFrom,rTo,rPat);
+        log(INFO, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ', rPat);
+        replaceInFile(rFrom, rTo, rPat);
     }
 }
 
@@ -326,11 +324,11 @@ replaceStringInFileOne = function (prefix) {
 replaceStringInFileWrapper = function () {
     return new Promise(async function (resolve, reject) {
         const rMul = getProp('Replace_MULTIPLE');
-        if(rMul == null){
+        if (rMul == null) {
             replaceStringInFileOne('');
         } else {
             const replaceA = rMul.split(',');
-            for(var i = 0; i < replaceA.length; i++) {
+            for (var i = 0; i < replaceA.length; i++) {
                 const currentRep = trim(replaceA[i]);
                 replaceStringInFileOne(currentRep);
             }
@@ -353,7 +351,7 @@ showLiveAppsWrapper = function () {
         const decision = await askMultipleChoiceQuestion('Do you want to count the cases ?', ['YES', 'NO']);
         if (decision == 'YES') {
             showLiveApps(true, true);
-        }else {
+        } else {
             showLiveApps(true, false);
         }
         resolve();
@@ -427,7 +425,7 @@ showTCIWrapper = function () {
     });
 }
 
-showSpotfireReportsWrapper  = function () {
+showSpotfireReportsWrapper = function () {
     return new Promise(async function (resolve, reject) {
         showSpotfire();
         resolve();
@@ -548,11 +546,8 @@ gulp.task('generate-cloud-descriptor', generateCloudDescriptorWrapper);
 generateCloudDescriptorWrapper.description = 'Generates the configured Public Cloud Descriptor';
 
 
-
 gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
 createMultiplePropertyFileWrapper.description = 'Creating an initial property file to manage multiple cloud starters and environments.';
-
-
 
 
 /*
@@ -601,7 +596,7 @@ promptGulp = function (stDir, cwdDir) {
     return new Promise(function (resolve, reject) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - CLOUD STARTER (\x1b[36m' + getRegion() + ' - ' + getProp('App_Name') + '\x1b[0m)]: ';
-        if(getOrganization() != ''){
+        if (getOrganization() != '') {
             pMes = '[TCLI - CLOUD STARTER (\x1b[36m' + getRegion() + '(' + getOrganization() + ') - ' + getProp('App_Name') + '\x1b[0m)]: ';
         }
         inquirer.prompt([{
@@ -652,10 +647,10 @@ promptGulp = function (stDir, cwdDir) {
                         additionalArugments += ' -d ';
                     }
                 }
-                if(getProp('CloudLogin.pass').toString() !== ''){
+                if (getProp('CloudLogin.pass').toString() !== '') {
                     additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
                 }
-                if(getOrganization() !== ''){
+                if (getOrganization() !== '') {
                     additionalArugments += ' --org "' + getOrganization() + '"';
                 }
                 let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;

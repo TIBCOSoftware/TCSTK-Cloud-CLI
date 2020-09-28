@@ -355,15 +355,17 @@ createTableValue = function (name, value, table) {
 }
 
 doDeleteApp = function (appToDelete) {
-    const lCookie = cLogin();
+    //const lCookie = cLogin();
     const location = cloudURL + 'webresource/v1/applications/' + appToDelete + '/';
+    /*
     const response = syncClient.del(location, {
         headers: {
             "accept": "application/json",
             "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
         }
     });
-    return response;
+    */
+    return callURL(location, 'DEL');
 }
 
 
@@ -407,7 +409,7 @@ getSharedState = function (showTable) {
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         //TODO: Also get Shared shared states (+ '&filter=type%20eq%20SHARED')
         //TODO: Rename scope for shared state
-        let sStateTemp = callURL(sharedStateURL + '?%24top=' + SHARED_STATE_STEP_SIZE + '&%24skip=' + start);
+        let sStateTemp = callURL(sharedStateURL + '?%24top=' + SHARED_STATE_STEP_SIZE + '&%24skip=' + start, null,null,null,false);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -522,21 +524,25 @@ showSharedStateDetails = function () {
 };
 
 deleteSharedState = function (sharedStateID) {
-    const lCookie = cLogin();
-    log(DEBUG, 'Login Cookie: ', lCookie);
+    //const lCookie = cLogin();
+    //log(DEBUG, 'Login Cookie: ', lCookie);
+    /*
     const response = syncClient.del(sharedStateURL + '/' + sharedStateID, {
         headers: {
             "accept": "application/json",
             "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
         }
-    });
-    var re = response;
+    });*/
+    const response = callURL(sharedStateURL + '/' + sharedStateID, 'DEL');
+
+
+        //var re = response;
     //let re = Object.assign({}, response.body);
     //logO(INFO, re);
     let ok = true;
-    if (re.body != null) {
-        if (re.body.errorMsg != null) {
-            log(ERROR, re.body.errorMsg);
+    if (response != null) {
+        if (response.errorMsg != null) {
+            log(ERROR, response.errorMsg);
             ok = false;
         }
     }
@@ -706,7 +712,7 @@ importSharedStateFile = function (ssFile) {
 putSharedState = function (sharedStateObject) {
     if (sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
-        const lCookie = cLogin();
+        /*const lCookie = cLogin();
         log(DEBUG, 'Login Cookie: ', lCookie);
         const response = syncClient.put(encodeURI(sharedStateURL), {
             headers: {
@@ -714,10 +720,11 @@ putSharedState = function (sharedStateObject) {
                 "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
             },
             payload: [sharedStateObject]
-        });
+        });*/
+        callURL(sharedStateURL, 'PUT',  [sharedStateObject]);
         //console.log(response.body);
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
-        var re = response;
+        // var re = response;
         // TODO: Check for errors, and if the state does not exist use post..
     } else {
         log(ERROR, 'NOT Posting Empty Shared State: ', sharedStateObject)
@@ -933,21 +940,30 @@ isIterable = function (obj) {
 // Function to upload a zip to the LiveApps ContentManagment API
 uploadApp = function (application) {
     return new Promise(function (resolve, reject) {
-        var lCookie = cLogin();
         let formData = new require('form-data')();
         log(INFO, 'UPLOADING APP: ' + application);
         var uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
         //formData.append('key1', 1);
         // formData.setHeader("cookie", "tsc="+lCookie.tsc + "; domain=" + lCookie.domain);
         formData.append('appContents', require("fs").createReadStream('./dist/' + application + '.zip'));
+        const header = {};
+        header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
+        // Possibly add OAUTH Header...
+        if(isOauthUsed()){
+            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAuthKey');
+        } else {
+            var lCookie = cLogin();
+            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        }
+
         let query = require('https').request({
             hostname: cloudHost,
             path: uploadAppLocation,
             method: 'POST',
-            headers: {
+            headers: header /*{
                 "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain,
                 'Content-Type': 'multipart/form-data; charset=UTF-8'
-            },
+            },*/
         }, (res) => {
             let data = '';
             res.on("data", (chunk) => {
@@ -972,17 +988,19 @@ uploadApp = function (application) {
 // Function to publish the application to the cloud
 publishApp = function (application) {
     return new Promise(function (resolve, reject) {
-        var lCookie = cLogin();
+        // var lCookie = cLogin();
         // var lCookie = cloudLoginV3();
         // console.log('Login Cookie: ' , lCookie);
         var publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
+        /*
         var response = syncClient.put(publishLocation, {
             headers: {
                 "accept": "application/json",
                 "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
             }
-        });
-        console.log(response.body);
+        });*/
+        var response = callURL(publishLocation, 'PUT');
+        log(INFO, 'Publish Result: ' , response);
         resolve();
     });
 }
@@ -998,14 +1016,13 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     }
     const cType = contentType || 'application/json';
     let body = null;
-    if (cMethod === 'POST') {
+    if (cMethod.toLowerCase() != 'get') {
         if (cType === 'application/json') {
             body = JSON.stringify(postRequest);
         } else {
             body = postRequest;
         }
     }
-
     const header = {};
     header["accept"] = 'application/json';
     header["Content-Type"] = cType;
@@ -1015,26 +1032,27 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
     }
-
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '-     URL: ' + url);
         log(INFO, '-  METHOD: ' + cMethod);
         log(INFO, '- CONTENT: ' + cType);
     }
-    if (method === 'POST') {
+    if (cMethod.toLowerCase() != 'get') {
         if (cdoLog) {
             log(INFO, '-    BODY: ' + body);
         }
-        var response = syncClient.post(encodeURI(url), {
+    }
+    let response = {};
+    if (cMethod.toLowerCase() === 'get') {
+        response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
+            headers: header
+        });
+    } else {
+        response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
             headers: header,
             payload: body
         });
-    } else {
-        var response = syncClient.get(encodeURI(url), {
-            headers: header
-        });
-
     }
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
