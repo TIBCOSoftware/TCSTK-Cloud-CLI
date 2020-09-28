@@ -304,6 +304,10 @@ updateGlobalConfig = function () {
     });
 }
 
+
+
+
+
 // Function to replace a string in a file
 replaceStringInFileOne = function (prefix) {
     let rFrom = getProp(prefix + 'Replace_FROM');
@@ -432,6 +436,15 @@ showSpotfireReportsWrapper = function () {
     });
 }
 
+generateOauthTokenWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        generateOauthToken();
+        resolve();
+    });
+}
+
+
+
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
 //gulp.task('test-wsu', testWSU);
@@ -480,6 +493,12 @@ showSpotfireReportsWrapper.description = 'List all Spotfire Analytical Reports.'
 
 //TODO: Create sepearate wrapper task, with display and make it non-interactive
 gulp.task('describe-cloud', gulp.series('show-cloud', 'show-tci-apps', 'show-spotfire-reports', 'show-live-apps-cases', 'show-cloud-starters'));
+
+
+
+gulp.task('generate-oauth-token', generateOauthTokenWrapper);
+generateOauthTokenWrapper.description = 'Generate a new OAUTH token to authenticate to the TIBCO Cloud.';
+
 
 gulp.task('clean-dist', cleanDist);
 gulp.task('buildZip', build);

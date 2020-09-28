@@ -1602,6 +1602,25 @@ showTCI = function () {
     });
 }
 
+
+
+generateOauthToken = function () {
+    return new Promise(async function (resolve, reject) {
+        log(INFO, 'Generating OAUTH Token...');
+        const url = 'https://eu.account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate';
+        const postRequest = 'maximum_validity=86400&name=MyToken&scope=TSC+BPM+TCE+TCI+TCM+TCTA';
+        // TODO: Hier Verder:  Internal Server Error: cookie is malformed or expired
+
+
+        const response = callURL(url, 'POST',postRequest, 'application/x-www-form-urlencoded' );
+        log(INFO, response)
+
+        //https://account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate
+        //maximum_validity=86400&name=MyToken&scope=TSC+BPM+TCE+TCI+TCM+TCTA
+        resolve();
+    });
+}
+
 //var art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 
