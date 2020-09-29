@@ -6,6 +6,7 @@ const fs = require('file-system');
 const jsonfile = require('jsonfile');
 const isWindows = process.platform == 'win32';
 const clURI = require('./../config-cloud.json').endpoints;
+const mappings = require('./../config-cloud.json').mappings;
 
 // Clean temp folder
 cleanTemp = function () {
@@ -34,25 +35,24 @@ if (getGlobalConfig()) {
 }
 
 
-
 //Function to manage the login from the cloud
 var loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
 cLogin = function (tenant, customLoginURL) {
-    if(getProp('CloudLogin.OAuthKey') != undefined){
-        if(getProp('CloudLogin.OAuthKey').trim() != '') {
+    if (getProp('CloudLogin.OAUTH_Token') != undefined) {
+        if (getProp('CloudLogin.OAUTH_Token').trim() != '') {
             useOAuth = true;
             // Getting the organization info
             if (getOrganization() == null || getOrganization().trim() == '') {
                 // Setting this to temp so it breaks the call stack
                 setOrganization('TEMP');
-                var response = callURL('https://' + getCurrentRegion() + clURI.accountInfo);
+                var response = callURL('https://' + getCurrentRegion() + clURI.account_info);
                 log(DEBUG, 'Got Account info: ', response);
                 if (response.selectedAccount) {
                     setOrganization(response.selectedAccount.displayName);
                 }
             } else {
-                if(doOAuthNotify){
+                if (doOAuthNotify) {
                     log(INFO, 'Using OAUTH for Authentication...');
                     doOAuthNotify = false;
                 }
@@ -409,7 +409,7 @@ getSharedState = function (showTable) {
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         //TODO: Also get Shared shared states (+ '&filter=type%20eq%20SHARED')
         //TODO: Rename scope for shared state
-        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start, null,null,null,false);
+        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start, null, null, null, false);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -536,7 +536,7 @@ deleteSharedState = function (sharedStateID) {
     const response = callURL(sharedStateURL + '/' + sharedStateID, 'DEL');
 
 
-        //var re = response;
+    //var re = response;
     //let re = Object.assign({}, response.body);
     //logO(INFO, re);
     let ok = true;
@@ -721,7 +721,7 @@ putSharedState = function (sharedStateObject) {
             },
             payload: [sharedStateObject]
         });*/
-        callURL(sharedStateURL, 'PUT',  [sharedStateObject]);
+        callURL(sharedStateURL, 'PUT', [sharedStateObject]);
         //console.log(response.body);
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
         // var re = response;
@@ -867,7 +867,7 @@ getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     var details = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
-    const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?$top=200', 'GET',null,null,false);
+    const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?$top=200', 'GET', null, null, false);
     //logO(INFO, appDet);
     var i = 0;
     for (var det in appDet) {
@@ -949,8 +949,8 @@ uploadApp = function (application) {
         const header = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         // Possibly add OAUTH Header...
-        if(isOauthUsed()){
-            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAuthKey');
+        if (isOauthUsed()) {
+            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         } else {
             var lCookie = cLogin();
             header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -1000,7 +1000,7 @@ publishApp = function (application) {
             }
         });*/
         var response = callURL(publishLocation, 'PUT');
-        log(INFO, 'Publish Result: ' , response);
+        log(INFO, 'Publish Result: ', response);
         resolve();
     });
 }
@@ -1027,8 +1027,8 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     header["accept"] = 'application/json';
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
-    if(useOAuth){
-        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAuthKey');
+    if (useOAuth) {
+        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
     }
@@ -1059,7 +1059,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
         log(ERROR, response.body);
         return null;
     } else {
-        if(reResponse){
+        if (reResponse) {
             return response;
         }
         return response.body;
@@ -1560,7 +1560,8 @@ showTCI = function () {
         const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
         const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
         const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint);
-        // TODO: Move to global config file
+        // TODO: Move to global config file (Do we need Entries ?)
+        console.log(response);
         let config = {
             entries:
                 [
@@ -1603,23 +1604,118 @@ showTCI = function () {
 }
 
 
+showOauthToken = function () {
+    log(INFO, 'Displaying OAUTH Tokens...');
+    let getOauthUrl = 'https://' + getCurrentRegion() + clURI.get_oauth;
+    const response = callURL(getOauthUrl, 'GET', null, null, true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+    // console.log(response);
+    for (let rep in response) {
+        if (response[rep]['lastAccessed']) {
+            response[rep]['used'] = 'IN USE';
+            response[rep]['lastAccessed'] = response[rep]['lastAccessed'] * 1000;
+        } else {
+            response[rep]['used'] = 'NEVER USED';
+        }
+        // Times need to be multiplied by 1000 (probalby UNIX Time)
+        response[rep]['generatedTime'] = response[rep]['generatedTime'] * 1000;
+        response[rep]['expirationTime'] = response[rep]['expirationTime'] * 1000;
+    }
+    const tObject = createTable(response, mappings.oauth, true);
+    log(DEBUG, 'OAUTH Object: ', tObject);
+    return tObject;
+}
+
+revokeOauthToken = function () {
+    return new Promise(async function (resolve, reject) {
+        log(INFO, 'Revoke OAUTH Tokens...');
+        resolve();
+    });
+}
+
 
 generateOauthToken = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Generating OAUTH Token...');
-        const url = 'https://eu.account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate';
-        const postRequest = 'maximum_validity=86400&name=MyToken&scope=TSC+BPM+TCE+TCI+TCM+TCTA';
-        // TODO: Hier Verder:  Internal Server Error: cookie is malformed or expired
+        const generateOauthUrl = 'https://' + getCurrentRegion() + clURI.generate_oauth
+        let skipCall = false;
+        // Check for Token name
+        let OauthTokenName = 'MyCLIToken';
+        if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
+            OauthTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
+        } else {
+            log(INFO, 'No OAUTH_Generate_Token_Name found; This is needed to specify the name of your OAUTH Token.');
+            let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
+            if (decision == 'YES') {
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', 'MyCLIToken', 'Name of the OAUTH token to be generated.');
+            } else {
+                skipCall = true;
+            }
+        }
 
+        // Check for Tenants
+        let OauthTenants = 'TSC+BPM';
+        if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
+            OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(',', '+');
+        } else {
+            log(INFO, 'No OAUTH_Generate_For_Tenants Property found; This is needed to specify for which tenants you would like to generate an OAUTH Token');
+            let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
+            if (decision == 'YES') {
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_For_Tenants', 'TSC,BPM', 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n# NOTE: You need to be part of the specified subscription.');
+            } else {
+                skipCall = true;
+            }
+        }
 
-        const response = callURL(url, 'POST',postRequest, 'application/x-www-form-urlencoded' );
-        log(INFO, response)
+        // Check for valid hours
+        let OauthHours = 24;
+        if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
+            OauthHours = getProp('CloudLogin.OAUTH_Generate_Valid_Hours');
+        } else {
+            log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
+            let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
+            if (decision == 'YES') {
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '24', 'Number of Hours the generated OAUTH token should be valid.');
+            } else {
+                skipCall = true;
+            }
+        }
+        let OauthSeconds = OauthHours * 3600;
+        const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants;
 
+        if (!skipCall) {
+            // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
+            const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+            // log(INFO, response);
+            if (response) {
+                if (response.error) {
+                    log(ERROR, response.error_description);
+                } else {
+                    // Display Table
+                    let nvs = createTableValue('NEW OAUTH TOKEN', response.access_token);
+                    nvs = createTableValue('VALID TENANTS', response.scope, nvs);
+                    nvs = createTableValue('TYPE', response.token_type, nvs);
+                    nvs = createTableValue('EXPIRY (SECONDS)', response.expires_in, nvs);
+                    nvs = createTableValue('EXPIRY (HOURS)', ((response.expires_in) / 3600), nvs);
+                    console.table(nvs);
+                    // Ask to update
+                    let decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
+                    if (decision == 'YES') {
+                        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', response.access_token);
+                    }
+                }
+            }
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
         //https://account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate
         //maximum_validity=86400&name=MyToken&scope=TSC+BPM+TCE+TCI+TCM+TCTA
         resolve();
     });
 }
+
+//TODO: Revoke OAUTH Token
+// https://eu.account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke
+
 
 //var art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
@@ -1637,8 +1733,10 @@ showSpotfire = function () {
         //console.log('response: ' , response);
 
 
-
-        const request =  {"folderId":"7002532b-0a61-408a-aca6-9bc6a4a23522","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+        const request = {
+            "folderId": "7002532b-0a61-408a-aca6-9bc6a4a23522",
+            "types": ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf"]
+        };
         const folderEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo';
         const response = callURL(folderEndpoint, 'POST', request, null, true, null, null, true);
         // console.log('Response ', response.headers);
@@ -1668,7 +1766,7 @@ showSpotfire = function () {
             "cookie": "AWSALB=" + newCookie.AWSALB + ';' + "AWSALBCORS=" + newCookie.AWSALBCORS + ';' + "JSESSIONID=" + newCookie.JSESSIONID + ';' + "XSRF-TOKEN=" + newCookie['XSRF-TOKEN'] + ';'
         }
         //let bodyL =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
-        let  reAuthResponseC = syncClient.post(folderEndpoint, {
+        let reAuthResponseC = syncClient.post(folderEndpoint, {
             headers: headerL,
             payload: request
         });
@@ -1687,7 +1785,6 @@ showSpotfire = function () {
 
 
          */
-
 
 
         //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';
@@ -1775,7 +1872,6 @@ showSpotfire = function () {
 
            RESPONSE: (See sfFolderResponse.json)
          */
-
 
 
         //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';

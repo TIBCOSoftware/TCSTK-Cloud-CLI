@@ -1,6 +1,43 @@
 {
   "endpoints": {
     "_note": "ALL ENDPOINTS START AFTER THE REGION",
-    "accountInfo" : "account.cloud.tibco.com/tsc-ws/v1/my-accounts/info"
+    "account_info": "account.cloud.tibco.com/tsc-ws/v1/my-accounts/info",
+    "general_login": "account.cloud.tibco.com/idm/v3/login-oauth",
+    "generate_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate",
+    "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens"
+  },
+  "mappings": {
+    "oauth": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Tenant",
+          "field": "tenantId"
+        },
+        {
+          "header": "Created On",
+          "field": "generatedTime",
+          "format": "DATE"
+        },
+        {
+          "header": "Expires On",
+          "field": "expirationTime",
+          "format": "DATE"
+        },
+        {
+          "header": "Used",
+          "field": "used"
+        },
+        {
+          "header": "Last Accessed On",
+          "field": "lastAccessed",
+          "format": "DATE"
+        }
+      ]
+    }
   }
 }
+

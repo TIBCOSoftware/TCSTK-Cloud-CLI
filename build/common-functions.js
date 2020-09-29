@@ -600,8 +600,8 @@ createTable = function (arrayObject, config, doShowTable ) {
 
 isOauthUsed = function() {
     let re = false;
-    if(getProp('CloudLogin.OAuthKey') != undefined) {
-        if (getProp('CloudLogin.OAuthKey').trim() != '') {
+    if(getProp('CloudLogin.OAUTH_Token') != undefined) {
+        if (getProp('CloudLogin.OAUTH_Token').trim() != '') {
             re = true
         }
     }

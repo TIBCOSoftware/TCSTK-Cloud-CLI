@@ -295,11 +295,25 @@
       "gulpTask": "describe-cloud",
       "availableOnOs": ["all"]
     },
-    "37. generate-oauth-token": {
+    "37. show-oauth-tokens": {
+      "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-oauth-tokens",
+      "availableOnOs": ["all"]
+    },
+    "38. generate-oauth-token": {
       "description": "Generate a new OAUTH token to authenticate to the TIBCO Cloud.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "gulpTask": "generate-oauth-token",
+      "availableOnOs": ["all"]
+    },
+    "39. revoke-oauth-token": {
+      "description": "Revokes an existing OAUTH token.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "revoke-oauth-token",
       "availableOnOs": ["all"]
     },
     "update-tcli": {

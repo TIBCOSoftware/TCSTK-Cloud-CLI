@@ -443,6 +443,24 @@ generateOauthTokenWrapper = function () {
     });
 }
 
+showOauthTokenWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        showOauthToken();
+        resolve();
+    });
+}
+
+revokeOauthTokenWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        revokeOauthToken();
+        resolve();
+    });
+}
+
+
+
+
+
 
 
 //gulp.task('test-call-service', testCallService);
@@ -498,6 +516,10 @@ gulp.task('describe-cloud', gulp.series('show-cloud', 'show-tci-apps', 'show-spo
 
 gulp.task('generate-oauth-token', generateOauthTokenWrapper);
 generateOauthTokenWrapper.description = 'Generate a new OAUTH token to authenticate to the TIBCO Cloud.';
+gulp.task('show-oauth-tokens', showOauthTokenWrapper);
+showOauthTokenWrapper.description = 'Displays OAUTH tokens to authenticate to the TIBCO Cloud.';
+gulp.task('revoke-oauth-token', revokeOauthTokenWrapper);
+revokeOauthTokenWrapper.description = 'Revokes an existing OAUTH token.';
 
 
 gulp.task('clean-dist', cleanDist);
