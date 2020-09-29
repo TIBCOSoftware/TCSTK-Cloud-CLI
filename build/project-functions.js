@@ -34,7 +34,7 @@ if (getGlobalConfig()) {
     }
 }
 
-
+const colors = require('colors');
 //Function to manage the login from the cloud
 var loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
@@ -46,9 +46,10 @@ cLogin = function (tenant, customLoginURL) {
             if (getOrganization() == null || getOrganization().trim() == '') {
                 // Setting this to temp so it breaks the call stack
                 setOrganization('TEMP');
-                var response = callURL('https://' + getCurrentRegion() + clURI.account_info);
+                var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null,null,null,false);
                 log(DEBUG, 'Got Account info: ', response);
                 if (response.selectedAccount) {
+                    log(INFO, 'ORGANIZATION: ' +  colors.blue(response.selectedAccount.displayName));
                     setOrganization(response.selectedAccount.displayName);
                 }
             } else {
