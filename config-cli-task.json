@@ -316,6 +316,13 @@
       "gulpTask": "revoke-oauth-token",
       "availableOnOs": ["all"]
     },
+    "40. rotate-oauth-token": {
+      "description": "Revokes your existing OAUTH token and then generates a new one.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "rotate-oauth-token",
+      "availableOnOs": ["all"]
+    },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,

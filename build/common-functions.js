@@ -417,22 +417,30 @@ updateTCLIwrapper = function () {
 
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
 addOrUpdateProperty = function (location, property, value, comment) {
-    log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
+    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
     // Check if file exists
     const fs = require('fs');
     try {
         if (fs.existsSync(location)) {
             //file exists
-            log(INFO, 'Property file found: ' + location);
+            log(DEBUG, 'Property file found: ' + location);
             // Check if file contains property
             var data = fs.readFileSync(location, 'utf8');
-            var reg = new RegExp(property + '\\s*=\\s*(.*)');
-            if (data.search(reg) > -1) {
+            var reg = new RegExp(property + '\\s*=\\s*(.*)\n');
+            var regNl = new RegExp(property + '\\s*=\n');
+            if (data.search(reg) > -1 || data.search(regNl) > -1) {
                 // We found the property
-                log(INFO, 'Property found: ' + property + ' We are updating it to: ' + value);
-                var regRes = new RegExp(property + '\\s*=\\s*(.*)');
-                var result = data.replace(regRes, property + '=' + value);
+                log(DEBUG, 'Property found: ' + property + ' We are updating it to: ' + value);
+                let result = '';
+                if(data.search(regNl) > -1){
+                    var regRes = new RegExp(property + '\\s*=\n');
+                    result = data.replace(regRes, property + '=' + value + '\n');
+                } else {
+                    var regRes = new RegExp(property + '\\s*=\\s*(.*)\n');
+                    result = data.replace(regRes, property + '=' + value + '\n');
+                }
                 fs.writeFileSync(location, result, 'utf8');
+                log(INFO, 'Updated: ' + property + ' to: ' + value + ' (in:' + location + ')');
             } else {
                 // append prop to the end.
                 log(INFO, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
@@ -442,7 +450,6 @@ addOrUpdateProperty = function (location, property, value, comment) {
                 var result = data + '\n' + property + '=' + value;
                 fs.writeFileSync(location, result, 'utf8');
             }
-
         } else {
             log(ERROR, 'Property File does not exist: ' + location);
         }

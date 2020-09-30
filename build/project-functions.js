@@ -1658,23 +1658,67 @@ revokeOauthToken = function (tokenName) {
 }
 
 
-generateOauthToken = function () {
+rotateOauthToken = function () {
+    return new Promise(async function (resolve, reject) {
+        if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null ) {
+            const tokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
+
+            const tokenNumber = Number(tokenName.split('_').pop().trim());
+            let newTokenNumber = 0;
+            let newTokenName = '';
+            let doRotate = false;
+            //console.log('Token Number: |' + tokenNumber + '|');
+            if(!isNaN(tokenNumber)){
+                newTokenNumber = tokenNumber + 1;
+                newTokenName = tokenName.replace(tokenNumber, newTokenNumber);
+                doRotate = true;
+            } else {
+                log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1)')
+            }
+            //console.log('New Token Number: ' , newTokenNumber);
+            // console.log('New Token Name: ' , newTokenName);
+            if(doRotate){
+                log(INFO, 'Rotating OAUTH Token:  ' + tokenName);
+                log(INFO, '     New OAUTH Token:  ' + newTokenName);
+                // Generate new Token
+                generateOauthToken(newTokenName, true);
+                // Update token name
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name',  newTokenName);
+                // Revoke old token
+                revokeOauthToken(tokenName);
+                log(INFO, 'Successfully Rotated Token: ' + tokenName + ' --> ' + newTokenName);
+
+            }
+        } else {
+            log(ERROR, 'No CloudLogin.OAUTH_Generate_Token_Name Property found (Perhaps you want to run generate-oauth-token first...)')
+        }
+        resolve();
+    });
+
+}
+
+
+generateOauthToken = function (tokenNameOverride, verbose) {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Generating OAUTH Token...');
         const generateOauthUrl = 'https://' + getCurrentRegion() + clURI.generate_oauth
         let skipCall = false;
         // Check for Token name
-        let OauthTokenName = 'MyCLIToken';
+        let OauthTokenName = 'MyCLIToken_1';
         if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
             OauthTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
         } else {
             log(INFO, 'No OAUTH_Generate_Token_Name found; This is needed to specify the name of your OAUTH Token.');
             let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
             if (decision == 'YES') {
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', 'MyCLIToken', 'Name of the OAUTH token to be generated.');
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', 'MyCLIToken_1', 'Name of the OAUTH token to be generated.');
             } else {
                 skipCall = true;
             }
+        }
+        // Override name in case of rotation
+        if(tokenNameOverride){
+            OauthTokenName = tokenNameOverride;
         }
 
         // Check for Tenants
@@ -1691,15 +1735,15 @@ generateOauthToken = function () {
             }
         }
 
-        // Check for valid hours
-        let OauthHours = 24;
+        // Check for valid hours (72 by default; 3 days)
+        let OauthHours = 72;
         if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
             OauthHours = getProp('CloudLogin.OAUTH_Generate_Valid_Hours');
         } else {
             log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
             let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
             if (decision == 'YES') {
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '24', 'Number of Hours the generated OAUTH token should be valid.');
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '72', 'Number of Hours the generated OAUTH token should be valid.');
             } else {
                 skipCall = true;
             }
@@ -1721,10 +1765,16 @@ generateOauthToken = function () {
                     nvs = createTableValue('TYPE', response.token_type, nvs);
                     nvs = createTableValue('EXPIRY (SECONDS)', response.expires_in, nvs);
                     nvs = createTableValue('EXPIRY (HOURS)', ((response.expires_in) / 3600), nvs);
+                    nvs = createTableValue('EXPIRY (DAYS)', (((response.expires_in) / 3600) / 24), nvs);
                     console.table(nvs);
                     // Ask to update
-                    let decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
-                    if (decision == 'YES') {
+                    let decision = '';
+                    if(verbose){
+                        decision = 'YES';
+                    } else {
+                        decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
+                    }
+                     if (decision == 'YES') {
                         addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', response.access_token);
                     }
                 }

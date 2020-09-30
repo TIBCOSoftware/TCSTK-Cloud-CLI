@@ -276,8 +276,10 @@ const getAppOwner = false;
 test = function () {
     return new Promise(async function (resolve, reject) {
         console.log('Test...');
+
         var now = new Date();
         console.log(now);
+        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token',  'NEW-' + now);
         resolve();
     });
 };
@@ -457,7 +459,12 @@ revokeOauthTokenWrapper = function () {
     });
 }
 
-
+rotateOauthTokenWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        rotateOauthToken();
+        resolve();
+    });
+}
 
 
 
@@ -512,14 +519,15 @@ showSpotfireReportsWrapper.description = 'List all Spotfire Analytical Reports.'
 //TODO: Create sepearate wrapper task, with display and make it non-interactive
 gulp.task('describe-cloud', gulp.series('show-cloud', 'show-tci-apps', 'show-spotfire-reports', 'show-live-apps-cases', 'show-cloud-starters'));
 
-
-
 gulp.task('generate-oauth-token', generateOauthTokenWrapper);
 generateOauthTokenWrapper.description = 'Generate a new OAUTH token to authenticate to the TIBCO Cloud.';
 gulp.task('show-oauth-tokens', showOauthTokenWrapper);
 showOauthTokenWrapper.description = 'Displays OAUTH tokens to authenticate to the TIBCO Cloud.';
 gulp.task('revoke-oauth-token', revokeOauthTokenWrapper);
 revokeOauthTokenWrapper.description = 'Revokes an existing OAUTH token.';
+gulp.task('rotate-oauth-token', rotateOauthTokenWrapper);
+rotateOauthTokenWrapper.description = 'Revokes your existing OAUTH token and then generates a new one.';
+
 
 
 gulp.task('clean-dist', cleanDist);
