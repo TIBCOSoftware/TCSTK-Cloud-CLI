@@ -423,19 +423,19 @@ addOrUpdateProperty = function (location, property, value, comment) {
     try {
         if (fs.existsSync(location)) {
             //file exists
-            log(DEBUG, 'Property file found: ' + location);
+            log(INFO, 'Property file found: ' + location);
             // Check if file contains property
             var data = fs.readFileSync(location, 'utf8');
             var reg = new RegExp(property + '\\s*=\\s*(.*)');
             if (data.search(reg) > -1) {
                 // We found the property
-                log(DEBUG, 'Property found: ' + property + ' We are updating it to: ' + value);
+                log(INFO, 'Property found: ' + property + ' We are updating it to: ' + value);
                 var regRes = new RegExp(property + '\\s*=\\s*(.*)');
                 var result = data.replace(regRes, property + '=' + value);
                 fs.writeFileSync(location, result, 'utf8');
             } else {
                 // append prop to the end.
-                log(DEBUG, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
+                log(INFO, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
                 if (comment) {
                     data = data + '\n# ' + comment
                 }
@@ -582,21 +582,21 @@ createTable = function (arrayObject, config, doShowTable ) {
                 tableRow[conf.header] = _F.get(arrayObject[element], conf.field);
             }
         }
-
-
-        //TODO: add date
-        //var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-        //tableRow['CREATED'] = created.toLocaleDateString("en-US", options);
-        //var lastModified = new Date(response.body[element].lastModifiedDate);
-        //var now = new Date();
-        //tableRow['AGE(DAYS)'] = Math.round((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-        //tableRow['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
         tableObject[rowNumber] = tableRow;
     }
     //logO(INFO,tableObject);
     if (doShowTable) console.table(tableObject);
     return tableObject;
 }
+
+iterateTable = function(tObject) {
+    const re = [];
+    for (const property in tObject) {
+        re.push(tObject[property]);
+    }
+    return re;
+}
+
 
 isOauthUsed = function() {
     let re = false;

@@ -4,7 +4,8 @@
     "account_info": "account.cloud.tibco.com/tsc-ws/v1/my-accounts/info",
     "general_login": "account.cloud.tibco.com/idm/v3/login-oauth",
     "generate_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate",
-    "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens"
+    "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens",
+    "revoke_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke"
   },
   "mappings": {
     "oauth": {

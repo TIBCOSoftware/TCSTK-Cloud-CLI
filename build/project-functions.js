@@ -17,7 +17,7 @@ cleanTemp = function () {
 // Function that determines which cloud login method to use
 // function to login to the cloud
 var loginC = null;
-var useOAuth = false;
+// var useOAuth = false;
 var argv = require('yargs').argv;
 
 var cloudURL = getProp('Cloud_URL');
@@ -39,24 +39,26 @@ const colors = require('colors');
 var loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
 cLogin = function (tenant, customLoginURL) {
-    if (getProp('CloudLogin.OAUTH_Token') != undefined) {
-        if (getProp('CloudLogin.OAUTH_Token').trim() != '') {
-            useOAuth = true;
-            // Getting the organization info
-            if (getOrganization() == null || getOrganization().trim() == '') {
-                // Setting this to temp so it breaks the call stack
-                setOrganization('TEMP');
-                var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null,null,null,false);
-                log(DEBUG, 'Got Account info: ', response);
-                if (response.selectedAccount) {
-                    log(INFO, 'ORGANIZATION: ' +  colors.blue(response.selectedAccount.displayName));
-                    setOrganization(response.selectedAccount.displayName);
-                }
-            } else {
-                if (doOAuthNotify) {
-                    log(INFO, 'Using OAUTH for Authentication...');
-                    doOAuthNotify = false;
-                }
+    if (isOauthUsed()) {
+        // useOAuth = true;
+        // Getting the organization info
+        if (getOrganization() == null || getOrganization().trim() == '') {
+            // Setting this to temp so it breaks the call stack
+            setOrganization('TEMP');
+            var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false);
+            log(DEBUG, 'Got Account info: ', response);
+            if (response == 'Unauthorized') {
+                log(ERROR, 'OAUTH Token Invalid...');
+                process.exit();
+            }
+            if (response.selectedAccount) {
+                log(INFO, 'ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
+                setOrganization(response.selectedAccount.displayName);
+            }
+        } else {
+            if (doOAuthNotify) {
+                log(INFO, 'Using OAUTH for Authentication...');
+                doOAuthNotify = false;
             }
         }
     } else {
@@ -1024,11 +1026,12 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
             body = postRequest;
         }
     }
+
     const header = {};
     header["accept"] = 'application/json';
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
-    if (useOAuth) {
+    if (isOauthUsed()) {
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -1036,14 +1039,16 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '-     URL: ' + url);
-        log(INFO, '-  METHOD: ' + cMethod);
-        log(INFO, '- CONTENT: ' + cType);
+        log(DEBUG, '-  METHOD: ' + cMethod);
+        log(DEBUG, '- CONTENT: ' + cType);
+        log(DEBUG, '-  HEADER: ', header);
     }
     if (cMethod.toLowerCase() != 'get') {
         if (cdoLog) {
             log(INFO, '-    BODY: ' + body);
         }
     }
+
     let response = {};
     if (cMethod.toLowerCase() === 'get') {
         response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
@@ -1626,9 +1631,28 @@ showOauthToken = function () {
     return tObject;
 }
 
-revokeOauthToken = function () {
+revokeOauthToken = function (tokenName) {
     return new Promise(async function (resolve, reject) {
-        log(INFO, 'Revoke OAUTH Tokens...');
+        if (!tokenName) {
+            //No token name provided so choose on from list
+            const possibleTokensArrObj = showOauthToken();
+            let possibleTokens = ['NO TOKEN'];
+            for (let tok of iterateTable(possibleTokensArrObj)) {
+                possibleTokens = possibleTokens.filter(f => f != tok.Name).concat([tok.Name])
+            }
+            // console.log(possibleTokens);
+            tokenName = await askMultipleChoiceQuestion('Which token would you like to revoke ?', possibleTokens);
+
+        }
+        if (tokenName != 'NO TOKEN') {
+            log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
+            let revokeOauthUrl = 'https://' + getCurrentRegion() + clURI.revoke_oauth;
+            const postRequest = 'name=' + tokenName;
+            const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+            log(INFO, 'Result: ' , colors.blue(response.message));
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
         resolve();
     });
 }
@@ -1713,9 +1737,6 @@ generateOauthToken = function () {
         resolve();
     });
 }
-
-//TODO: Revoke OAUTH Token
-// https://eu.account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke
 
 
 //var art = require('ascii-art');
