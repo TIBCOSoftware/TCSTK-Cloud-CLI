@@ -206,7 +206,15 @@ helptcli = function () {
 start = function () {
     return new Promise(async function (resolve, reject) {
         log('INFO', 'Starting: ' + getProp('App_Name'));
-        //TODO: Check if port 4200 is available, if not use 4201, 4202 etc.
+
+        //TODO: If OAUTH is Used and Inject OAUTH Key is set to YES;
+        // - Copy OAUTH Template to Variables
+        // - Make sure the file is part of .gitIgnore
+        // - Add Import Code to the Environment.ts file (if Not exists)
+        // - Use the OAUTH Interceptor
+
+
+        //Check if port 4200 is available, if not use 4201, 4202 etc.
         let port = 4200;
         const range = 50;
         let portToUse = 0;

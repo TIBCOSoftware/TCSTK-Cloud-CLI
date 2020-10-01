@@ -1782,8 +1782,6 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
         }
-        //https://account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate
-        //maximum_validity=86400&name=MyToken&scope=TSC+BPM+TCE+TCI+TCM+TCTA
         resolve();
     });
 }
@@ -1837,26 +1835,12 @@ showSpotfire = function () {
             "Content-Type": 'application/x-www-form-urlencoded',
             "cookie": "AWSALB=" + newCookie.AWSALB + ';' + "AWSALBCORS=" + newCookie.AWSALBCORS + ';' + "JSESSIONID=" + newCookie.JSESSIONID + ';' + "XSRF-TOKEN=" + newCookie['XSRF-TOKEN'] + ';'
         }
-        //let bodyL =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+        //let bodyL =  {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
         let reAuthResponseC = syncClient.post(folderEndpoint, {
             headers: headerL,
             payload: request
         });
         console.log(reAuthResponseC.toJSON());
-
-        /*
-            'AWSALB=HtRybCeEO5c7mD2mss4xBkIWzPT1BR12hYq+cse4AUQCVeYXGylzCxKJ8UzlP92g0C+qK3FEztSdV2YtYfRtD43BqLJ7LaVG0GPzHUuoJI3pLcJ1aODjsRPuOdwD; Expires=Tue, 29 Sep 2020 15:55:18 GMT; Path=/',
-    'AWSALBCORS=HtRybCeEO5c7mD2mss4xBkIWzPT1BR12hYq+cse4AUQCVeYXGylzCxKJ8UzlP92g0C+qK3FEztSdV2YtYfRtD43BqLJ7LaVG0GPzHUuoJI3pLcJ1aODjsRPuOdwD; Expires=Tue, 29 Sep 2020 15:55:18 GMT; Path=/; SameSite=None',
-    'JSESSIONID=B84AED80E2A0CB5371ECBB2CD800B65B.ec2amaz-s6g324e-srv; Path=/spotfire; Secure; HttpOnly; SameSite=None',
-    'XSRF-TOKEN=c2613215606578f3f8f1a051967cc1c8; Path=/; Secure; SameSite=None'
-
-
-         */
-
-        /* REQUEST:
-
-
-         */
 
 
         //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';
@@ -1907,7 +1891,7 @@ showSpotfire = function () {
             "Content-Type": 'application/x-www-form-urlencoded',
             "cookie": "tsc=" + newCookie.tsc + ';'
         }
-        //let bodyL =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+        //let bodyL =  {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
         let  reAuthResponseC = syncClient.post(reAuthResponse.location, {
             headers: headerL,
             payload: postFormC
@@ -1929,7 +1913,7 @@ showSpotfire = function () {
             "Content-Type": 'application/json',
             "cookie": "tsc=" + newCookie.tsc + "; domain=" + newCookie.domain
         }
-      let body =  {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
+      let body =  {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
       let  responseFolder = syncClient.post(encodeURI('https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo'), {
                 headers: header,
                 payload: body
@@ -1940,7 +1924,7 @@ showSpotfire = function () {
         // TODO: POST ON
         //https://spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo
         /* REQUEST:
-        {"folderId":"1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]}
+        {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]}
 
            RESPONSE: (See sfFolderResponse.json)
          */
