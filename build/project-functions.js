@@ -870,6 +870,7 @@ getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     var details = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
+    // TODO: HIER VERDER: See if there are more artefacts
     const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?$top=200', 'GET', null, null, false);
     //logO(INFO, appDet);
     var i = 0;
@@ -902,13 +903,24 @@ getAppLinks = function (showTable) {
         var appTemp = {};
         appTemp['APP NAME'] = app.name;
         var appN = i++;
-        appTemp['PUBLISHED VERSION'] = parseInt(app.publishedVersion);
+        // appTemp['PUBLISHED VERSION'] = parseInt(app.publishedVersion);
         // console.log(app.name, app.publishedVersion);
         var tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
         logLine("Processing App: (" + appN + '/' + apps.length + ')...');
+        //console.log(/[^/]*$/.exec(getProp('Descriptor_File'))[0]);
         if (isIterable(tempDet)) {
             for (let appD of tempDet) {
-                // console.log(appD.name);
+                //console.log(appD.name);
+                // Get file after last slash in Descriptor file name; expected cloudstarter.json
+                if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
+                    //console.log(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name);
+                    const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null,null,null,false);
+                    //console.log(csInfo);
+                    if(csInfo && csInfo.cloudstarter){
+                        appTemp['CS VERSION'] = csInfo.cloudstarter.version;
+                        appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
+                    }
+                }
                 if (appD.name.includes("index.html")) {
                     // console.log('FOUND INDEX of ' + app.name + ': ' + appD.name);
                     const tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
@@ -917,7 +929,7 @@ getAppLinks = function (showTable) {
                 }
             }
         } else {
-            if (app.name && tempDet.errorMsg) {
+            if (app.name && tempDet && tempDet.errorMsg) {
                 log(ERROR, 'App: ' + app.name + ', Error: ' + tempDet.errorMsg);
             } else {
                 log(ERROR, 'Something is wrong with ', app, tempDet);
