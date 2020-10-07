@@ -118,6 +118,7 @@ let propertiesGl;
 let propsGl;
 let globalMultipleFileName;
 // Function to get a property
+let globalOAUTH = {};
 getProp = function (propName) {
     log(DEBUG, 'Getting Property: ' + propName);
     if (propsGl == null) {
@@ -143,7 +144,20 @@ getProp = function (propName) {
     } else {
         log(ERROR, 'Property file not set yet...')
     }
-
+    if(re && propName == 'CloudLogin.OAUTH_Token'){
+        const key = 'Token:';
+        if(re.indexOf(key) > 0){
+            const orgOInfo = re;
+            re = re.substring(re.indexOf(key) + key.length);
+            // Look for other token parts
+            globalOAUTH = {};
+            // TODO: Hier verder create globalOAUTH
+            // globalOAUTH['token-name'] =  orgOInfo.substring(orgOInfo.lastIndexOf("[Token Name:") + 12,orgOInfo.indexOf.firstIndexOf(";"));
+            //globalOAUTH['token-name'] =  (/\[Token Name:(.*?)\]/.exec(orgOInfo));
+            //globalOAUTH['region'] =  (/(?<=\[Region:)(.*?)(?=\])/.exec(orgOInfo)).trim();
+            //console.log('OAUTH, ' , globalOAUTH);
+        }
+    }
     return re;
 }
 

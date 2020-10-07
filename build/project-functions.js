@@ -914,9 +914,9 @@ getAppLinks = function (showTable) {
                 // Get file after last slash in Descriptor file name; expected cloudstarter.json
                 if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
                     //console.log(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name);
-                    const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null,null,null,false);
+                    const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
                     //console.log(csInfo);
-                    if(csInfo && csInfo.cloudstarter){
+                    if (csInfo && csInfo.cloudstarter) {
                         appTemp['CS VERSION'] = csInfo.cloudstarter.version;
                         appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
                     }
@@ -1050,12 +1050,12 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     }
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
-        log(INFO, '-     URL: ' + url);
+        log(INFO, '- URL(' + cMethod + '): ' + url);
         log(DEBUG, '-  METHOD: ' + cMethod);
         log(DEBUG, '- CONTENT: ' + cType);
         log(DEBUG, '-  HEADER: ', header);
     }
-    if (cMethod.toLowerCase() != 'get') {
+    if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
         if (cdoLog) {
             log(INFO, '-    BODY: ' + body);
         }
@@ -1571,7 +1571,9 @@ schematicAdd = function () {
     });
 }
 
-
+//var art = require('ascii-art');
+//https://www.npmjs.com/package/ascii-art-font
+// Show TCI Apps
 showTCI = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Getting TCI Apps...');
@@ -1621,7 +1623,7 @@ showTCI = function () {
     });
 }
 
-
+// Function to display all OAUTH Tokens...
 showOauthToken = function () {
     log(INFO, 'Displaying OAUTH Tokens...');
     let getOauthUrl = 'https://' + getCurrentRegion() + clURI.get_oauth;
@@ -1643,6 +1645,7 @@ showOauthToken = function () {
     return tObject;
 }
 
+// Function to revoke an OAUTH Token
 revokeOauthToken = function (tokenName) {
     return new Promise(async function (resolve, reject) {
         if (!tokenName) {
@@ -1654,14 +1657,13 @@ revokeOauthToken = function (tokenName) {
             }
             // console.log(possibleTokens);
             tokenName = await askMultipleChoiceQuestion('Which token would you like to revoke ?', possibleTokens);
-
         }
         if (tokenName != 'NO TOKEN') {
             log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
             let revokeOauthUrl = 'https://' + getCurrentRegion() + clURI.revoke_oauth;
             const postRequest = 'name=' + tokenName;
             const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-            log(INFO, 'Result: ' , colors.blue(response.message));
+            log(INFO, 'Result: ', colors.blue(response.message));
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
         }
@@ -1669,10 +1671,10 @@ revokeOauthToken = function (tokenName) {
     });
 }
 
-
+// Function to rotate an OAUTH Token
 rotateOauthToken = function () {
     return new Promise(async function (resolve, reject) {
-        if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null ) {
+        if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
             const tokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
 
             const tokenNumber = Number(tokenName.split('_').pop().trim());
@@ -1680,7 +1682,7 @@ rotateOauthToken = function () {
             let newTokenName = '';
             let doRotate = false;
             //console.log('Token Number: |' + tokenNumber + '|');
-            if(!isNaN(tokenNumber)){
+            if (!isNaN(tokenNumber)) {
                 newTokenNumber = tokenNumber + 1;
                 newTokenName = tokenName.replace(tokenNumber, newTokenNumber);
                 doRotate = true;
@@ -1689,13 +1691,13 @@ rotateOauthToken = function () {
             }
             //console.log('New Token Number: ' , newTokenNumber);
             // console.log('New Token Name: ' , newTokenName);
-            if(doRotate){
+            if (doRotate) {
                 log(INFO, 'Rotating OAUTH Token:  ' + tokenName);
                 log(INFO, '     New OAUTH Token:  ' + newTokenName);
                 // Generate new Token
                 generateOauthToken(newTokenName, true);
                 // Update token name
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name',  newTokenName);
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
                 // Revoke old token
                 revokeOauthToken(tokenName);
                 log(INFO, 'Successfully Rotated Token: ' + tokenName + ' --> ' + newTokenName);
@@ -1706,10 +1708,9 @@ rotateOauthToken = function () {
         }
         resolve();
     });
-
 }
 
-
+// Function to generate an OAUTH Token
 generateOauthToken = function (tokenNameOverride, verbose) {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Generating OAUTH Token...');
@@ -1729,10 +1730,9 @@ generateOauthToken = function (tokenNameOverride, verbose) {
             }
         }
         // Override name in case of rotation
-        if(tokenNameOverride){
+        if (tokenNameOverride) {
             OauthTokenName = tokenNameOverride;
         }
-
         // Check for Tenants
         let OauthTenants = 'TSC+BPM';
         if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
@@ -1746,7 +1746,6 @@ generateOauthToken = function (tokenNameOverride, verbose) {
                 skipCall = true;
             }
         }
-
         // Check for valid hours (72 by default; 3 days)
         let OauthHours = 72;
         if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
@@ -1762,7 +1761,6 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         }
         let OauthSeconds = OauthHours * 3600;
         const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants;
-
         if (!skipCall) {
             // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
             const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
@@ -1781,13 +1779,18 @@ generateOauthToken = function (tokenNameOverride, verbose) {
                     console.table(nvs);
                     // Ask to update
                     let decision = '';
-                    if(verbose){
+                    if (verbose) {
                         decision = 'YES';
                     } else {
                         decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
                     }
-                     if (decision == 'YES') {
-                        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', response.access_token);
+                    if (decision == 'YES') {
+                        //console.log('Response: ', response);
+                        const expiryDate = new Date((new Date()).getTime() + response.expires_in);
+                        const responseC = callURL(getClaimsURL, null, null, null, false);
+                        const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseC.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
+                        //console.log(tokenToInject);
+                        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
                     }
                 }
             }
@@ -1798,177 +1801,14 @@ generateOauthToken = function (tokenNameOverride, verbose) {
     });
 }
 
-
-//var art = require('ascii-art');
-//https://www.npmjs.com/package/ascii-art-font
-
+// Function to show spotfire reports
 showSpotfire = function () {
     return new Promise(async function (resolve, reject) {
-        const loginEndpoint = 'https://' + getCurrentRegion(true) + 'account.cloud.tibco.com/idm/v3/login-oauth';
-        //const appEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/manifest';
-        //const appEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/pub/headerConfig';
-        //https://account.cloud.tibco.com/tsc-ws/v2/whoami
-        const appEndpoint = 'https://' + getCurrentRegion() + 'account.cloud.tibco.com/tsc-ws/v2/whoami';
-
-
-        //const response = callURL(appEndpoint, 'GET', null, null, true, 'SPOTFIRE', loginEndpoint, false);
-        //console.log('response: ' , response);
-
-
-        const request = {
-            "folderId": "7002532b-0a61-408a-aca6-9bc6a4a23522",
-            "types": ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf"]
-        };
-        const folderEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo';
-        const response = callURL(folderEndpoint, 'POST', request, null, true, null, null, true);
-        // console.log('Response ', response.headers);
-
-
-        var loginCookieTSC = response.headers['set-cookie'];
-        console.log('loginCookieTSC: ', loginCookieTSC);
-        let newCookie = {};
-        var rxt = /AWSALB=(.*?);/g;
-        newCookie["AWSALB"] = rxt.exec(loginCookieTSC)[1];
-
-        rxt = /AWSALBCORS=(.*?);/g;
-        newCookie["AWSALBCORS"] = rxt.exec(loginCookieTSC)[1];
-
-        rxt = /XSRF-TOKEN=(.*?);/g;
-        newCookie["XSRF-TOKEN"] = rxt.exec(loginCookieTSC)[1];
-
-        rxt = /JSESSIONID=(.*?);/g;
-        newCookie["JSESSIONID"] = rxt.exec(loginCookieTSC)[1];
-
-        log(INFO, 'New Cookie: ', newCookie);
-
-
-        const headerL = {
-            "accept": 'application/json',
-            "Content-Type": 'application/x-www-form-urlencoded',
-            "cookie": "AWSALB=" + newCookie.AWSALB + ';' + "AWSALBCORS=" + newCookie.AWSALBCORS + ';' + "JSESSIONID=" + newCookie.JSESSIONID + ';' + "XSRF-TOKEN=" + newCookie['XSRF-TOKEN'] + ';'
-        }
-        //let bodyL =  {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
-        let reAuthResponseC = syncClient.post(folderEndpoint, {
-            headers: headerL,
-            payload: request
-        });
-        console.log(reAuthResponseC.toJSON());
-
-
-        //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';
-
-
-        // SPOTFIRE (POST)
-        // https://account.cloud.tibco.com/idm/v3/login-oauth
-        /*
-        var SCookie = cLogin('SPOTFIRE', 'https://account.cloud.tibco.com/idm/v3/login-oauth');
-        console.log('SCookie: ' , SCookie);*/
-        /*
-        var S1response = syncClient.get('https://spotfire-next.cloud.tibco.com/spotfire/manifest', {
-            headers: {
-                "accept": "application/json",
-                "cookie": "tsc=" + SCookie.tsc + "; domain=" + SCookie.domain
-            }
-        });
-        console.log(S1response);*/
-
-        // https://spotfire.cloud.tibco.com/spotfire/manifest
-        /*
-            pm.environment.set("XSRFToken", pm.cookies.get("XSRF-TOKEN"));
-         */
-
-        /*
-        log(INFO, 'Getting Spotfire Reports...');
-        //art.style('Getting Spotfire Reports...', 'bold')
-        // TODO: Login (perhaps LiveApps and then re-authorize...)
-        var lCookie = cLogin();
-        // log(INFO, 'Login Cookie: ', lCookie);
-        const postForm = 'opaque-for-tenant=SPOTFIRE';
-        //const postForm = 'opaque-for-tenant=TCE';
-        const reAuthEndpoint = 'https://' + getCurrentRegion(true) + 'liveapps.cloud.tibco.com/idm/v1/reauthorize';
-        const reAuthResponsePlain = callURL(reAuthEndpoint, 'POST', postForm, 'application/x-www-form-urlencoded', true, null, null, true);
-        var loginCookieTSC = reAuthResponsePlain.headers['set-cookie'];
-        console.log('loginCookieTSC: ', loginCookieTSC);
-        let newCookie = {};
-        var rxt = /tsc=(.*?);/g;
-        newCookie["tsc"] = rxt.exec(loginCookieTSC)[1];
-        log(INFO, 'New TSC Cookie: ', newCookie.tsc);
-        const reAuthResponse = reAuthResponsePlain.body;
-        log(INFO, 'Redirect URL: ', reAuthResponse.location);
-        const postFormC = 'token=' + reAuthResponse.token;
-
-
-        const headerL = {
-            "accept": 'application/json',
-            "Content-Type": 'application/x-www-form-urlencoded',
-            "cookie": "tsc=" + newCookie.tsc + ';'
-        }
-        //let bodyL =  {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
-        let  reAuthResponseC = syncClient.post(reAuthResponse.location, {
-            headers: headerL,
-            payload: postFormC
-        });
-
-
-        //const reAuthResponseC = callURL(reAuthResponse.location, 'POST', postFormC, 'application/x-www-form-urlencoded', true, null, null, true);
-        //console.log('reAuthResponseC: ', reAuthResponseC);
-        var loginCookie = reAuthResponseC.headers['set-cookie'];
-        // log(INFO, loginCookie);
-        var rxd = /domain=(.*?);/g;
-        // var rxt = /tsc=(.*?);/g;
-        newCookie["domain"] = rxd.exec(loginCookie)[1];
-        log(INFO, 'New Domain Cookie: ', newCookie.domain);
-        //logO(INFO, newCookie.tsc);
-
-        const header = {
-            "accept": 'application/json',
-            "Content-Type": 'application/json',
-            "cookie": "tsc=" + newCookie.tsc + "; domain=" + newCookie.domain
-        }
-      let body =  {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]};
-      let  responseFolder = syncClient.post(encodeURI('https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo'), {
-                headers: header,
-                payload: body
-            });
-      console.log(responseFolder.toJSON());
-*/
-
-        // TODO: POST ON
-        //https://spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo
-        /* REQUEST:
-        {"folderId":"","types":["spotfire.folder","spotfire.dxp","spotfire.sbdf"]}
-
-           RESPONSE: (See sfFolderResponse.json)
-         */
-
-
-        //const loginEndpoint = 'https://' + getCurrentRegion(true) + 'spotfire-next.cloud.tibco.com/idm/v3/login-oauth';
-        //https://account.cloud.tibco.com/idm/v1/reauthorize
-        /*
-        const loginEndpoint = 'https://account.cloud.tibco.com/idm/v1/reauthorize';
-        const appEndpoint = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/api/v1/apps';
-
-        //1b2cbd0d-c1fe-49fc-b4d1-ee2034e97747
-
-        const response = callURL(appEndpoint, 'GET', null, null, true, 'SPOTFIRE', loginEndpoint);
-        // TODO: Move to global config file
-        let config = {
-            entries:
-                [
-                    {
-                        header: "Name",
-                        field: "name"
-                    }
-                ]
-        };
-        let tObject = createTable(response, config, true);
-        log(DEBUG, 'SPOTFIRE Object: ', tObject);
-        //console.log(response[0]);
-        */
+        // TODO: Implement
+        console.log('TODO: Implement');
         resolve();
     });
 }
-
 
 // Set log debug level from local property
 setLogDebug(getProp('Use_Debug'));
