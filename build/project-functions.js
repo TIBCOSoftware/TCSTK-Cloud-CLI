@@ -38,6 +38,8 @@ const colors = require('colors');
 //Function to manage the login from the cloud
 var loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
+let useOAUTH = false;
+
 cLogin = function (tenant, customLoginURL) {
     if (isOauthUsed()) {
         // useOAuth = true;
@@ -45,15 +47,16 @@ cLogin = function (tenant, customLoginURL) {
         if (getOrganization() == null || getOrganization().trim() == '') {
             // Setting this to temp so it breaks the call stack
             setOrganization('TEMP');
-            var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false);
+            var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
-                log(ERROR, 'OAUTH Token Invalid...');
-                process.exit();
+                log(ERROR, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
+                // process.exit();
             }
             if (response.selectedAccount) {
                 log(INFO, 'ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
                 setOrganization(response.selectedAccount.displayName);
+                useOAUTH = true;
             }
         } else {
             if (doOAuthNotify) {
@@ -61,10 +64,13 @@ cLogin = function (tenant, customLoginURL) {
                 doOAuthNotify = false;
             }
         }
-    } else {
+    }
+    if(!useOAUTH){
         var setLoginURL = loginURL;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
+            // Delete the previous cookie on a custom login
+            loginC = null;
         }
 
         var tentantID = getProp('CloudLogin.tenantID');
@@ -1021,7 +1027,8 @@ publishApp = function (application) {
 }
 
 // Function to call the Tibco Cloud
-callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse) {
+callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH) {
+    const fOAUTH = forceOAUTH || false;
     const reResponse = returnResponse || false;
     const lCookie = cLogin(tenant, customLoginURL);
     const cMethod = method || 'GET';
@@ -1043,7 +1050,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     header["accept"] = 'application/json';
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
-    if (isOauthUsed()) {
+    if ((isOauthUsed() && useOAUTH) || fOAUTH) {
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -1763,8 +1770,10 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants;
         if (!skipCall) {
             // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
+            // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
+            const responseClaims = callURL(getClaimsURL, null, null, null, false);
             const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-            // log(INFO, response);
+            log(INFO, response);
             if (response) {
                 if (response.error) {
                     log(ERROR, response.error_description);
@@ -1787,9 +1796,10 @@ generateOauthToken = function (tokenNameOverride, verbose) {
                     if (decision == 'YES') {
                         //console.log('Response: ', response);
                         const expiryDate = new Date((new Date()).getTime() + response.expires_in);
-                        const responseC = callURL(getClaimsURL, null, null, null, false);
-                        const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseC.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
-                        //console.log(tokenToInject);
+                        // ADD Get Claims Call here...
+                        // console.log(responseClaims);
+                        const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
+                        console.log(tokenToInject);
                         addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
                     }
                 }
