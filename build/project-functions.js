@@ -287,6 +287,8 @@ showAvailableApps = function (showTable) {
     //TODO: Use table config
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     var response = callURL(getAppURL);
+    //console.log('APPS: ' , response);
+    // TODO: Apparently apps can have tags, look into this...
     var apps = {};
     for (var app in response) {
         var appTemp = {};
@@ -876,19 +878,39 @@ getApplicationDetails = function (application, version, showTable) {
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     var details = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
-    // TODO: HIER VERDER: See if there are more artefacts
-    const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?$top=200', 'GET', null, null, false);
-    //logO(INFO, appDet);
+    const artefactStepSize = 200;
+    let hasMoreArtefacts = true;
+    let allArteFacts = [];
+    for (let i = 0; hasMoreArtefacts; i = i + artefactStepSize) {
+        // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+        let skip = '';
+        if(i != 0){
+            skip = '&$skip=' + i
+        }
+        const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip, 'GET', null, null, false);
+        if(appDet){
+            if(appDet.length < artefactStepSize){
+                hasMoreArtefacts = false;
+            }
+            allArteFacts = allArteFacts.concat(appDet);
+        } else {
+            hasMoreArtefacts = false;
+        }
+        // console.log('Export Artefacts ', appDet);
+        // logLine('Getting Artefacts: (' + i + ')...');
+    }
+
+    // logO(INFO, appDet);
     var i = 0;
-    for (var det in appDet) {
+    for (var det in allArteFacts) {
         var appTemp = {};
         appN = i;
         i++;
-        appTemp['DETAIL NAME'] = appDet[det].name;
+        appTemp['DETAIL NAME'] = allArteFacts[det].name;
         details[appN] = appTemp;
     }
     if (doShowTable) console.table(details);
-    return appDet;
+    return allArteFacts;
 };
 
 //Show all the applications links
