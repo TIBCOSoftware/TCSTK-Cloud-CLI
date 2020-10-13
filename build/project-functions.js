@@ -418,9 +418,15 @@ getSharedState = function (showTable) {
         let start = i * SHARED_STATE_STEP_SIZE;
         let end = (i + 1) * SHARED_STATE_STEP_SIZE;
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
-        //TODO: Also get Shared shared states (+ '&filter=type%20eq%20SHARED')
+        //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         //TODO: Rename scope for shared state
-        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start, null, null, null, false);
+        let filterType = 'PUBLIC';
+        if(getProp('Shared_State_Type') != null){
+            filterType = getProp('Shared_State_Type');
+        }
+        let filter = '&$filter=type=' + filterType;
+        log(INFO, 'Type of Shared State: ' + filterType);
+        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter, null, null, null, true);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
