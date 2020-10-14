@@ -425,7 +425,7 @@ getSharedState = function (showTable) {
             filterType = getProp('Shared_State_Type');
         }
         let filter = '&$filter=type=' + filterType;
-        log(INFO, 'Type of Shared State: ' + filterType);
+        log(INFO, 'Type of Shared State: ' + colors.blue(filterType));
         let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter, null, null, null, true);
         if (sStateTemp.length < 1) {
             moreStates = false;
