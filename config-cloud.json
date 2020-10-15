@@ -5,7 +5,8 @@
     "general_login": "account.cloud.tibco.com/idm/v3/login-oauth",
     "generate_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate",
     "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens",
-    "revoke_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke"
+    "revoke_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke",
+    "org_folders": "liveapps.cloud.tibco.com/webresource/v1/orgFolders/"
   },
   "mappings": {
     "oauth": {
@@ -35,6 +36,24 @@
         {
           "header": "Last Accessed On",
           "field": "lastAccessed",
+          "format": "DATE"
+        }
+      ]
+    },
+    "org_folder": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Created",
+          "field": "creationDate",
+          "format": "DATE"
+        },
+        {
+          "header": "Modified",
+          "field": "lastModifiedDate",
           "format": "DATE"
         }
       ]

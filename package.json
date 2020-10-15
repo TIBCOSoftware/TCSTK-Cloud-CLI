@@ -74,6 +74,6 @@
     "forms",
     "custom forms"
   ],
-  "license": "BSD3",
+  "license": "BSD-3-Clause",
   "description": "TCSTK Component to provide commandline interaction to manage and develop your own TIBCO Cloud Starter"
 }

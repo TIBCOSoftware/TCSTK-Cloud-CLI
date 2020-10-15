@@ -474,6 +474,14 @@ rotateOauthTokenWrapper = function () {
     });
 }
 
+showOrgFoldersWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        showOrgFolders();
+        resolve();
+    });
+}
+
+
 
 
 
@@ -535,6 +543,9 @@ gulp.task('revoke-oauth-token', revokeOauthTokenWrapper);
 revokeOauthTokenWrapper.description = 'Revokes an existing OAUTH token.';
 gulp.task('rotate-oauth-token', rotateOauthTokenWrapper);
 rotateOauthTokenWrapper.description = 'Revokes your existing OAUTH token and then generates a new one.';
+
+gulp.task('show-org-folders', showOrgFoldersWrapper);
+showOrgFoldersWrapper.description = 'Displays the content of the LiveApps Organization Folders.';
 
 
 

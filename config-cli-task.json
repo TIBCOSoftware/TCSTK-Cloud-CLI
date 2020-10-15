@@ -323,6 +323,13 @@
       "gulpTask": "rotate-oauth-token",
       "availableOnOs": ["all"]
     },
+    "40. show-org-folders": {
+      "description": "Displays the content of the LiveApps Organization Folders.",
+      "enabled": true,
+      "internal": false,
+      "gulpTask": "show-org-folders",
+      "availableOnOs": ["all"]
+    },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,

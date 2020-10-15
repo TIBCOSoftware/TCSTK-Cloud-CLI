@@ -65,7 +65,7 @@ cLogin = function (tenant, customLoginURL) {
             }
         }
     }
-    if(!useOAUTH){
+    if (!useOAUTH) {
         var setLoginURL = loginURL;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
@@ -421,7 +421,7 @@ getSharedState = function (showTable) {
         //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         //TODO: Rename scope for shared state
         let filterType = 'PUBLIC';
-        if(getProp('Shared_State_Type') != null){
+        if (getProp('Shared_State_Type') != null) {
             filterType = getProp('Shared_State_Type');
         }
         let filter = '&$filter=type=' + filterType;
@@ -890,12 +890,12 @@ getApplicationDetails = function (application, version, showTable) {
     for (let i = 0; hasMoreArtefacts; i = i + artefactStepSize) {
         // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
         let skip = '';
-        if(i != 0){
+        if (i != 0) {
             skip = '&$skip=' + i
         }
         const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip, 'GET', null, null, false);
-        if(appDet){
-            if(appDet.length < artefactStepSize){
+        if (appDet) {
+            if (appDet.length < artefactStepSize) {
                 hasMoreArtefacts = false;
             }
             allArteFacts = allArteFacts.concat(appDet);
@@ -1838,6 +1838,38 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         resolve();
     });
 }
+
+/*
+ORG FOLDERS:
+
+./Cloud_Folders/
+./Cloud_Folders/caseFolders
+./Cloud_Folders/orgFolders
+
+Endpoints:
+
+GET /caseFolders/
+GET /caseFolders/{folderName}/
+GET /caseFolders/{folderName}/artifacts/
+GET /caseFolders/{folderName}/artifacts/{artifactName}/artifactVersions
+
+GET /orgFolders/
+GET /orgFolders/{folderName}/
+GET /orgFolders/{folderName}/artifacts/
+GET /orgFolders/{folderName}/artifacts/{artifactName}/artifactVersions
+
+
+ */
+
+// Function to show org folders
+showOrgFolders = function () {
+    const getOrgFolderURL = 'https://' + getCurrentRegion() + clURI.org_folders;
+    const oResponse = callURL(getOrgFolderURL);
+    const tObject = createTable(oResponse, mappings.org_folder, true);
+    log(INFO, 'OAUTH Object: ', tObject);
+    return tObject;
+}
+
 
 // Function to show spotfire reports
 showSpotfire = function () {
