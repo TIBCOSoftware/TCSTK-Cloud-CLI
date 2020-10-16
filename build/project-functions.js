@@ -38,15 +38,20 @@ const colors = require('colors');
 //Function to manage the login from the cloud
 var loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
-let useOAUTH = false;
+let isOAUTHValid = false;
 
 cLogin = function (tenant, customLoginURL) {
     if (isOauthUsed()) {
-        // useOAuth = true;
+        if (doOAuthNotify) {
+            log(INFO, 'Using OAUTH for Authentication...');
+            doOAuthNotify = false;
+        }
+        // isOAUTHValid = true;
         // Getting the organization info
+        // console.log('Get Org: ' , getOrganization());
         if (getOrganization() == null || getOrganization().trim() == '') {
             // Setting this to temp so it breaks the call stack
-            setOrganization('TEMP');
+            // setOrganization('TEMP');
             var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
@@ -54,18 +59,14 @@ cLogin = function (tenant, customLoginURL) {
                 // process.exit();
             }
             if (response.selectedAccount) {
-                log(INFO, 'ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
+                log(INFO, 'OAUTH Token Valid, ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
                 setOrganization(response.selectedAccount.displayName);
-                useOAUTH = true;
-            }
-        } else {
-            if (doOAuthNotify) {
-                log(INFO, 'Using OAUTH for Authentication...');
-                doOAuthNotify = false;
+                isOAUTHValid = true;
             }
         }
     }
-    if (!useOAUTH) {
+    if (!isOauthUsed() || !isOAUTHValid) {
+        log(INFO, 'Using CLIENT-ID Authentication...');
         var setLoginURL = loginURL;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
@@ -1058,7 +1059,10 @@ publishApp = function (application) {
 callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH) {
     const fOAUTH = forceOAUTH || false;
     const reResponse = returnResponse || false;
-    const lCookie = cLogin(tenant, customLoginURL);
+    let lCookie = {};
+    if(!fOAUTH){
+        lCookie = cLogin(tenant, customLoginURL);
+    }
     const cMethod = method || 'GET';
     let cdoLog = true;
     if (doLog != null) {
@@ -1078,7 +1082,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     header["accept"] = 'application/json';
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
-    if ((isOauthUsed() && useOAUTH) || fOAUTH) {
+    if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -1823,7 +1827,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
                     }
                     if (decision == 'YES') {
                         //console.log('Response: ', response);
-                        const expiryDate = new Date((new Date()).getTime() + response.expires_in);
+                        const expiryDate = new Date((new Date()).getTime() + (response.expires_in * 1000));
                         // ADD Get Claims Call here...
                         // console.log(responseClaims);
                         const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
