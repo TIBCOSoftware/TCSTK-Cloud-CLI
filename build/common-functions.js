@@ -144,9 +144,9 @@ getProp = function (propName) {
     } else {
         log(ERROR, 'Property file not set yet...')
     }
-    if(re && propName == 'CloudLogin.OAUTH_Token'){
+    if (re && propName == 'CloudLogin.OAUTH_Token') {
         const key = 'Token:';
-        if(re.indexOf(key) > 0){
+        if (re.indexOf(key) > 0) {
             const orgOInfo = re;
             re = re.substring(re.indexOf(key) + key.length);
             // Look for other token parts
@@ -431,20 +431,55 @@ updateTCLIwrapper = function () {
 
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
 addOrUpdateProperty = function (location, property, value, comment) {
-    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
+    log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
     // Check if file exists
     const fs = require('fs');
     try {
         if (fs.existsSync(location)) {
             //file exists
-            log(DEBUG, 'Property file found: ' + location);
+            log(INFO, 'Property file found: ' + location);
             // Check if file contains property
-            var data = fs.readFileSync(location, 'utf8');
-            var reg = new RegExp(property + '\\s*=\\s*(.*)\n');
-            var regNl = new RegExp(property + '\\s*=\n');
+            // var data = fs.readFileSync(location, 'utf8');
+            var dataLines = fs.readFileSync(location, 'utf8').split('\n');
+            let propFound = false;
+            for (let lineNumber in dataLines) {
+                if (!dataLines[lineNumber].startsWith('#')) {
+                    // console.log('Line: ', dataLines[lineNumber]);
+                    const reg = new RegExp(property + '\\s*=\\s*(.*)');
+                    const regNl = new RegExp(property + '\\s*=');
+                    if (dataLines[lineNumber].search(reg) > -1 || dataLines[lineNumber].search(regNl) > -1) {
+                        // We found the property
+                        log(INFO, `Property found: ${property} We are updating it to: ${value}`);
+                        dataLines[lineNumber] = property + '=' + value;
+                        propFound = true;
+                    }
+
+                }
+            }
+            let dataForFile = '';
+            for (let line of dataLines) {
+                dataForFile += line + '\n';
+            }
+            if (propFound) {
+                log(INFO, 'Updated: ' + property + ' to: ' + value + ' (in:' + location + ')');
+            } else {
+                // append prop to the end.
+                log(INFO, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
+                if (comment) {
+                    dataForFile += '\n# ' + comment;
+                }
+                dataForFile += '\n' + property + '=' + value;
+            }
+            fs.writeFileSync(location, dataForFile, 'utf8');
+            //var reg = new RegExp('(?<!#)' + property + '\\s*=\\s*(.*)\n');
+            //var regNl = new RegExp('(?<!#)' + property + '\\s*=\n');
+            /*
+            var reg = new RegExp( property + '\\s*=\\s*(.*)\n');
+            var regNl = new RegExp( property + '\\s*=\n');
+
             if (data.search(reg) > -1 || data.search(regNl) > -1) {
                 // We found the property
-                log(DEBUG, 'Property found: ' + property + ' We are updating it to: ' + value);
+                log(INFO, 'Property found: ' + property + ' We are updating it to: ' + value);
                 let result = '';
                 if(data.search(regNl) > -1){
                     var regRes = new RegExp(property + '\\s*=\n');
@@ -463,7 +498,7 @@ addOrUpdateProperty = function (location, property, value, comment) {
                 }
                 var result = data + '\n' + property + '=' + value;
                 fs.writeFileSync(location, result, 'utf8');
-            }
+            }*/
         } else {
             log(ERROR, 'Property File does not exist: ' + location);
         }
@@ -489,7 +524,7 @@ getGlobalConfig = function () {
 // Run an OS Command
 run = function (command, failOnError) {
     let doFail = true;
-    if(failOnError != null){
+    if (failOnError != null) {
         doFail = failOnError;
     }
     const execSync = require('child_process').execSync;
@@ -504,7 +539,7 @@ run = function (command, failOnError) {
             // console.log('Got Error ' , err);
             // logO(DEBUG, reason);
             log(ERROR, 'Error Running command: ' + err.message);
-            if(doFail){
+            if (doFail) {
                 process.exit(1);
             }
             reject(err);
@@ -588,15 +623,15 @@ sleep = async function (ms) {
     });
 }
 
-createTable = function (arrayObject, config, doShowTable ) {
+createTable = function (arrayObject, config, doShowTable) {
     var tableObject = {};
     for (var element in arrayObject) {
         var tableRow = {};
         var rowNumber = parseInt(element) + 1;
         // TODO: Change to debug
         //log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
-        for(let conf of config.entries){
-            if(conf.format && conf.format.toLowerCase() == 'date'){
+        for (let conf of config.entries) {
+            if (conf.format && conf.format.toLowerCase() == 'date') {
                 var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
                 tableRow[conf.header] = new Date(_F.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
             } else {
@@ -610,7 +645,7 @@ createTable = function (arrayObject, config, doShowTable ) {
     return tableObject;
 }
 
-iterateTable = function(tObject) {
+iterateTable = function (tObject) {
     const re = [];
     for (const property in tObject) {
         re.push(tObject[property]);
@@ -619,9 +654,9 @@ iterateTable = function(tObject) {
 }
 
 
-isOauthUsed = function() {
+isOauthUsed = function () {
     let re = false;
-    if(getProp('CloudLogin.OAUTH_Token') != undefined) {
+    if (getProp('CloudLogin.OAUTH_Token') != undefined) {
         if (getProp('CloudLogin.OAUTH_Token').trim() != '') {
             re = true
         }
@@ -629,8 +664,6 @@ isOauthUsed = function() {
     // console.log('Is Oauth used: ' , re);
     return re;
 }
-
-
 
 
 //Common log function
