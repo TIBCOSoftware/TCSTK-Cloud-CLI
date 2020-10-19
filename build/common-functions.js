@@ -118,7 +118,12 @@ let propertiesGl;
 let propsGl;
 let globalMultipleFileName;
 // Function to get a property
-let globalOAUTH = {};
+let globalOAUTH = null;
+getOAUTHDetails = function () {
+    log(DEBUG, 'Returning globalOAUTH: ', globalOAUTH);
+    return globalOAUTH;
+}
+
 getProp = function (propName) {
     log(DEBUG, 'Getting Property: ' + propName);
     if (propsGl == null) {
@@ -150,16 +155,44 @@ getProp = function (propName) {
             const orgOInfo = re;
             re = re.substring(re.indexOf(key) + key.length);
             // Look for other token parts
-            globalOAUTH = {};
-            // TODO: Hier verder create globalOAUTH
-            // globalOAUTH['token-name'] =  orgOInfo.substring(orgOInfo.lastIndexOf("[Token Name:") + 12,orgOInfo.indexOf.firstIndexOf(";"));
-            //globalOAUTH['token-name'] =  (/\[Token Name:(.*?)\]/.exec(orgOInfo));
-            //globalOAUTH['region'] =  (/(?<=\[Region:)(.*?)(?=\])/.exec(orgOInfo)).trim();
-            //console.log('OAUTH, ' , globalOAUTH);
+            if(globalOAUTH == null){
+                globalOAUTH = parseOAUTHToken(orgOInfo, true);
+            }
         }
     }
     return re;
 }
+
+parseOAUTHToken = function(stringToken, doLog) {
+    let showLog = doLog || false;
+    let re = {};
+    log(DEBUG,'Parsing OAUTH Token: ' , stringToken);
+    let elements  = stringToken.match(/(?<=\[\s*).*?(?=\s*\])/gs);
+    for(let el of elements){
+        // let nameValue = el.split(':');
+        let nameValue = el.split(/:/);
+        let key = nameValue.shift().trim().replace(' ', '_');
+        let val = nameValue.join(':').trim();
+        if(key && val){
+            log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|' );
+            if(key == 'Expiry_Date'){
+                //Parse expiry date
+                re[key + '_Display'] = val;
+                re[key] = Date.parse(val);
+            } else {
+                re[key] = val;
+            }
+        }
+    }
+    if(showLog){
+        log(INFO, 'OAUTH Details:');
+        console.table(re);
+    }
+    return re;
+}
+
+
+
 
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';

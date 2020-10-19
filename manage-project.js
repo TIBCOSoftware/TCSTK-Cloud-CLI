@@ -287,7 +287,9 @@ test = function () {
 
         var now = new Date();
         console.log(now);
-        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token',  'NEW-' + now);
+        //addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token',  'NEW-' + now);
+        console.log(' OAUTH Token: ' , getProp('CloudLogin.OAUTH_Token'));
+        console.log('OAUTH Token2: ' , getProp('CloudLogin.OAUTH_Token'));
         resolve();
     });
 };
