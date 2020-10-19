@@ -1666,7 +1666,7 @@ showTCI = function () {
 showOauthToken = function () {
     log(INFO, 'Displaying OAUTH Tokens...');
     let getOauthUrl = 'https://' + getCurrentRegion() + clURI.get_oauth;
-    const response = callURL(getOauthUrl, 'GET', null, null, true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+    const response = callURL(getOauthUrl, 'GET', null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
     // console.log(response);
     for (let rep in response) {
         if (response[rep]['lastAccessed']) {
@@ -1804,7 +1804,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
             // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
             // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
             const responseClaims = callURL(getClaimsURL, null, null, null, false);
-            const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+            const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
             // log(INFO, response);
             if (response) {
                 if (response.error) {
