@@ -25,6 +25,8 @@ function parseArgumentsIntoOptions(rawArgs) {
             '-p': '--propfile',
             '--multiple': Boolean,
             '-m': '--multiple',
+            '--multipleInteraction': Boolean,
+            '-i': '--multipleInteraction',
             '--multipleFile': String,
             '-f': '--multipleFile',
             '--surpressStart': Boolean,
@@ -45,6 +47,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         update: args['--update'] || false,
         propfile: args['--propfile'] || 'tibco-cloud.properties',
         doMultiple: args['--multiple'] || false,
+        doMultipleInteraction: args['--multipleInteraction'] || false,
         multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
         surpressStart: args['--surpressStart'] || false,
         task: args._[0] || '',
@@ -100,10 +103,16 @@ export async function cli(args) {
         //options.task = 'help-tcli';
     }
     // Run multiple management
-    if (options.doMultiple) {
+    if (options.doMultiple || options.doMultipleInteraction) {
         var gulp = require('gulp');
         require(__dirname + '/manage-multiple');
-        gulp.series('run-multiple')();
+        if(options.doMultiple){
+            gulp.series('run-multiple')();
+        }
+        if(options.doMultipleInteraction){
+            gulp.series('run-multiple-interaction')();
+        }
+
         // process.exit(0);
     }
 
@@ -123,7 +132,7 @@ export async function cli(args) {
 
 
     var projectManagementMode = true;
-    if (!options.doMultiple) {
+    if (!(options.doMultiple || options.doMultipleInteraction)) {
         if (options.task == 'new' || options.task == 'new-starter') {
             options.task = 'new-starter';
             var projectManagementMode = false;
@@ -201,7 +210,7 @@ export async function cli(args) {
         }
     }
 
-    if (!options.createCP && !options.doMultiple) {
+    if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
         // Start the specified Gulp Task
         var gulp = require('gulp');
         if (projectManagementMode) {

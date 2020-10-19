@@ -415,19 +415,19 @@ getSharedState = function (showTable) {
     let ALLsState = [];
     var i = 0;
     let moreStates = true;
+    let filterType = 'PUBLIC';
+    if (getProp('Shared_State_Type') != null) {
+        filterType = getProp('Shared_State_Type');
+    }
+    log(INFO, 'Type of Shared State: ' + colors.blue(filterType));
     while (moreStates && i < SHARED_STATE_MAX_CALLS) {
         let start = i * SHARED_STATE_STEP_SIZE;
         let end = (i + 1) * SHARED_STATE_STEP_SIZE;
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         //TODO: Rename scope for shared state
-        let filterType = 'PUBLIC';
-        if (getProp('Shared_State_Type') != null) {
-            filterType = getProp('Shared_State_Type');
-        }
         let filter = '&$filter=type=' + filterType;
-        log(INFO, 'Type of Shared State: ' + colors.blue(filterType));
-        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter, null, null, null, true);
+        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter, null, null, null, false);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -1064,7 +1064,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
         lCookie = cLogin(tenant, customLoginURL);
     }
     const cMethod = method || 'GET';
-    let cdoLog = true;
+    let cdoLog = false;
     if (doLog != null) {
         cdoLog = doLog;
     }
@@ -1620,7 +1620,7 @@ showTCI = function () {
         const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
         const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint);
         // TODO: Move to global config file (Do we need Entries ?)
-        console.log(response);
+        // console.log(response);
         let config = {
             entries:
                 [
@@ -1775,7 +1775,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         // Check for Tenants
         let OauthTenants = 'TSC+BPM';
         if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
-            OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(',', '+');
+            OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(/,/g,"+");
         } else {
             log(INFO, 'No OAUTH_Generate_For_Tenants Property found; This is needed to specify for which tenants you would like to generate an OAUTH Token');
             let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
@@ -1805,7 +1805,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
             // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
             const responseClaims = callURL(getClaimsURL, null, null, null, false);
             const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-            log(INFO, response);
+            // log(INFO, response);
             if (response) {
                 if (response.error) {
                     log(ERROR, response.error_description);

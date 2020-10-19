@@ -156,7 +156,7 @@ getProp = function (propName) {
             re = re.substring(re.indexOf(key) + key.length);
             // Look for other token parts
             if(globalOAUTH == null){
-                globalOAUTH = parseOAUTHToken(orgOInfo, true);
+                globalOAUTH = parseOAUTHToken(orgOInfo, false);
             }
         }
     }
@@ -168,25 +168,27 @@ parseOAUTHToken = function(stringToken, doLog) {
     let re = {};
     log(DEBUG,'Parsing OAUTH Token: ' , stringToken);
     let elements  = stringToken.match(/(?<=\[\s*).*?(?=\s*\])/gs);
-    for(let el of elements){
-        // let nameValue = el.split(':');
-        let nameValue = el.split(/:/);
-        let key = nameValue.shift().trim().replace(' ', '_');
-        let val = nameValue.join(':').trim();
-        if(key && val){
-            log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|' );
-            if(key == 'Expiry_Date'){
-                //Parse expiry date
-                re[key + '_Display'] = val;
-                re[key] = Date.parse(val);
-            } else {
-                re[key] = val;
+    if(Symbol.iterator in Object(elements)){
+        for(let el of elements){
+            // let nameValue = el.split(':');
+            let nameValue = el.split(/:/);
+            let key = nameValue.shift().trim().replace(' ', '_');
+            let val = nameValue.join(':').trim();
+            if(key && val){
+                log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|' );
+                if(key == 'Expiry_Date'){
+                    //Parse expiry date
+                    re[key + '_Display'] = val;
+                    re[key] = Date.parse(val);
+                } else {
+                    re[key] = val;
+                }
             }
         }
-    }
-    if(showLog){
-        log(INFO, 'OAUTH Details:');
-        console.table(re);
+        if(showLog){
+            log(INFO, 'OAUTH Details:');
+            console.table(re);
+        }
     }
     return re;
 }
@@ -464,13 +466,13 @@ updateTCLIwrapper = function () {
 
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
 addOrUpdateProperty = function (location, property, value, comment) {
-    log(INFO, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
+    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
     // Check if file exists
     const fs = require('fs');
     try {
         if (fs.existsSync(location)) {
             //file exists
-            log(INFO, 'Property file found: ' + location);
+            log(DEBUG, 'Property file found: ' + location);
             // Check if file contains property
             // var data = fs.readFileSync(location, 'utf8');
             var dataLines = fs.readFileSync(location, 'utf8').split('\n');
@@ -482,7 +484,7 @@ addOrUpdateProperty = function (location, property, value, comment) {
                     const regNl = new RegExp(property + '\\s*=');
                     if (dataLines[lineNumber].search(reg) > -1 || dataLines[lineNumber].search(regNl) > -1) {
                         // We found the property
-                        log(INFO, `Property found: ${property} We are updating it to: ${value}`);
+                        log(DEBUG,`Property found: ${property} We are updating it to: ${value}`);
                         dataLines[lineNumber] = property + '=' + value;
                         propFound = true;
                     }

@@ -202,17 +202,32 @@ helptcli = function () {
     });
 }
 
+const OAUTH_REQUIRED_HOURS_VALID = 24;
 // Start Cloudstarter Locally
 start = function () {
     return new Promise(async function (resolve, reject) {
-        log('INFO', 'Starting: ' + getProp('App_Name'));
+        log(INFO, 'Starting: ' + getProp('App_Name'));
 
-        //TODO: If OAUTH is Used and Inject OAUTH Key is set to YES;
-        // - Copy OAUTH Template to Variables
-        // - Make sure the file is part of .gitIgnore
-        // - Add Import Code to the Environment.ts file (if Not exists)
-        // - Use the OAUTH Interceptor
-
+        if (isOauthUsed()) {
+            // Ask for prop to force the parsing
+            const oKey = getProp('CloudLogin.OAUTH_Token');
+            const oDetails = getOAUTHDetails();
+            if (oDetails && oDetails['Expiry_Date']) {
+                const now = new Date();
+                // See if Expiry date is more than 24 hours, if not ask to rotate.
+                if (oDetails['Expiry_Date'] < (now.getTime() + OAUTH_REQUIRED_HOURS_VALID * 3600 * 1000)) {
+                    log(WARNING, 'Your OAUTH key is expired or about to expire within 24 hours.');
+                    const decision = await askMultipleChoiceQuestion('Would you like to rotate your OAUTH key ?', ['YES', 'NO']);
+                    if (decision == 'YES') {
+                        rotateOauthToken();
+                    } else {
+                        log(INFO, 'Ok I won\'t do anything...');
+                    }
+                } else {
+                    log(INFO, 'OAUTH Key is valid for more than ' + OAUTH_REQUIRED_HOURS_VALID + ' hours :-)...');
+                }
+            }
+        }
 
         //Check if port 4200 is available, if not use 4201, 4202 etc.
         let port = 4200;
@@ -244,6 +259,7 @@ start = function () {
                     }
                 }
             } else {
+                // TODO: if we use OAUTH this could be a '.js' file...
                 if (myHost.includes('eu')) {
                     run('ng serve --proxy-config proxy.conf.prod.eu.json --ssl true --source-map --aot --port ' + portToUse);
                 } else {
@@ -288,8 +304,8 @@ test = function () {
         var now = new Date();
         console.log(now);
         //addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token',  'NEW-' + now);
-        console.log(' OAUTH Token: ' , getProp('CloudLogin.OAUTH_Token'));
-        console.log('OAUTH Token2: ' , getProp('CloudLogin.OAUTH_Token'));
+        console.log(' OAUTH Token: ', getProp('CloudLogin.OAUTH_Token'));
+        console.log('OAUTH Token2: ', getProp('CloudLogin.OAUTH_Token'));
         resolve();
     });
 };
@@ -315,9 +331,6 @@ updateGlobalConfig = function () {
         resolve();
     });
 }
-
-
-
 
 
 // Function to replace a string in a file
@@ -364,12 +377,14 @@ createMultiplePropertyFileWrapper = function () {
 // Function to
 showLiveAppsWrapper = function () {
     return new Promise(async function (resolve, reject) {
+        showLiveApps(true, true);
+        /* We always count the cases
         const decision = await askMultipleChoiceQuestion('Do you want to count the cases ?', ['YES', 'NO']);
         if (decision == 'YES') {
             showLiveApps(true, true);
         } else {
             showLiveApps(true, false);
-        }
+        }*/
         resolve();
     });
 }
@@ -484,10 +499,6 @@ showOrgFoldersWrapper = function () {
 }
 
 
-
-
-
-
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
 //gulp.task('test-wsu', testWSU);
@@ -548,7 +559,6 @@ rotateOauthTokenWrapper.description = 'Revokes your existing OAUTH token and the
 
 gulp.task('show-org-folders', showOrgFoldersWrapper);
 showOrgFoldersWrapper.description = 'Displays the content of the LiveApps Organization Folders.';
-
 
 
 gulp.task('clean-dist', cleanDist);
