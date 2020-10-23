@@ -117,8 +117,8 @@ cLogin = function (tenant, customLoginURL) {
 // Function that logs into the cloud and returns a cookie
 function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     var postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
-    log(INFO, 'cloudLoginV3]   URL: ' + TCbaseURL);
-    log(INFO, 'cloudLoginV3]  POST:' + postForm);
+    log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
+    log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
     //log(DEBUG,'With Form: ' + postForm);
     var response = syncClient.post(encodeURI(TCbaseURL), {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -1712,7 +1712,7 @@ revokeOauthToken = function (tokenName) {
             log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
             let revokeOauthUrl = 'https://' + getCurrentRegion() + clURI.revoke_oauth;
             const postRequest = 'name=' + tokenName;
-            const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', true, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+            const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
             log(INFO, 'Result: ', colors.blue(response.message));
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
