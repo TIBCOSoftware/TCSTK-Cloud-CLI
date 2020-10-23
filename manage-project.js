@@ -202,7 +202,8 @@ helptcli = function () {
     });
 }
 
-const OAUTH_REQUIRED_HOURS_VALID = 24;
+// Required to be valid for more than a week (default generation 2 weeks)
+const OAUTH_REQUIRED_HOURS_VALID = 168;
 // Start Cloudstarter Locally
 start = function () {
     return new Promise(async function (resolve, reject) {

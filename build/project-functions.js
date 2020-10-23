@@ -42,10 +42,7 @@ let isOAUTHValid = false;
 
 cLogin = function (tenant, customLoginURL) {
     if (isOauthUsed()) {
-        if (doOAuthNotify) {
-            log(INFO, 'Using OAUTH for Authentication...');
-            doOAuthNotify = false;
-        }
+        log(DEBUG, 'Using OAUTH for Authentication...');
         // isOAUTHValid = true;
         // Getting the organization info
         // console.log('Get Org: ' , getOrganization());
@@ -59,7 +56,11 @@ cLogin = function (tenant, customLoginURL) {
                 // process.exit();
             }
             if (response.selectedAccount) {
-                log(INFO, 'OAUTH Token Valid, ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
+                if (doOAuthNotify) {
+                    log(INFO, 'Using OAUTH Authentication, ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
+                    doOAuthNotify = false;
+                }
+
                 setOrganization(response.selectedAccount.displayName);
                 isOAUTHValid = true;
             }
@@ -115,9 +116,9 @@ cLogin = function (tenant, customLoginURL) {
 
 // Function that logs into the cloud and returns a cookie
 function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
-    log(DEBUG, 'cloudLoginV3]  tenantID=' + tenantID + ' clientID=' + clientID + ' email=' + email + ' TCbaseURL=' + TCbaseURL);
     var postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
-    log(INFO, 'Calling: ' + TCbaseURL);
+    log(INFO, 'cloudLoginV3]   URL: ' + TCbaseURL);
+    log(INFO, 'cloudLoginV3]  POST:' + postForm);
     //log(DEBUG,'With Form: ' + postForm);
     var response = syncClient.post(encodeURI(TCbaseURL), {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -656,15 +657,24 @@ exportSharedStateScope = function () {
         }
         if (decision == 'YES') {
             // Check if folder exist
-            mkdirIfNotExist(SHARED_STATE_FOLDER);
-            mkdirIfNotExist(SHARED_STATE_FOLDER + 'CONTENT/');
+            let ssExportFolder = SHARED_STATE_FOLDER;
+            // TODO: think about setting up a structure with the organization (so that import get it directly from the right org)
+            /*
+            if(getOrganization() && getOrganization().trim() != ''){
+                ssExportFolder = SHARED_STATE_FOLDER + getOrganization() + '/';
+            } else {
+                log(WARNING, 'No organization for folder export...');
+            }*/
+
+            mkdirIfNotExist(ssExportFolder);
+            mkdirIfNotExist(ssExportFolder + 'CONTENT/');
             // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
             const storeOptions = {spaces: 2, EOL: '\r\n'};
             for (let sSEntry of sharedStateEntries) {
                 let writeContentSeparate = false;
                 let contentObject = {};
-                let contextFileName = SHARED_STATE_FOLDER + sSEntry.name + '.json';
-                let contentFileName = SHARED_STATE_FOLDER + 'CONTENT/' + sSEntry.name + '.CONTENT.json';
+                let contextFileName = ssExportFolder + sSEntry.name + '.json';
+                let contentFileName = ssExportFolder + 'CONTENT/' + sSEntry.name + '.CONTENT.json';
                 if (sSEntry.content != null) {
                     if (sSEntry.content.json != null) {
                         try {
@@ -680,7 +690,7 @@ exportSharedStateScope = function () {
                         }
                     }
                 }
-                jsonfile.writeFileSync(SHARED_STATE_FOLDER + sSEntry.name + '.json', sSEntry, storeOptions);
+                jsonfile.writeFileSync(ssExportFolder + sSEntry.name + '.json', sSEntry, storeOptions);
                 log(INFO, '[STORED CONTEXT]: ' + contextFileName);
                 if (!writeContentSeparate) {
                     log(ERROR, 'Stored all in: ' + contextFileName)
@@ -752,6 +762,7 @@ putSharedState = function (sharedStateObject) {
 // Import the Shared state scope from a folder
 importSharedStateScope = function () {
     return new Promise(async function (resolve, reject) {
+            //console.log('ORG: ', getOrganization());
             let importOptions = [];
             // Go Over Shared State files
             var states = {};
@@ -1060,7 +1071,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     const fOAUTH = forceOAUTH || false;
     const reResponse = returnResponse || false;
     let lCookie = {};
-    if(!fOAUTH){
+    if (!fOAUTH) {
         lCookie = cLogin(tenant, customLoginURL);
     }
     const cMethod = method || 'GET';
@@ -1775,7 +1786,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         // Check for Tenants
         let OauthTenants = 'TSC+BPM';
         if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
-            OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(/,/g,"+");
+            OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(/,/g, "+");
         } else {
             log(INFO, 'No OAUTH_Generate_For_Tenants Property found; This is needed to specify for which tenants you would like to generate an OAUTH Token');
             let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
@@ -1785,15 +1796,15 @@ generateOauthToken = function (tokenNameOverride, verbose) {
                 skipCall = true;
             }
         }
-        // Check for valid hours (72 by default; 3 days)
-        let OauthHours = 72;
+        // Check for valid hours (336 by default; 2 weeks)
+        let OauthHours = 336;
         if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
             OauthHours = getProp('CloudLogin.OAUTH_Generate_Valid_Hours');
         } else {
             log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
             let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
             if (decision == 'YES') {
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '72', 'Number of Hours the generated OAUTH token should be valid.');
+                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '336', 'Number of Hours the generated OAUTH token should be valid.');
             } else {
                 skipCall = true;
             }
@@ -1870,7 +1881,7 @@ showOrgFolders = function () {
     const getOrgFolderURL = 'https://' + getCurrentRegion() + clURI.org_folders;
     const oResponse = callURL(getOrgFolderURL);
     const tObject = createTable(oResponse, mappings.org_folder, true);
-    log(INFO, 'OAUTH Object: ', tObject);
+    // log(INFO, 'OAUTH Object: ', tObject);
     return tObject;
 }
 

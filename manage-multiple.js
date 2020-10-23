@@ -83,6 +83,8 @@ processMultipleFile = function () {
     });
 }
 
+const TCLI_INTERACTVIE = 'tcli-interactive';
+
 multipleInteraction = function () {
     return new Promise(async function (resolve, reject) {
         const PropertiesReader = require('properties-reader');
@@ -95,13 +97,18 @@ multipleInteraction = function () {
         log(INFO, 'Multiple Cloud Interactions');
         log(INFO, '- Managing Multiple, Using file: ' + mFile + ' (Fail on error:', doFailOnError, ')');
         let taskOverRide = false;
-        let miTask = getMProp('Multiple_Interaction_CLITask');
+        // let miTask = getMProp('Multiple_Interaction_CLITask');
+
         //Start a loop till the user end's it (interactive), do reload prop files every time
         while (true) {
             let miPropFolder = getMProp('Multiple_Interaction_Property_File_Folder');
             let miPropFiles = getMProp('Multiple_Interaction_Property_Files');
             if(!taskOverRide){
                 miTask = getMProp('Multiple_Interaction_CLITask');
+            }
+            let displayTask = miTask;
+            if(miTask == ''){
+                displayTask = TCLI_INTERACTVIE;
             }
 
             // 1. Get list of property files to use and which task to execute
@@ -145,7 +152,7 @@ multipleInteraction = function () {
             console.log(colors.blue('|------------------------------------------------|'));
             console.log(colors.blue('|     M U L T I P L E    I N T E R A C T I O N   |'));
             console.log(colors.blue('|------------------------------------------------|'));
-            console.log(colors.blue(`|- TASK: ${miTask} `));
+            console.log(colors.blue(`|- TASK: ${displayTask} `));
             //console.log(colors.blue('|------------------------------------------------|'));
             //console.log(colors.blue('ENVIRONMENTS:'));
             // 3. Display a table of all environments
@@ -169,8 +176,9 @@ multipleInteraction = function () {
             if (chosenEnv == 'CHANGE TASK') {
                 const cliTaskConfigCLI = require('./config-cli-task.json');
                 let cTsks = cliTaskConfigCLI.cliTasks;
-                const taskDescription = [];
-                const taskTarget = [];
+
+                const taskDescription = [ '0) ' + TCLI_INTERACTVIE];
+                const taskTarget = [''];
                 for (let cliTask in cTsks) {
                     if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && cTsks[cliTask].multipleInteraction) {
                         // console.log('\x1b[36m%s\x1b[0m',':', ' ' + cTsks[cliTask].description);
@@ -189,23 +197,26 @@ multipleInteraction = function () {
             } else {
                 // 5. Execute the task, when it was none go back directly when it was a task have pause message before displaying the table again
                 let propFileToUse = '';
+
                 for (let envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber];
                     let command = 'tcli -p ' + miPropFolder + propFileToUse + ' ' + miTask;
                     if (chosenEnv == 'ALL ENVIRONMENTS') {
-                        console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + miTask + ')'));
+                        console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                         run(command, doFailOnError);
                         // await askQuestion('Press [enter] to continue...');
                     } else {
                         if (environmentOptions[envNumber] == chosenEnv) {
-                            console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + miTask + ')'));
+                            console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                             // console.log('Propfile to use: ', miPropFilesA[envNumber]);
                             run(command, doFailOnError);
 
                         }
                     }
                 }
-                await askQuestion('Press [enter] to continue...');
+                if(miTask != ''){
+                    await askQuestion('Press [enter] to continue...');
+                }
             }
         }
         resolve();
