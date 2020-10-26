@@ -478,9 +478,10 @@ getSharedState = function (showTable) {
         sTemp['LAST MODIFIED'] = modified.toLocaleDateString("en-US", options);
         states[appN] = sTemp;
     }
-    if (showTable) {
-        console.table(states);
-    }
+    //if (showTable) {
+    //    console.table(states);
+    pexTable(states, 'shared-states', getPEXConfig(), showTable);
+    //}
     return sState;
 }
 
@@ -927,10 +928,12 @@ getApplicationDetails = function (application, version, showTable) {
         var appTemp = {};
         appN = i;
         i++;
+        appTemp['CLOUD STARTER'] = application;
         appTemp['DETAIL NAME'] = allArteFacts[det].name;
         details[appN] = appTemp;
     }
-    if (doShowTable) console.table(details);
+    // if (doShowTable) console.table(details);
+    pexTable(details, 'cloud-starter-details', getPEXConfig(), doShowTable);
     return allArteFacts;
 };
 
@@ -987,9 +990,11 @@ getAppLinks = function (showTable) {
         appLinkTable[appN] = appTemp;
     }
     process.stdout.write('\n');
+    /*
     if (showTable) {
         console.table(appLinkTable);
-    }
+    }*/
+    pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), showTable);
     return appLinkTable;
 }
 
@@ -1183,7 +1188,9 @@ showLiveApps = function (doShowTable, doCountCases) {
     }
     console.log('\n');
     //logO(INFO,apps);
-    if (doShowTable) console.table(cases);
+    // if (doShowTable) console.table(cases);
+    pexTable(cases, 'live-apps', getPEXConfig(), doShowTable);
+
     return caseTypes;
 
 
@@ -1598,13 +1605,16 @@ wsuAddTci = function () {
 
 wsuListTci = function () {
     return new Promise(async function (resolve, reject) {
-        var wsu = require('@tibco-tcstk/web-scaffolding-utility');
+        // TODO: Remove web scaffolding utility ?
+        /*var wsu = require('@tibco-tcstk/web-scaffolding-utility');
         console.log(wsu.API.getVersion());
         wsu.API.login(getProp('CloudLogin.clientID'), getProp('CloudLogin.email'), getProp('CloudLogin.pass'));
         // console.log(wsu.API.getArtefactList("TCI").createTable());
         var afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
         console.table(afList.createTable());
+        */
         resolve();
+
     });
 }
 
@@ -1901,6 +1911,11 @@ showSpotfire = function () {
 
 getPEXConfig = function () {
     const re = {};
+    // TODO: Add config on which tables to export
+    // pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), showTable);
+    // pexTable(cases, 'live-apps', getPEXConfig(), doShowTable);
+    // cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
+
     // table-export-to-csv= YES | NO
     let table_export_to_csv = 'NO';
     if (getProp('table-export-to-csv') != null) {
@@ -1914,7 +1929,7 @@ getPEXConfig = function () {
     if (getProp('table-export-folder') != null) {
         table_export_folder = getProp('table-export-folder');
     } else {
-        log(INFO, 'No table-export-folder found; We are adding it to: ' + getPropFileName());
+        log(INFO, 'No table-export-folder property found; We are adding it to: ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'table-export-folder', table_export_folder, 'Folder to export the CSV files to.');
     }
 
@@ -1923,12 +1938,22 @@ getPEXConfig = function () {
     if (getProp('table-export-file-prefix') != null) {
         table_export_file_prefix = getProp('table-export-file-prefix');
     } else {
-        log(INFO, 'No table-export-file-prefix found; We are adding it to: ' + getPropFileName());
+        log(INFO, 'No table-export-file-prefix property found; We are adding it to: ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'table-export-file-prefix', table_export_file_prefix, 'Prefix to use for the export to table CSV files.');
     }
+    // table-export-tables=cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
+    let table_export_tables = 'ALL';
+    if (getProp('table-export-tables') != null) {
+        table_export_tables = getProp('table-export-tables');
+    } else {
+        log(INFO, 'No table-export-tables property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'table-export-tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states');
+    }
+
     re.export = table_export_to_csv.toLowerCase() == 'yes';
     re.folder = table_export_folder;
     re.filePreFix = table_export_file_prefix;
+    re.tables = table_export_tables;
     return re;
 }
 

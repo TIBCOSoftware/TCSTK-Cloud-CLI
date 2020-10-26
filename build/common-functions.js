@@ -155,7 +155,7 @@ getProp = function (propName) {
             const orgOInfo = re;
             re = re.substring(re.indexOf(key) + key.length);
             // Look for other token parts
-            if(globalOAUTH == null){
+            if (globalOAUTH == null) {
                 globalOAUTH = parseOAUTHToken(orgOInfo, false);
             }
         }
@@ -163,20 +163,20 @@ getProp = function (propName) {
     return re;
 }
 
-parseOAUTHToken = function(stringToken, doLog) {
+parseOAUTHToken = function (stringToken, doLog) {
     let showLog = doLog || false;
     let re = {};
-    log(DEBUG,'Parsing OAUTH Token: ' , stringToken);
-    let elements  = stringToken.match(/(?<=\[\s*).*?(?=\s*\])/gs);
-    if(Symbol.iterator in Object(elements)){
-        for(let el of elements){
+    log(DEBUG, 'Parsing OAUTH Token: ', stringToken);
+    let elements = stringToken.match(/(?<=\[\s*).*?(?=\s*\])/gs);
+    if (Symbol.iterator in Object(elements)) {
+        for (let el of elements) {
             // let nameValue = el.split(':');
             let nameValue = el.split(/:/);
             let key = nameValue.shift().trim().replace(' ', '_');
             let val = nameValue.join(':').trim();
-            if(key && val){
-                log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|' );
-                if(key == 'Expiry_Date'){
+            if (key && val) {
+                log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|');
+                if (key == 'Expiry_Date') {
                     //Parse expiry date
                     re[key + '_Display'] = val;
                     re[key] = Date.parse(val);
@@ -185,15 +185,13 @@ parseOAUTHToken = function(stringToken, doLog) {
                 }
             }
         }
-        if(showLog){
+        if (showLog) {
             log(INFO, 'OAUTH Details:');
             console.table(re);
         }
     }
     return re;
 }
-
-
 
 
 // Function to get and set the Organization (after login)
@@ -484,7 +482,7 @@ addOrUpdateProperty = function (location, property, value, comment) {
                     const regNl = new RegExp(property + '\\s*=');
                     if (dataLines[lineNumber].search(reg) > -1 || dataLines[lineNumber].search(regNl) > -1) {
                         // We found the property
-                        log(DEBUG,`Property found: ${property} We are updating it to: ${value}`);
+                        log(DEBUG, `Property found: ${property} We are updating it to: ${value}`);
                         dataLines[lineNumber] = property + '=' + value;
                         propFound = true;
                     }
@@ -690,62 +688,81 @@ iterateTable = function (tObject) {
 
 // Print and possibly export Table to CSV
 pexTable = function (tObject, tName, config, doPrint) {
-    if(!config){
+    if (!config) {
         config = {};
         config.export = false;
     }
-    const printT = doPrint || true;
+    let printT = true;
+    if (doPrint == null) {
+        printT = true;
+    } else {
+        printT = doPrint;
+    }
     // console.log(config);
-    if(config.export){
-        const fs = require('file-system');
-        const fileName = config.folder + config.filePreFix + tName + '.csv';
-        let additionalMessage = '';
-        mkdirIfNotExist(config.folder);
-        // If file does not exist create headerLine
-        const newFile = !doesFileExist(fileName);
-        let dataForFile = '';
-        let headerForFile = '';
-        const now = new Date()
-        for(let line of iterateTable(tObject)){
-            // console.log(line);
-            // Add organization and Now
-            headerForFile = 'ORGANIZATION, EXPORT TIME';
-            let lineForFile = getOrganization() + ',' + now;
-            for (let [key, value] of Object.entries(line)) {
-                // console.log(`${key}: ${value}`);
-                if((key && key.indexOf && key.indexOf(',') > 0) || (value && value.indexOf && value.indexOf(',') > 0)){
-                    log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${value}); we are removing it...`);
-                    additionalMessage = colors.yellow(' (We have removed some comma\'s from the data...)');
-                    if(key.replaceAll){
-                        key = key.replaceAll(',','');
-                    }
-                    if(value.replaceAll){
-                        value = value.replaceAll(',','');
+    if (config.export) {
+        let doExport = false;
+        if (config.tables && config.tables.trim() != '') {
+            if (config.tables.toLowerCase() == 'all') {
+                doExport = true;
+            } else {
+                let tableArr = config.tables.split(',');
+                for(let tab of tableArr){
+                    if(tab == tName){
+                        doExport = true;
                     }
                 }
-                if(newFile){
-                    headerForFile += ',' + key;
-                }
-                lineForFile += ',' + value;
             }
-            // Add data to file
-            dataForFile += lineForFile + '\n';
         }
-        if(newFile) {
-            dataForFile = headerForFile + '\n' + dataForFile;
-            fs.writeFileSync(fileName, dataForFile, 'utf8');
-            log(INFO, '--> (New File) Exported table to ' + colors.blue(fileName) + additionalMessage);
-        } else {
-            fs.appendFileSync( fileName, dataForFile, 'utf8');
-            log(INFO, '--> (Appended) Exported table data to ' + colors.blue(fileName) + additionalMessage);
+        if (doExport) {
+            const fs = require('file-system');
+            const fileName = config.folder + config.filePreFix + tName + '.csv';
+            let additionalMessage = '';
+            mkdirIfNotExist(config.folder);
+            // If file does not exist create headerLine
+            const newFile = !doesFileExist(fileName);
+            let dataForFile = '';
+            let headerForFile = '';
+            const now = new Date()
+            for (let line of iterateTable(tObject)) {
+                // console.log(line);
+                // Add organization and Now
+                headerForFile = 'ORGANIZATION, EXPORT TIME';
+                let lineForFile = getOrganization() + ',' + now;
+                for (let [key, value] of Object.entries(line)) {
+                    // console.log(`${key}: ${value}`);
+                    if ((key && key.indexOf && key.indexOf(',') > 0) || (value && value.indexOf && value.indexOf(',') > 0)) {
+                        log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${value}); we are removing it...`);
+                        additionalMessage = colors.yellow(' (We have removed some comma\'s from the data...)');
+                        if (key.replaceAll) {
+                            key = key.replaceAll(',', '');
+                        }
+                        if (value.replaceAll) {
+                            value = value.replaceAll(',', '');
+                        }
+                    }
+                    if (newFile) {
+                        headerForFile += ',' + key;
+                    }
+                    lineForFile += ',' + value;
+                }
+                // Add data to file
+                dataForFile += lineForFile + '\n';
+            }
+            if (newFile) {
+                dataForFile = headerForFile + '\n' + dataForFile;
+                fs.writeFileSync(fileName, dataForFile, 'utf8');
+                log(INFO, '--> (New File) Exported table to ' + colors.blue(fileName) + additionalMessage);
+            } else {
+                fs.appendFileSync(fileName, dataForFile, 'utf8');
+                log(INFO, '--> (Appended) Exported table data to ' + colors.blue(fileName) + additionalMessage);
+            }
         }
     }
-    if(printT){
+    if (printT) {
         log(INFO, colors.blue('TABLE] ' + tName));
         console.table(tObject);
     }
 }
-
 
 
 isOauthUsed = function () {
