@@ -688,6 +688,65 @@ iterateTable = function (tObject) {
     return re;
 }
 
+// Print and possibly export Table to CSV
+pexTable = function (tObject, tName, config, doPrint) {
+    if(!config){
+        config = {};
+        config.export = false;
+    }
+    const printT = doPrint || true;
+    // console.log(config);
+    if(config.export){
+        const fs = require('file-system');
+        const fileName = config.folder + config.filePreFix + tName + '.csv';
+        let additionalMessage = '';
+        mkdirIfNotExist(config.folder);
+        // If file does not exist create headerLine
+        const newFile = !doesFileExist(fileName);
+        let dataForFile = '';
+        let headerForFile = '';
+        const now = new Date()
+        for(let line of iterateTable(tObject)){
+            // console.log(line);
+            // Add organization and Now
+            headerForFile = 'ORGANIZATION, EXPORT TIME';
+            let lineForFile = getOrganization() + ',' + now;
+            for (let [key, value] of Object.entries(line)) {
+                // console.log(`${key}: ${value}`);
+                if((key && key.indexOf && key.indexOf(',') > 0) || (value && value.indexOf && value.indexOf(',') > 0)){
+                    log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${value}); we are removing it...`);
+                    additionalMessage = colors.yellow(' (We have removed some comma\'s from the data...)');
+                    if(key.replaceAll){
+                        key = key.replaceAll(',','');
+                    }
+                    if(value.replaceAll){
+                        value = value.replaceAll(',','');
+                    }
+                }
+                if(newFile){
+                    headerForFile += ',' + key;
+                }
+                lineForFile += ',' + value;
+            }
+            // Add data to file
+            dataForFile += lineForFile + '\n';
+        }
+        if(newFile) {
+            dataForFile = headerForFile + '\n' + dataForFile;
+            fs.writeFileSync(fileName, dataForFile, 'utf8');
+            log(INFO, '--> (New File) Exported table to ' + colors.blue(fileName) + additionalMessage);
+        } else {
+            fs.appendFileSync( fileName, dataForFile, 'utf8');
+            log(INFO, '--> (Appended) Exported table data to ' + colors.blue(fileName) + additionalMessage);
+        }
+    }
+    if(printT){
+        log(INFO, colors.blue('TABLE] ' + tName));
+        console.table(tObject);
+    }
+}
+
+
 
 isOauthUsed = function () {
     let re = false;

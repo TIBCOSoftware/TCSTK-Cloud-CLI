@@ -324,7 +324,8 @@ showAvailableApps = function (showTable) {
         appTemp['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
     }
     //logO(INFO,apps);
-    if (doShowTable) console.table(apps);
+    // if (doShowTable) console.table(apps);
+    pexTable(apps, 'cloud-starters', getPEXConfig(), doShowTable);
     return response;
     // resolve();
     // });
@@ -348,9 +349,11 @@ showCloudInfo = function () {
         nvs = createTableValue('FIRST NAME', response.firstName, nvs);
         nvs = createTableValue('LAST NAME', response.lastName, nvs);
         nvs = createTableValue('EMAIL', response.email, nvs);
-        for (var i = 0; i < response.sandboxes.length; i++) {
-            nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
-            nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
+        if (response.sandboxes) {
+            for (var i = 0; i < response.sandboxes.length; i++) {
+                nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
+                nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
+            }
         }
         // TODO: display groups
         console.table(nvs);
@@ -1894,6 +1897,41 @@ showSpotfire = function () {
         resolve();
     });
 }
+
+
+getPEXConfig = function () {
+    const re = {};
+    // table-export-to-csv= YES | NO
+    let table_export_to_csv = 'NO';
+    if (getProp('table-export-to-csv') != null) {
+        table_export_to_csv = getProp('table-export-to-csv');
+    } else {
+        log(INFO, 'No table-export-to-csv property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'table-export-to-csv', table_export_to_csv, 'Export tables to CSV files. Possible values YES | NO');
+    }
+    // table-export-folder= ./table-exports
+    let table_export_folder = './table-exports/';
+    if (getProp('table-export-folder') != null) {
+        table_export_folder = getProp('table-export-folder');
+    } else {
+        log(INFO, 'No table-export-folder found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'table-export-folder', table_export_folder, 'Folder to export the CSV files to.');
+    }
+
+    // table-export-file-prefix=table-export-
+    let table_export_file_prefix = 'table-export-';
+    if (getProp('table-export-file-prefix') != null) {
+        table_export_file_prefix = getProp('table-export-file-prefix');
+    } else {
+        log(INFO, 'No table-export-file-prefix found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'table-export-file-prefix', table_export_file_prefix, 'Prefix to use for the export to table CSV files.');
+    }
+    re.export = table_export_to_csv.toLowerCase() == 'yes';
+    re.folder = table_export_folder;
+    re.filePreFix = table_export_file_prefix;
+    return re;
+}
+
 
 // Set log debug level from local property
 setLogDebug(getProp('Use_Debug'));
