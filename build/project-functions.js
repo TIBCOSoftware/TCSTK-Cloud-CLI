@@ -1916,38 +1916,44 @@ getPEXConfig = function () {
     // pexTable(cases, 'live-apps', getPEXConfig(), doShowTable);
     // cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
 
+
+    //Table_Export_To_CSV
+    //Table_Export_Folder
+    //Table_Export_File_Prefix
+    //Table_Export_Tables
+
     // table-export-to-csv= YES | NO
     let table_export_to_csv = 'NO';
-    if (getProp('table-export-to-csv') != null) {
-        table_export_to_csv = getProp('table-export-to-csv');
+    if (getProp('Table_Export_To_CSV') != null) {
+        table_export_to_csv = getProp('Table_Export_To_CSV');
     } else {
-        log(INFO, 'No table-export-to-csv property found; We are adding it to: ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'table-export-to-csv', table_export_to_csv, 'Export tables to CSV files. Possible values YES | NO');
+        log(INFO, 'No Table_Export_To_CSV property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_To_CSV', table_export_to_csv, 'Export tables to CSV files. Possible values YES | NO');
     }
     // table-export-folder= ./table-exports
     let table_export_folder = './table-exports/';
-    if (getProp('table-export-folder') != null) {
-        table_export_folder = getProp('table-export-folder');
+    if (getProp('Table_Export_Folder') != null) {
+        table_export_folder = getProp('Table_Export_Folder');
     } else {
-        log(INFO, 'No table-export-folder property found; We are adding it to: ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'table-export-folder', table_export_folder, 'Folder to export the CSV files to.');
+        log(INFO, 'No Table_Export_Folder property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_Folder', table_export_folder, 'Folder to export the CSV files to.');
     }
 
     // table-export-file-prefix=table-export-
     let table_export_file_prefix = 'table-export-';
-    if (getProp('table-export-file-prefix') != null) {
-        table_export_file_prefix = getProp('table-export-file-prefix');
+    if (getProp('Table_Export_File_Prefix') != null) {
+        table_export_file_prefix = getProp('Table_Export_File_Prefix');
     } else {
-        log(INFO, 'No table-export-file-prefix property found; We are adding it to: ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'table-export-file-prefix', table_export_file_prefix, 'Prefix to use for the export to table CSV files.');
+        log(INFO, 'No Table_Export_File_Prefix property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_File_Prefix', table_export_file_prefix, 'Prefix to use for the export to table CSV files.');
     }
     // table-export-tables=cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
     let table_export_tables = 'ALL';
-    if (getProp('table-export-tables') != null) {
-        table_export_tables = getProp('table-export-tables');
+    if (getProp('Table_Export_Tables') != null) {
+        table_export_tables = getProp('Table_Export_Tables');
     } else {
-        log(INFO, 'No table-export-tables property found; We are adding it to: ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'table-export-tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states');
+        log(INFO, 'No Table_Export_Tables property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states');
     }
 
     re.export = table_export_to_csv.toLowerCase() == 'yes';
