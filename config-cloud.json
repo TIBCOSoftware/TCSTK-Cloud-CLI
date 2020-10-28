@@ -57,6 +57,39 @@
           "format": "DATE"
         }
       ]
+    },
+    "tci_apps": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Type",
+          "field": "type.val"
+        },
+        {
+          "header": "Visibility",
+          "field": "endpointVisibility"
+        },
+        {
+          "header": "publishStage",
+          "field": "publishStage"
+        },
+        {
+          "header": "Last Modified",
+          "field": "modifiedTime",
+          "format": "DATE"
+        },
+        {
+          "header": "Status",
+          "field": "appInitialStatus"
+        },
+        {
+          "header": "Instances",
+          "field": "desiredInstanceCount"
+        }
+      ]
     }
   }
 }

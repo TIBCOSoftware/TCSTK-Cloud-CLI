@@ -40,8 +40,9 @@ var loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
 let isOAUTHValid = false;
 
-cLogin = function (tenant, customLoginURL) {
-    if (isOauthUsed()) {
+cLogin = function (tenant, customLoginURL, forceClientID) {
+    const fClientID = forceClientID || false;
+    if (isOauthUsed() && !fClientID) {
         log(DEBUG, 'Using OAUTH for Authentication...');
         // isOAUTHValid = true;
         // Getting the organization info
@@ -66,7 +67,7 @@ cLogin = function (tenant, customLoginURL) {
             }
         }
     }
-    if (!isOauthUsed() || !isOAUTHValid) {
+    if (!isOauthUsed() || !isOAUTHValid || fClientID) {
         log(INFO, 'Using CLIENT-ID Authentication...');
         var setLoginURL = loginURL;
         if (customLoginURL) {
@@ -1075,12 +1076,16 @@ publishApp = function (application) {
 }
 
 // Function to call the Tibco Cloud
-callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH) {
+callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID) {
     const fOAUTH = forceOAUTH || false;
+    const fCLIENTID = forceCLIENTID || false;
     const reResponse = returnResponse || false;
     let lCookie = {};
     if (!fOAUTH) {
         lCookie = cLogin(tenant, customLoginURL);
+    }
+    if(fCLIENTID){
+        lCookie = cLogin(tenant, customLoginURL, true);
     }
     const cMethod = method || 'GET';
     let cdoLog = false;
@@ -1106,12 +1111,17 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
     }
+    if(fCLIENTID){
+        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        delete header.Authorization;
+    }
+
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '- URL(' + cMethod + '): ' + url);
-        log(DEBUG, '-  METHOD: ' + cMethod);
-        log(DEBUG, '- CONTENT: ' + cType);
-        log(DEBUG, '-  HEADER: ', header);
+        log(INFO, '-  METHOD: ' + cMethod);
+        log(INFO, '- CONTENT: ' + cType);
+        log(INFO, '-  HEADER: ', header);
     }
     if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
         if (cdoLog) {
@@ -1642,9 +1652,10 @@ showTCI = function () {
         log(INFO, 'Getting TCI Apps...');
         const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
         const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
-        const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint);
+        const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint, null, false, true);
         // TODO: Move to global config file (Do we need Entries ?)
         // console.log(response);
+        /*
         let config = {
             entries:
                 [
@@ -1678,12 +1689,16 @@ showTCI = function () {
                         field: "desiredInstanceCount"
                     }
                 ]
-        };
-        let tObject = createTable(response, config, true);
+        };*/
+        let tObject = createTable(response, mappings.tci_apps, true);
         log(DEBUG, 'TCI Object: ', tObject);
         //console.log(response[0]);
         resolve();
     });
+}
+
+monitorTCI = function () {
+    log(INFO, 'Todo Implement');
 }
 
 // Function to display all OAUTH Tokens...

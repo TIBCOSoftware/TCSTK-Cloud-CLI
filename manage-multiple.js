@@ -73,8 +73,9 @@ processMultipleFile = function () {
                         logT += colors.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]' + tObj.S);
                         command += 'node ' + tObj.S;
                     }
-                    log(INFO, logT + ' Command: ' + command);
+                    log(DEBUG, logT + 'Command (before replacing): ' + command);
                     command = replaceAtSign(command, currLoc + propFile);
+                    log(INFO, logT + ' Command: ' + command);
                     run(command, doFailOnError);
                 }
             }
@@ -270,10 +271,10 @@ replaceDollar = function (content) {
 replaceAtSign = function (content, propFile) {
     if (content.includes('@{') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
-        log(DEBUG, 'Looking for subprop: ' + subProp);
+        log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
         content = content.replace(/@{.*?\}/, getPropFromFile(subProp, propFile));
         log(DEBUG, 'Replaced: ' + content);
-        content = replaceAtSign(content);
+        content = replaceAtSign(content, propFile);
     }
     return content;
 }

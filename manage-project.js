@@ -457,6 +457,14 @@ showTCIWrapper = function () {
     });
 }
 
+monitorTCIWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        monitorTCI();
+        resolve();
+    });
+}
+
+
 showSpotfireReportsWrapper = function () {
     return new Promise(async function (resolve, reject) {
         showSpotfire();
@@ -542,6 +550,9 @@ exportLiveAppsCaseTypeWrapper.description = 'Export the details of a Live Apps C
 
 gulp.task('show-tci-apps', showTCIWrapper);
 showTCIWrapper.description = 'List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).';
+// monitor-tci-app
+gulp.task('monitor-tci-app', monitorTCIWrapper);
+monitorTCIWrapper.description = 'Monitor the logs of a TIBCO Cloud Integration Flogo Application';
 
 gulp.task('show-spotfire-reports', showSpotfireReportsWrapper);
 showSpotfireReportsWrapper.description = 'List all Spotfire Analytical Reports.';
