@@ -439,6 +439,23 @@ getCurrentRegion = function (showRegion) {
     return re;
 }
 
+getCurrentAWSRegion = function () {
+    // Oregon
+    let re = 'us-west-2';
+    switch (getCurrentRegion()) {
+        case 'eu.':
+            // Ireland
+            re = 'eu-west-1';
+            break;
+        case 'au.':
+            // Sydney
+            re = 'ap-southeast-2';
+            break;
+    }
+    return re
+}
+
+
 updateTCLI = function () {
     log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../package.json').version);
     run('npm -g install @tibco-tcstk/cloud-cli');

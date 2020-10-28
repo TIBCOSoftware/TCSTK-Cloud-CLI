@@ -459,7 +459,7 @@ showTCIWrapper = function () {
 
 monitorTCIWrapper = function () {
     return new Promise(async function (resolve, reject) {
-        monitorTCI();
+        await monitorTCI();
         resolve();
     });
 }

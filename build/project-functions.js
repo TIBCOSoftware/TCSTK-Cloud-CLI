@@ -342,8 +342,12 @@ showApps = function () {
 
 // Function to show claims for the configured user
 const getClaimsURL = cloudURL + getProp('Claims_URE');
-showCloudInfo = function () {
+showCloudInfo = function (showTable) {
     return new Promise(function (resolve, reject) {
+        let doShowTable = true;
+        if (showTable != null) {
+            doShowTable = showTable;
+        }
         var response = callURL(getClaimsURL);
         let nvs = createTableValue('REGION', getRegion());
         nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
@@ -357,7 +361,9 @@ showCloudInfo = function () {
             }
         }
         // TODO: display groups
-        console.table(nvs);
+        if (doShowTable) {
+            console.table(nvs);
+        }
         resolve();
     });
 };
@@ -1084,7 +1090,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     if (!fOAUTH) {
         lCookie = cLogin(tenant, customLoginURL);
     }
-    if(fCLIENTID){
+    if (fCLIENTID) {
         lCookie = cLogin(tenant, customLoginURL, true);
     }
     const cMethod = method || 'GET';
@@ -1111,7 +1117,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     } else {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
     }
-    if(fCLIENTID){
+    if (fCLIENTID) {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
         delete header.Authorization;
     }
@@ -1119,9 +1125,9 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '- URL(' + cMethod + '): ' + url);
-        log(INFO, '-  METHOD: ' + cMethod);
-        log(INFO, '- CONTENT: ' + cType);
-        log(INFO, '-  HEADER: ', header);
+        log(DEBUG, '-  METHOD: ' + cMethod);
+        log(DEBUG, '- CONTENT: ' + cType);
+        log(DEBUG, '-  HEADER: ', header);
     }
     if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
         if (cdoLog) {
@@ -1648,58 +1654,47 @@ schematicAdd = function () {
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
 showTCI = function () {
-    return new Promise(async function (resolve, reject) {
-        log(INFO, 'Getting TCI Apps...');
-        const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
-        const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
-        const response = callURL(appEndpoint, 'GET', null, null, true, 'TCI', loginEndpoint, null, false, true);
-        // TODO: Move to global config file (Do we need Entries ?)
-        // console.log(response);
-        /*
-        let config = {
-            entries:
-                [
-                    {
-                        header: "Name",
-                        field: "name"
-                    },
-                    {
-                        header: "Type",
-                        field: "type.val"
-                    },
-                    {
-                        header: "Visibility",
-                        field: "endpointVisibility"
-                    },
-                    {
-                        header: "publishStage",
-                        field: "publishStage"
-                    },
-                    {
-                        header: "Last Modified",
-                        field: "modifiedTime",
-                        format: "DATE"
-                    },
-                    {
-                        header: "Status",
-                        field: "appInitialStatus"
-                    },
-                    {
-                        header: "Instances",
-                        field: "desiredInstanceCount"
-                    }
-                ]
-        };*/
-        let tObject = createTable(response, mappings.tci_apps, true);
-        log(DEBUG, 'TCI Object: ', tObject);
-        //console.log(response[0]);
-        resolve();
-    });
+    log(INFO, 'Getting TCI Apps...');
+    const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
+    const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
+    const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
+    let tObject = createTable(response, mappings.tci_apps, true);
+    log(DEBUG, 'TCI Object: ', tObject);
+    return tObject;
 }
 
-monitorTCI = function () {
-    log(INFO, 'Todo Implement');
+monitorTCI = async function () {
+    log(INFO, 'Monitoring a TCI App');
+    // showCloudInfo(false);
+    const tibCli = getTIBCli();
+    const tciApps = showTCI();
+    let tAppsToChoose = ['Nothing'];
+    for (let tApp of iterateTable(tciApps)) {
+        // console.log(tApp);
+        tAppsToChoose.push(tApp.Name);
+    }
+    let appToMonitor = await askMultipleChoiceQuestion('Which TCI App would you like to monitor ?', tAppsToChoose);
+    // console.log(appToMonitor);
+    run(tibCli + ' logout');
+    // TODO: move this logic to common lib
+    let email = getProp('CloudLogin.email');
+    var pass = getProp('CloudLogin.pass');
+    if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+    if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
+    if (pass == '') {
+        pass = argv.pass;
+        // console.log('Pass from args: ' + pass);
+    }
+    if (pass.charAt(0) == '#') {
+        pass = Buffer.from(pass, 'base64').toString()
+    }
+    pass = pass.replace('$', '\\$')
+    //TODO: Translate region to AWS region
+    run(tibCli + ' login -u "' + email + '" -p "' + pass + '" -o "' + getOrganization() + '" -r "' + getCurrentAWSRegion() + '"');
+    log(INFO, 'Monitoring ' + colors.yellow('[' + appToMonitor + ']') + ' in organization ' + colors.blue('[' + getOrganization() + ']'))
+    run(tibCli + ' monitor applog -s ' + appToMonitor);
 }
+
 
 // Function to display all OAUTH Tokens...
 showOauthToken = function () {
@@ -1924,19 +1919,21 @@ showSpotfire = function () {
 }
 
 
+getTIBCli = function () {
+    let re = '';
+    if (getProp('TIBCLI_Location') != null) {
+        re = getProp('TIBCLI_Location');
+    } else {
+        log(INFO, 'No TIBCLI_Location property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'TIBCLI_Location', '', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
+        log(WARNING, 'Before continuing, please download TIBCO® Cloud - Command Line Interface from https://' + getCurrentRegion() + 'integration.cloud.tibco.com/envtools/download_tibcli, and add it\'s location to ' + getPropFileName());
+        process.exit(0);
+    }
+    return re;
+}
+
 getPEXConfig = function () {
     const re = {};
-    // TODO: Add config on which tables to export
-    // pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), showTable);
-    // pexTable(cases, 'live-apps', getPEXConfig(), doShowTable);
-    // cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
-
-
-    //Table_Export_To_CSV
-    //Table_Export_Folder
-    //Table_Export_File_Prefix
-    //Table_Export_Tables
-
     // table-export-to-csv= YES | NO
     let table_export_to_csv = 'NO';
     if (getProp('Table_Export_To_CSV') != null) {
@@ -1970,7 +1967,6 @@ getPEXConfig = function () {
         log(INFO, 'No Table_Export_Tables property found; We are adding it to: ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states');
     }
-
     re.export = table_export_to_csv.toLowerCase() == 'yes';
     re.folder = table_export_folder;
     re.filePreFix = table_export_file_prefix;

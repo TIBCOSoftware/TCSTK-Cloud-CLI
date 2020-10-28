@@ -291,7 +291,7 @@
     },
     "35. monitor-tci-app": {
       "description": "Monitor the logs of a TIBCO Cloud Integration Flogo Application",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": false,
       "gulpTask": "monitor-tci-app",
