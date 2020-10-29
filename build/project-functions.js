@@ -16,12 +16,11 @@ cleanTemp = function () {
 
 // Function that determines which cloud login method to use
 // function to login to the cloud
-var loginC = null;
+let loginC = null;
 // var useOAuth = false;
-var argv = require('yargs').argv;
-
-var cloudURL = getProp('Cloud_URL');
-var cloudHost = getProp('cloudHost');
+const argv = require('yargs').argv;
+let cloudURL = getProp('Cloud_URL');
+let cloudHost = getProp('cloudHost');
 // Check if a global config exists and if it is required
 //TODO: Manage global config in common functions
 if (getGlobalConfig()) {
@@ -36,7 +35,7 @@ if (getGlobalConfig()) {
 
 const colors = require('colors');
 //Function to manage the login from the cloud
-var loginURL = cloudURL + getProp('loginURE');
+let loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
 let isOAUTHValid = false;
 
@@ -1674,26 +1673,110 @@ monitorTCI = async function () {
         tAppsToChoose.push(tApp.Name);
     }
     let appToMonitor = await askMultipleChoiceQuestion('Which TCI App would you like to monitor ?', tAppsToChoose);
-    // console.log(appToMonitor);
-    run(tibCli + ' logout');
-    // TODO: move this logic to common lib
-    let email = getProp('CloudLogin.email');
-    var pass = getProp('CloudLogin.pass');
-    if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-    if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
-    if (pass == '') {
-        pass = argv.pass;
-        // console.log('Pass from args: ' + pass);
+    if(appToMonitor != 'Nothing'){
+        // console.log(appToMonitor);
+        // run(tibCli + ' logout');
+        // TODO: move this logic to common lib
+        let email = getProp('CloudLogin.email');
+        var pass = getProp('CloudLogin.pass');
+        if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+        if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
+        if (pass == '') {
+            pass = argv.pass;
+            // console.log('Pass from args: ' + pass);
+        }
+        if (pass.charAt(0) == '#') {
+            pass = Buffer.from(pass, 'base64').toString()
+        }
+        pass = pass.replace('$', '\\$')
+
+        run(tibCli + ' login -u "' + email + '" -p "' + pass + '" -o "' + getOrganization() + '" -r "' + getCurrentAWSRegion() + '"');
+        log(INFO, 'Monitoring ' + colors.yellow('[' + appToMonitor + ']') + ' in organization ' + colors.blue('[' + getOrganization() + ']'))
+        run(tibCli + ' monitor applog -s ' + appToMonitor);
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
     }
-    if (pass.charAt(0) == '#') {
-        pass = Buffer.from(pass, 'base64').toString()
-    }
-    pass = pass.replace('$', '\\$')
-    //TODO: Translate region to AWS region
-    run(tibCli + ' login -u "' + email + '" -p "' + pass + '" -o "' + getOrganization() + '" -r "' + getCurrentAWSRegion() + '"');
-    log(INFO, 'Monitoring ' + colors.yellow('[' + appToMonitor + ']') + ' in organization ' + colors.blue('[' + getOrganization() + ']'))
-    run(tibCli + ' monitor applog -s ' + appToMonitor);
 }
+
+
+generateCloudPropertyFiles = async function () {
+    log(INFO, 'Generating Cloud Property Files');
+    const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+    // console.log(response);
+    let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
+    if(projectName.trim() != ''){
+        projectName = projectName + '_';
+    }
+    const propFilesALL = [];
+    const propFilesEU = [];
+    const propFilesUS = [];
+    const propFilesAU = [];
+
+    const propOption = ['NONE', 'ALL', 'ALL EU' , 'ALL US', 'ALL AU'];
+
+
+    for(let org of response.accountsInfo){
+        let orgName = '' + org.accountDisplayName;
+        let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g,'_');
+        let tOrgNameEU = {REGION: 'EU', PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties'};
+        let tOrgNameUS = {REGION: 'US', PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties'};
+        let tOrgNameAU = {REGION: 'AU', PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties'};
+        propOption.push(tOrgNameEU.PROPERTY_FILE_NAME,tOrgNameUS.PROPERTY_FILE_NAME,tOrgNameAU.PROPERTY_FILE_NAME);
+        propFilesALL.push(tOrgNameEU,tOrgNameUS,tOrgNameAU);
+        propFilesEU.push(tOrgNameEU);
+        propFilesUS.push(tOrgNameUS);
+        propFilesAU.push(tOrgNameAU);
+    }
+    log(INFO, 'Files that can be created');
+    console.table(propFilesALL);
+    let propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption);
+    console.log('Create: ' + propFilesToGenerate);
+    if(propFilesToGenerate != 'NONE'){
+        let genOne = true;
+        if(propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL EU'){
+            genOne = false;
+            for (let pFile of propFilesEU){
+                configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+            }
+        }
+        if(propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL US'){
+            genOne = false;
+            for (let pFile of propFilesUS){
+                configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+            }
+        }
+        if(propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL AU'){
+            genOne = false;
+            for (let pFile of propFilesAU){
+                configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+            }
+        }
+        if(genOne){
+            let reg = '';
+            for (let pFile of propFilesALL){
+                if(pFile.PROPERTY_FILE_NAME == propFilesToGenerate){
+                    reg = pFile.REGION;
+                }
+            }
+            configurePropFile('./' + propFilesToGenerate, reg);
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+}
+
+configurePropFile = function (fileName, region){
+    log(INFO, '[' + region + ']: Generating: ' + fileName);
+    let regToAdd = '';
+    if(region == 'EU'){regToAdd = 'eu.';}
+    if(region == 'AU'){regToAdd = 'au.';}
+    copyFile(getPropFileName(), fileName);
+    addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://"+regToAdd+"account.cloud.tibco.com/manage/settings/oAuthTokens>");
+    addOrUpdateProperty(fileName, 'cloudHost', regToAdd + 'liveapps.cloud.tibco.com');
+    addOrUpdateProperty(fileName, 'Cloud_URL', 'https://'+regToAdd+'liveapps.cloud.tibco.com/');
+    log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
+}
+
 
 
 // Function to display all OAUTH Tokens...

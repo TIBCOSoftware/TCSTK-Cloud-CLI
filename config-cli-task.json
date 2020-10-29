@@ -343,6 +343,14 @@
       "gulpTask": "show-org-folders",
       "availableOnOs": ["all"]
     },
+    "41. generate-cloud-property-files": {
+      "description": "Generates a list of cloud property files.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "generate-cloud-property-files",
+      "availableOnOs": ["all"]
+    },
     "show-spotfire-reports": {
       "description": "List all Spotfire Analytical Reports.",
       "enabled": false,

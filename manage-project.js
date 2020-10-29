@@ -507,6 +507,13 @@ showOrgFoldersWrapper = function () {
     });
 }
 
+generateCloudPropertyFilesWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        generateCloudPropertyFiles();
+        resolve();
+    });
+}
+
 
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
@@ -568,6 +575,9 @@ gulp.task('revoke-oauth-token', revokeOauthTokenWrapper);
 revokeOauthTokenWrapper.description = 'Revokes an existing OAUTH token.';
 gulp.task('rotate-oauth-token', rotateOauthTokenWrapper);
 rotateOauthTokenWrapper.description = 'Revokes your existing OAUTH token and then generates a new one.';
+
+gulp.task('generate-cloud-property-files', generateCloudPropertyFilesWrapper);
+generateCloudPropertyFilesWrapper.description = 'Generates a list of cloud property files.';
 
 gulp.task('show-org-folders', showOrgFoldersWrapper);
 showOrgFoldersWrapper.description = 'Displays the content of the LiveApps Organization Folders.';
