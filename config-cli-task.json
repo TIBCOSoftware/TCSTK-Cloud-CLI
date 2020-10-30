@@ -317,6 +317,7 @@
       "description": "Generate a new OAUTH token to authenticate to the TIBCO Cloud.",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": true,
       "gulpTask": "generate-oauth-token",
       "availableOnOs": ["all"]
     },
@@ -335,20 +336,28 @@
       "gulpTask": "rotate-oauth-token",
       "availableOnOs": ["all"]
     },
-    "40. show-org-folders": {
-      "description": "Displays the content of the LiveApps Organization Folders.",
+    "41. validate-and-rotate-oauth-token": {
+      "description": "Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-org-folders",
+      "gulpTask": "validate-and-rotate-oauth-token",
       "availableOnOs": ["all"]
     },
-    "41. generate-cloud-property-files": {
+    "42. generate-cloud-property-files": {
       "description": "Generates a list of cloud property files.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": false,
       "gulpTask": "generate-cloud-property-files",
+      "availableOnOs": ["all"]
+    },
+    "43. show-org-folders": {
+      "description": "Displays the content of the LiveApps Organization Folders.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "gulpTask": "show-org-folders",
       "availableOnOs": ["all"]
     },
     "show-spotfire-reports": {

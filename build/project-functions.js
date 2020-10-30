@@ -1698,7 +1698,7 @@ monitorTCI = async function () {
     }
 }
 
-
+// Function to generate other property files next to the existing ones
 generateCloudPropertyFiles = async function () {
     log(INFO, 'Generating Cloud Property Files');
     const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
@@ -1711,10 +1711,7 @@ generateCloudPropertyFiles = async function () {
     const propFilesEU = [];
     const propFilesUS = [];
     const propFilesAU = [];
-
     const propOption = ['NONE', 'ALL', 'ALL EU' , 'ALL US', 'ALL AU'];
-
-
     for(let org of response.accountsInfo){
         let orgName = '' + org.accountDisplayName;
         let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g,'_');
@@ -1864,6 +1861,44 @@ rotateOauthToken = function () {
         }
         resolve();
     });
+}
+
+validateAndRotateOauthToken = async function (isInteractive) {
+    let doInteraction = true;
+    if(isInteractive != null){
+        doInteraction = isInteractive;
+    }
+    log(INFO, 'Validating and Rotating OAUTH Token...');
+    // Ask for prop to force the parsing
+    const oKey = getProp('CloudLogin.OAUTH_Token');
+    let oauth_required_hours_valid = 168;
+    if (getProp('CloudLogin.OAUTH_Required_Hours_Valid') != null) {
+        oauth_required_hours_valid = getProp('CloudLogin.OAUTH_Required_Hours_Valid');
+    } else {
+        log(INFO, 'No CloudLogin.OAUTH_Required_Hours_Valid property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Required_Hours_Valid', oauth_required_hours_valid, 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
+    }
+    const oDetails = getOAUTHDetails();
+    if (oDetails && oDetails['Expiry_Date']) {
+        const now = new Date();
+        // See if Expiry date is more than 24 hours, if not ask to rotate.
+        if (oDetails['Expiry_Date'] < (now.getTime() + oauth_required_hours_valid * 3600 * 1000)) {
+            log(WARNING, 'Your OAUTH key is expired or about to expire within ' + oauth_required_hours_valid + ' hours.');
+            let decision = 'YES';
+            if(doInteraction){
+                decision = await askMultipleChoiceQuestion('Would you like to rotate your OAUTH key ?', ['YES', 'NO']);
+            }
+            if (decision == 'YES') {
+                rotateOauthToken();
+            } else {
+                log(INFO, 'Ok I won\'t do anything...');
+            }
+        } else {
+            log(INFO, 'OAUTH Key is valid for more than ' + oauth_required_hours_valid + ' hours :-)...');
+        }
+    } else {
+        log(WARNING, 'No OAUTH (expiry) Details Found...');
+    }
 }
 
 // Function to generate an OAUTH Token

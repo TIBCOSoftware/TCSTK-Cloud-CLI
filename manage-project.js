@@ -208,26 +208,8 @@ const OAUTH_REQUIRED_HOURS_VALID = 168;
 start = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Starting: ' + getProp('App_Name'));
-
         if (isOauthUsed()) {
-            // Ask for prop to force the parsing
-            const oKey = getProp('CloudLogin.OAUTH_Token');
-            const oDetails = getOAUTHDetails();
-            if (oDetails && oDetails['Expiry_Date']) {
-                const now = new Date();
-                // See if Expiry date is more than 24 hours, if not ask to rotate.
-                if (oDetails['Expiry_Date'] < (now.getTime() + OAUTH_REQUIRED_HOURS_VALID * 3600 * 1000)) {
-                    log(WARNING, 'Your OAUTH key is expired or about to expire within 24 hours.');
-                    const decision = await askMultipleChoiceQuestion('Would you like to rotate your OAUTH key ?', ['YES', 'NO']);
-                    if (decision == 'YES') {
-                        rotateOauthToken();
-                    } else {
-                        log(INFO, 'Ok I won\'t do anything...');
-                    }
-                } else {
-                    log(INFO, 'OAUTH Key is valid for more than ' + OAUTH_REQUIRED_HOURS_VALID + ' hours :-)...');
-                }
-            }
+            await validateAndRotateOauthToken(true);
         }
 
         //Check if port 4200 is available, if not use 4201, 4202 etc.
@@ -500,6 +482,13 @@ rotateOauthTokenWrapper = function () {
     });
 }
 
+validateAndRotateOauthTokenWrapper = function () {
+    return new Promise(async function (resolve, reject) {
+        validateAndRotateOauthToken(false);
+        resolve();
+    });
+}
+
 showOrgFoldersWrapper = function () {
     return new Promise(async function (resolve, reject) {
         showOrgFolders();
@@ -575,6 +564,11 @@ gulp.task('revoke-oauth-token', revokeOauthTokenWrapper);
 revokeOauthTokenWrapper.description = 'Revokes an existing OAUTH token.';
 gulp.task('rotate-oauth-token', rotateOauthTokenWrapper);
 rotateOauthTokenWrapper.description = 'Revokes your existing OAUTH token and then generates a new one.';
+gulp.task('validate-and-rotate-oauth-token', validateAndRotateOauthTokenWrapper);
+validateAndRotateOauthTokenWrapper.description = 'Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it.';
+
+
+
 
 gulp.task('generate-cloud-property-files', generateCloudPropertyFilesWrapper);
 generateCloudPropertyFilesWrapper.description = 'Generates a list of cloud property files.';
