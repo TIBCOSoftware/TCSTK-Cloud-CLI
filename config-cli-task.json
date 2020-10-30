@@ -285,7 +285,7 @@
       "description": "List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).",
       "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "gulpTask": "show-tci-apps",
       "availableOnOs": ["all"]
     },
@@ -293,7 +293,7 @@
       "description": "Monitor the logs of a TIBCO Cloud Integration Flogo Application",
       "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "gulpTask": "monitor-tci-app",
       "availableOnOs": ["all"]
     },

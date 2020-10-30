@@ -1657,7 +1657,8 @@ showTCI = function () {
     const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
     const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
     const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
-    let tObject = createTable(response, mappings.tci_apps, true);
+    let tObject = createTable(response, mappings.tci_apps, false);
+    pexTable(tObject, 'tci-apps', getPEXConfig(), true);
     log(DEBUG, 'TCI Object: ', tObject);
     return tObject;
 }
