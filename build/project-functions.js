@@ -455,7 +455,7 @@ getSharedState = function (showTable) {
     log(INFO, 'Applying Filter) Shared State Scope: ' + SHARED_STATE_SCOPE);
     if (SHARED_STATE_SCOPE != '*') {
         for (var state in ALLsState) {
-            if (ALLsState[state].name.startsWith(SHARED_STATE_SCOPE)) {
+            if (ALLsState[state] && ALLsState[state].name && ALLsState[state].name.startsWith(SHARED_STATE_SCOPE)) {
                 sState.push(ALLsState[state]);
             }
         }
@@ -1640,7 +1640,7 @@ schematicAdd = function () {
         var sType = await askMultipleChoiceQuestion('What type of schematic would you like to add ?', posSchematics.descriptions);
         var sName = await askQuestion('What is the name of your schematic ?');
         run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
-        // TODO: run npm install only after certain schematics.
+        // Run npm install only after certain schematics.
         log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
         if (posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]) {
             run('npm install');
@@ -1673,7 +1673,7 @@ monitorTCI = async function () {
         // console.log(tApp);
         tAppsToChoose.push(tApp.Name);
     }
-    let appToMonitor = await askMultipleChoiceQuestion('Which TCI App would you like to monitor ?', tAppsToChoose);
+    let appToMonitor = await askMultipleChoiceQuestionSearch('Which TCI App would you like to monitor ?', tAppsToChoose);
     if(appToMonitor != 'Nothing'){
         // console.log(appToMonitor);
         // run(tibCli + ' logout');
@@ -1958,13 +1958,14 @@ generateOauthToken = function (tokenNameOverride, verbose) {
             // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
             const responseClaims = callURL(getClaimsURL, null, null, null, false);
             const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-            // log(INFO, response);
+            log(INFO, response);
             if (response) {
                 if (response.error) {
                     log(ERROR, response.error_description);
                 } else {
                     // Display Table
-                    let nvs = createTableValue('NEW OAUTH TOKEN', response.access_token);
+                    let nvs = createTableValue('OAUTH TOKEN NAME', OauthTokenName);
+                    nvs = createTableValue('NEW OAUTH TOKEN', response.access_token, nvs);
                     nvs = createTableValue('VALID TENANTS', response.scope, nvs);
                     nvs = createTableValue('TYPE', response.token_type, nvs);
                     nvs = createTableValue('EXPIRY (SECONDS)', response.expires_in, nvs);

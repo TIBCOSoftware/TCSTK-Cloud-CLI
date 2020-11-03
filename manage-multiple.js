@@ -98,17 +98,18 @@ multipleInteraction = function () {
         log(INFO, 'Multiple Cloud Interactions');
         log(INFO, '- Managing Multiple, Using file: ' + mFile + ' (Fail on error:', doFailOnError, ')');
         let taskOverRide = false;
-        // let miTask = getMProp('Multiple_Interaction_CLITask');
+        let miTask = getMProp('Multiple_Interaction_CLITask');
 
         //Start a loop till the user end's it (interactive), do reload prop files every time
         while (true) {
+            console.log(miTask);
             let miPropFolder = getMProp('Multiple_Interaction_Property_File_Folder');
             let miPropFiles = getMProp('Multiple_Interaction_Property_Files');
-            if(!taskOverRide){
+            if (!taskOverRide) {
                 miTask = getMProp('Multiple_Interaction_CLITask');
             }
             let displayTask = miTask;
-            if(miTask == ''){
+            if (miTask == '') {
                 displayTask = TCLI_INTERACTVIE;
             }
 
@@ -168,55 +169,62 @@ multipleInteraction = function () {
             }
             // TODO: Add change task
             let userOptions = ['ALL ENVIRONMENTS', ...environmentOptions]
-            userOptions.push('QUIT', 'EXIT', 'CHANGE TASK');
-            let chosenEnv = await askMultipleChoiceQuestionSearch('On which environment would you like to run ' + miTask + ' ?', userOptions);
+            userOptions.push('QUIT', 'EXIT', 'CHANGE TASK', 'CHANGE TO INTERACTIVE CLI TASK');
+            let chosenEnv = await askMultipleChoiceQuestionSearch('On which environment would you like to run ' + colors.blue(displayTask) + ' ?', userOptions);
             if (chosenEnv == 'QUIT' || chosenEnv == 'EXIT') {
                 console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 process.exit(0);
             }
-            if (chosenEnv == 'CHANGE TASK') {
-                const cliTaskConfigCLI = require('./config-cli-task.json');
-                let cTsks = cliTaskConfigCLI.cliTasks;
-
-                const taskDescription = [ '0) ' + TCLI_INTERACTVIE];
-                const taskTarget = [''];
-                for (let cliTask in cTsks) {
-                    if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && cTsks[cliTask].multipleInteraction) {
-                        // console.log('\x1b[36m%s\x1b[0m',':', ' ' + cTsks[cliTask].description);
-                        taskDescription.push( cliTask + ') ' + cTsks[cliTask].description);
-                        taskTarget.push(cTsks[cliTask].gulpTask);
-
-                    }
-                }
-                let chosenTask = await askMultipleChoiceQuestionSearch('Which cli task would you like to switch to ?', taskDescription);
-                for(let taskN in  taskDescription){
-                    if(taskDescription[taskN] == chosenTask){
-                        taskOverRide = true;
-                        miTask = taskTarget[taskN];
-                    }
-                }
+            //
+            if (chosenEnv == 'CHANGE TO INTERACTIVE CLI TASK') {
+                log(INFO, 'Setting task to: ' + TCLI_INTERACTVIE);
+                miTask = '';
+                taskOverRide = true;
+                displayTask = TCLI_INTERACTVIE;
             } else {
-                // 5. Execute the task, when it was none go back directly when it was a task have pause message before displaying the table again
-                let propFileToUse = '';
+                if (chosenEnv == 'CHANGE TASK') {
+                    const cliTaskConfigCLI = require('./config-cli-task.json');
+                    let cTsks = cliTaskConfigCLI.cliTasks;
 
-                for (let envNumber in environmentOptions) {
-                    propFileToUse = miPropFilesA[envNumber];
-                    let command = 'tcli -p ' + miPropFolder + propFileToUse + ' ' + miTask;
-                    if (chosenEnv == 'ALL ENVIRONMENTS') {
-                        console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
-                        run(command, doFailOnError);
-                        // await askQuestion('Press [enter] to continue...');
-                    } else {
-                        if (environmentOptions[envNumber] == chosenEnv) {
-                            console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
-                            // console.log('Propfile to use: ', miPropFilesA[envNumber]);
-                            run(command, doFailOnError);
-
+                    const taskDescription = ['0) ' + TCLI_INTERACTVIE];
+                    const taskTarget = [''];
+                    for (let cliTask in cTsks) {
+                        if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && cTsks[cliTask].multipleInteraction) {
+                            // console.log('\x1b[36m%s\x1b[0m',':', ' ' + cTsks[cliTask].description);
+                            taskDescription.push(cliTask + ') ' + cTsks[cliTask].description);
+                            taskTarget.push(cTsks[cliTask].gulpTask);
                         }
                     }
-                }
-                if(miTask != ''){
-                    await askQuestion('Press [enter] to continue...');
+                    let chosenTask = await askMultipleChoiceQuestionSearch('Which cli task would you like to switch to ?', taskDescription);
+                    for (let taskN in taskDescription) {
+                        if (taskDescription[taskN] == chosenTask) {
+                            taskOverRide = true;
+                            miTask = taskTarget[taskN];
+                        }
+                    }
+                } else {
+                    // 5. Execute the task, when it was none go back directly when it was a task have pause message before displaying the table again
+                    let propFileToUse = '';
+
+                    for (let envNumber in environmentOptions) {
+                        propFileToUse = miPropFilesA[envNumber];
+                        let command = 'tcli -p ' + miPropFolder + propFileToUse + ' ' + miTask;
+                        if (chosenEnv == 'ALL ENVIRONMENTS') {
+                            console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
+                            run(command, doFailOnError);
+                            // await askQuestion('Press [enter] to continue...');
+                        } else {
+                            if (environmentOptions[envNumber] == chosenEnv) {
+                                console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
+                                // console.log('Propfile to use: ', miPropFilesA[envNumber]);
+                                run(command, doFailOnError);
+
+                            }
+                        }
+                    }
+                    if (miTask != '') {
+                        await askQuestion('Press [enter] to continue...');
+                    }
                 }
             }
         }
