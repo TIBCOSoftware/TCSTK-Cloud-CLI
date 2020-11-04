@@ -53,22 +53,24 @@ processMultipleFile = function () {
                 const tasksA = tasks.split(',');
                 for (var k = 0; k < tasksA.length; k++) {
                     const currentTask = trim(tasksA[k]);
-                    console.log('Parsing: ' , currentTask , '|');
+                    // console.log('Parsing: ' , currentTask , '|');
                     let tObj = JSON.parse(currentTask);
                     // console.log(tObj);
                     let logT = logSE;
                     let command = 'cd ' + currLoc + ' && ';
                     if (tObj.T != null) {
+                        /* TODO: mutliple does not accept comma's (for additional json entries...
                         let ansCom = '';
                         if(tObj.ANSWERS != null){
                             ansCom = ' -a ' + tObj.ANSWERS;
-                        }
+                        } */
                         logT += colors.brightCyan('[' + (k + 1) + '] [TCLI TASK]');
                         //TODO: USE Absolute path ? We can't for the moment, since -p option only takes relative path.
                         //const absPropFile = process.env.PWD + '/' + propFile;
                         //console.log('absPropFile: ' + absPropFile)
                         //command += 'tcli -p "' + absPropFile + '" ' + tObj.T;
-                        command += 'tcli -p "' + propFile + '" ' + tObj.T + ansCom;
+                        command += 'tcli -p "' + propFile + '" ' + tObj.T;
+                        //command += 'tcli -p "' + propFile + '" ' + tObj.T + ansCom;
                     }
                     if (tObj.O != null) {
                         logT += colors.brightCyan('[' + (k + 1) + '] [OS TASK]');

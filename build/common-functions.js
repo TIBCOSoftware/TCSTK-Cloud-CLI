@@ -382,7 +382,7 @@ let useGlobalAnswers = false;
 let globalAnswers = [];
 
 setGlobalAnswers = function (answers) {
-    console.log('Answers: ' , answers);
+    // console.log('Answers: ' , answers);
     if (answers) {
         // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
         if(answers.indexOf(':') > 0){
