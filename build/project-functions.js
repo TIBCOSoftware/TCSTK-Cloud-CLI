@@ -1371,11 +1371,18 @@ createLAImportFile = async function () {
 
 // Function to Import LiveApps Case Data based on Config File
 importLiveAppsData = async function () {
-    //TODO: Choose import file (if there are more) --> Starts with import && ends with json
+
 
     log(INFO, ' -- Gathering Import Configuration --- ');
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
-    const impConf = require(importFolder + 'import-live-apps-data-configuration.json');
+    let importFile = importFolder + 'import-live-apps-data-configuration.json';
+    //TODO: Choose import file (if there are more) --> Starts with import && ends with json
+
+    // If default import file does not exist, ask for a custom one.
+    if(!doesFileExist(importFile)){
+        importFile = process.cwd() + '/' + await askQuestion('Default Import file ('+importFile+') not found, which import configuration file would you like to use ?');
+    }
+    const impConf = require(importFile);
     const cSteps = impConf['import-steps'];
     log(INFO, 'Configured Steps: ', cSteps);
 
