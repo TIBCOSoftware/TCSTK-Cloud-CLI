@@ -280,71 +280,84 @@ copyFile = function (fromFile, toFile) {
 
 // function to ask a question
 askQuestion = async function (question, type = 'input') {
-    let inquirerF = require('inquirer');
-    var re = 'result';
-    // console.log('Type: ' , type);
-    await inquirerF.prompt([{
-        type: type,
-        name: 'result',
-        message: question,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        logO(DEBUG, answers);
-        re = answers.result;
-    });
-    return re;
+    if (!useGlobalAnswers) {
+        let inquirerF = require('inquirer');
+        var re = 'result';
+        // console.log('Type: ' , type);
+        await inquirerF.prompt([{
+            type: type,
+            name: 'result',
+            message: question,
+            filter: function (val) {
+                return val;
+            }
+        }]).then((answers) => {
+            logO(DEBUG, answers);
+            re = answers.result;
+        });
+        return re;
+    } else {
+        return getLastGlobalAnswer(question);
+    }
 }
 
 // function to ask a question
 askMultipleChoiceQuestion = async function (question, options) {
-    let inquirerF = require('inquirer');
-    let re = 'result';
-    // console.log('Asking Question: ' , question);
-    await inquirerF.prompt([{
-        type: 'list',
-        name: 'result',
-        message: question,
-        choices: options,
-        filter: function (val) {
-            return val;
-        }
-    }]).then((answers) => {
-        logO(DEBUG, answers);
-        re = answers.result;
-        //return answers.result;
-    }).catch(error => {
-        log(ERROR, error);
-    });
-    //let name = require.resolve('inquirer');
-    //delete require.cache[name];
-    //console.log(re);
-    return re;
+    if (!useGlobalAnswers) {
+        let inquirerF = require('inquirer');
+        let re = 'result';
+        // console.log('Asking Question: ' , question);
+        await inquirerF.prompt([{
+            type: 'list',
+            name: 'result',
+            message: question,
+            choices: options,
+            filter: function (val) {
+                return val;
+            }
+        }]).then((answers) => {
+            logO(DEBUG, answers);
+            re = answers.result;
+            //return answers.result;
+        }).catch(error => {
+            log(ERROR, error);
+        });
+        //let name = require.resolve('inquirer');
+        //delete require.cache[name];
+        //console.log(re);
+        return re;
+    } else {
+        return getLastGlobalAnswer(question);
+    }
+
 }
 
 var gOptions = [];
 // Ask a question to a user, and allow the user to search through a possilbe set of options
 askMultipleChoiceQuestionSearch = async function (question, options) {
-    let inquirerF = require('inquirer');
-    gOptions = options;
-    var re = 'result';
-    inquirerF.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-    await inquirerF.prompt([{
-        type: 'autocomplete',
-        name: 'command',
-        suggestOnly: false,
-        message: question,
-        source: searchAnswerF,
-        pageSize: 4/*,
+    let re = '';
+    if (!useGlobalAnswers) {
+        let inquirerF = require('inquirer');
+        gOptions = options;
+        inquirerF.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+        await inquirerF.prompt([{
+            type: 'autocomplete',
+            name: 'command',
+            suggestOnly: false,
+            message: question,
+            source: searchAnswerF,
+            pageSize: 4/*,
             validate: function (val) {
                 return val ? true : 'Type something!';
             }*/
-    }]).then((answers) => {
-        // console.log('answers: ' , answers);
-        logO(DEBUG, answers);
-        re = answers.command;
-    });
+        }]).then((answers) => {
+            // console.log('answers: ' , answers);
+            logO(DEBUG, answers);
+            re = answers.command;
+        });
+    } else {
+        return getLastGlobalAnswer(question);
+    }
     return re;
 }
 
@@ -364,6 +377,38 @@ searchAnswerF = function (answers, input) {
         }, _F.random(30, 60));
     });
 }
+
+let useGlobalAnswers = false;
+let globalAnswers = [];
+
+setGlobalAnswers = function (answers) {
+    console.log('Answers: ' , answers);
+    if (answers) {
+        // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
+        if(answers.indexOf(':') > 0){
+            globalAnswers = answers.split(':');
+        } else {
+            globalAnswers = answers.split(',');
+        }
+        if (globalAnswers.length > 0) {
+            useGlobalAnswers = true;
+            log(INFO, 'Global Answers set: ', globalAnswers)
+        }
+    }
+}
+
+getLastGlobalAnswer = function (question) {
+    let re = '';
+    if (globalAnswers && globalAnswers.length > 0) {
+        re = globalAnswers.shift();
+        log(INFO, 'Injected answer: ', re);
+    } else {
+        log(ERROR, 'No answer left for question: ' + question);
+        process.exit(1);
+    }
+    return re;
+}
+
 
 // Update the cloud login properties
 updateCloudLogin = async function (propFile) {
@@ -723,8 +768,8 @@ pexTable = function (tObject, tName, config, doPrint) {
                 doExport = true;
             } else {
                 let tableArr = config.tables.split(',');
-                for(let tab of tableArr){
-                    if(tab == tName){
+                for (let tab of tableArr) {
+                    if (tab == tName) {
                         doExport = true;
                     }
                 }

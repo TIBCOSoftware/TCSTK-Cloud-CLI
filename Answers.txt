@@ -1,0 +1,11 @@
+
+
+Show Shared State Details:
+tcli show-shared-state-details -a processdiscovery2.general.config.tibcolabs.client.context.PUBLIC
+
+
+tcli  export-shared-state-scope -a YES
+
+
+tcli export-live-apps-cases -a Discoveranalysis,mine/
+tcli export-live-apps-cases -a Discoveranalysis,

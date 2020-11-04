@@ -32,7 +32,9 @@ function parseArgumentsIntoOptions(rawArgs) {
             '--surpressStart': Boolean,
             '-s': '--surpressStart',
             '--pass': String,
-            '--org': String
+            '--org': String,
+            '--answers': String,
+            '-a': '--answers',
         },
         {
             argv: rawArgs.slice(2),
@@ -52,7 +54,8 @@ function parseArgumentsIntoOptions(rawArgs) {
         surpressStart: args['--surpressStart'] || false,
         task: args._[0] || '',
         pass: args['--pass'] || '',
-        org: args['--org'] || ''
+        org: args['--org'] || '',
+        answers: args['--answers'] || '',
     };
 }
 
@@ -82,6 +85,7 @@ export async function cli(args) {
         console.log('multipleFile: ' + options.multipleFile);
         console.log('pass: ' + options.pass);
         console.log('org: ' + options.org);
+        console.log('answers: ' + options.answers);
     }
     if(options.pass != ''){
         // This call sets the properties object, to be able to add a property to it.
@@ -95,6 +99,11 @@ export async function cli(args) {
     if(options.org != ''){
         setOrganization(options.org);
     }
+
+    if(options.answers != ''){
+        setGlobalAnswers(options.answers);
+    }
+
 
     // Show help
     if (options.help) {

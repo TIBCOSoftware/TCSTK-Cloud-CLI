@@ -38,6 +38,7 @@ const colors = require('colors');
 let loginURL = cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
 let isOAUTHValid = false;
+let toldClientID = false;
 
 cLogin = function (tenant, customLoginURL, forceClientID) {
     const fClientID = forceClientID || false;
@@ -67,7 +68,10 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
         }
     }
     if (!isOauthUsed() || !isOAUTHValid || fClientID) {
-        log(INFO, 'Using CLIENT-ID Authentication...');
+        if(!toldClientID){
+            log(INFO, 'Using CLIENT-ID Authentication...');
+            toldClientID = true;
+        }
         var setLoginURL = loginURL;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
