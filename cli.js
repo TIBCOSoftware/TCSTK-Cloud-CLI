@@ -35,6 +35,10 @@ function parseArgumentsIntoOptions(rawArgs) {
             '--org': String,
             '--answers': String,
             '-a': '--answers',
+            '--job': String,
+            '-j': '--job',
+            '--environment': String,
+            '-e': '--environment',
         },
         {
             argv: rawArgs.slice(2),
@@ -56,6 +60,8 @@ function parseArgumentsIntoOptions(rawArgs) {
         pass: args['--pass'] || '',
         org: args['--org'] || '',
         answers: args['--answers'] || '',
+        job: args['--job'] || '',
+        environment: args['--environment'] || '',
     };
 }
 
@@ -70,7 +76,8 @@ export async function cli(args) {
     const cwdir = process.cwd();
     propFileName = options.propfile;
     setPropFileName(propFileName);
-    setMultipleFileName(options.multipleFile);
+    // TODO: Allow for multiple Jobs and environments
+    setMultipleOptions({name: options.multipleFile, job: options.job, environment: options.environment});
     if (options.debug) {
         console.log(' Options: ', options);
         console.log('    Task: ' + options.task);

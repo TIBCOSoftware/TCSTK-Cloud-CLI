@@ -371,26 +371,8 @@ showCloudInfo = function (showTable) {
     });
 };
 
-createTableValue = function (name, value, table) {
-    table = table || [];
-    var entry = {};
-    entry['NAME'] = name;
-    entry['VALUE'] = value;
-    table[table.length] = entry;
-    return table;
-}
-
 doDeleteApp = function (appToDelete) {
-    //const lCookie = cLogin();
     const location = cloudURL + 'webresource/v1/applications/' + appToDelete + '/';
-    /*
-    const response = syncClient.del(location, {
-        headers: {
-            "accept": "application/json",
-            "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-        }
-    });
-    */
     return callURL(location, 'DEL');
 }
 

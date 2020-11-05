@@ -10,10 +10,21 @@ const colors = require('colors');
 processMultipleFile = function () {
     return new Promise(async function (resolve, reject) {
         // setLogDebug('true');
-        mFile = getMultipleFileName();
-        log(INFO, '- Managing Multiple, Using file: ' + mFile);
+        let mOpts = getMultipleOptions();
+        mFile = mOpts.name;
+
+
+        // log(INFO, '- Managing Multiple, Using file: ' + mFile);
         // Go Over All Cloud Starter Jobs
         let cloudStarters = getMProp('Cloud_Starter_JOBS');
+        if(mOpts.job && mOpts.job.trim() != ''){
+            cloudStarters = mOpts.job;
+        }
+        let environmentOverride = '';
+        if(mOpts.environment && mOpts.environment.trim() != ''){
+            environmentOverride = mOpts.environment;
+        }
+
         if (cloudStarters == null) {
             //Try to get from old definition for backwards compatibility.
             cloudStarters = getMProp('Cloud_Starters');
@@ -21,6 +32,7 @@ processMultipleFile = function () {
                 log(WARNING, "Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...");
             }
         }
+
         let failOnError = getMProp('Fail_On_Error');
         if (failOnError == null) {
             log(INFO, 'No Fail_On_Error Property found; Adding Fail_On_Error to ' + mFile);
@@ -29,16 +41,36 @@ processMultipleFile = function () {
         }
         const doFailOnError = !(failOnError.toLowerCase() == 'no');
 
-        log(INFO, '- Looping over Configured Starter JOBS: ' + cloudStarters);
+        // log(INFO, '- Looping over Configured Starter JOBS: ' + cloudStarters);
+        let nvs = createTableValue('File', mFile);
         const cloudStartersA = cloudStarters.split(',');
-        for (var i = 0; i < cloudStartersA.length; i++) {
+        let jobN = 0;
+        for (let k = 0; k < cloudStartersA.length; k++) {
+            const currentJob = cloudStartersA[k].trim();
+            let environments = getMProp(currentJob + '_Environments');
+            if(environmentOverride != ''){
+                environments = environmentOverride;
+            }
+            const environmentsA = environments.split(',');
+            for (var l = 0; l < environmentsA.length; l++) {
+                jobN++;
+                nvs = createTableValue(currentJob , environmentsA[l].trim(), nvs, 'JOB' , 'ENVIRONMENT');
+            }
+        }
+        log(INFO, colors.blue('JOB SUMMARY]' ) + ' FILE: ' + mFile);
+        console.table(nvs);
+
+        for (let i = 0; i < cloudStartersA.length; i++) {
             const currentStarter = trim(cloudStartersA[i]);
             const logS = colors.blue('[STARTER JOB: ' + currentStarter + ']');
             // log(INFO, logS);
             // Per Starter Go Over the Configured Environments
             const currLoc = getMProp(currentStarter + '_Location');
             log(INFO, logS + ' Location: ' + currLoc);
-            const environments = getMProp(currentStarter + '_Environments');
+            let environments = getMProp(currentStarter + '_Environments');
+            if(environmentOverride != ''){
+                environments = environmentOverride;
+            }
             log(INFO, logS + ' Environments: ' + environments);
             const environmentsA = environments.split(',');
             // TODO: Allow for a pre environment command (like git pulls or build)

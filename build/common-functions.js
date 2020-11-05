@@ -116,7 +116,7 @@ let globalProperties;
 let propFileNameGl;
 let propertiesGl;
 let propsGl;
-let globalMultipleFileName;
+let globalMultipleOptions = {};
 // Function to get a property
 let globalOAUTH = null;
 getOAUTHDetails = function () {
@@ -231,12 +231,12 @@ setPropFileName = function (propFileName) {
 getPropFileName = function () {
     return propFileNameGl;
 }
-setMultipleFileName = function (mFileName) {
-    globalMultipleFileName = mFileName;
-    log(DEBUG, 'Using Multiple File: ' + globalMultipleFileName);
+setMultipleOptions = function (mOptions) {
+    globalMultipleOptions = mOptions;
+    log(DEBUG, 'Using Multiple Options: ' , globalMultipleOptions);
 }
-getMultipleFileName = function () {
-    return globalMultipleFileName;
+getMultipleOptions = function () {
+    return globalMultipleOptions;
 }
 
 // Function to trim string
@@ -437,7 +437,7 @@ obfuscatePW = function (toObfuscate) {
 
 // function to update the tenant
 updateRegion = async function (propFile) {
-    var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+    let re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     switch (re) {
         case 'US - Oregon':
             addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
@@ -566,34 +566,6 @@ addOrUpdateProperty = function (location, property, value, comment) {
                 dataForFile += '\n' + property + '=' + value;
             }
             fs.writeFileSync(location, dataForFile, 'utf8');
-            //var reg = new RegExp('(?<!#)' + property + '\\s*=\\s*(.*)\n');
-            //var regNl = new RegExp('(?<!#)' + property + '\\s*=\n');
-            /*
-            var reg = new RegExp( property + '\\s*=\\s*(.*)\n');
-            var regNl = new RegExp( property + '\\s*=\n');
-
-            if (data.search(reg) > -1 || data.search(regNl) > -1) {
-                // We found the property
-                log(INFO, 'Property found: ' + property + ' We are updating it to: ' + value);
-                let result = '';
-                if(data.search(regNl) > -1){
-                    var regRes = new RegExp(property + '\\s*=\n');
-                    result = data.replace(regRes, property + '=' + value + '\n');
-                } else {
-                    var regRes = new RegExp(property + '\\s*=\\s*(.*)\n');
-                    result = data.replace(regRes, property + '=' + value + '\n');
-                }
-                fs.writeFileSync(location, result, 'utf8');
-                log(INFO, 'Updated: ' + property + ' to: ' + value + ' (in:' + location + ')');
-            } else {
-                // append prop to the end.
-                log(INFO, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
-                if (comment) {
-                    data = data + '\n# ' + comment
-                }
-                var result = data + '\n' + property + '=' + value;
-                fs.writeFileSync(location, result, 'utf8');
-            }*/
         } else {
             log(ERROR, 'Property File does not exist: ' + location);
         }
@@ -640,13 +612,7 @@ run = function (command, failOnError) {
             reject(err);
         }
         resolve();
-    })/*.catch(
-        (reason => {
-            logO(DEBUG, reason);
-            log(ERROR, 'Error Running command: ' + command);
-            process.exit(1);
-        })
-    );*/
+    })
 }
 
 // Delete a folder
@@ -746,6 +712,18 @@ iterateTable = function (tObject) {
         re.push(tObject[property]);
     }
     return re;
+}
+
+// Creates a flat table with names and values
+createTableValue = function (name, value, table, headerName, headerValue) {
+    let hName = headerName || 'NAME';
+    let hValue = headerValue || 'VALUE';
+    table = table || [];
+    let entry = {};
+    entry[hName] = name;
+    entry[hValue] = value;
+    table[table.length] = entry;
+    return table;
 }
 
 // Print and possibly export Table to CSV
