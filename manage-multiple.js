@@ -128,7 +128,8 @@ const TCLI_INTERACTVIE = 'tcli-interactive';
 multipleInteraction = function () {
     return new Promise(async function (resolve, reject) {
         const PropertiesReader = require('properties-reader');
-        mFile = getMultipleFileName();
+        let mOpts = getMultipleOptions();
+        mFile = mOpts.name;
         let failOnError = getMProp('Fail_On_Error');
         if (failOnError == null) {
             failOnError = 'YES';
