@@ -43,6 +43,9 @@ processMultipleFile = function () {
 
         // log(INFO, '- Looping over Configured Starter JOBS: ' + cloudStarters);
         let nvs = createTableValue('File', mFile);
+        if(fileExtension.trim() != ''){
+            nvs = createTableValue('File Extension', fileExtension, nvs);
+        }
         const cloudStartersA = cloudStarters.split(',');
         let jobN = 0;
         for (let k = 0; k < cloudStartersA.length; k++) {
@@ -277,8 +280,9 @@ gulp.task('run-multiple', processMultipleFile);
 gulp.task('run-multiple-interaction', multipleInteraction);
 
 
-// TODO: Move this to global (merge with other property function)
+
 let propsM;
+let fileExtension = '';
 
 getMProp = function (property, propFileName) {
     let propFileToUse = mFile;
@@ -289,6 +293,13 @@ getMProp = function (property, propFileName) {
     if (propsM == null) {
         const PropertiesReader = require('properties-reader');
         propsM = PropertiesReader(propFileToUse).path();
+        if(propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() != ''){
+            log(INFO, 'Adding extension to propfile('+propFileToUse+') : ' + propsM.PROPERTY_EXTENSION_FILE)
+            let propsTwo = PropertiesReader(propsM.PROPERTY_EXTENSION_FILE).path();
+            fileExtension = propsM.PROPERTY_EXTENSION_FILE;
+            const objectTemp = {...propsTwo, ...propsM};
+            propsM = objectTemp;
+        }
         //console.log(propsM);
     }
     let re;
