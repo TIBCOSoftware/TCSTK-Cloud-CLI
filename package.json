@@ -34,7 +34,7 @@
   },
   "devDependencies": {},
   "peerDependencies": {
-    "gulp": "^4.0.2"
+    "gulp-cli": "^2.3.0"
   },
   "bin": {
     "tcli": "bin/cloud-cli.js"
