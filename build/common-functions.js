@@ -830,6 +830,7 @@ setLogDebug = function (debug) {
     useDebug = (debug == 'true');
 }
 
+// Function moved to TS
 log = function (level, ...message) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level == DEBUG && !useDebug)) {
@@ -844,10 +845,11 @@ log = function (level, ...message) {
             } else {
                 console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ', ...message, '\033[0m');
             }
-
         }
     }
 }
+
+
 logO = function (level, message) {
     if (!(level == DEBUG && !useDebug)) {
         console.log(message);
@@ -855,6 +857,7 @@ logO = function (level, message) {
 }
 
 //Function to log on one line...
+//TODO: Add option to skip this logging (for Jenkins)
 logLine = function (message) {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
