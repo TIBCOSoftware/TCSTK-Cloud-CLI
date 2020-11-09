@@ -859,8 +859,10 @@ logO = function (level, message) {
 //Function to log on one line...
 //TODO: Add option to skip this logging (for Jenkins)
 logLine = function (message) {
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
+    const readline = require('readline');
+    readline.cursorTo(process.stdout, 0);
+    //process.stdout.clearLine();
+    //process.stdout.cursorTo(0);
     process.stdout.write(message);
 }
 
