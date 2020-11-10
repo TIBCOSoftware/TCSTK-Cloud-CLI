@@ -68,7 +68,7 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
         }
     }
     if (!isOauthUsed() || !isOAUTHValid || fClientID) {
-        if(!toldClientID){
+        if (!toldClientID) {
             log(INFO, 'Using CLIENT-ID Authentication...');
             toldClientID = true;
         }
@@ -1361,8 +1361,8 @@ importLiveAppsData = async function () {
     //TODO: Choose import file (if there are more) --> Starts with import && ends with json
 
     // If default import file does not exist, ask for a custom one.
-    if(!doesFileExist(importFile)){
-        importFile = process.cwd() + '/' + await askQuestion('Default Import file ('+importFile+') not found, which import configuration file would you like to use ?');
+    if (!doesFileExist(importFile)) {
+        importFile = process.cwd() + '/' + await askQuestion('Default Import file (' + importFile + ') not found, which import configuration file would you like to use ?');
     }
     const impConf = require(importFile);
     const cSteps = impConf['import-steps'];
@@ -1664,13 +1664,13 @@ monitorTCI = async function () {
     let tAppsToChoose = ['Nothing'];
     for (let tApp of iterateTable(tciApps)) {
         // console.log(tApp);
-        if(tApp && tApp.Name){
+        if (tApp && tApp.Name) {
             tAppsToChoose.push(tApp.Name);
         }
 
     }
     let appToMonitor = await askMultipleChoiceQuestionSearch('Which TCI App would you like to monitor ?', tAppsToChoose);
-    if(appToMonitor != 'Nothing'){
+    if (appToMonitor != 'Nothing') {
         // console.log(appToMonitor);
         // run(tibCli + ' logout');
         // TODO: move this logic to common lib
@@ -1701,22 +1701,31 @@ generateCloudPropertyFiles = async function () {
     const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
     // console.log(response);
     let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
-    if(projectName.trim() != ''){
+    if (projectName.trim() != '') {
         projectName = projectName + '_';
     }
     const propFilesALL = [];
     const propFilesEU = [];
     const propFilesUS = [];
     const propFilesAU = [];
-    const propOption = ['NONE', 'ALL', 'ALL EU' , 'ALL US', 'ALL AU'];
-    for(let org of response.accountsInfo){
+    const propOption = ['NONE', 'ALL', 'ALL EU', 'ALL US', 'ALL AU'];
+    for (let org of response.accountsInfo) {
         let orgName = '' + org.accountDisplayName;
-        let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g,'_');
-        let tOrgNameEU = {REGION: 'EU', PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties'};
-        let tOrgNameUS = {REGION: 'US', PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties'};
-        let tOrgNameAU = {REGION: 'AU', PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties'};
-        propOption.push(tOrgNameEU.PROPERTY_FILE_NAME,tOrgNameUS.PROPERTY_FILE_NAME,tOrgNameAU.PROPERTY_FILE_NAME);
-        propFilesALL.push(tOrgNameEU,tOrgNameUS,tOrgNameAU);
+        let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
+        let tOrgNameEU = {
+            REGION: 'EU',
+            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties'
+        };
+        let tOrgNameUS = {
+            REGION: 'US',
+            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties'
+        };
+        let tOrgNameAU = {
+            REGION: 'AU',
+            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties'
+        };
+        propOption.push(tOrgNameEU.PROPERTY_FILE_NAME, tOrgNameUS.PROPERTY_FILE_NAME, tOrgNameAU.PROPERTY_FILE_NAME);
+        propFilesALL.push(tOrgNameEU, tOrgNameUS, tOrgNameAU);
         propFilesEU.push(tOrgNameEU);
         propFilesUS.push(tOrgNameUS);
         propFilesAU.push(tOrgNameAU);
@@ -1725,30 +1734,30 @@ generateCloudPropertyFiles = async function () {
     console.table(propFilesALL);
     let propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption);
     console.log('Create: ' + propFilesToGenerate);
-    if(propFilesToGenerate != 'NONE'){
+    if (propFilesToGenerate != 'NONE') {
         let genOne = true;
-        if(propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL EU'){
+        if (propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL EU') {
             genOne = false;
-            for (let pFile of propFilesEU){
+            for (let pFile of propFilesEU) {
                 configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
             }
         }
-        if(propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL US'){
+        if (propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL US') {
             genOne = false;
-            for (let pFile of propFilesUS){
+            for (let pFile of propFilesUS) {
                 configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
             }
         }
-        if(propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL AU'){
+        if (propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL AU') {
             genOne = false;
-            for (let pFile of propFilesAU){
+            for (let pFile of propFilesAU) {
                 configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
             }
         }
-        if(genOne){
+        if (genOne) {
             let reg = '';
-            for (let pFile of propFilesALL){
-                if(pFile.PROPERTY_FILE_NAME == propFilesToGenerate){
+            for (let pFile of propFilesALL) {
+                if (pFile.PROPERTY_FILE_NAME == propFilesToGenerate) {
                     reg = pFile.REGION;
                 }
             }
@@ -1759,18 +1768,21 @@ generateCloudPropertyFiles = async function () {
     }
 }
 
-configurePropFile = function (fileName, region){
+configurePropFile = function (fileName, region) {
     log(INFO, '[' + region + ']: Generating: ' + fileName);
     let regToAdd = '';
-    if(region == 'EU'){regToAdd = 'eu.';}
-    if(region == 'AU'){regToAdd = 'au.';}
+    if (region == 'EU') {
+        regToAdd = 'eu.';
+    }
+    if (region == 'AU') {
+        regToAdd = 'au.';
+    }
     copyFile(getPropFileName(), fileName);
-    addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://"+regToAdd+"account.cloud.tibco.com/manage/settings/oAuthTokens>");
+    addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://" + regToAdd + "account.cloud.tibco.com/manage/settings/oAuthTokens>");
     addOrUpdateProperty(fileName, 'cloudHost', regToAdd + 'liveapps.cloud.tibco.com');
-    addOrUpdateProperty(fileName, 'Cloud_URL', 'https://'+regToAdd+'liveapps.cloud.tibco.com/');
+    addOrUpdateProperty(fileName, 'Cloud_URL', 'https://' + regToAdd + 'liveapps.cloud.tibco.com/');
     log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
 }
-
 
 
 // Function to display all OAUTH Tokens...
@@ -1862,7 +1874,7 @@ rotateOauthToken = function () {
 
 validateAndRotateOauthToken = async function (isInteractive) {
     let doInteraction = true;
-    if(isInteractive != null){
+    if (isInteractive != null) {
         doInteraction = isInteractive;
     }
     log(INFO, 'Validating and Rotating OAUTH Token...');
@@ -1882,7 +1894,7 @@ validateAndRotateOauthToken = async function (isInteractive) {
         if (oDetails['Expiry_Date'] < (now.getTime() + oauth_required_hours_valid * 3600 * 1000)) {
             log(WARNING, 'Your OAUTH key is expired or about to expire within ' + oauth_required_hours_valid + ' hours.');
             let decision = 'YES';
-            if(doInteraction){
+            if (doInteraction) {
                 decision = await askMultipleChoiceQuestion('Would you like to rotate your OAUTH key ?', ['YES', 'NO']);
             }
             if (decision == 'YES') {
@@ -1891,7 +1903,7 @@ validateAndRotateOauthToken = async function (isInteractive) {
                 log(INFO, 'Ok I won\'t do anything...');
             }
         } else {
-            log(INFO, 'OAUTH Key('+oDetails['Token_Name']+') is valid for more than ' + oauth_required_hours_valid + ' hours :-)...');
+            log(INFO, 'OAUTH Key(' + oDetails['Token_Name'] + ') is valid for more than ' + oauth_required_hours_valid + ' hours :-)...');
         }
     } else {
         log(WARNING, 'No OAUTH (expiry) Details Found...');
@@ -1997,7 +2009,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
 // TODO: implement Function, that does all sorts of validations
 validate = function () {
     //console.log('Validate ',new Date());
-    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
     log(ERROR, 'TODO: Implement...')
 }
 
@@ -2027,7 +2039,8 @@ GET /orgFolders/{folderName}/artifacts/{artifactName}/artifactVersions
 showOrgFolders = function () {
     const getOrgFolderURL = 'https://' + getCurrentRegion() + clURI.org_folders;
     const oResponse = callURL(getOrgFolderURL);
-    const tObject = createTable(oResponse, mappings.org_folder, true);
+    const tObject = createTable(oResponse, mappings.org_folder, false);
+    pexTable(tObject, 'live-apps-org-folders', getPEXConfig(), true);
     // log(INFO, 'OAUTH Object: ', tObject);
     return tObject;
 }
@@ -2047,9 +2060,36 @@ watchOrgFolder = function () {
     log(ERROR, 'TODO: Implement...')
 }
 
-// TODO: implement Function
-showLiveAppsGroups = function () {
-    log(ERROR, 'TODO: Implement...')
+getGroupsTable = function () {
+    const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups);
+    const groupTable = createTable(oResponse, mappings.la_groups, false);
+    pexTable(groupTable, 'live-apps-groups', getPEXConfig(), true);
+    return groupTable;
+}
+
+// Function that shows live apps group and who is in it.
+showLiveAppsGroups = async function () {
+    const groupT = getGroupsTable();
+    let selectGroup = ['NONE', 'ALL'];
+    for (let gr of iterateTable(groupT)) {
+        selectGroup.push(gr.Name);
+    }
+    const decision = await askMultipleChoiceQuestionSearch('For which group would you like to see the users ?', selectGroup);
+    if (decision != 'NONE') {
+        for (let gr of iterateTable(groupT)) {
+            if (decision == gr.Name || decision == 'ALL') {
+                const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
+                const userGroupTable = createTable(oResponse, mappings.la_groups_users, false)
+                for (let uGr in userGroupTable) {
+                    userGroupTable[uGr]['Group'] = gr.Name;
+                }
+                log(INFO, 'Users for group: ' + gr.Name);
+                pexTable(userGroupTable, 'live-apps-groups-users', getPEXConfig(), true);
+            }
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
 }
 
 // TODO: implement Function

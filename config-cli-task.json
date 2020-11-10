@@ -386,9 +386,9 @@
     },
     "47. show-live-apps-groups": {
       "description": "Displays the LiveApps groups and their users.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "gulpTask": "show-live-apps-groups",
       "availableOnOs": ["all"]
     },
