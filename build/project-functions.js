@@ -1226,7 +1226,6 @@ exportLiveAppsCaseType = async function () {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-
     let fName = await askQuestion('What file name would you like to export to ? (press enter for default)');
     for (var curCase in cTypes) {
         if (typeForExport == cTypes[curCase].name) {
@@ -2092,9 +2091,24 @@ showLiveAppsGroups = async function () {
     }
 }
 
-// TODO: implement Function
-createLiveAppsGroup = function () {
-    log(ERROR, 'TODO: Implement...')
+// Function to create LiveApps Group
+createLiveAppsGroup = async function () {
+    log(INFO, 'Creating LiveApps Group...');
+    const gName = await askQuestion('What file name of the group you would like to create ? (press enter to not create a group)');
+    if (gName != '') {
+        const gDescription = await askQuestion('What is the description of the group  ? (press enter to leave blank)');
+        let postGroup = {
+            "name": gName,
+            "description": gDescription,
+            "type": "SubscriptionDefined"
+        }
+        const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups, 'POST', postGroup);
+        if(oResponse != null){
+            log(INFO, 'Successfully create group with ID: ', oResponse);
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
 }
 
 // TODO: implement Function

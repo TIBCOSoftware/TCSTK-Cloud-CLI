@@ -394,7 +394,7 @@
     },
     "48. create-live-apps-group": {
       "description": "Creates a new LiveApps group.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": false,
       "gulpTask": "create-live-apps-group",
