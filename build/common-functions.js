@@ -574,7 +574,6 @@ addOrUpdateProperty = function (location, property, value, comment) {
     }
 }
 
-
 // Get the global configuration
 // TODO: Get rid of this function
 getGlobalConfig = function () {
