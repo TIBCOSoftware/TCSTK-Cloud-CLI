@@ -396,19 +396,27 @@
       "description": "Creates a new LiveApps group.",
       "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "gulpTask": "create-live-apps-group",
       "availableOnOs": ["all"]
     },
-    "49. add-user-to-group": {
-      "description": "Adds a user to a LiveApps group.",
-      "enabled": false,
+    "49. show-live-apps-users": {
+      "description": "Shows the users in LiveApps (which can be added to groups).",
+      "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
+      "gulpTask": "show-live-apps-users",
+      "availableOnOs": ["all"]
+    },
+    "50. add-user-to-group": {
+      "description": "Adds a user to a LiveApps group.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
       "gulpTask": "add-user-to-group",
       "availableOnOs": ["all"]
     },
-    "50. validate": {
+    "51. validate": {
       "description": "Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.",
       "enabled": false,
       "internal": false,
@@ -416,7 +424,7 @@
       "gulpTask": "validate",
       "availableOnOs": ["all"]
     },
-    "51. update-property": {
+    "52. update-property": {
       "description": "Updates a property in a file.",
       "enabled": false,
       "internal": false,

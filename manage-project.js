@@ -538,6 +538,14 @@ createLiveAppsGroupWrapper  = function () {
     });
 }
 
+showLiveAppsUsersWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        showLiveAppsUsers(true, false);
+        resolve();
+    });
+}
+
+
 addUserToGroupWrapper  = function () {
     return new Promise(async function (resolve, reject) {
         addUserToGroup();
@@ -558,6 +566,8 @@ updatePropertyWrapper  = function () {
         resolve();
     });
 }
+
+
 
 if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Before gulp init');
 //gulp.task('test-call-service', testCallService);
@@ -642,12 +652,15 @@ gulp.task('show-live-apps-groups', showLiveAppsGroupsWrapper);
 showLiveAppsGroupsWrapper.description = 'Displays the LiveApps groups and their users.';
 gulp.task('create-live-apps-group', createLiveAppsGroupWrapper);
 createLiveAppsGroupWrapper.description = 'Creates a new LiveApps group.';
+gulp.task('show-live-apps-users', showLiveAppsUsersWrapper);
+showLiveAppsUsersWrapper.description = 'Shows the users in LiveApps (which can be added to groups).';
+
 gulp.task('add-user-to-group', addUserToGroupWrapper);
-
 addUserToGroupWrapper.description = 'Adds a user to a LiveApps group.';
-gulp.task('validate', validateWrapper);
 
+gulp.task('validate', validateWrapper);
 validateWrapper.description = 'Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.';
+
 gulp.task('update-property', updatePropertyWrapper);
 updatePropertyWrapper.description = 'Updates a property in a file.';
 

@@ -7,7 +7,9 @@
     "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens",
     "revoke_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke",
     "org_folders": "liveapps.cloud.tibco.com/webresource/v1/orgFolders/",
-    "la_groups": "liveapps.cloud.tibco.com/organisation/v1/groups"
+    "la_groups": "liveapps.cloud.tibco.com/organisation/v1/groups",
+    "la_users": "liveapps.cloud.tibco.com/organisation/v1/users",
+    "la_user_group_mapping": "liveapps.cloud.tibco.com/organisation/v1/userGroupMappings"
   },
   "mappings": {
     "oauth": {
@@ -95,6 +97,10 @@
     "la_groups": {
       "entries": [
         {
+          "header": "Id",
+          "field": "id"
+        },
+        {
           "header": "Name",
           "field": "name"
         },
@@ -105,17 +111,13 @@
         {
           "header": "Description",
           "field": "description"
-        },
-        {
-          "header": "Id",
-          "field": "id"
         }
       ]
     },
     "la_groups_users": {
       "entries": [
         {
-          "header": "Fist Name",
+          "header": "First Name",
           "field": "firstName"
         },
         {
@@ -133,6 +135,38 @@
         {
           "header": "Mapping Id",
           "field": "id"
+        }
+      ]
+    },
+    "la_users": {
+      "entries": [
+        {
+          "header": "Id",
+          "field": "id"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "First Name",
+          "field": "firstName"
+        },
+        {
+          "header": "Last Name",
+          "field": "lastName"
+        },
+        {
+          "header": "User Name",
+          "field": "username"
+        },
+        {
+          "header": "Email",
+          "field": "email"
+        },
+        {
+          "header": "External ID",
+          "field": "externalId"
         }
       ]
     }

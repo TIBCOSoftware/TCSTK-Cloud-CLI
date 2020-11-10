@@ -2080,7 +2080,8 @@ showLiveAppsGroups = async function () {
                 const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
                 const userGroupTable = createTable(oResponse, mappings.la_groups_users, false)
                 for (let uGr in userGroupTable) {
-                    userGroupTable[uGr]['Group'] = gr.Name;
+                    //userGroupTable[uGr].assign({Group: gr.Name}, userGroupTable[uGr]);
+                    userGroupTable[uGr] = Object.assign({Group: gr.Name}, userGroupTable[uGr])
                 }
                 log(INFO, 'Users for group: ' + gr.Name);
                 pexTable(userGroupTable, 'live-apps-groups-users', getPEXConfig(), true);
@@ -2103,7 +2104,7 @@ createLiveAppsGroup = async function () {
             "type": "SubscriptionDefined"
         }
         const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups, 'POST', postGroup);
-        if(oResponse != null){
+        if (oResponse != null) {
             log(INFO, 'Successfully create group with ID: ', oResponse);
         }
     } else {
@@ -2111,11 +2112,98 @@ createLiveAppsGroup = async function () {
     }
 }
 
-// TODO: implement Function
-addUserToGroup = function () {
-    log(ERROR, 'TODO: Implement...')
+// Function that shows the LiveApps Users
+showLiveAppsUsers = function (showTable, hideTestUsers) {
+    const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_users);
+    const usersTable = createTable(oResponse, mappings.la_users, false);
+    if (hideTestUsers) {
+        for (let usr in usersTable) {
+            if (usersTable[usr] && usersTable[usr].Type == 'Test') {
+                delete usersTable[usr];
+            }
+        }
+    }
+    pexTable(usersTable, 'live-apps-users', getPEXConfig(), showTable);
+    return usersTable;
 }
 
+// Function
+addUserToGroup = async function () {
+    // Show all the groups and ask to which group you would like to add a user.
+    let groupIdToAdd = '';
+    let userIdToAdd = '';
+    const groupT = getGroupsTable();
+    // TODO: perhaps allow to add a user to all groups
+    // let selectGroup = ['NONE', 'ALL'];
+    let selectGroup = ['NONE'];
+    for (let gr of iterateTable(groupT)) {
+        selectGroup.push(gr.Name);
+    }
+    const groupDecision = await askMultipleChoiceQuestionSearch('For which group would you like to ADD a user ?', selectGroup);
+    if (groupDecision != 'NONE') {
+        let currentUsersInGroupT = [];
+        for (let gr of iterateTable(groupT)) {
+            if (groupDecision == gr.Name) {
+                groupIdToAdd = gr.Id;
+                const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
+                log(INFO, 'CURRENT USERS IN GROUP: ' + groupDecision);
+                currentUsersInGroupT = createTable(oResponse, mappings.la_groups_users, true)
+
+            }
+        }
+        const userT = showLiveAppsUsers(false, true);
+        // TODO: perhaps allow to add a user to all groups
+        //let selectedUser = ['NONE', 'ALL'];
+        let selectedUser = ['NONE'];
+        let allowedUsersTable = [];
+        for (let usr of iterateTable(userT)) {
+            let add = true;
+            for (let cUsrGrp of iterateTable(currentUsersInGroupT)) {
+                // console.log(cUsrGrp.Email + ' == ' + usr['Email'])
+                if (cUsrGrp.Email == usr['Email']) {
+                    add = false;
+                }
+            }
+            if (add) {
+                allowedUsersTable.push(usr);
+                selectedUser.push(usr['First Name'] + ' ' + usr['Last Name']);
+            }
+        }
+        log(INFO, 'Users that can be added to ' + groupDecision);
+        console.table(allowedUsersTable);
+        const userDecision = await askMultipleChoiceQuestionSearch('Which user would you like to add to the group (' + groupDecision + ')', selectedUser);
+        if (userDecision != 'NONE') {
+            if (userDecision.startsWith('ID-')) {
+                userIdToAdd = userDecision.substr(3);
+            }
+            if (groupDecision.startsWith('ID-')) {
+                groupIdToAdd = userDecision.substr(3);
+            }
+            for (let usr of iterateTable(userT)) {
+                if (userDecision == usr['First Name'] + ' ' + usr['Last Name']) {
+                    userIdToAdd = usr.Id;
+                }
+            }
+            log(INFO, 'Adding user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + ']');
+            const postGroupMapping = {
+                sandboxId: getProductionSandbox(),
+                groupId: groupIdToAdd,
+                userId: userIdToAdd
+            }
+            const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_user_group_mapping, 'POST', postGroupMapping);
+            if (oResponse != null) {
+                log(INFO, 'Successfully added user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
+
+            }
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+    // Show all the users and add that users to a group.
+
+}
 
 // Function to show spotfire reports
 showSpotfire = function () {
