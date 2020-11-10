@@ -70,6 +70,7 @@ const dirDelimiter = isWindows ? '\\' : '/';
 
 // Main function
 export async function cli(args) {
+    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' CLI INIT');
     //console.log('start');
     const options = parseArgumentsIntoOptions(args);
     const appRoot = process.env.PWD;
@@ -228,9 +229,13 @@ export async function cli(args) {
 
     if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
         // Start the specified Gulp Task
+        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
         var gulp = require('gulp');
+        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
         if (projectManagementMode) {
+            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
             require(__dirname + '/manage-project');
+            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
         } else {
             require(__dirname + '/manage-application');
         }

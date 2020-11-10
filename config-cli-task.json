@@ -354,9 +354,73 @@
     },
     "43. show-org-folders": {
       "description": "Displays the content of the LiveApps Organization Folders.",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
-      "multipleInteraction": true,
+      "multipleInteraction": false,
+      "gulpTask": "show-org-folders",
+      "availableOnOs": ["all"]
+    },
+    "44. export-org-folder": {
+      "description": "Exports the content of a LiveApps Organization Folder to disk.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "export-org-folder",
+      "availableOnOs": ["all"]
+    },
+    "45. import-org-folder": {
+      "description": "Imports the content of a folder on disk to a LiveApps Organization Folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "import-org-folder",
+      "availableOnOs": ["all"]
+    },
+    "46. watch-org-folder": {
+      "description": "Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "watch-org-folder",
+      "availableOnOs": ["all"]
+    },
+    "47. show-live-apps-groups": {
+      "description": "Displays the LiveApps groups and their users.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "show-live-apps-groups",
+      "availableOnOs": ["all"]
+    },
+    "48. create-live-apps-group": {
+      "description": "Creates a new LiveApps group.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "create-live-apps-group",
+      "availableOnOs": ["all"]
+    },
+    "49. add-user-to-group": {
+      "description": "Adds a user to a LiveApps group.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "add-user-to-group",
+      "availableOnOs": ["all"]
+    },
+    "50. validate": {
+      "description": "Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "gulpTask": "validate",
+      "availableOnOs": ["all"]
+    },
+    "51. update-property": {
+      "description": "Updates a property in a file.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
       "gulpTask": "show-org-folders",
       "availableOnOs": ["all"]
     },

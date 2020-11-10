@@ -574,6 +574,11 @@ addOrUpdateProperty = function (location, property, value, comment) {
     }
 }
 
+// TODO: implement Function to update a propety (possibly in a custom file)
+updateProperty = function () {
+    log(ERROR, 'TODO: Implement...')
+}
+
 // Get the global configuration
 // TODO: Get rid of this function
 getGlobalConfig = function () {

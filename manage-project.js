@@ -503,7 +503,63 @@ generateCloudPropertyFilesWrapper  = function () {
     });
 }
 
+exportOrgFolderWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        exportOrgFolder();
+        resolve();
+    });
+}
 
+importOrgFolderWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        importOrgFolder();
+        resolve();
+    });
+}
+
+watchOrgFolderWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        watchOrgFolder();
+        resolve();
+    });
+}
+
+showLiveAppsGroupsWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        showLiveAppsGroups();
+        resolve();
+    });
+}
+
+createLiveAppsGroupWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        createLiveAppsGroup();
+        resolve();
+    });
+}
+
+addUserToGroupWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        addUserToGroup();
+        resolve();
+    });
+}
+
+validateWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        validate();
+        resolve();
+    });
+}
+
+updatePropertyWrapper  = function () {
+    return new Promise(async function (resolve, reject) {
+        updateProperty();
+        resolve();
+    });
+}
+
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Before gulp init');
 //gulp.task('test-call-service', testCallService);
 gulp.task('test', test);
 //gulp.task('test-wsu', testWSU);
@@ -576,6 +632,25 @@ generateCloudPropertyFilesWrapper.description = 'Generates a list of cloud prope
 gulp.task('show-org-folders', showOrgFoldersWrapper);
 showOrgFoldersWrapper.description = 'Displays the content of the LiveApps Organization Folders.';
 
+gulp.task('export-org-folder', exportOrgFolderWrapper);
+exportOrgFolderWrapper.description = 'Exports the content of a LiveApps Organization Folder to disk.';
+gulp.task('import-org-folder', importOrgFolderWrapper);
+importOrgFolderWrapper.description = 'Imports the content of a folder on disk to a LiveApps Organization Folder.';
+gulp.task('watch-org-folder', watchOrgFolderWrapper);
+watchOrgFolderWrapper.description = 'Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.';
+gulp.task('show-live-apps-groups', showLiveAppsGroupsWrapper);
+showLiveAppsGroupsWrapper.description = 'Displays the LiveApps groups and their users.';
+gulp.task('create-live-apps-group', createLiveAppsGroupWrapper);
+createLiveAppsGroupWrapper.description = 'Creates a new LiveApps group.';
+gulp.task('add-user-to-group', addUserToGroupWrapper);
+
+addUserToGroupWrapper.description = 'Adds a user to a LiveApps group.';
+gulp.task('validate', validateWrapper);
+
+validateWrapper.description = 'Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.';
+gulp.task('update-property', updatePropertyWrapper);
+updatePropertyWrapper.description = 'Updates a property in a file.';
+
 
 gulp.task('clean-dist', cleanDist);
 gulp.task('buildZip', build);
@@ -644,7 +719,7 @@ generateCloudDescriptorWrapper.description = 'Generates the configured Public Cl
 
 gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
 createMultiplePropertyFileWrapper.description = 'Creating an initial property file to manage multiple cloud starters and environments.';
-
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After gulp init');
 
 /*
 TODO: Additional Cloud CLI Capabilities

@@ -1993,6 +1993,14 @@ generateOauthToken = function (tokenNameOverride, verbose) {
     });
 }
 
+
+// TODO: implement Function, that does all sorts of validations
+validate = function () {
+    //console.log('Validate ',new Date());
+    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
+    log(ERROR, 'TODO: Implement...')
+}
+
 /*
 ORG FOLDERS:
 
@@ -2022,6 +2030,36 @@ showOrgFolders = function () {
     const tObject = createTable(oResponse, mappings.org_folder, true);
     // log(INFO, 'OAUTH Object: ', tObject);
     return tObject;
+}
+
+// TODO: implement Function
+exportOrgFolder = function () {
+    log(ERROR, 'TODO: Implement...')
+}
+
+// TODO: implement Function
+importOrgFolder = function () {
+    log(ERROR, 'TODO: Implement...')
+}
+
+// TODO: implement Function
+watchOrgFolder = function () {
+    log(ERROR, 'TODO: Implement...')
+}
+
+// TODO: implement Function
+showLiveAppsGroups = function () {
+    log(ERROR, 'TODO: Implement...')
+}
+
+// TODO: implement Function
+createLiveAppsGroup = function () {
+    log(ERROR, 'TODO: Implement...')
+}
+
+// TODO: implement Function
+addUserToGroup = function () {
+    log(ERROR, 'TODO: Implement...')
 }
 
 
