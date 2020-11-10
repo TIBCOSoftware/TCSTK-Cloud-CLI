@@ -1664,7 +1664,10 @@ monitorTCI = async function () {
     let tAppsToChoose = ['Nothing'];
     for (let tApp of iterateTable(tciApps)) {
         // console.log(tApp);
-        tAppsToChoose.push(tApp.Name);
+        if(tApp && tApp.Name){
+            tAppsToChoose.push(tApp.Name);
+        }
+
     }
     let appToMonitor = await askMultipleChoiceQuestionSearch('Which TCI App would you like to monitor ?', tAppsToChoose);
     if(appToMonitor != 'Nothing'){
