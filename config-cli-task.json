@@ -354,9 +354,9 @@
     },
     "43. show-org-folders": {
       "description": "Displays the content of the LiveApps Organization Folders.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "gulpTask": "show-org-folders",
       "availableOnOs": ["all"]
     },

@@ -72,7 +72,7 @@ replaceInFile = function (from, to, filePattern) {
     let results = replace.sync(options);
     for (result of results) {
         if (result.numReplacements > 0) {
-            log(INFO, '\x1b[0m[REPLACED] [FROM: |\x1b[32m' + from + '\x1b[0m|] [TO: |\x1b[32m' + to + '\x1b[0m|]', '(Number of Replacements: ' + result.numReplacements + ')', result.file);
+            log(INFO, '\x1b[0m[REPLACED] [FROM: |\x1b[32m' + from + '\x1b[0m|] [TO: |\x1b[32m' + to + '\x1b[0m|]', '(Number of Replacements: ' + result.numReplacements + ')\nFILE: ', result.file);
         }
     }
     return results;
@@ -555,6 +555,7 @@ addOrUpdateProperty = function (location, property, value, comment) {
             for (let line of dataLines) {
                 dataForFile += line + '\n';
             }
+            // TODO: cut off the last \n
             if (propFound) {
                 log(INFO, 'Updated: ' + property + ' to: ' + value + ' (in:' + location + ')');
             } else {
@@ -861,7 +862,6 @@ logO = function (level, message) {
 }
 
 //Function to log on one line...
-//TODO: Add option to skip this logging (for Jenkins)
 logLine = function (message) {
     const readline = require('readline');
     readline.cursorTo(process.stdout, 0);

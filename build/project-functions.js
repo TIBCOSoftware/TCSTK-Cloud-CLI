@@ -2035,13 +2035,63 @@ GET /orgFolders/{folderName}/artifacts/{artifactName}/artifactVersions
  */
 
 // Function to show org folders
-showOrgFolders = function () {
-    const getOrgFolderURL = 'https://' + getCurrentRegion() + clURI.org_folders;
+showOrgFolders = async function () {
+    let OrgFolderLocation = './LA_Organization_Folder/'
+    if (getProp('LA_Organization_Folder') != null) {
+        OrgFolderLocation = getProp('LA_Organization_Folder');
+    } else {
+        log(INFO, 'No LA_Organization_Folder property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'LA_Organization_Folder', OrgFolderLocation, 'The location for exports and imports of the LiveApps organization folders');
+    }
+    const getOrgFolderURL = 'https://' + getCurrentRegion() + clURI.la_org_folders + '?$top=200';
     const oResponse = callURL(getOrgFolderURL);
-    const tObject = createTable(oResponse, mappings.org_folder, false);
-    pexTable(tObject, 'live-apps-org-folders', getPEXConfig(), true);
-    // log(INFO, 'OAUTH Object: ', tObject);
-    return tObject;
+    const folderTable = createTable(oResponse, mappings.la_org_folders, false);
+
+    //TODO: Perhaps allow all let chFolder = ['NONE', 'ALL']; (for export)
+    let chFolder = ['NONE'];
+    for (let fNr in folderTable) {
+        let noItems = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
+        logLine('Processing folder (' + fNr + '/' + iterateTable(folderTable).length + ')');
+        folderTable[fNr]['Number of Items'] = noItems;
+        if (noItems > 0) {
+            chFolder.push(folderTable[fNr].Name);
+        }
+    }
+    pexTable(folderTable, 'live-apps-org-folders', getPEXConfig(), true);
+    const folderDecision = await askMultipleChoiceQuestionSearch('For which folder would you like to see the contents ?', chFolder);
+    if (folderDecision != 'NONE') {
+        const folderResp = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folderDecision + '/artifacts/');
+        const folderContentTable = createTable(folderResp, mappings.la_org_folder_content, false);
+        const users = showLiveAppsUsers(false, false);
+        let chContent = ['NONE'];
+        for (let cont in folderContentTable) {
+            for (let usr of iterateTable(users)) {
+                if (usr.Id == folderContentTable[cont]['Author']) {
+                    folderContentTable[cont]['Author'] = usr['First Name'] + ' ' + usr['Last Name'];
+                }
+                if (usr.Id == folderContentTable[cont]['Modified By']) {
+                    folderContentTable[cont]['Modified By'] = usr['First Name'] + ' ' + usr['Last Name'];
+                }
+            }
+            chContent.push(folderContentTable[cont]['Name']);
+        }
+        pexTable(folderContentTable, 'live-apps-folder-folder-content', getPEXConfig(), true);
+        const fileDecision = await askMultipleChoiceQuestionSearch('Which file would you like to download ?', chContent);
+        if (fileDecision != 'NONE') {
+            mkdirIfNotExist(OrgFolderLocation);
+            mkdirIfNotExist(OrgFolderLocation + '/' + folderDecision);
+            const dataForFile = callURL('https://' + getCurrentRegion() + clURI.la_org_folder_download + '/' + folderDecision + '/' + fileDecision + '?$download=true', null, null, null, true);
+            const fs = require('fs');
+            const fileName = OrgFolderLocation + '/' + folderDecision+ '/' + fileDecision;
+            fs.writeFileSync(fileName, dataForFile, 'utf8');
+            log(INFO, 'LA Orgfolder data exported: ' + fileName);
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+    return folderTable;
 }
 
 // TODO: implement Function
