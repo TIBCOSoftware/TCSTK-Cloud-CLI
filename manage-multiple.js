@@ -12,27 +12,23 @@ processMultipleFile = function () {
         // setLogDebug('true');
         let mOpts = getMultipleOptions();
         mFile = mOpts.name;
-
-
         // log(INFO, '- Managing Multiple, Using file: ' + mFile);
         // Go Over All Cloud Starter Jobs
-        let cloudStarters = getMProp('Cloud_Starter_JOBS');
+        let csJobs = getMProp('Cloud_Starter_JOBS');
         if(mOpts.job && mOpts.job.trim() != ''){
-            cloudStarters = mOpts.job;
+            csJobs = mOpts.job;
         }
         let environmentOverride = '';
         if(mOpts.environment && mOpts.environment.trim() != ''){
             environmentOverride = mOpts.environment;
         }
-
-        if (cloudStarters == null) {
+        if (csJobs == null) {
             //Try to get from old definition for backwards compatibility.
-            cloudStarters = getMProp('Cloud_Starters');
-            if (cloudStarters != null) {
+            csJobs = getMProp('Cloud_Starters');
+            if (csJobs != null) {
                 log(WARNING, "Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...");
             }
         }
-
         let failOnError = getMProp('Fail_On_Error');
         if (failOnError == null) {
             log(INFO, 'No Fail_On_Error Property found; Adding Fail_On_Error to ' + mFile);
@@ -41,16 +37,17 @@ processMultipleFile = function () {
         }
         const doFailOnError = !(failOnError.toLowerCase() == 'no');
 
-        // log(INFO, '- Looping over Configured Starter JOBS: ' + cloudStarters);
+        // log(INFO, '- Looping over Configured Starter JOBS: ' + csJobs);
         let nvs = createTableValue('File', mFile);
         if(fileExtension.trim() != ''){
             nvs = createTableValue('File Extension', fileExtension, nvs);
         }
-        const cloudStartersA = cloudStarters.split(',');
+        const csJobsA = csJobs.split(',');
         let jobN = 0;
-        for (let k = 0; k < cloudStartersA.length; k++) {
-            const currentJob = cloudStartersA[k].trim();
+        for (let k = 0; k < csJobsA.length; k++) {
+            const currentJob = csJobsA[k].trim();
             let environments = getMProp(currentJob + '_Environments');
+           
             if(environmentOverride != ''){
                 environments = environmentOverride;
             }
@@ -63,14 +60,14 @@ processMultipleFile = function () {
         log(INFO, colors.blue('JOB SUMMARY]' ) + ' FILE: ' + mFile);
         console.table(nvs);
 
-        for (let i = 0; i < cloudStartersA.length; i++) {
-            const currentStarter = trim(cloudStartersA[i]);
-            const logS = colors.blue('[STARTER JOB: ' + currentStarter + ']');
+        for (let i = 0; i < csJobsA.length; i++) {
+            const currentJob = trim(csJobsA[i]);
+            const logS = colors.blue('[STARTER JOB: ' + currentJob + ']');
             // log(INFO, logS);
             // Per Starter Go Over the Configured Environments
-            const currLoc = getMProp(currentStarter + '_Location');
+            const currLoc = getMProp(currentJob + '_Location');
             log(INFO, logS + ' Location: ' + currLoc);
-            let environments = getMProp(currentStarter + '_Environments');
+            let environments = getMProp(currentJob + '_Environments');
             if(environmentOverride != ''){
                 environments = environmentOverride;
             }
@@ -83,11 +80,43 @@ processMultipleFile = function () {
                 const propFile = getMProp(currentEnvironment + '_PropertyFile');
                 log(INFO, logSE + ' Property File: ' + propFile);
                 // Per Environment Run the Configured Tasks
+                let jobTasksP = getMProp(currentJob + '_Tasks');
+                let jobTasksA = [];
+                if(jobTasksP != null){
+                    jobTasksA = jobTasksP.split(',');
+                }
                 const tasks = getMProp(currentEnvironment + '_Tasks');
-                log(INFO, logSE + ' Tasks: ' + tasks);
-                const tasksA = tasks.split(',');
-                for (var k = 0; k < tasksA.length; k++) {
-                    const currentTask = trim(tasksA[k]);
+                if(tasks != null){
+                    log(WARNING, 'Job tasks on an environment are discouraged; consider moving: '+currentEnvironment + '_Tasks TO: ' + currentJob + '_Tasks');
+                    jobTasksA = jobTasksA.concat(tasks.split(','));
+                }
+                log(DEBUG, logSE + ' Tasks: ' + jobTasksA);
+                let jvs = [];
+                if(jobTasksA.length >0){
+                    for (let jTask of jobTasksA){
+                        let taskType = '';
+                        let task = '';
+                        let tObj = JSON.parse(jTask);
+                        if (tObj.T != null) {
+                            taskType = 'TCLI TASK';
+                            task = replaceAtSign(tObj.T, currLoc + propFile);
+                        }
+                        if (tObj.O != null) {
+                            taskType = 'OS TASK';
+                            task = replaceAtSign(tObj.O, currLoc + propFile);
+                        }
+                        if (tObj.S != null) {
+                            taskType = 'SCRIPT TASK';
+                            task = replaceAtSign(tObj.S, currLoc + propFile);
+                        }
+                        jvs = createTableValue( taskType, task, jvs  , 'TYPE', 'TASK');
+                    }
+                }
+                log(INFO, colors.blue('TASK SUMMARY]' ) + ' ENVIRONMENT: ' + currentEnvironment);
+                console.table(jvs);
+                for (let k = 0; k < jobTasksA.length; k++) {
+                    // console.log('Parsing: ' , jobTasksA[k] , '|');
+                    const currentTask = jobTasksA[k].trim();
                     // console.log('Parsing: ' , currentTask , '|');
                     let tObj = JSON.parse(currentTask);
                     // console.log(tObj);
@@ -99,7 +128,7 @@ processMultipleFile = function () {
                         if(tObj.ANSWERS != null){
                             ansCom = ' -a ' + tObj.ANSWERS;
                         } */
-                        logT += colors.brightCyan('[' + (k + 1) + '] [TCLI TASK]');
+                        logT += colors.brightCyan('[' + (k + 1) + '] [TCLI TASK]\n');
                         //TODO: USE Absolute path ? We can't for the moment, since -p option only takes relative path.
                         //const absPropFile = process.env.PWD + '/' + propFile;
                         //console.log('absPropFile: ' + absPropFile)
@@ -108,11 +137,11 @@ processMultipleFile = function () {
                         //command += 'tcli -p "' + propFile + '" ' + tObj.T + ansCom;
                     }
                     if (tObj.O != null) {
-                        logT += colors.brightCyan('[' + (k + 1) + '] [OS TASK]');
+                        logT += colors.brightCyan('[' + (k + 1) + '] [OS TASK]\n');
                         command += tObj.O;
                     }
                     if (tObj.S != null) {
-                        logT += colors.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]' + tObj.S);
+                        logT += colors.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]\n' + tObj.S);
                         command += 'node ' + tObj.S;
                     }
                     log(DEBUG, logT + 'Command (before replacing): ' + command);
