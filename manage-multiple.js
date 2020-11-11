@@ -109,7 +109,7 @@ processMultipleFile = function () {
                             taskType = 'SCRIPT TASK';
                             task = replaceAtSign(tObj.S, currLoc + propFile);
                         }
-                        if(task.length > 30){
+                        if(task.length > 77){
                             task = task.substr(0,77) + '...';
                         }
                         jvs = createTableValue( taskType, task, jvs  , 'TYPE', 'TASK');
