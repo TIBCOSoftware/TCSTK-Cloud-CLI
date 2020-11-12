@@ -1652,7 +1652,7 @@ schematicAdd = function () {
                 initialList = false;
             }
             sType = await askMultipleChoiceQuestion(question, possibleSchematics);
-            if(sType != LIST_ALL){
+            if (sType != LIST_ALL) {
                 listing = false;
             }
         }
@@ -1739,15 +1739,18 @@ generateCloudPropertyFiles = async function () {
         let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
         let tOrgNameEU = {
             REGION: 'EU',
-            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties'
+            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties',
+            PROP: 'tibco-cloud-' + projectName + 'EU_' + tOrgName
         };
         let tOrgNameUS = {
             REGION: 'US',
-            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties'
+            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties',
+            PROP: 'tibco-cloud-' + projectName + 'US_' + tOrgName
         };
         let tOrgNameAU = {
             REGION: 'AU',
-            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties'
+            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties',
+            PROP: 'tibco-cloud-' + projectName + 'AU_' + tOrgName
         };
         propOption.push(tOrgNameEU.PROPERTY_FILE_NAME, tOrgNameUS.PROPERTY_FILE_NAME, tOrgNameAU.PROPERTY_FILE_NAME);
         propFilesALL.push(tOrgNameEU, tOrgNameUS, tOrgNameAU);
@@ -1758,25 +1761,28 @@ generateCloudPropertyFiles = async function () {
     log(INFO, 'Files that can be created');
     console.table(propFilesALL);
     let propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption);
-    console.log('Create: ' + propFilesToGenerate);
+    let propForMFile = '';
     if (propFilesToGenerate != 'NONE') {
         let genOne = true;
         if (propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL EU') {
             genOne = false;
             for (let pFile of propFilesEU) {
                 configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+                propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL US') {
             genOne = false;
             for (let pFile of propFilesUS) {
                 configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+                propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate == 'ALL' || propFilesToGenerate == 'ALL AU') {
             genOne = false;
             for (let pFile of propFilesAU) {
                 configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+                propForMFile += pFile.PROP + ',';
             }
         }
         if (genOne) {
@@ -1784,9 +1790,22 @@ generateCloudPropertyFiles = async function () {
             for (let pFile of propFilesALL) {
                 if (pFile.PROPERTY_FILE_NAME == propFilesToGenerate) {
                     reg = pFile.REGION;
+                    propForMFile += pFile.PROP + ',';
                 }
             }
             configurePropFile('./' + propFilesToGenerate, reg);
+        }
+        const tcliIprop = propForMFile.substr(0, propForMFile.length - 1);
+        log(INFO, 'Property for tcli interaction: ' + tcliIprop);
+        const doUpdate = await askMultipleChoiceQuestion('Do you want to add this to your manage-multiple-cloud-starters property file ?', ['YES', 'NO']);
+        if (doUpdate == 'YES') {
+            let fileName = await askQuestion('What is file name of multiple property file ? (press enter for: manage-multiple-cloud-starters.properties)');
+            if (fileName == '') {
+                fileName = 'manage-multiple-cloud-starters.properties';
+            }
+            addOrUpdateProperty(fileName, 'Multiple_Interaction_Property_Files', tcliIprop);
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
         }
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
@@ -1807,6 +1826,7 @@ configurePropFile = function (fileName, region) {
     addOrUpdateProperty(fileName, 'cloudHost', regToAdd + 'liveapps.cloud.tibco.com');
     addOrUpdateProperty(fileName, 'Cloud_URL', 'https://' + regToAdd + 'liveapps.cloud.tibco.com/');
     log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
+
 }
 
 

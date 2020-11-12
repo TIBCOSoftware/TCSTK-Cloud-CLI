@@ -266,7 +266,8 @@ createMultiplePropertyFile = async function () {
         log(INFO, 'Creating new multiple property file: ' + mPropFileName);
         copyFile(__dirname + '/../template/multiple.properties', targetFile);
         //'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
-        log(INFO, 'Now configure the multiple propety file and then run "\x1b[34mtcli -m\033[0m" (for default propety name) or "\x1b[34mtcli -m <propfile name>\033[0m" to execute...');
+        log(INFO, 'Now configure the multiple property file and then run "\x1b[34mtcli -m\033[0m" (for default fileq name) \nor "\x1b[34mtcli -m <propfile name> [-j <job-name> -e <environment-name>]\033[0m" to execute...');
+        log(INFO, 'Or run "\x1b[34mtcli -i\033[0m" to interact with multiple cloud environments...');
     }
 }
 
