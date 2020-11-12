@@ -1651,12 +1651,12 @@ schematicAdd = function () {
                 question = 'Based on your application type ' + colors.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
                 initialList = false;
             }
-            let sType = await askMultipleChoiceQuestion(question, possibleSchematics);
+            sType = await askMultipleChoiceQuestion(question, possibleSchematics);
             if(sType != LIST_ALL){
                 listing = false;
             }
         }
-        var sName = await askQuestion('What is the name of your schematic ?');
+        const sName = await askQuestion('What is the name of your schematic ?');
         run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
         // Run npm install only after certain schematics.
         log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
