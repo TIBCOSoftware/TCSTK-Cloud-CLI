@@ -1629,7 +1629,33 @@ const posSchematics = require('../config-schematics').schematicConfig;
 schematicAdd = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Adding Schematic...');
-        var sType = await askMultipleChoiceQuestion('What type of schematic would you like to add ?', posSchematics.descriptions);
+        const LIST_ALL = 'List All Possible Schematics';
+        // Check if schematic is allowed
+        let listing = true;
+        let initialList = true;
+        let sType = '';
+        while (listing) {
+            const appType = getProp('App_Type');
+            let possibleSchematics = posSchematics.descriptions;
+            let question = 'What type of schematic would you like to add ?';
+            if (appType != null && initialList) {
+                possibleSchematics = [LIST_ALL];
+                for (let sNr in posSchematics.AvailableInTemplate) {
+                    for (let availableSchematic of posSchematics.AvailableInTemplate[sNr]) {
+                        // console.log('App Type: ', appType, ' availableSchematic: ', availableSchematic);
+                        if (appType == availableSchematic) {
+                            possibleSchematics.unshift(posSchematics.descriptions[sNr]);
+                        }
+                    }
+                }
+                question = 'Based on your application type ' + colors.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
+                initialList = false;
+            }
+            let sType = await askMultipleChoiceQuestion(question, possibleSchematics);
+            if(sType != LIST_ALL){
+                listing = false;
+            }
+        }
         var sName = await askQuestion('What is the name of your schematic ?');
         run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
         // Run npm install only after certain schematics.
@@ -2082,7 +2108,7 @@ showOrgFolders = async function () {
             mkdirIfNotExist(OrgFolderLocation + '/' + folderDecision);
             const dataForFile = callURL('https://' + getCurrentRegion() + clURI.la_org_folder_download + '/' + folderDecision + '/' + fileDecision + '?$download=true', null, null, null, true);
             const fs = require('fs');
-            const fileName = OrgFolderLocation + '/' + folderDecision+ '/' + fileDecision;
+            const fileName = OrgFolderLocation + '/' + folderDecision + '/' + fileDecision;
             fs.writeFileSync(fileName, dataForFile, 'utf8');
             log(INFO, 'LA Orgfolder data exported: ' + fileName);
         } else {
