@@ -197,6 +197,8 @@ multipleInteraction = function () {
                 rowNumber++;
                 // console.log('Prop file: ' + miPropFile);
                 // TODO: Check for ALL and Exclude
+                // # A comma separated list of environment property files to connect to for interactions (Use ALL for All property files, and EXCEPT:<filename>, to exclude file).
+                // # Multiple_Interaction_Property_Files=ALL,EXCEPT:tibco-cloud.properties
                 if (!(miPropFilesA[miP].indexOf('.properties') > 0)) {
                     miPropFilesA[miP] += '.properties';
                 }

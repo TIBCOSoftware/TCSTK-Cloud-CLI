@@ -1,77 +1,48 @@
 {
   "templates": {
-  "TCSTK-base-template-git": {
-    "displayName": "Basic Cloud Starter Template (GIT)",
-    "enabled": true,
-    "templateFolder": "",
-    "useGit": true,
-    "git" : "https://github.com/TIBCOSoftware/TCSTK-base-app",
-    "gitTag": "LATEST",
-    "removeGitFolder": true,
-    "gitPostCommands": [],
-    "gitPostCommandsWin": [],
-    "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
-    "PostCommandsWin": [],
-    "replacements": [
-      {
-        "from": "tcstk-base-app",
-        "to": "@name"
-      },
-      {
-        "from": "TCSTKBaseApp",
-        "to": "@name"
-      }
-    ]
-  },
-    "TCSTK-case-manager-app": {
-      "displayName": "Case Manager App",
-      "enabled": false,
-      "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
-      "useGit": false,
+    "TCSTK-base-template-git": {
+      "displayName": "Basic Cloud Starter Template - LATEST Angular 10",
+      "enabled": true,
+      "templateFolder": "",
+      "useGit": true,
+      "git": "https://github.com/TIBCOSoftware/TCSTK-base-app",
+      "gitTag": "angular-10",
+      "removeGitFolder": true,
+      "gitPostCommands": [],
+      "gitPostCommandsWin": [],
+      "PostCommands": [
+        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib",
+        "npm install --save-dev @tibco-tcstk/component-template"
+      ],
+      "PostCommandsWin": [],
       "replacements": [
         {
-          "from": "tcstk-case-manager-app",
+          "from": "tcstk-base-app",
           "to": "@name"
         },
         {
-          "from": "Case Manager",
+          "from": "TCSTKBaseApp",
           "to": "@name"
         }
       ]
     },
     "TCSTK-case-manager-app-git": {
-      "displayName": "Case Manager App (GIT)",
+      "displayName": "Case Manager App - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
-      "gitTag": "LATEST",
+      "git": "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
+      "gitTag": "angular-10",
       "removeGitFolder": true,
-      "gitPostCommands": ["rm package-lock.json"],
+      "gitPostCommands": [
+        "rm package-lock.json"
+      ],
       "gitPostCommandsWin": [],
-      "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
+      "PostCommands": [
+        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib",
+        "npm install --save-dev @tibco-tcstk/component-template"
+      ],
       "PostCommandsWin": [],
-      "replacements": [
-        {
-          "from": "tcstk-case-manager-app",
-          "to": "@name"
-        },
-        {
-          "from": "Case Manager",
-          "to": "@name"
-        }
-      ]
-    },
-    "TCSTK-case-manager-app-git-rm-pl": {
-      "displayName": "Case Manager App (GIT) - Remove Package Lock",
-      "enabled": false,
-      "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
-      "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
-      "gitTag": "LATEST",
-      "removeGitFolder": true,
-      "gitPostCommands": ["rm package-lock.json"],
-      "gitPostCommandsWin": ["del package-lock.json"],
       "replacements": [
         {
           "from": "tcstk-case-manager-app",
@@ -88,7 +59,7 @@
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
+      "git": "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
@@ -102,33 +73,20 @@
         }
       ]
     },
-    "Form-Template-Git-rm-pl": {
-      "displayName": "Form Template (GIT) - Remove Package Lock",
-      "enabled": false,
-      "templateFolder": "",
-      "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-custom-form-app-plugin",
-      "gitTag": "LATEST",
-      "removeGitFolder": true,
-      "gitPostCommands": ["rm package-lock.json"],
-      "gitPostCommandsWin": ["del package-lock.json"],
-      "replacements": [
-        {
-          "from": "custom-form-app",
-          "to": "@name"
-        }
-      ]
-    },"TCSTK-spotfire-template-git": {
-      "displayName": "Analytics Application Template (GIT)",
+    "TCSTK-spotfire-template-git": {
+      "displayName": "Analytics Application Template - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-analytics-app",
-      "gitTag": "LATEST",
+      "git": "https://github.com/TIBCOSoftware/TCSTK-analytics-app",
+      "gitTag": "angular-10",
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
-      "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib @tibco-tcstk/tc-spotfire-lib @tibco/spotfire-wrapper","npm install --save-dev @tibco-tcstk/component-template"],
+      "PostCommands": [
+        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib @tibco-tcstk/tc-spotfire-lib @tibco/spotfire-wrapper",
+        "npm install --save-dev @tibco-tcstk/component-template"
+      ],
       "PostCommandsWin": [],
       "replacements": [
         {
@@ -142,11 +100,15 @@
       "enabled": false,
       "templateFolder": "",
       "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-process-discovery-app",
+      "git": "https://github.com/TIBCOSoftware/TCSTK-process-discovery-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
-      "gitPostCommands": ["rm package-lock.json"],
-      "gitPostCommandsWin": ["del package-lock.json"],
+      "gitPostCommands": [
+        "rm package-lock.json"
+      ],
+      "gitPostCommandsWin": [
+        "del package-lock.json"
+      ],
       "replacements": []
     },
     "process-discovery-replace": {
@@ -154,11 +116,15 @@
       "enabled": false,
       "templateFolder": "",
       "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-process-discovery-app",
+      "git": "https://github.com/TIBCOSoftware/TCSTK-process-discovery-app",
       "gitTag": "LATEST",
       "removeGitFolder": true,
-      "gitPostCommands": ["rm package-lock.json"],
-      "gitPostCommandsWin": ["del package-lock.json"],
+      "gitPostCommands": [
+        "rm package-lock.json"
+      ],
+      "gitPostCommandsWin": [
+        "del package-lock.json"
+      ],
       "replacements": [
         {
           "from": "process-discovery-app",
@@ -171,7 +137,7 @@
       "enabled": false,
       "templateFolder": "/applicationTemplate/",
       "useGit": false,
-      "git" : "",
+      "git": "",
       "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
