@@ -6,7 +6,7 @@
       "templateFolder": "",
       "useGit": true,
       "git": "https://github.com/TIBCOSoftware/TCSTK-base-app",
-      "gitTag": "angular-10",
+      "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
@@ -32,7 +32,7 @@
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": true,
       "git": "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
-      "gitTag": "angular-10",
+      "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [
         "rm package-lock.json"
@@ -55,7 +55,7 @@
       ]
     },
     "Form-Template-Git": {
-      "displayName": "Form Template (GIT)",
+      "displayName": "Form Template - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
@@ -79,7 +79,7 @@
       "templateFolder": "",
       "useGit": true,
       "git": "https://github.com/TIBCOSoftware/TCSTK-analytics-app",
-      "gitTag": "angular-10",
+      "gitTag": "LATEST",
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
