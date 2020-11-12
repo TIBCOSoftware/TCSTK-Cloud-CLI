@@ -244,12 +244,12 @@ start = function () {
             } else {
                 // TODO: if we use OAUTH this could be a '.js' file...
                 if (myHost.includes('eu')) {
-                    run('ng serve --proxy-config proxy.conf.prod.eu.json --ssl true --source-map --aot --port ' + portToUse);
+                    run('ng serve --proxy-config proxy.conf.prod.eu.js --ssl true --source-map --aot --port ' + portToUse);
                 } else {
                     if (myHost.includes('au')) {
-                        run('ng serve --proxy-config proxy.conf.prod.au.json --ssl true --source-map --aot --port ' + portToUse);
+                        run('ng serve --proxy-config proxy.conf.prod.au.js --ssl true --source-map --aot --port ' + portToUse);
                     } else {
-                        run('ng serve --proxy-config proxy.conf.prod.us.json --ssl true --source-map --aot --port ' + portToUse);
+                        run('ng serve --proxy-config proxy.conf.prod.us.js --ssl true --source-map --aot --port ' + portToUse);
                     }
                 }
             }

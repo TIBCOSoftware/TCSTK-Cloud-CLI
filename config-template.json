@@ -22,29 +22,7 @@
         "to": "@name"
       }
     ]
-  },"TCSTK-base-template-git": {
-      "displayName": "Basic Cloud Starter Template (GIT) - ANG10",
-      "enabled": true,
-      "templateFolder": "",
-      "useGit": true,
-      "git" : "https://github.com/TIBCOSoftware/TCSTK-base-app",
-      "gitTag": "angular-10",
-      "removeGitFolder": true,
-      "gitPostCommands": [],
-      "gitPostCommandsWin": [],
-      "PostCommands": ["npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib","npm install --save-dev @tibco-tcstk/component-template"],
-      "PostCommandsWin": [],
-      "replacements": [
-        {
-          "from": "tcstk-base-app",
-          "to": "@name"
-        },
-        {
-          "from": "TCSTKBaseApp",
-          "to": "@name"
-        }
-      ]
-    },
+  },
     "TCSTK-case-manager-app": {
       "displayName": "Case Manager App",
       "enabled": false,
