@@ -86,7 +86,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |rotate-oauth-token|  Revokes your existing OAUTH token and then generates a new one. |
  |validate-and-rotate-oauth-token|  Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it. |
  |generate-cloud-property-files|  Generates a list of cloud property files. |
- |show-org-folders|  Displays the content of the LiveApps Organization Folders. |
+ |show-org-folders|  Displays the content of the LiveApps Organization Folders, and allow you to download content. |
  |show-live-apps-groups|  Displays the LiveApps groups and their users. |
  |create-live-apps-group|  Creates a new LiveApps group. |
  |show-live-apps-users|  Shows the users in LiveApps (which can be added to groups). |
