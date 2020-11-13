@@ -10,7 +10,7 @@ npm install -g gulp-cli @tibco-tcstk/cloud-cli
 
 ###TIBCO Cloud™ CLI) Usage: 
 ```
-tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>  ] [--multipleInteraction(-i)] [--surpressStart(-s)]
+tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)]
 ```
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
@@ -56,6 +56,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |                         build |  Build your local cloud starter project |
  |                        deploy |  Deploy your local cloud starter project |
  |                  build-deploy |  Builds and Deploys your local project to the cloud |
+ |           delete-cloud-starter|  Delete a cloud starter from the cloud |
  |            inject-lib-sources |  Enables your project for Cloud Library Debugging |
  |              undo-lib-sources |  Undo enabling your project for Cloud Library Debugging |
  |                 schematic-add |  Add a component template (schematic) into your project |
@@ -70,7 +71,6 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |       watch-shared-state-scope|  Monitors the local shared state and when changes are detected it is uploaded to the cloud |
  |  create-multiple-property-file|  Creating an initial property file to manage multiple cloud starters and environments |
  |         replace-string-in-file|  Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties |
- |           delete-cloud-starter|  Delete a LiveApps WebApp |
  |           show-live-apps-cases|  Show Live Apps Cases |
  |     export-live-apps-case-type|  Export the details of a Live Apps Case Type |
  |                   export-live-apps-cases|  Export Data from Live Apps |
