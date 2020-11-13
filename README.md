@@ -10,7 +10,7 @@ npm install -g gulp-cli @tibco-tcstk/cloud-cli
 
 ###TIBCO Cloud™ CLI) Usage: 
 ```
-tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m)] [--multipleFile(-f)] [--surpressStart(-s)]
+tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>  ] [--multipleInteraction(-i)] [--surpressStart(-s)]
 ```
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
@@ -37,7 +37,9 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 * multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud starters and many different configured environments at the same time.
 
-* multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties
+* multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties you can optionally specify a job to run and an environment to run this in; this is handy in integrating with CI/CD Buildpipelines.
+
+* multipleInteraction: when specified, the multiple file will also be used, but in an interactive way. This is extremly handy if you want to run specific tcli jobs on multiple environments quickly.
 
 * surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.
     
@@ -68,6 +70,27 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |       watch-shared-state-scope|  Monitors the local shared state and when changes are detected it is uploaded to the cloud |
  |  create-multiple-property-file|  Creating an initial property file to manage multiple cloud starters and environments |
  |         replace-string-in-file|  Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties |
+ |           delete-cloud-starter|  Delete a LiveApps WebApp |
+ |           show-live-apps-cases|  Show Live Apps Cases |
+ |     export-live-apps-case-type|  Export the details of a Live Apps Case Type |
+ |                   export-live-apps-cases|  Export Data from Live Apps |
+ |  generate-live-apps-import-configuration|  Generate the Live Apps Import configuration file |
+ |                   import-live-apps-cases|  Import Cases to Live Apps |
+ |generate-cloud-descriptor|  Generates the configured Public Cloud Descriptor |
+ |update-cloud-packages|  Updates the NPM packges in the @tibco-tcstk scope in your project. |
+ |show-tci-apps|  List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works). |
+ |monitor-tci-app|  Monitor the logs of a TIBCO Cloud Integration Flogo Application |
+ |show-oauth-tokens|  Displays OAUTH tokens to authenticate to the TIBCO Cloud. |
+ |generate-oauth-token|  Generate a new OAUTH token to authenticate to the TIBCO Cloud. |
+ |revoke-oauth-token|  Revokes an existing OAUTH token. |
+ |rotate-oauth-token|  Revokes your existing OAUTH token and then generates a new one. |
+ |validate-and-rotate-oauth-token|  Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it. |
+ |generate-cloud-property-files|  Generates a list of cloud property files. |
+ |show-org-folders|  Displays the content of the LiveApps Organization Folders. |
+ |show-live-apps-groups|  Displays the LiveApps groups and their users. |
+ |create-live-apps-group|  Creates a new LiveApps group. |
+ |show-live-apps-users|  Shows the users in LiveApps (which can be added to groups). |
+ |add-user-to-group|  Adds a user to a LiveApps group. |
  |                    update-tcli|  Update the Cloud CLI |
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
