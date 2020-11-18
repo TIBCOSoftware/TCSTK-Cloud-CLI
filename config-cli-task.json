@@ -178,6 +178,7 @@
       "description": "Downloads all shared state entries from the configured scope to the local file system.",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": true,
       "gulpTask": "export-shared-state-scope",
       "availableOnOs": ["all"]
     },
@@ -185,6 +186,7 @@
       "description": "Uploads one entry or the configured scope from the local file system to the shared state.",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": true,
       "gulpTask": "import-shared-state-scope",
       "availableOnOs": ["all"]
     },
@@ -192,6 +194,7 @@
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": true,
       "gulpTask": "watch-shared-state-scope",
       "availableOnOs": ["all"]
     },
