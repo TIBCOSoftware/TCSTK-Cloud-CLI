@@ -1668,13 +1668,17 @@ schematicAdd = function () {
 //var art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
-showTCI = function () {
+showTCI = function (showTable) {
+    let doShowTable = true;
+    if (showTable != null) {
+        doShowTable =  showTable;
+    }
     log(INFO, 'Getting TCI Apps...');
     const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
     const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
     const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
     let tObject = createTable(response, mappings.tci_apps, false);
-    pexTable(tObject, 'tci-apps', getPEXConfig(), true);
+    pexTable(tObject, 'tci-apps', getPEXConfig(), doShowTable);
     log(DEBUG, 'TCI Object: ', tObject);
     return tObject;
 }
@@ -2138,10 +2142,80 @@ updateProperty = async function () {
 
 
 // TODO: implement Function, that does all sorts of validations
-validate = function () {
+validate = async function () {
     //console.log('Validate ',new Date());
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
-    log(ERROR, 'TODO: Implement...')
+    // TODO: Add; case_folder_exist,
+    const valChoices = ['property_exist', 'property_is_set', 'property_is_set_ask', 'LiveApps_app_exist', 'TCI_App_exist', 'Cloud_Starter_exist'];
+    const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();
+    log(INFO, 'Validating: ', valD);
+    if (valD == 'property_exist' || valD == 'property_is_set' || valD == 'property_is_set_ask') {
+        let propD = await askQuestion('Which property would you like to validate (Use plus character to validate multiple properties, for example: prop1+prop2) ?');
+        let propDArray = propD.split('+');
+        for (let prop of propDArray) {
+            if (getProp(prop) != null) {
+                validationOk('Property ' + prop + ' exists...');
+                if (valD == 'property_is_set' || valD == 'property_is_set_ask') {
+                    if (getProp(prop).trim() != '') {
+                        validationOk('Property ' + prop + ' is set: ' + getProp(prop));
+                    } else {
+                        validationFailed('Property ' + prop + ' does not have a value...');
+                        if (valD == 'property_is_set_ask') {
+                            let propVal = await askQuestion('What value would you like to set for ' + prop + ' ?');
+                            addOrUpdateProperty(getPropFileName(), prop, propVal, 'Set by validation on: ' + new Date());
+                        }
+                    }
+                }
+            } else {
+                validationFailed('Property ' + prop + ' does not exist...');
+                if (valD == 'property_is_set_ask') {
+                    let propVal = await askQuestion('What value would you like to set for ' + prop + ' ?');
+                    addOrUpdateProperty(getPropFileName(), prop, propVal, 'Set by validation on: ' + new Date());
+                }
+            }
+        }
+    }
+
+    // Validate if a liveApps App exist
+    if (valD == 'liveapps_app_exist') {
+        const apps = showLiveApps(false, false);
+        await validationAppHelper(apps, 'LiveApps App', 'name')
+    }
+
+    // Validate if a Flogo App exist
+    if (valD == 'tci_app_exist') {
+        const apps = showTCI(false);
+        await validationAppHelper(iterateTable(apps), 'TCI App', 'Name');
+
+    }
+
+    // Validate if a Cloud Starter exist
+    if (valD == 'cloud_starter_exist') {
+
+    }
+}
+
+validationAppHelper = async function (apps, type, search){
+    let appToValidate = await askQuestion('Which '+type+' would you like to validate (Use plus character to validate multiple '+type+'s, for example: app1+app2) ?');
+    let appArray = appToValidate.split('+');
+    for (let app of appArray) {
+        let laApp = apps.find(e => e[search] == app.trim());
+        if (laApp != null) {
+            validationOk(type + ' ' + colors.blue(app) + '\033[0m exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+        } else {
+            validationFailed(type + ' ' + colors.blue(app) + '\033[0m does not exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+        }
+    }
+}
+
+
+validationOk = function (message) {
+    log(INFO, colors.green(' [VALIDATION --OK--] \033[0m' + message))
+}
+
+validationFailed = function (message) {
+    log(ERROR, colors.red('[VALIDATION FAILED] \033[0m' + message));
+    process.exit(1);
 }
 
 /*

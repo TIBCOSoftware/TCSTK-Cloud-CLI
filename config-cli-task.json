@@ -421,7 +421,7 @@
     },
     "51. validate": {
       "description": "Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": false,
       "gulpTask": "validate",
