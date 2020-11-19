@@ -427,12 +427,12 @@
       "gulpTask": "validate",
       "availableOnOs": ["all"]
     },
-    "52. update-property": {
-      "description": "Updates a property in a file.",
-      "enabled": false,
+    "52. add-or-update-property": {
+      "description": "Adds or Updates a property in a file.",
+      "enabled": true,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "show-org-folders",
+      "gulpTask": "add-or-update-property",
       "availableOnOs": ["all"]
     },
     "show-spotfire-reports": {

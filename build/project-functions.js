@@ -1352,8 +1352,6 @@ createLAImportFile = async function () {
 
 // Function to Import LiveApps Case Data based on Config File
 importLiveAppsData = async function () {
-
-
     log(INFO, ' -- Gathering Import Configuration --- ');
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
     let importFile = importFolder + 'import-live-apps-data-configuration.json';
@@ -2048,6 +2046,94 @@ generateOauthToken = function (tokenNameOverride, verbose) {
         }
         resolve();
     });
+}
+
+const SPECIAL = 'SPECIAL';
+// TODO: implement Function to update a propety (possibly in a custom file)
+updateProperty = async function () {
+    let doUpdate = true;
+    log(INFO, 'Update a property file');
+    // Ask in which file, or use default
+    let pFile = await askQuestion('In which file would you like to update a property ? (use enter or default for the current property file)');
+    if (pFile.toLowerCase() == 'default' || pFile == '') {
+        pFile = getPropFileName();
+    }
+    log(INFO, '--> Property File: ', pFile);
+    // Ask propname
+    let pName = await askQuestion('Which property would you like to update or add ?');
+    if (pName == '') {
+        log(ERROR, 'You have to provide a property name');
+        doUpdate = false;
+    }
+    // Ask prop comments
+    let pComment = await askQuestion('What comment would you like to add ? (use enter on none to not provide a comment)');
+    if (pComment == 'none') {
+        pComment = '';
+    }
+    // Ask prop value
+    let pValue = await askQuestion('What value would you like to add ? (use ' + SPECIAL + ' to select from a list)');
+    if (pValue.toUpperCase() == SPECIAL) {
+        // TODO: Add Cloud Starter Link, FlogoAppId,
+        const vTChoices = ['SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID'];
+        const vType = await askMultipleChoiceQuestion('What type of answer would you like to add to the property ?', vTChoices);
+        if (vType == 'SandboxID') {
+            pValue = getProductionSandbox();
+        }
+        if (vType == 'LiveApps_AppID' || vType == 'LiveApps_ActionID') {
+            const apps = showLiveApps(true, false);
+            let laAppNameA = ['NONE'].concat(apps.map(v => v.name));
+            let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA);
+            if (laAppD == 'NONE') {
+                log(INFO, 'OK, I won\'t do anything :-)');
+                doUpdate = false;
+            } else {
+                let laApp = apps.find(e => e.name == laAppD.trim());
+                if (laApp == null) {
+                    log(ERROR, 'App not found: ' + laAppD);
+                    doUpdate = false;
+                }
+                if (doUpdate && vType == 'LiveApps_AppID') {
+                    pValue = laApp.applicationId
+                }
+                if (doUpdate && vType == 'LiveApps_ActionID') {
+                    let laActions = [{name: 'NONE'}];
+                    if (laApp.creators) {
+                        laActions = laActions.concat(laApp.creators.map(v => ({
+                            type: 'CREATOR',
+                            id: v.id,
+                            name: v.name
+                        })));
+                    }
+                    if (laApp.actions) {
+                        laActions = laActions.concat(laApp.actions.map(v => ({
+                            type: 'ACTION',
+                            id: v.id,
+                            name: v.name
+                        })));
+                    }
+                    // console.log(laActions);
+                    log(INFO, 'Liva Apps Actions: ');
+                    console.table(laActions);
+                    let laActD = await askMultipleChoiceQuestionSearch('For which ACTION would you like to store an Action ID ?', laActions.map(v => v.name));
+                    if (laActD == 'NONE') {
+                        log(INFO, 'OK, I won\'t do anything :-)');
+                        doUpdate = false;
+                    } else {
+                        let laAction = laActions.find(e => e.name == laActD);
+                        if (laApp != null) {
+                            pValue = laAction.id
+                        } else {
+                            log(ERROR, 'LA Action not found: ' + laAction);
+                            doUpdate = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (doUpdate) {
+        addOrUpdateProperty(pFile, pName, pValue, pComment);
+    }
 }
 
 

@@ -402,7 +402,7 @@ getLastGlobalAnswer = function (question) {
     let re = '';
     if (globalAnswers && globalAnswers.length > 0) {
         re = globalAnswers.shift();
-        log(INFO, 'Injected answer: ', re);
+        log(INFO, 'Injected answer: ', colors.blue(re) , ' For question: ' , question);
     } else {
         log(ERROR, 'No answer left for question: ' + question);
         process.exit(1);
@@ -558,10 +558,10 @@ addOrUpdateProperty = function (location, property, value, comment) {
             }
             // TODO: cut off the last \n
             if (propFound) {
-                log(INFO, 'Updated: ' + property + ' to: ' + value + ' (in:' + location + ')');
+                log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
             } else {
                 // append prop to the end.
-                log(INFO, 'Property NOT found: ' + property + ' We are adding it and set it to: ' + value);
+                log(INFO, 'Property NOT found: ' + colors.blue(property) + ' We are adding it and set it to: ' + colors.yellow(value) + ' (in:' + location + ')');
                 if (comment) {
                     dataForFile += '\n# ' + comment;
                 }
@@ -574,11 +574,6 @@ addOrUpdateProperty = function (location, property, value, comment) {
     } catch (err) {
         console.error(err)
     }
-}
-
-// TODO: implement Function to update a propety (possibly in a custom file)
-updateProperty = function () {
-    log(ERROR, 'TODO: Implement...')
 }
 
 // Get the global configuration

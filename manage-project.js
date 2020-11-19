@@ -661,7 +661,7 @@ addUserToGroupWrapper.description = 'Adds a user to a LiveApps group.';
 gulp.task('validate', validateWrapper);
 validateWrapper.description = 'Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.';
 
-gulp.task('update-property', updatePropertyWrapper);
+gulp.task('add-or-update-property', updatePropertyWrapper);
 updatePropertyWrapper.description = 'Updates a property in a file.';
 
 
