@@ -1671,7 +1671,7 @@ schematicAdd = function () {
 showTCI = function (showTable) {
     let doShowTable = true;
     if (showTable != null) {
-        doShowTable =  showTable;
+        doShowTable = showTable;
     }
     log(INFO, 'Getting TCI Apps...');
     const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
@@ -2186,17 +2186,18 @@ validate = async function () {
     if (valD == 'tci_app_exist') {
         const apps = showTCI(false);
         await validationAppHelper(iterateTable(apps), 'TCI App', 'Name');
-
     }
 
     // Validate if a Cloud Starter exist
     if (valD == 'cloud_starter_exist') {
-
+        const apps = showAvailableApps(true);
+        // console.log(apps);
+        await validationAppHelper(apps, 'Cloudstarter', 'name');
     }
 }
 
-validationAppHelper = async function (apps, type, search){
-    let appToValidate = await askQuestion('Which '+type+' would you like to validate (Use plus character to validate multiple '+type+'s, for example: app1+app2) ?');
+validationAppHelper = async function (apps, type, search) {
+    let appToValidate = await askQuestion('Which ' + type + ' would you like to validate (Use plus character to validate multiple ' + type + 's, for example: app1+app2) ?');
     let appArray = appToValidate.split('+');
     for (let app of appArray) {
         let laApp = apps.find(e => e[search] == app.trim());
