@@ -2140,12 +2140,11 @@ updateProperty = async function () {
     }
 }
 
-
-// TODO: implement Function, that does all sorts of validations
+// Function, that does all sorts of validations
 validate = async function () {
     //console.log('Validate ',new Date());
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
-    // TODO: Add; case_folder_exist, live_apps_group_exist
+    // TODO: Add; case_folder_exist,
     const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist'];
     const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();
     log(INFO, 'Validating: ', valD);
@@ -2228,28 +2227,6 @@ validationFailed = function (message) {
     process.exit(1);
 }
 
-/*
-ORG FOLDERS:
-
-./Cloud_Folders/
-./Cloud_Folders/caseFolders
-./Cloud_Folders/orgFolders
-
-Endpoints:
-
-GET /caseFolders/
-GET /caseFolders/{folderName}/
-GET /caseFolders/{folderName}/artifacts/
-GET /caseFolders/{folderName}/artifacts/{artifactName}/artifactVersions
-
-GET /orgFolders/
-GET /orgFolders/{folderName}/
-GET /orgFolders/{folderName}/artifacts/
-GET /orgFolders/{folderName}/artifacts/{artifactName}/artifactVersions
-
-
- */
-
 // Function to show org folders
 showOrgFolders = async function () {
     let OrgFolderLocation = './LA_Organization_Folder/'
@@ -2309,6 +2286,28 @@ showOrgFolders = async function () {
     }
     return folderTable;
 }
+
+
+/*
+ORG FOLDERS:
+
+./Cloud_Folders/
+./Cloud_Folders/caseFolders
+./Cloud_Folders/orgFolders
+
+Endpoints:
+
+GET /caseFolders/
+GET /caseFolders/{folderName}/
+GET /caseFolders/{folderName}/artifacts/
+GET /caseFolders/{folderName}/artifacts/{artifactName}/artifactVersions
+
+GET /orgFolders/
+GET /orgFolders/{folderName}/
+GET /orgFolders/{folderName}/artifacts/
+GET /orgFolders/{folderName}/artifacts/{artifactName}/artifactVersions
+
+ */
 
 // TODO: implement Function
 exportOrgFolder = function () {

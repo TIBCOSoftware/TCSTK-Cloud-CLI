@@ -10,7 +10,7 @@ npm install -g gulp-cli @tibco-tcstk/cloud-cli
 
 ###TIBCO Cloud™ CLI) Usage: 
 ```
-tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)]
+tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]
 ```
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
@@ -39,9 +39,11 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 * multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties you can optionally specify a job to run and an environment to run this in; this is handy in integrating with CI/CD Buildpipelines.
 
-* multipleInteraction: when specified, the multiple file will also be used, but in an interactive way. This is extremly handy if you want to run specific tcli jobs on multiple environments quickly.
+* multipleInteraction: when specified, the multiple file will also be used, but in an interactive way. This is extremely handy if you want to run specific tcli jobs on multiple environments quickly.
 
 * surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.
+
+* answers: a comma(,) or column(:) separated list of answers to interactive questions. This is useful to run the tcli completely verbose; useful in a build-pipeline. 
     
 These are the available TIBCO Cloud™ CLI Tasks:
 
@@ -91,6 +93,8 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |create-live-apps-group|  Creates a new LiveApps group. |
  |show-live-apps-users|  Shows the users in LiveApps (which can be added to groups). |
  |add-user-to-group|  Adds a user to a LiveApps group. |
+ |validate|  Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.|
+ |add-or-update-property|  Adds or Updates a property in a file.|
  |                    update-tcli|  Update the Cloud CLI |
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
