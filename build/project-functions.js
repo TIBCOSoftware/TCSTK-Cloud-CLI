@@ -2145,8 +2145,8 @@ updateProperty = async function () {
 validate = async function () {
     //console.log('Validate ',new Date());
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
-    // TODO: Add; case_folder_exist,
-    const valChoices = ['property_exist', 'property_is_set', 'property_is_set_ask', 'LiveApps_app_exist', 'TCI_App_exist', 'Cloud_Starter_exist'];
+    // TODO: Add; case_folder_exist, live_apps_group_exist
+    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist'];
     const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();
     log(INFO, 'Validating: ', valD);
     if (valD == 'property_exist' || valD == 'property_is_set' || valD == 'property_is_set_ask') {
@@ -2180,6 +2180,15 @@ validate = async function () {
     if (valD == 'liveapps_app_exist') {
         const apps = showLiveApps(false, false);
         await validationAppHelper(apps, 'LiveApps App', 'name')
+    }
+
+    // Validate if a liveApps Group exist
+    // Live_Apps_group_exist
+    if (valD == 'live_apps_group_exist') {
+        const groups = getGroupsTable(false);
+        // console.log(iterateTable(groups));
+
+        await validationAppHelper(iterateTable(groups), 'LiveApps Group', 'Name');
     }
 
     // Validate if a Flogo App exist
@@ -2316,10 +2325,14 @@ watchOrgFolder = function () {
     log(ERROR, 'TODO: Implement...')
 }
 
-getGroupsTable = function () {
+getGroupsTable = function (showTable) {
+    let doShowTable = true;
+    if (showTable != null) {
+        doShowTable = showTable;
+    }
     const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups);
     const groupTable = createTable(oResponse, mappings.la_groups, false);
-    pexTable(groupTable, 'live-apps-groups', getPEXConfig(), true);
+    pexTable(groupTable, 'live-apps-groups', getPEXConfig(), doShowTable);
     return groupTable;
 }
 
@@ -2526,6 +2539,30 @@ getPEXConfig = function () {
     re.tables = table_export_tables;
     return re;
 }
+
+/*
+Messaging URL's
+
+https://eu.messaging.cloud.tibco.com/tcm/v1/system
+https://eu.messaging.cloud.tibco.com/tcm/v1/system/summary
+https://eu.messaging.cloud.tibco.com/tcm/v1/system/durables
+https://eu.messaging.cloud.tibco.com/tcm/v1/system/eftl/clients
+https://eu.messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keysInfo
+https://eu.messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keys/165a2ea122ea4f238b34821526f76f8f
+
+messaging-show-summary
+messaging-show-durables
+messaging-show-clients
+messaging-show-keys
+
+tcli add-or-update-property -a default,Messaging.discodev.Connection_URL,none,SPECIAL,MessagingURL
+tcli add-or-update-property -a default,Messaging.discodev.Authentication_Key,none,SPECIAL,MessagingKEY,LongKey
+
+
+ */
+
+
+
 
 
 // Set log debug level from local property
