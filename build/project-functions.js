@@ -2152,11 +2152,18 @@ validate = async function () {
         let propD = await askQuestion('Which property would you like to validate (Use plus character to validate multiple properties, for example: prop1+prop2) ?');
         let propDArray = propD.split('+');
         for (let prop of propDArray) {
-            if (getProp(prop) != null) {
-                validationOk('Property ' + prop + ' exists...');
+            let val = null;
+            let valueFound = true;
+            try {
+               val = getProp(prop)
+            } catch (e) {
+                valueFound = false;
+            }
+            if (val != null && valueFound) {
+                validationOk('Property ' + colors.blue(prop) + '\033[0m exists...');
                 if (valD == 'property_is_set' || valD == 'property_is_set_ask') {
                     if (getProp(prop).trim() != '') {
-                        validationOk('Property ' + prop + ' is set: ' + getProp(prop));
+                        validationOk('Property ' + colors.blue(prop) + '\033[0m is set: ' + colors.yellow(getProp(prop)));
                     } else {
                         validationFailed('Property ' + prop + ' does not have a value...');
                         if (valD == 'property_is_set_ask') {
