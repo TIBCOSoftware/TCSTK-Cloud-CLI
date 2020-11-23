@@ -1726,7 +1726,7 @@ monitorTCI = async function () {
 generateCloudPropertyFiles = async function () {
     log(INFO, 'Generating Cloud Property Files');
     const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-    // console.log(response);
+    // console.log(JSON.stringify(response));
     let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
     if (projectName.trim() != '') {
         projectName = projectName + '_';
@@ -1737,28 +1737,13 @@ generateCloudPropertyFiles = async function () {
     const propFilesAU = [];
     const propOption = ['NONE', 'ALL', 'ALL EU', 'ALL US', 'ALL AU'];
     for (let org of response.accountsInfo) {
-        let orgName = '' + org.accountDisplayName;
-        let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
-        let tOrgNameEU = {
-            REGION: 'EU',
-            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties',
-            PROP: 'tibco-cloud-' + projectName + 'EU_' + tOrgName
-        };
-        let tOrgNameUS = {
-            REGION: 'US',
-            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties',
-            PROP: 'tibco-cloud-' + projectName + 'US_' + tOrgName
-        };
-        let tOrgNameAU = {
-            REGION: 'AU',
-            PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties',
-            PROP: 'tibco-cloud-' + projectName + 'AU_' + tOrgName
-        };
-        propOption.push(tOrgNameEU.PROPERTY_FILE_NAME, tOrgNameUS.PROPERTY_FILE_NAME, tOrgNameAU.PROPERTY_FILE_NAME);
-        propFilesALL.push(tOrgNameEU, tOrgNameUS, tOrgNameAU);
-        propFilesEU.push(tOrgNameEU);
-        propFilesUS.push(tOrgNameUS);
-        propFilesAU.push(tOrgNameAU);
+        extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU);
+        // Check for Children
+        if(org.childAccountsInfo && org.childAccountsInfo.length > 0){
+            for (let childOrg of org.childAccountsInfo) {
+                extractCloudInfo(childOrg, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU);
+            }
+        }
     }
     log(INFO, 'Files that can be created');
     console.table(propFilesALL);
@@ -1814,6 +1799,33 @@ generateCloudPropertyFiles = async function () {
     }
 }
 
+// Extract Helper
+extractCloudInfo = function(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU) {
+    let orgName = '' + org.accountDisplayName;
+    let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
+    let tOrgNameEU = {
+        REGION: 'EU',
+        PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties',
+        PROP: 'tibco-cloud-' + projectName + 'EU_' + tOrgName
+    };
+    let tOrgNameUS = {
+        REGION: 'US',
+        PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties',
+        PROP: 'tibco-cloud-' + projectName + 'US_' + tOrgName
+    };
+    let tOrgNameAU = {
+        REGION: 'AU',
+        PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties',
+        PROP: 'tibco-cloud-' + projectName + 'AU_' + tOrgName
+    };
+    propOption.push(tOrgNameEU.PROPERTY_FILE_NAME, tOrgNameUS.PROPERTY_FILE_NAME, tOrgNameAU.PROPERTY_FILE_NAME);
+    propFilesALL.push(tOrgNameEU, tOrgNameUS, tOrgNameAU);
+    propFilesEU.push(tOrgNameEU);
+    propFilesUS.push(tOrgNameUS);
+    propFilesAU.push(tOrgNameAU);
+}
+
+// Config property helper
 configurePropFile = function (fileName, region) {
     log(INFO, '[' + region + ']: Generating: ' + fileName);
     let regToAdd = '';
@@ -1828,7 +1840,6 @@ configurePropFile = function (fileName, region) {
     addOrUpdateProperty(fileName, 'cloudHost', regToAdd + 'liveapps.cloud.tibco.com');
     addOrUpdateProperty(fileName, 'Cloud_URL', 'https://' + regToAdd + 'liveapps.cloud.tibco.com/');
     log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
-
 }
 
 
@@ -2053,7 +2064,7 @@ generateOauthToken = function (tokenNameOverride, verbose) {
 }
 
 const SPECIAL = 'SPECIAL';
-// TODO: implement Function to update a propety (possibly in a custom file)
+// A Function to update a property (possibly in a custom file)
 updateProperty = async function () {
     let doUpdate = true;
     log(INFO, 'Update a property file');
