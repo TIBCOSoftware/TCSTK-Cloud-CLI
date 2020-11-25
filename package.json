@@ -4,6 +4,7 @@
   "scripts": {
     "postinstall": "node message.js",
     "test": "node ./test/run-test-cases.js",
+    "testJ": "jasmine",
     "pub": "npm publish"
   },
   "dependencies": {
@@ -32,7 +33,11 @@
     "tcp-port-used": "^1.0.1",
     "yargs": "^13.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jasmine": "^3.6.3",
+    "jasmine-reporters": "^2.3.2",
+    "jasmine-ts-console-reporter": "^3.1.1"
+  },
   "peerDependencies": {
     "gulp-cli": "^2.3.0"
   },
