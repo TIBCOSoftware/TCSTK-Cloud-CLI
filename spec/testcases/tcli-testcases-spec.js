@@ -1,11 +1,14 @@
 const CLI_EXECUTOR = './../../bin/cloud-cli.js --DebugTime ';
 const CLI_EXECUTOR_CS = './../' + CLI_EXECUTOR;
+const TEMP_TEST_FOLDER = './test/tmpTest';
+const OS_COMMAND_SEPARATOR = ' && ';
+
 
 describe("tcli testsuite", function () {
-
-    beforeEach(function () {
-        run('pwd');
-        run('rm -rf ./*');
+    beforeEach( function () {
+        mkdirIfNotExist(TEMP_TEST_FOLDER);
+        deleteFolder(TEMP_TEST_FOLDER);
+        mkdirIfNotExist(TEMP_TEST_FOLDER);
     });
     afterEach(function () {
 

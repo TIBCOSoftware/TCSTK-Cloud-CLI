@@ -22,4 +22,22 @@ run = function (command) {
     }
     return re;
 }
+
+
+// Delete a folder
+deleteFolder = function (folder) {
+    const del = require('del');
+    del.sync([folder]);
+    console.log('Deleted: ' + folder);
+}
+
+// Create a directory if it does not exists
+mkdirIfNotExist = function (dir) {
+    const fs = require('file-system');
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+        console.log('Created: ' + dir);
+    }
+}
+
 console.log('Test Helper Functions Loaded...');
