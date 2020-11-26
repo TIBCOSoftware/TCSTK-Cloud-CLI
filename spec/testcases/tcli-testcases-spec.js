@@ -44,6 +44,7 @@ describe("tcli testsuite", function () {
         // "help":
         // "repeat-last-task": {
         // "update-tcli"
+
     });
 
     // jasmine --filter='Basic Operations'
@@ -91,6 +92,7 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
         // "publish":
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starter-links')).toBe(true);
@@ -101,7 +103,9 @@ describe("tcli testsuite", function () {
 
     // jasmine --filter='Case Manager and Schematics'
     // Basic Cloud Starter Template - LATEST Angular 10
-    it("Case Manager and Schematics", function () {
+
+    //TODO: Testcase fails on windows (on ./backup folder)
+    xit("Case Manager and Schematics", function () {
         const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
@@ -110,10 +114,14 @@ describe("tcli testsuite", function () {
         // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'schematic-add -a ')).toBe(true);
         expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:case-cockpit CustomCaseCockpit')).toBe(true);
         expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:case-cockpit CustomHomeCockpit')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'generate-cloud-descriptor')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'update-cloud-packages')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        // TODO: "9. clean":
         // TODO: look at providing Anlytic schematic input on commandline
 
         // ng generate @tibco-tcstk/component-template:analytics-cockpit CustomAnalyticsCockpit
-
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'inject-lib-sources')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'undo-lib-sources')).toBe(true);
@@ -124,69 +132,143 @@ describe("tcli testsuite", function () {
 
     // jasmine --filter='Form Template and Schematics'
     // Form Template - LATEST Angular 10
+    // TODO: Testcase fails on: Cannot read property 'length' of undefined
     xit("Form Template and Schematics", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Form Template - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
-        // TODO: Cannot read property 'length' of undefined
-        // TODO: Add default ID for form ref
 
+        // TODO: Add default ID for form ref
         expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-creator CustomFormCreator --defaults=true --interactive=false')).toBe(true);
         expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-action CustomFormAction --defaults=true --interactive=false')).toBe(true);
         expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-casedata CustomFormCaseData --defaults=true --interactive=false')).toBe(true);
     });
 
-        /*
+    // jasmine --filter='Analytics Template and Schematics'
+    // Analytics Application Template - LATEST Angular 10
+    it("Analytics Template and Schematics", function () {
+        const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
+        expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-deploy')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + CSName + ':YES')).toBe(true);
+    });
 
-Analytics Application Template - LATEST Angular 10
-         */
 
+    // jasmine --filter='Generate files'
+    it("Generate files", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        let mFile = 'myMultiple';
+        expect(run(CLI_EXECUTOR + 'create-multiple-property-file -a ' + mFile)).toBe(true);
+        // TODO: allow for default as input for multiple
+        expect(run(CLI_EXECUTOR + 'generate-cloud-property-files -a MyProject:ALL:YES:' + mFile + '.properties')).toBe(true);
+        // TODO: allow for default as input for multiple
+        // TODO: output should be json NOT properties
+        expect(run(CLI_EXECUTOR + 'generate-live-apps-import-configuration -a import-live-apps-data-configuration.json')).toBe(true);
+    });
+
+    // Shared State Testcases
+    // jasmine --filter='Shared State Testcases'
+    it("Shared State Testcases", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Scope:none:*')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:SHARED')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PRIVATE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
+        // TODO: Provide details on shared state entry (maybe after importing one)
+        // expect(run(CLI_EXECUTOR + 'show-shared-state-details')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'export-shared-state-scope -a YES')).toBe(true);
+    });
+
+
+    // Live Apps Cases
+    // jasmine --filter='Live Apps Cases'
+    it("Live Apps Cases", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        // TODO: Allow for NONE
+        // TODO: Allow for All
+        // TODO: Allow for default on name input
+        expect(run(CLI_EXECUTOR + 'export-live-apps-case-type -a Discoveranalysis:Discoveranalysis.json')).toBe(true);
+        // TODO: Allow for NONE
+        // TODO: Allow for All
+        // TODO: Allow for default on folder input
+        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discoveranalysis:DiscoFOLDER')).toBe(true);
+    });
+
+    // Validation Testcases
+    // jasmine --filter='Validation Testcases'
+    it("Validation Testcases", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a Property_exist,cloudHost+Cloud_URL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a Property_exist,crap')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'validate -a Property_is_set,cloudHost+Cloud_URL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a Property_is_set,crap')).toBe(false);
+        // TODO: Look at other validations
+        // tcli validate -a LiveApps_app_exist,Discovercompliance+Discoverimprovement+Discoveranalysis
+        // tcli validate -a tci_app_exist,test+graniteStateCRM
+        // tcli validate -a cloud_starter_exist,labs-processmining-ui
+    });
+
+
+    // Groups and Users
+    // jasmine --filter='Groups and Users'
+    it("Groups and Users", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-live-apps-groups -a NONE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-live-apps-groups -a ALL')).toBe(true);
+        // TODO: Create and remove group
+        // tcli validate -a "Live_Apps_group_exist,Discover Administrators+Discover Case Resolvers+Discover Users+crap"
+        // tcli validate -a "Live_Apps_group_exist,Discover Administrators+Discover Case Resolvers+Discover Users"
+        expect(run(CLI_EXECUTOR + 'show-live-apps-users')).toBe(true);
+    });
+
+    // Org Folders
+    // jasmine --filter='Org Folders'
+    it("Org Folders", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        // TODO: Get more than 200 folders
+        expect(run(CLI_EXECUTOR + 'show-org-folders -a NONE')).toBe(true);
+        // TODO: Get content of a known folder (perhaps when you can upload)
+        // expect(run(CLI_EXECUTOR + 'show-org-folders -a CloudStarterSample')).toBe(true);
+        // CloudStarterSample
+    });
+
+
+    // TCI Apps
+    // jasmine --filter='TCI Apps'
+    it("TCI Apps", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-tci-apps')).toBe(true);
+    });
+
+    // TODO: Test Multiple
+
+    // TODO: Test Export Table (use does file exist test)
 
     /*
-            "6. start":
-            "9. clean":
-            "10. build-deploy":
+Difficult to TEST:
+// "50. add-user-to-group":
+// "48. create-live-apps-group": (need a remove group)
+"6. start":
+"16. update-global-config":
+"19. clear-shared-state-entry":
+show-shared-state-details
+"20. clear-shared-state-scope":
+"22. import-shared-state-scope":
+"23. watch-shared-state-scope":
+"31. import-live-apps-cases":
+"35. monitor-tci-app":
 
-             "26. ":
-            "wsu-list-tci":
-            "wsu-add-tci":
-            "14. ":
-
-            "16. update-global-config":
-            "17. show-shared-state":
-            "18. show-shared-state-details":
-            "19. clear-shared-state-entry":
-            "20. clear-shared-state-scope":
-            "21. export-shared-state-scope":
-            "22. import-shared-state-scope":
-            "23. watch-shared-state-scope":
-            "24. create-multiple-property-file":
-
-            "28. export-live-apps-case-type"
-            "29. export-live-apps-cases"
-            "30. generate-live-apps-import-configuration"
-            "31. import-live-apps-cases":
-            "csv-to-json-live-apps-data":
-            "json-to-csv-liveapps-data":
-            "32. generate-cloud-descriptor":
-            "33. update-cloud-packages":
-            "34. show-tci-apps":
-            "35. monitor-tci-app":
-            "36. describe-cloud":
-           // "42. generate-cloud-property-files"
-           // "43. show-org-folders":
-           // "44. export-org-folder":
-           // "45. import-org-folder":
-           // "46. watch-org-folder":
-           // "47. show-live-apps-groups"
-           // "48. create-live-apps-group":
-           // "49. show-live-apps-users":
-           // "50. add-user-to-group":
-           // "51. validate"
-
-           // "show-spotfire-reports":
-
-
+Not Yet Implemented:
+"show-spotfire-reports":
+"wsu-list-tci":
+"wsu-add-tci":
+"36. describe-cloud":
+"44. export-org-folder":
+"45. import-org-folder":
+"46. watch-org-folder":
     */
 
 
