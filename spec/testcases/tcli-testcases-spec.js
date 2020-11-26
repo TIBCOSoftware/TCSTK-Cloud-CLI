@@ -86,7 +86,7 @@ describe("tcli testsuite", function () {
     // Generate an OAUTH Token
     it("Build and Deploy Cloud Starter", function () {
         const BasicName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime();
-        expect(run(CLI_EXECUTOR + ' new ' + BasicName + ' -t \'Basic Cloud Starter Template - LATEST Angular 10\' -s')).toBe(true);
+        expect(run(CLI_EXECUTOR + ' new ' + BasicName + ' -t "Basic Cloud Starter Template - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true);
         expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true);
