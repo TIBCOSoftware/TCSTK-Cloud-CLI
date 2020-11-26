@@ -96,7 +96,14 @@ processMultipleFile = function () {
                     for (let jTask of jobTasksA){
                         let taskType = '';
                         let task = '';
-                        let tObj = JSON.parse(jTask);
+
+                        let tObj = {};
+                        try {
+                            tObj = JSON.parse(jTask);
+                        } catch (e){
+                            log(ERROR, 'Parsing error on: |' + jTask + '| ('+ e.message + ')');
+                            process.exit(1);
+                        }
                         if (tObj.T != null) {
                             taskType = 'TCLI TASK';
                             task = replaceAtSign(tObj.T, currLoc + propFile);

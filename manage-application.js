@@ -148,7 +148,7 @@ createNewStarter = function (name, template, doStart) {
     });
 }
 
-const git = require('gulp-git');
+// const git = require('gulp-git');
 // const simpleGit = require('simple-git')();
 // function to get git repo
 getGit = function (source, target, tag) {

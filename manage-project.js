@@ -321,7 +321,6 @@ replaceStringInFileOne = function (prefix) {
     let rFrom = getProp(prefix + 'Replace_FROM');
     let rTo = getProp(prefix + 'Replace_TO');
     const rPat = getProp(prefix + 'Replace_PATTERN');
-
     if (rFrom == null || rTo == null || rPat == null) {
         log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...');
     } else {

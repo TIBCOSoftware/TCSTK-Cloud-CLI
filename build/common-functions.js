@@ -840,6 +840,7 @@ log = function (level, ...message) {
 
         if (level == global.ERROR) {
             console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', '\x1b[31m', ...message, '\033[0m');
+            process.exitCode = 1;
         } else {
             if (level == global.WARNING) {
                 console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
