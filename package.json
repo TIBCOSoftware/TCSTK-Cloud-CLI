@@ -3,8 +3,8 @@
   "version": "2.2.0",
   "scripts": {
     "postinstall": "node message.js",
-    "test": "node ./test/run-test-cases.js",
-    "testJ": "jasmine",
+    "testO": "node ./test/run-test-cases.js",
+    "test": "jasmine",
     "pub": "npm publish"
   },
   "dependencies": {
