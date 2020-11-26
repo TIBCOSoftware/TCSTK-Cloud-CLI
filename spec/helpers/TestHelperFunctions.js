@@ -1,6 +1,10 @@
-const TEMP_TEST_FOLDER = './test/tmpTest';
-const OS_COMMAND_SEPARATOR = ' && ';
+let TEMP_TEST_FOLDER = '';
+let OS_COMMAND_SEPARATOR = '';
 
+setFolderAndOperator = function(folder, oper){
+    TEMP_TEST_FOLDER = folder;
+    OS_COMMAND_SEPARATOR = oper;
+}
 
 const execSync = require('child_process').execSync;
 run = function (command) {

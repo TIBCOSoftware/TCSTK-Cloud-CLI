@@ -1,11 +1,13 @@
 let CLI_EXECUTOR = './../../bin/cloud-cli.js --DebugTime ';
 let CLI_EXECUTOR_CS = './../' + CLI_EXECUTOR;
 let TEMP_TEST_FOLDER = './test/tmpTest';
+let OS_COMMAND_SEPARATOR = ' && ';
 if(/^win/.test(process.platform)){
     // C:\Program Files (x86)\Jenkins\workspace\CLOUD STARTERS\CS Update CLI and Validate\tmp\TCSTK-Cloud-CLI\test\tmpTest>cd .\test\tmpTest && node .\..\..\bin\cloud-cli.js --DebugTime --createCP
     CLI_EXECUTOR = 'node .\\..\\..\\bin\\cloud-cli.js --DebugTime ';
     CLI_EXECUTOR_CS = 'node .\\..\\..\\..\\bin\\cloud-cli.js --DebugTime ';
     TEMP_TEST_FOLDER = '.\\test\\tmpTest';
+    OS_COMMAND_SEPARATOR = ' & ';
 }
 
 // const OS_COMMAND_SEPARATOR = ' && ';
@@ -21,7 +23,7 @@ describe("tcli testsuite", function () {
 
     });
     beforeAll(function () {
-
+        setFolderAndOperator(TEMP_TEST_FOLDER, OS_COMMAND_SEPARATOR);
     });
     afterAll(function () {
 
