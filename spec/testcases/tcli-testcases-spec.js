@@ -92,7 +92,7 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
         // "publish":
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starter-links')).toBe(true);
@@ -150,7 +150,7 @@ describe("tcli testsuite", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-deploy')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + CSName + ':YES')).toBe(true);
     });
 
