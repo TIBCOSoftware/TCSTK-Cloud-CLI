@@ -43,6 +43,7 @@ describe("tcli testsuite", function () {
         // "quit"
         // "help":
         // "repeat-last-task": {
+        // "update-tcli"
     });
 
     // jasmine --filter='Basic Operations'
@@ -83,32 +84,73 @@ describe("tcli testsuite", function () {
     });
 
     // jasmine --filter='Build and Deploy Cloud Starter'
-    // Generate an OAUTH Token
-    it("Build and Deploy Cloud Starter", function () {
-        const BasicName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime();
-        expect(run(CLI_EXECUTOR + ' new ' + BasicName + ' -t "Basic Cloud Starter Template - LATEST Angular 10" -s')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true);
+    // Basic Cloud Starter Template - LATEST Angular 10
+    it("Build and Deploy Basic Cloud Starter", function () {
+        const CSName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime();
+        expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Basic Cloud Starter Template - LATEST Angular 10" -s')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true);
         // "publish":
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starter-links')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a NONE')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + BasicName + ':YES')).toBe(true);
-        expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starter-links')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a NONE')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + CSName + ':YES')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
     });
+
+    // jasmine --filter='Case Manager and Schematics'
+    // Basic Cloud Starter Template - LATEST Angular 10
+    it("Case Manager and Schematics", function () {
+        const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime();
+        expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        //TODO: Test Schematic add by making it more interactive...
+
+        // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'schematic-add -a ')).toBe(true);
+        expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:case-cockpit CustomCaseCockpit')).toBe(true);
+        expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:case-cockpit CustomHomeCockpit')).toBe(true);
+        // TODO: look at providing Anlytic schematic input on commandline
+
+        // ng generate @tibco-tcstk/component-template:analytics-cockpit CustomAnalyticsCockpit
+
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'inject-lib-sources')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'undo-lib-sources')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'get-cloud-libs-from-git')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+    });
+
+    // jasmine --filter='Form Template and Schematics'
+    // Form Template - LATEST Angular 10
+    xit("Form Template and Schematics", function () {
+        const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
+        expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Form Template - LATEST Angular 10" -s')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        // TODO: Cannot read property 'length' of undefined
+        // TODO: Add default ID for form ref
+
+        expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-creator CustomFormCreator --defaults=true --interactive=false')).toBe(true);
+        expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-action CustomFormAction --defaults=true --interactive=false')).toBe(true);
+        expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-casedata CustomFormCaseData --defaults=true --interactive=false')).toBe(true);
+    });
+
+        /*
+
+Analytics Application Template - LATEST Angular 10
+         */
+
+
     /*
             "6. start":
-
             "9. clean":
             "10. build-deploy":
-            "11. get-cloud-libs-from-git":
-            "12. inject-lib-sources":
-            "13. undo-lib-sources":
+
              "26. ":
             "wsu-list-tci":
             "wsu-add-tci":
-            "14. schematic-add":
+            "14. ":
 
             "16. update-global-config":
             "17. show-shared-state":
@@ -119,8 +161,6 @@ describe("tcli testsuite", function () {
             "22. import-shared-state-scope":
             "23. watch-shared-state-scope":
             "24. create-multiple-property-file":
-
-
 
             "28. export-live-apps-case-type"
             "29. export-live-apps-cases"
@@ -133,8 +173,6 @@ describe("tcli testsuite", function () {
             "34. show-tci-apps":
             "35. monitor-tci-app":
             "36. describe-cloud":
-
-
            // "42. generate-cloud-property-files"
            // "43. show-org-folders":
            // "44. export-org-folder":
@@ -147,7 +185,7 @@ describe("tcli testsuite", function () {
            // "51. validate"
 
            // "show-spotfire-reports":
-           // "update-tcli"
+
 
     */
 
