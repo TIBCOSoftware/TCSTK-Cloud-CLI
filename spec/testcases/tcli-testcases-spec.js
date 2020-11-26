@@ -51,7 +51,8 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'change-region -a "US - Oregon"')).toBe(true);
+        // TODO: add test user to US
+        // expect(run(CLI_EXECUTOR + 'change-region -a "US - Oregon"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Replace_FROM:none:CloudLogin')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Replace_TO:none:CRAP')).toBe(true);
@@ -81,7 +82,7 @@ describe("tcli testsuite", function () {
 
     // jasmine --filter='Build and Deploy Cloud Starter'
     // Generate an OAUTH Token
-    xit("Build and Deploy Cloud Starter", function () {
+    it("Build and Deploy Cloud Starter", function () {
         const BasicName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + BasicName + ' -t \'Basic Cloud Starter Template - LATEST Angular 10\' -s')).toBe(true);
         expect(run('cd ' + BasicName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
