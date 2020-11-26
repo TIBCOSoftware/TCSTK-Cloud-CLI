@@ -132,14 +132,24 @@ getProp = function (propName) {
     }
     let re;
     if (propsGl != null) {
-        re = indexObj(propsGl, propName);
+        try {
+            re = indexObj(propsGl, propName);
+        } catch (e) {
+            log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
+            process.exit(1);
+        }
         log(DEBUG, 'Returning Property: ', re);
         if (re == 'USE-GLOBAL') {
             if (doesFileExist(globalTCpropFile)) {
                 if (globalProperties == null) {
                     globalProperties = PropertiesReader(globalTCpropFile).path();
                 }
-                re = indexObj(globalProperties, propName);
+                try {
+                    re = indexObj(globalProperties, propName);
+                } catch (e) {
+                    log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
+                    process.exit(1);
+                }
                 log(DEBUG, 'Got Property From Global: ', re);
             } else {
                 log(DEBUG, 'No Global Configuration Set...');
@@ -233,7 +243,7 @@ getPropFileName = function () {
 }
 setMultipleOptions = function (mOptions) {
     globalMultipleOptions = mOptions;
-    log(DEBUG, 'Using Multiple Options: ' , globalMultipleOptions);
+    log(DEBUG, 'Using Multiple Options: ', globalMultipleOptions);
 }
 getMultipleOptions = function () {
     return globalMultipleOptions;
@@ -386,7 +396,7 @@ setGlobalAnswers = function (answers) {
     // console.log('Answers: ' , answers);
     if (answers) {
         // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
-        if(answers.indexOf(':') > 0){
+        if (answers.indexOf(':') > 0) {
             globalAnswers = answers.split(':');
         } else {
             globalAnswers = answers.split(',');
@@ -402,7 +412,7 @@ getLastGlobalAnswer = function (question) {
     let re = '';
     if (globalAnswers && globalAnswers.length > 0) {
         re = globalAnswers.shift();
-        log(INFO, 'Injected answer: ', colors.blue(re) , ' For question: ' , question);
+        log(INFO, 'Injected answer: ', colors.blue(re), ' For question: ', question);
     } else {
         log(ERROR, 'No answer left for question: ' + question);
         process.exit(1);
