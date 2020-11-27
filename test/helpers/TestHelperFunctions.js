@@ -37,7 +37,7 @@ deleteFolder = function (folder) {
 
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
-    const fs = require('file-system');
+    const fs = require('fs');
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
         console.log('Created: ' + dir);

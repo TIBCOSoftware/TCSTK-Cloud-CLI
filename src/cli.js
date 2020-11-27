@@ -155,7 +155,7 @@ export async function cli(args) {
             var projectManagementMode = false;
         } else {
             // Test if tibco-cloud.properties exists
-            const fs = require("file-system");
+            const fs = require("fs");
             const tCreate = 'Create New Cloud Starter';
             const tCProp = 'Create New TIBCO Cloud properties file';
             const tManageG = 'Manage Global Cloud Connection Configuration';

@@ -284,7 +284,7 @@ createMultiplePropertyFile = async function () {
 // Function to copy a file
 copyFile = function (fromFile, toFile) {
     log(INFO, 'Copying File from: ' + fromFile + ' to: ' + toFile);
-    const fs = require('file-system');
+    const fs = require('fs');
     fs.copyFileSync(fromFile, toFile);
 }
 
@@ -637,7 +637,7 @@ deleteFolder = function (folder) {
 
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
-    const fs = require('file-system');
+    const fs = require('fs');
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
@@ -765,7 +765,7 @@ pexTable = function (tObject, tName, config, doPrint) {
             }
         }
         if (doExport) {
-            const fs = require('file-system');
+            const fs = require('fs');
             const fileName = config.folder + config.filePreFix + tName + '.csv';
             let additionalMessage = '';
             mkdirIfNotExist(config.folder);

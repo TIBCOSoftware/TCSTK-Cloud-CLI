@@ -1,12 +1,13 @@
 // Package Definitions
 //TODO: For startup speed, move these to when they are used.
 const syncClient = require('sync-rest-client');
-const fs = require('file-system');
-//const fse = require('fs-extra');
+const fs = require('fs');
+// const fse = require('fs-extra');
 const jsonfile = require('jsonfile');
-const isWindows = process.platform == 'win32';
-const clURI = require('../config/config-cloud.json').endpoints;
-const mappings = require('../config/config-cloud.json').mappings;
+// const isWindows = process.platform == 'win32';
+const cloudConfig = require('../config/config-cloud.json');
+const clURI = cloudConfig.endpoints;
+const mappings = cloudConfig.mappings;
 
 // Clean temp folder
 cleanTemp = function () {
