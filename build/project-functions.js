@@ -47,6 +47,7 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
         // isOAUTHValid = true;
         // Getting the organization info
         // console.log('Get Org: ' , getOrganization());
+        // TODO: think of a fix for OAUTH Tokens that just have LA Access (get orgname from a live apps api)
         if (getOrganization() == null || getOrganization().trim() == '') {
             // Setting this to temp so it breaks the call stack
             // setOrganization('TEMP');
@@ -255,7 +256,7 @@ if (getProp('BUILD_COMMAND') != null) {
     addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
 }
 
-
+// Build the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
     return new Promise(async function (resolve, reject) {
         const csURL = '/webresource/apps/' + cloudStarter + '/';
@@ -286,51 +287,60 @@ buildCloudStarterZip = function (cloudStarter) {
     });
 }
 
-
 // function that shows all the availible applications in the cloud
 const getAppURL = cloudURL + getProp('appURE') + '?$top=200';
 showAvailableApps = function (showTable) {
     //TODO: Use table config
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
-    var response = callURL(getAppURL);
-    //console.log('APPS: ' , response);
-    // TODO: Apparently apps can have tags, look into this...
-    var apps = {};
-    for (var app in response) {
-        var appTemp = {};
-        var appN = parseInt(app) + 1;
-        //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
-        appTemp['APP NAME'] = response[app].name;
-        //appTemp['LINK'] = 'https://eu.liveapps.cloud.tibco.com/webresource/apps/'+response[app].name+'/index.html';
-        // TODO: Use the API (get artifacts) to find an index.htm(l) and provide highest
-        // TODO: Use right eu / us link
-        var publV = parseInt(response[app].publishedVersion);
-        appTemp['PUBLISHED VERSION'] = publV;
-        var latestV = parseInt(response[app].latestVersion);
-        appTemp['LATEST VERSION'] = latestV;
-        //appTemp['PUBLISHED / LATEST VERSION'] = '(' + publV + '/' + latestV + ')';
-        var latestDeployed = false;
-        if (publV == latestV) {
-            latestDeployed = true;
+    var response = callURL(getAppURL,null, null, null,null,null,null, null, null,null,true);
+    if(response.errorMsg){
+        if(response.errorMsg == 'Application does not exist'){
+            log(INFO, 'No Cloud Starters deployed yet...');
+            return null;
+        } else {
+            log(ERROR, response.errorMsg);
+            process.exit(1);
         }
-        appTemp['LATEST DEPLOYED'] = latestDeployed;
-        apps[appN] = appTemp;
-        var created = new Date(response[app].creationDate);
-        var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-        var optionsT = {hour: 'numeric'};
-        appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
-        //appTemp['CREATED TIME'] = created.toLocaleTimeString();
-        var lastModified = new Date(response[app].lastModifiedDate);
-        //appTemp['LAST MODIFIED'] = lastModified.toLocaleDateString("en-US", options);
-        //appTemp['LAST MODIFIED TIME'] = lastModified.toLocaleTimeString();
-        var now = new Date();
-        appTemp['AGE(DAYS)'] = Math.round((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-        appTemp['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
+    } else {
+        //console.log('APPS: ' , response);
+        // TODO: Apparently apps can have tags, look into this...
+        var apps = {};
+        for (var app in response) {
+            var appTemp = {};
+            var appN = parseInt(app) + 1;
+            //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
+            appTemp['APP NAME'] = response[app].name;
+            //appTemp['LINK'] = 'https://eu.liveapps.cloud.tibco.com/webresource/apps/'+response[app].name+'/index.html';
+            // TODO: Use the API (get artifacts) to find an index.htm(l) and provide highest
+            // TODO: Use right eu / us link
+            var publV = parseInt(response[app].publishedVersion);
+            appTemp['PUBLISHED VERSION'] = publV;
+            var latestV = parseInt(response[app].latestVersion);
+            appTemp['LATEST VERSION'] = latestV;
+            //appTemp['PUBLISHED / LATEST VERSION'] = '(' + publV + '/' + latestV + ')';
+            var latestDeployed = false;
+            if (publV == latestV) {
+                latestDeployed = true;
+            }
+            appTemp['LATEST DEPLOYED'] = latestDeployed;
+            apps[appN] = appTemp;
+            var created = new Date(response[app].creationDate);
+            var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            var optionsT = {hour: 'numeric'};
+            appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
+            //appTemp['CREATED TIME'] = created.toLocaleTimeString();
+            var lastModified = new Date(response[app].lastModifiedDate);
+            //appTemp['LAST MODIFIED'] = lastModified.toLocaleDateString("en-US", options);
+            //appTemp['LAST MODIFIED TIME'] = lastModified.toLocaleTimeString();
+            var now = new Date();
+            appTemp['AGE(DAYS)'] = Math.round((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+            appTemp['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
+        }
+        //logO(INFO,apps);
+        // if (doShowTable) console.table(apps);
+        pexTable(apps, 'cloud-starters', getPEXConfig(), doShowTable);
+        return response;
     }
-    //logO(INFO,apps);
-    // if (doShowTable) console.table(apps);
-    pexTable(apps, 'cloud-starters', getPEXConfig(), doShowTable);
-    return response;
     // resolve();
     // });
 };
@@ -1067,7 +1077,9 @@ publishApp = function (application) {
 }
 
 // Function to call the Tibco Cloud
-callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID) {
+// TODO: Accept, URL, doLog and possible config
+callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside) {
+    const doErrorOutside = handleErrorOutside || false;
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
     const reResponse = returnResponse || false;
@@ -1132,8 +1144,12 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
         });
     }
     if (response.body.errorMsg != null) {
-        log(ERROR, response.body.errorMsg);
-        log(ERROR, response.body);
+        if(doErrorOutside){
+            return response.body;
+        } else {
+            log(ERROR, response.body.errorMsg);
+            log(ERROR, response.body);
+        }
         return null;
     } else {
         if (reResponse) {
