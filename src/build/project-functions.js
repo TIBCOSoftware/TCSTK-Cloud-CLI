@@ -1,6 +1,7 @@
 // Package Definitions
 //TODO: For startup speed, move these to when they are used.
-const syncClient = require('sync-rest-client');
+
+// const syncClient = require('sync-rest-client');
 const fs = require('fs');
 // const fse = require('fs-extra');
 const jsonfile = require('jsonfile');
@@ -126,6 +127,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
     log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
     //log(DEBUG,'With Form: ' + postForm);
+    const syncClient = require('sync-rest-client');
     var response = syncClient.post(encodeURI(TCbaseURL), {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         payload: postForm
@@ -1137,6 +1139,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     }
 
     let response = {};
+    const syncClient = require('sync-rest-client');
     if (cMethod.toLowerCase() === 'get') {
         response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
             headers: header

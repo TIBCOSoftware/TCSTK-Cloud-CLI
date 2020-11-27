@@ -1,8 +1,12 @@
 // This file manages all the tasks within a project
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Second GulP');
 const gulp = require('gulp');
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Second GulP');
 //import functions
 require('./build/common-functions');
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 require('./build/project-functions');
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Projects');
 // Read TIBCO cloud properties...
 //const PropertiesReader = require('properties-reader');
 //const propFileNameGulp = 'tibco-cloud.properties';

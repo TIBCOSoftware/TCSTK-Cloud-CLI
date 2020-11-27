@@ -13,6 +13,7 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
+      "task": "showCloudInfo",
       "gulpTask": "show-cloud",
       "availableOnOs": ["all"]
     },

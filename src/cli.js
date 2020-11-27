@@ -228,6 +228,14 @@ export async function cli(args) {
     }
 
     if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
+/*
+        if(options.task == 'show-cloud'){
+            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
+            require(__dirname + '/build/project-functions');
+            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
+            showCloudInfo();
+        }
+*/
         // Start the specified Gulp Task
         if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
         var gulp = require('gulp');
