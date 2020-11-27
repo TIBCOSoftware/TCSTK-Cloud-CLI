@@ -135,7 +135,7 @@ export async function cli(args) {
 
     // Show the version
     if (options.version) {
-        console.log('TIBCO Cloud CLI Version: ' + require('./package.json').version);
+        console.log('TIBCO Cloud CLI Version: ' + require('../package.json').version);
         process.exit(0);
     }
 
@@ -165,7 +165,7 @@ export async function cli(args) {
                 var cif = tCProp;
                 if (!options.createCP) {
                     displayOpeningMessage();
-                    console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + require('./package.json').version + "]");
+                    console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + require('../package.json').version + "]");
                     console.log('No TIBCO Cloud Properties file found...');
                     cif = await askMultipleChoiceQuestion('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing]);
                 }
@@ -174,11 +174,11 @@ export async function cli(args) {
                         // if we use a global config
                         if (getGlobalConfig()) {
                             log(INFO, 'Using Global Connection Configuration...');
-                            console.log(__dirname + '/template/tibco-cloud_global.properties')
-                            fs.copyFileSync(__dirname + '/template/tibco-cloud_global.properties', cwdir + '/' + propFileName);
+                            console.log(__dirname + '/templates/tibco-cloud_global.properties')
+                            fs.copyFileSync(__dirname + '/templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
                         } else {
                             log(INFO, 'Using Local Connection Configuration...');
-                            fs.copyFileSync(__dirname + '/template/tibco-cloud.properties', cwdir + '/' + propFileName);
+                            fs.copyFileSync(__dirname + '/templates/tibco-cloud.properties', cwdir + '/' + propFileName);
                             await updateRegion(propFileName);
                             await updateCloudLogin(propFileName);
                         }
@@ -250,7 +250,7 @@ export async function cli(args) {
                 options.task = 'help-tcli';
             }
             // Check if the task exists...
-            const cliTaskConfigCLI = require('./config-cli-task.json');
+            const cliTaskConfigCLI = require('./config/config-cli-task.json');
             var cTsks = cliTaskConfigCLI.cliTasks;
             let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-scope-do'];
             let taskExist = false;
@@ -299,7 +299,7 @@ function helptcli() {
     console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.');
     console.log('These are the available TIBCO CLOUD CLI Tasks:');
     // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
-    const cliTaskConfigCLI = require('./config-cli-task.json');
+    const cliTaskConfigCLI = require('./config/config-cli-task.json');
     var cTsks = cliTaskConfigCLI.cliTasks;
     for (var cliTask in cTsks) {
         var allowed = false;

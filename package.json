@@ -4,7 +4,8 @@
   "scripts": {
     "postinstall": "node message.js",
     "testO": "node ./test/run-test-cases.js",
-    "test": "jasmine",
+    "test": "jasmine --config=test/support/jasmine.json",
+    "testB": "jasmine --config=test/support/jasmine.json --filter='Basic Operations'",
     "pub": "npm publish"
   },
   "dependencies": {
@@ -42,7 +43,7 @@
     "gulp-cli": "^2.3.0"
   },
   "bin": {
-    "tcli": "bin/cloud-cli.js"
+    "tcli": "src/bin/cloud-cli.js"
   },
   "publishConfig": {
     "access": "public"

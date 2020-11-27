@@ -5,8 +5,8 @@ const fs = require('file-system');
 //const fse = require('fs-extra');
 const jsonfile = require('jsonfile');
 const isWindows = process.platform == 'win32';
-const clURI = require('./../config-cloud.json').endpoints;
-const mappings = require('./../config-cloud.json').mappings;
+const clURI = require('../config/config-cloud.json').endpoints;
+const mappings = require('../config/config-cloud.json').mappings;
 
 // Clean temp folder
 cleanTemp = function () {
@@ -1361,7 +1361,7 @@ createLAImportFile = async function () {
         mkdirIfNotExist(CASE_FOLDER);
         mkdirIfNotExist(importFolder);
         log(INFO, 'Creating new Live Aps Import Configuration file: ' + impConfFileName);
-        copyFile(__dirname + '/../template/import-live-apps-data-configuration.json', targetFile);
+        copyFile(__dirname + '/../templates/import-live-apps-data-configuration.json', targetFile);
         // log(INFO, 'Now configure the multiple propety file and then run "\x1b[34mtcli -m\033[0m" (for default propety name) or "\x1b[34mtcli -m <propfile name>\033[0m" to execute...');
     }
 }
@@ -1639,7 +1639,7 @@ wsuListTci = function () {
     });
 }
 
-const posSchematics = require('../config-schematics').schematicConfig;
+const posSchematics = require('../config/config-schematics.json').schematicConfig;
 schematicAdd = function () {
     return new Promise(async function (resolve, reject) {
         log(INFO, 'Adding Schematic...');

@@ -267,7 +267,7 @@ multipleInteraction = function () {
                 displayTask = TCLI_INTERACTVIE;
             } else {
                 if (chosenEnv == 'CHANGE TASK') {
-                    const cliTaskConfigCLI = require('./config-cli-task.json');
+                    const cliTaskConfigCLI = require('./config/config-cli-task.json');
                     let cTsks = cliTaskConfigCLI.cliTasks;
 
                     const taskDescription = ['0) ' + TCLI_INTERACTVIE];

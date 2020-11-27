@@ -1,6 +1,6 @@
 // This file does not depend on any other files
 // All inputs are provided as input to the functions
-const globalTCpropFolder = __dirname + '/../../common/';
+const globalTCpropFolder = __dirname + '/../../../common/';
 const globalTCpropFile = globalTCpropFolder + 'global-tibco-cloud.properties';
 const colors = require('colors');
 
@@ -8,7 +8,7 @@ const colors = require('colors');
 displayOpeningMessage = function () {
     //var pjson = require('./package.json');
     //console.log(process.env.npm_package_version);
-    const version = require('../package.json').version;
+    const version = require('../../package.json').version;
     console.log('\x1b[35m%s\x1b[0m', '# |-------------------------------------------|');
     console.log('\x1b[35m%s\x1b[0m', '# |  *** T I B C O    C L O U D   C L I ***   |');
     console.log('\x1b[35m%s\x1b[0m', '# |            V' + version + '                         |');
@@ -86,10 +86,10 @@ updateGlobalConnectionConfig = async function () {
     // Check if the global propfile exists, if not create one
     if (!doesFileExist(globalTCpropFile)) {
         // Create Global config from template
-        copyFile(__dirname + '/../template/global-tibco-cloud.properties', globalTCpropFile);
+        copyFile(__dirname + '/../templates/global-tibco-cloud.properties', globalTCpropFile);
     }
     if (!doesFileExist(globalTCpropFolder + 'package.json')) {
-        copyFile(__dirname + '/../template/package-common.json', globalTCpropFolder + 'package.json');
+        copyFile(__dirname + '/../templates/package-common.json', globalTCpropFolder + 'package.json');
         log(INFO, 'Inserted package.json...');
     }
     // Get Cloud Environment
@@ -274,7 +274,7 @@ createMultiplePropertyFile = async function () {
     }
     if (doWrite) {
         log(INFO, 'Creating new multiple property file: ' + mPropFileName);
-        copyFile(__dirname + '/../template/multiple.properties', targetFile);
+        copyFile(__dirname + '/../templates/multiple.properties', targetFile);
         //'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
         log(INFO, 'Now configure the multiple property file and then run "\x1b[34mtcli -m\033[0m" (for default fileq name) \nor "\x1b[34mtcli -m <propfile name> [-j <job-name> -e <environment-name>]\033[0m" to execute...');
         log(INFO, 'Or run "\x1b[34mtcli -i\033[0m" to interact with multiple cloud environments...');
@@ -513,7 +513,7 @@ getCurrentAWSRegion = function () {
 
 
 updateTCLI = function () {
-    log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../package.json').version);
+    log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../../package.json').version);
     run('npm -g install @tibco-tcstk/cloud-cli');
     log(INFO, 'New Cloud CLI Version: ');
     run('tcli -v');

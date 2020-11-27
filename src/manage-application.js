@@ -2,7 +2,7 @@
 require('./build/common-functions');
 const gulp = require('gulp');
 //const inquirerA = require('inquirer');
-const configApp = require('./config-template.json');
+const configApp = require('./config/config-template.json');
 // var templatesToUse = ['Template1', 'Template2', 'TCSTK-case-manager-app'];
 var templatesToUse = [];
 const isWindows = process.platform == 'win32';

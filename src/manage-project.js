@@ -8,7 +8,7 @@ require('./build/project-functions');
 //const propFileNameGulp = 'tibco-cloud.properties';
 //const properties = PropertiesReader(propFileNameGulp);
 //const getProp( = properties.path();
-const version = require('./package.json').version;
+const version = require('../package.json').version;
 const isWindows = process.platform == 'win32';
 
 // Function to build the cloud starter
@@ -744,7 +744,7 @@ TODO: Additional Cloud CLI Capabilities
 -- Get the token from the cloud
  */
 
-const cliTaskConfig = require('./config-cli-task.json');
+const cliTaskConfig = require('./config/config-cli-task.json');
 // Comes from prop file now...
 // const gtasks = ['show-cloud', 'show-apps', 'show-application-links','change-region', 'obfuscate', 'start', 'build', 'deploy', 'publish', 'clean', 'build-deploy-publish', 'get-cloud-libs-from-git', 'inject-lib-sources', 'undo-lib-sources', 'q', 'exit', 'quit', 'help-tcli' , 'repeat-last-task'];
 var gtasks = [];
