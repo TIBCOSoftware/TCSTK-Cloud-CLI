@@ -357,11 +357,13 @@ showApps = function () {
 const getClaimsURL = cloudURL + getProp('Claims_URE');
 showCloudInfo = function (showTable) {
     return new Promise(function (resolve, reject) {
+        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
         let doShowTable = true;
         if (showTable != null) {
             doShowTable = showTable;
         }
         var response = callURL(getClaimsURL);
+        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
         let nvs = createTableValue('REGION', getRegion());
         nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
         nvs = createTableValue('FIRST NAME', response.firstName, nvs);
@@ -377,6 +379,7 @@ showCloudInfo = function (showTable) {
         if (doShowTable) {
             console.table(nvs);
         }
+        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
         resolve();
     });
 };
