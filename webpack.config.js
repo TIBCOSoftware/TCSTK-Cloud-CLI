@@ -19,6 +19,7 @@ module.exports = {
     },
     target: 'node',
     mode: 'production',
+    /*mode: 'development', TODO: look at map files*/
     externals: nodeModules,
     plugins: [
         new webpack.BannerPlugin({banner: '#!/usr/bin/env node', raw: true})

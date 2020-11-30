@@ -1,3 +1,4 @@
+// #!/usr/bin/env node
 global.TIME = new Date();
 global.SHOW_START_TIME = false
 if(process.argv && process.argv.length > 0){

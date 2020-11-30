@@ -4,6 +4,7 @@ require('./build/common-functions');
 import arg from 'arg';
 
 let propFileName;
+
 //const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
@@ -71,7 +72,7 @@ const dirDelimiter = isWindows ? '\\' : '/';
 
 // Main function
 export async function cli(args) {
-    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' CLI INIT');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' CLI INIT');
     //console.log('start');
     const options = parseArgumentsIntoOptions(args);
     const appRoot = process.env.PWD;
@@ -96,7 +97,7 @@ export async function cli(args) {
         console.log('org: ' + options.org);
         console.log('answers: ' + options.answers);
     }
-    if(options.pass != ''){
+    if (options.pass != '') {
         // This call sets the properties object, to be able to add a property to it.
         getProp('CloudLogin.pass');
         if (options.pass.charAt(0) == '#') {
@@ -105,11 +106,11 @@ export async function cli(args) {
             setProperty('CloudLogin.pass', obfuscatePW(options.pass));
         }
     }
-    if(options.org != ''){
+    if (options.org != '') {
         setOrganization(options.org);
     }
 
-    if(options.answers != ''){
+    if (options.answers != '') {
         setGlobalAnswers(options.answers);
     }
 
@@ -122,12 +123,12 @@ export async function cli(args) {
     }
     // Run multiple management
     if (options.doMultiple || options.doMultipleInteraction) {
-        var gulp = require('gulp');
+        const gulp = require('gulp');
         require('./manage-multiple');
-        if(options.doMultiple){
+        if (options.doMultiple) {
             gulp.series('run-multiple')();
         }
-        if(options.doMultipleInteraction){
+        if (options.doMultipleInteraction) {
             gulp.series('run-multiple-interaction')();
         }
 
@@ -229,22 +230,21 @@ export async function cli(args) {
     }
 
     if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
-/*
-        if(options.task == 'show-cloud'){
-            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
+        /*
+        if (options.task == 'show-cloud') {
+            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
             require(__dirname + '/build/project-functions');
-            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
+            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
             showCloudInfo();
-        }
-*/
+            process.exit(0);
+        }*/
+
         // Start the specified Gulp Task
-        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
-        var gulp = require('gulp');
-        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
+
         if (projectManagementMode) {
-            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
+            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
             require('./manage-project');
-            if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
+            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
         } else {
             require('./manage-application');
         }
@@ -252,6 +252,8 @@ export async function cli(args) {
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
         if (options.task == '') {
+            const gulp = require('gulp');
+            initGulp();
             gulp.series('default')();
         } else {
             // console.log('TASK: ' + options.task);
@@ -263,25 +265,43 @@ export async function cli(args) {
             var cTsks = cliTaskConfigCLI.cliTasks;
             let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-scope-do'];
             let taskExist = false;
+            let directTask = false;
+            let directTaskMethod = '';
+            let directTaskFile = '';
             for (var cliTask of taskArray) {
                 if (cliTask == options.task) {
                     taskExist = true;
                 }
             }
             for (var cliTask in cTsks) {
-                if(cTsks[cliTask].gulpTask == options.task){
+                if (cTsks[cliTask].gulpTask == options.task) {
                     taskExist = true;
+                    if (cTsks[cliTask].taskFile && cTsks[cliTask].task) {
+                        directTask = true;
+                        directTaskFile = cTsks[cliTask].taskFile;
+                        directTaskMethod = cTsks[cliTask].task;
+                    }
                 }
                 // console.log(cTsks[cliTask].gulpTask);
                 taskArray.push(cTsks[cliTask].gulpTask);
             }
-            if(!taskExist){
+            if (!taskExist) {
                 log(ERROR, 'TASK: ' + options.task + ' does not exist...');
                 var stringSimilarity = require('string-similarity');
                 var matches = stringSimilarity.findBestMatch(options.task, taskArray);
                 log(INFO, 'Did you mean ? \x1b[34m' + taskArray[matches.bestMatchIndex]);
             } else {
-                gulp.series(options.task)();
+                if (directTask) {
+                    require(__dirname + directTaskFile);
+                    global[directTaskMethod]();
+                } else {
+                    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
+
+                    const gulp = require('gulp');
+                    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
+                    initGulp();
+                    gulp.series(options.task)();
+                }
             }
         }
     }
