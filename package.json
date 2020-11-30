@@ -6,6 +6,7 @@
     "testO": "node ./test/run-test-cases.js",
     "test": "jasmine --config=test/support/jasmine.json",
     "testB": "jasmine --config=test/support/jasmine.json --filter='Basic Operations'",
+    "build": "webpack --config webpack.config.js",
     "pub": "npm publish"
   },
   "dependencies": {
@@ -35,17 +36,25 @@
   "devDependencies": {
     "jasmine": "^3.6.3",
     "jasmine-reporters": "^2.3.2",
-    "jasmine-ts-console-reporter": "^3.1.1"
+    "jasmine-ts-console-reporter": "^3.1.1",
+    "webpack": "^5.9.0",
+    "webpack-cli": "^4.2.0"
   },
   "peerDependencies": {
     "gulp-cli": "^2.3.0"
   },
   "bin": {
-    "tcli": "src/bin/cloud-cli.js"
+    "tcli": "dist/tcli/main.js"
   },
   "pkg": {
-    "assets": [ "node_modules/**/*", "src/**/*" ],
-    "targets": [ "node12-macos-x64", "node12-win-x64" ]
+    "assets": [
+      "node_modules/**/*",
+      "src/**/*"
+    ],
+    "targets": [
+      "node12-macos-x64",
+      "node12-win-x64"
+    ]
   },
   "publishConfig": {
     "access": "public"
