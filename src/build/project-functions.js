@@ -1458,10 +1458,10 @@ getGit = function (source, target, tag) {
 }
 
 // Function to install NPM packages
-npmInstall = function (location, package) {
+npmInstall = function (location, packageToUse) {
     return new Promise(function (resolve, reject) {
-        if (package != null) {
-            run('cd ' + location + ' && npm install ' + package);
+        if (packageToUse != null) {
+            run('cd ' + location + ' && npm install ' + packageToUse);
         } else {
             run('cd ' + location + ' && npm install');
         }

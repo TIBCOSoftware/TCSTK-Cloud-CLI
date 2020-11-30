@@ -1,3 +1,4 @@
+'use strict';
 // File to manage the CLI Interaction
 require('./build/common-functions');
 import arg from 'arg';
@@ -122,7 +123,7 @@ export async function cli(args) {
     // Run multiple management
     if (options.doMultiple || options.doMultipleInteraction) {
         var gulp = require('gulp');
-        require(__dirname + '/manage-multiple');
+        require('./manage-multiple');
         if(options.doMultiple){
             gulp.series('run-multiple')();
         }
@@ -242,10 +243,10 @@ export async function cli(args) {
         if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
         if (projectManagementMode) {
             if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
-            require(__dirname + '/manage-project');
+            require('./manage-project');
             if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
         } else {
-            require(__dirname + '/manage-application');
+            require('./manage-application');
         }
         // TODO: pass in commandline options
         // TODO: Maybe call run here to prevent two times asking of PW on new file
