@@ -238,6 +238,8 @@ export async function cli(args) {
         if (projectManagementMode) {
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
             require('./manage-project');
+            // TODO: HIER VERDER Only run this for task defined in gulp
+            initGulp();
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
         } else {
             require('./manage-application');
@@ -246,9 +248,11 @@ export async function cli(args) {
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
         if (options.task == '') {
-            const gulp = require('gulp');
-            initGulp();
-            gulp.series('default')();
+            // const gulp = require('gulp');
+            //  initGulp();
+            // gulp.series('default')();
+            displayOpeningMessage();
+            await mainT();
         } else {
             // console.log('TASK: ' + options.task);
             if (options.task == 'help') {
@@ -292,7 +296,7 @@ export async function cli(args) {
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
                     const gulp = require('gulp');
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
-                    initGulp();
+
                     gulp.series(options.task)();
                 }
             }

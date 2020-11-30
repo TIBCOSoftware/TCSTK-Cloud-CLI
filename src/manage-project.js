@@ -146,12 +146,13 @@ changeRegion = function () {
     });
 };
 
+/*
 openingMessage = function () {
     return new Promise(async function (resolve, reject) {
         displayOpeningMessage();
         resolve()
     });
-}
+}*/
 
 
 helptcli = function () {
@@ -247,7 +248,6 @@ mainT = function () {
             var pass = await askQuestion('Please provide your password: ', 'password');
             setProperty('CloudLogin.pass', obfuscatePW(pass));
         }
-
         await promptGulp(__dirname, appRoot);
     });
 };
@@ -551,9 +551,9 @@ initGulp = function () {
     gulp.task('schematic-add', schematicAdd);
     gulp.task('help-tcli', helptcli);
 // helptcli.description = 'Displays this message';
-    gulp.task('main', mainT);
-    gulp.task('opening', openingMessage);
-    gulp.task('default', gulp.series('opening', 'main'));
+    //gulp.task('main', mainT);
+    //gulp.task('opening', openingMessage);
+    //gulp.task('default', gulp.series('opening', 'main'));
     gulp.task('start', start);
 // start.description = 'Starts the cloud starter locally';
     gulp.task('change-region', changeRegion);
@@ -672,7 +672,9 @@ initGulp = function () {
     gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
 // createMultiplePropertyFileWrapper.description = 'Creating an initial property file to manage multiple cloud starters and environments.';
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After gulp init');
+}
 
+loadTaskDesc = function() {
     for (cliTask in cTsks) {
         // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
         var allowed = false;
@@ -697,7 +699,7 @@ let globalLastCommand = 'help-tcli';
 //Main Cloud CLI Questions
 promptGulp = function (stDir, cwdDir) {
     const inquirer = require('inquirer');
-    initGulp();
+    loadTaskDesc();
     log(DEBUG, 'PromtGulp)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtGulp) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
