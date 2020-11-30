@@ -1,6 +1,7 @@
 // #!/usr/bin/env node
 global.TIME = new Date();
-global.SHOW_START_TIME = false
+global.SHOW_START_TIME = false;
+global.PROJECT_ROOT = __dirname + '/../../';
 if(process.argv && process.argv.length > 0){
     global.SHOW_START_TIME = process.argv.includes('--DebugTime');
     process.argv =  process.argv.filter(e => e !== '--DebugTime')

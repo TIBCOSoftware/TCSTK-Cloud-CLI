@@ -1250,7 +1250,7 @@ createLAImportFile = async function () {
         mkdirIfNotExist(CASE_FOLDER);
         mkdirIfNotExist(importFolder);
         log(INFO, 'Creating new Live Aps Import Configuration file: ' + impConfFileName);
-        copyFile(__dirname + '/../../templates/import-live-apps-data-configuration.json', targetFile);
+        copyFile(global.PROJECT_ROOT + 'templates/import-live-apps-data-configuration.json', targetFile);
         // log(INFO, 'Now configure the multiple propety file and then run "\x1b[34mtcli -m\033[0m" (for default propety name) or "\x1b[34mtcli -m <propfile name>\033[0m" to execute...');
     }
 }

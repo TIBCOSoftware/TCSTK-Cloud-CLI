@@ -673,7 +673,6 @@ initGulp = function () {
 // createMultiplePropertyFileWrapper.description = 'Creating an initial property file to manage multiple cloud starters and environments.';
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After gulp init');
 
-
     for (cliTask in cTsks) {
         // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
         var allowed = false;
@@ -694,10 +693,10 @@ initGulp = function () {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
 }
 
-var globalLastCommand = 'help-tcli';
-var inquirer = require('inquirer');
+let globalLastCommand = 'help-tcli';
 //Main Cloud CLI Questions
 promptGulp = function (stDir, cwdDir) {
+    const inquirer = require('inquirer');
     initGulp();
     log(DEBUG, 'PromtGulp)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtGulp) current working dir: ' + cwdDir);
@@ -713,13 +712,8 @@ promptGulp = function (stDir, cwdDir) {
             suggestOnly: false,
             message: pMes,
             source: searchAnswer,
-            pageSize: 4/*,
-            validate: function (val) {
-                return val ? true : 'Type something!';
-            }*/
+            pageSize: 4
         }]).then(function (answers) {
-            //console.log(answers);
-            //console.log('Command: ' + answers.command);
             let selectedTask = '';
             let selectedTaskConfig = {};
             for (cliTask in cTsks) {
@@ -727,11 +721,7 @@ promptGulp = function (stDir, cwdDir) {
                     selectedTask = cliTask;
                     selectedTaskConfig = cTsks[cliTask];
                 }
-                //gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
             }
-            // console.log('Selected Task: ' , selectedTask);
-            // console.log('Task Config: ' , selectedTaskConfig);
-
             var com = selectedTask;
             if (com == 'q' || com == 'quit' || com == 'exit') {
                 console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
@@ -747,7 +737,6 @@ promptGulp = function (stDir, cwdDir) {
                 }
                 let additionalArugments = '';
                 for (arg in process.argv) {
-                    // console.log(process.argv[arg]);
                     // TODO: Should not all arguments be propagated >?
                     if (process.argv[arg] == '--debug' || process.argv[arg] == '-d') {
                         additionalArugments += ' -d ';
@@ -760,7 +749,6 @@ promptGulp = function (stDir, cwdDir) {
                     additionalArugments += ' --org "' + getOrganization() + '"';
                 }
                 let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
-                // console.log('commandTcli: ' + commandTcli)
                 run(commandTcli);
                 return promptGulp(stDir, cwdDir);
             }
@@ -769,11 +757,10 @@ promptGulp = function (stDir, cwdDir) {
 }
 
 
-const _ = require('lodash');
-const fuzzy = require('fuzzy');
-
 //User interaction
 searchAnswer = function (answers, input) {
+    const _ = require('lodash');
+    const fuzzy = require('fuzzy');
     input = input || '';
     return new Promise(function (resolve) {
         setTimeout(function () {

@@ -86,10 +86,10 @@ updateGlobalConnectionConfig = async function () {
     // Check if the global propfile exists, if not create one
     if (!doesFileExist(globalTCpropFile)) {
         // Create Global config from template
-        copyFile(__dirname + '/../../templates/global-tibco-cloud.properties', globalTCpropFile);
+        copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', globalTCpropFile);
     }
     if (!doesFileExist(globalTCpropFolder + 'package.json')) {
-        copyFile(__dirname + '/../../templates/package-common.json', globalTCpropFolder + 'package.json');
+        copyFile(global.PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json');
         log(INFO, 'Inserted package.json...');
     }
     // Get Cloud Environment
@@ -274,7 +274,7 @@ createMultiplePropertyFile = async function () {
     }
     if (doWrite) {
         log(INFO, 'Creating new multiple property file: ' + mPropFileName);
-        copyFile(__dirname + '/../../templates/multiple.properties', targetFile);
+        copyFile(global.PROJECT_ROOT + 'templates/multiple.properties', targetFile);
         //'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
         log(INFO, 'Now configure the multiple property file and then run "\x1b[34mtcli -m\033[0m" (for default fileq name) \nor "\x1b[34mtcli -m <propfile name> [-j <job-name> -e <environment-name>]\033[0m" to execute...');
         log(INFO, 'Or run "\x1b[34mtcli -i\033[0m" to interact with multiple cloud environments...');

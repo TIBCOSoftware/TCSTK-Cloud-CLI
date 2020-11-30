@@ -173,9 +173,10 @@ getGit = function (source, target, tag) {
 }
 
 
-const fseA = require('fs-extra');
+
 // Function to copy a directory
 copyDir = function (fromDir, toDir) {
+    const fseA = require('fs-extra');
     log(DEBUG, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fseA.copySync(fromDir, toDir, {overwrite: true});
 }
@@ -184,7 +185,7 @@ copyDir = function (fromDir, toDir) {
 manageGlobalConfig = function (name, template) {
     return new Promise(async function (resolve, reject) {
         if(displayGlobalConnectionConfig()){
-            updateGC = await askMultipleChoiceQuestion('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
+            let updateGC = await askMultipleChoiceQuestion('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
             if(updateGC == 'YES'){
                 updateGlobalConnectionConfig();
             }
