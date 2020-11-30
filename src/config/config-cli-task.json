@@ -23,6 +23,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
+      "taskFile": "/manage-project",
+      "task": "showApps",
       "gulpTask": "show-cloud-starters",
       "availableOnOs": ["all"]
     },

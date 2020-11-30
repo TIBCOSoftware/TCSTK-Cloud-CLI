@@ -1,6 +1,5 @@
 // This file manages the applications
 require('./build/common-functions');
-const gulp = require('gulp');
 let mFile = '';
 const colors = require('colors');
 
@@ -8,7 +7,7 @@ const colors = require('colors');
 // Function to process the multiple property file
 // processMultipleFile = function (propfileName) {
 processMultipleFile = function () {
-    return new Promise(async function (resolve, reject) {
+    // return new Promise(async function (resolve, reject) {
         // setLogDebug('true');
         let mOpts = getMultipleOptions();
         mFile = mOpts.name;
@@ -161,14 +160,15 @@ processMultipleFile = function () {
                 }
             }
         }
+        /*
         resolve();
-    });
+    });*/
 }
 
 const TCLI_INTERACTVIE = 'tcli-interactive';
 
-multipleInteraction = function () {
-    return new Promise(async function (resolve, reject) {
+multipleInteraction = async function () {
+    // return new Promise(async function (resolve, reject) {
         const PropertiesReader = require('properties-reader');
         let mOpts = getMultipleOptions();
         mFile = mOpts.name;
@@ -311,15 +311,17 @@ multipleInteraction = function () {
                     }
                 }
             }
-        }
+        }/*
         resolve();
-    });
+    });*/
 }
 
+/*
+const gulp = require('gulp');
 // Gulp task definition
 gulp.task('run-multiple', processMultipleFile);
 gulp.task('run-multiple-interaction', multipleInteraction);
-
+*/
 
 
 let propsM;

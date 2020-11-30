@@ -123,16 +123,19 @@ export async function cli(args) {
     }
     // Run multiple management
     if (options.doMultiple || options.doMultipleInteraction) {
-        const gulp = require('gulp');
+        // const gulp = require('gulp');
         require('./manage-multiple');
         if (options.doMultiple) {
-            gulp.series('run-multiple')();
+            await processMultipleFile();
+            // gulp.series('run-multiple')();
         }
         if (options.doMultipleInteraction) {
-            gulp.series('run-multiple-interaction')();
+            console.log('Gulpless interaction');
+            await multipleInteraction();
+            // gulp.series('run-multiple-interaction')();
         }
 
-        // process.exit(0);
+        process.exit(0);
     }
 
     // Show the version
@@ -230,17 +233,8 @@ export async function cli(args) {
     }
 
     if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
-        /*
-        if (options.task == 'show-cloud') {
-            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
-            require(__dirname + '/build/project-functions');
-            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
-            showCloudInfo();
-            process.exit(0);
-        }*/
 
         // Start the specified Gulp Task
-
         if (projectManagementMode) {
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
             require('./manage-project');
@@ -296,7 +290,6 @@ export async function cli(args) {
                     global[directTaskMethod]();
                 } else {
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
-
                     const gulp = require('gulp');
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
                     initGulp();
