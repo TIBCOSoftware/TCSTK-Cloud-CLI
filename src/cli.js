@@ -239,7 +239,7 @@ export async function cli(args) {
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
             require('./manage-project');
             // TODO: HIER VERDER Only run this for task defined in gulp
-            initGulp();
+
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
         } else {
             require('./manage-application');
@@ -274,9 +274,9 @@ export async function cli(args) {
             for (var cliTask in cTsks) {
                 if (cTsks[cliTask].gulpTask == options.task) {
                     taskExist = true;
-                    if (cTsks[cliTask].taskFile && cTsks[cliTask].task) {
+                    if (cTsks[cliTask].task) {
                         directTask = true;
-                        directTaskFile = cTsks[cliTask].taskFile;
+                        // directTaskFile = cTsks[cliTask].taskFile;
                         directTaskMethod = cTsks[cliTask].task;
                     }
                 }
@@ -290,13 +290,15 @@ export async function cli(args) {
                 log(INFO, 'Did you mean ? \x1b[34m' + taskArray[matches.bestMatchIndex]);
             } else {
                 if (directTask) {
-                    require(__dirname + directTaskFile);
+                    //require(__dirname + directTaskFile);
                     global[directTaskMethod]();
                 } else {
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
                     const gulp = require('gulp');
+                    if (projectManagementMode) {
+                        initGulp();
+                    }
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
-
                     gulp.series(options.task)();
                 }
             }

@@ -13,7 +13,6 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "taskFile": "/build/project-functions",
       "task": "showCloudInfo",
       "gulpTask": "show-cloud",
       "availableOnOs": ["all"]
@@ -23,7 +22,6 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "taskFile": "/manage-project",
       "task": "showApps",
       "gulpTask": "show-cloud-starters",
       "availableOnOs": ["all"]
