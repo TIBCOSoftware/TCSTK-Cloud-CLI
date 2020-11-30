@@ -1,11 +1,4 @@
 // Package Definitions
-//TODO: For startup speed, move these to when they are used.
-
-// const syncClient = require('sync-rest-client');
-const fs = require('fs');
-// const fse = require('fs-extra');
-const jsonfile = require('jsonfile');
-// const isWindows = process.platform == 'win32';
 const cloudConfig = require('../config/config-cloud.json');
 const clURI = cloudConfig.endpoints;
 const mappings = cloudConfig.mappings;
@@ -20,7 +13,6 @@ cleanTemp = function () {
 // function to login to the cloud
 let loginC = null;
 // var useOAuth = false;
-const argv = require('yargs').argv;
 let cloudURL = getProp('Cloud_URL');
 let cloudHost = getProp('cloudHost');
 // Check if a global config exists and if it is required
@@ -101,7 +93,7 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
         }
 
         if (pass == '') {
-            pass = argv.pass;
+            pass = require('yargs').argv.pass;
             // console.log('Pass from args: ' + pass);
         }
         if (pass.charAt(0) == '#') {
@@ -170,32 +162,31 @@ cleanDist = function () {
     return deleteFolder('./dist/' + getProp('App_Name'));
 }
 
-// Add Descriptor
-let ADD_DESCRIPTOR = 'YES';
-if (getProp('Add_Descriptor') != null) {
-    ADD_DESCRIPTOR = getProp('Add_Descriptor');
-} else {
-    log(INFO, 'No Add_Descriptor Property found; Adding Add_Descriptor to ' + getPropFileName());
-    addOrUpdateProperty(getPropFileName(), 'Add_Descriptor', 'YES');
-}
-// Add Descriptor
-let ADD_DESCRIPTOR_TIMESTAMP = 'YES';
-if (getProp('Add_Descriptor_Timestamp') != null) {
-    ADD_DESCRIPTOR_TIMESTAMP = getProp('Add_Descriptor_Timestamp');
-} else {
-    log(INFO, 'No Add_Descriptor_Timestamp Property found; Adding Add_Descriptor_Timestamp to ' + getPropFileName());
-    addOrUpdateProperty(getPropFileName(), 'Add_Descriptor_Timestamp', 'YES');
-}
-// Add Descriptor
-let DESCRIPTOR_FILE = './src/assets/cloudstarter.json';
-if (getProp('Descriptor_File') != null) {
-    DESCRIPTOR_FILE = getProp('Descriptor_File');
-} else {
-    log(INFO, 'No Descriptor_File Property found; Adding Descriptor_File to ' + getPropFileName());
-    addOrUpdateProperty(getPropFileName(), 'Descriptor_File', './src/assets/cloudstarter.json');
-}
-
 generateCloudDescriptor = function () {
+    // Add Descriptor
+    let ADD_DESCRIPTOR = 'YES';
+    if (getProp('Add_Descriptor') != null) {
+        ADD_DESCRIPTOR = getProp('Add_Descriptor');
+    } else {
+        log(INFO, 'No Add_Descriptor Property found; Adding Add_Descriptor to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Add_Descriptor', 'YES');
+    }
+    // Add Descriptor
+    let ADD_DESCRIPTOR_TIMESTAMP = 'YES';
+    if (getProp('Add_Descriptor_Timestamp') != null) {
+        ADD_DESCRIPTOR_TIMESTAMP = getProp('Add_Descriptor_Timestamp');
+    } else {
+        log(INFO, 'No Add_Descriptor_Timestamp Property found; Adding Add_Descriptor_Timestamp to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Add_Descriptor_Timestamp', 'YES');
+    }
+    // Add Descriptor
+    let DESCRIPTOR_FILE = './src/assets/cloudstarter.json';
+    if (getProp('Descriptor_File') != null) {
+        DESCRIPTOR_FILE = getProp('Descriptor_File');
+    } else {
+        log(INFO, 'No Descriptor_File Property found; Adding Descriptor_File to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Descriptor_File', './src/assets/cloudstarter.json');
+    }
     log(INFO, 'Adding descriptor file: ' + DESCRIPTOR_FILE + ' Adding Timestamp: ' + ADD_DESCRIPTOR_TIMESTAMP);
     // Get the version from the JSON File
     const workdir = process.cwd();
@@ -230,8 +221,7 @@ generateCloudDescriptor = function () {
         }
         log(INFO, 'Adding Cloud Starter Descriptor: ', csObject);
         const storeOptions = {spaces: 2, EOL: '\r\n'};
-        jsonfile.writeFileSync(DESCRIPTOR_FILE, csObject, storeOptions);
-
+        require('jsonfile').writeFileSync(DESCRIPTOR_FILE, csObject, storeOptions);
     } else {
         log(ERROR, packageJson + ' File not found...');
     }
@@ -250,18 +240,18 @@ showAppLinkInfo = function () {
     }
 }
 
-// Check for Build Command
-let BUILD_COMMAND = 'HASHROUTING';
-if (getProp('BUILD_COMMAND') != null) {
-    BUILD_COMMAND = getProp('BUILD_COMMAND');
-} else {
-    log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
-    addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
-}
 
 // Build the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
     return new Promise(async function (resolve, reject) {
+        // Check for Build Command
+        let BUILD_COMMAND = 'HASHROUTING';
+        if (getProp('BUILD_COMMAND') != null) {
+            BUILD_COMMAND = getProp('BUILD_COMMAND');
+        } else {
+            log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
+            addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
+        }
         const csURL = '/webresource/apps/' + cloudStarter + '/';
         deleteFile('./dist/' + cloudStarter + '.zip');
         //Add the cloudstarter.json file
@@ -295,9 +285,9 @@ const getAppURL = cloudURL + getProp('appURE') + '?$top=200';
 showAvailableApps = function (showTable) {
     //TODO: Use table config
     var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
-    var response = callURL(getAppURL,null, null, null,null,null,null, null, null,null,true);
-    if(response.errorMsg){
-        if(response.errorMsg == 'Application does not exist'){
+    var response = callURL(getAppURL, null, null, null, null, null, null, null, null, null, true);
+    if (response.errorMsg) {
+        if (response.errorMsg == 'Application does not exist') {
             log(INFO, 'No Cloud Starters deployed yet...');
             return null;
         } else {
@@ -339,13 +329,9 @@ showAvailableApps = function (showTable) {
             appTemp['AGE(DAYS)'] = Math.round((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
             appTemp['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
         }
-        //logO(INFO,apps);
-        // if (doShowTable) console.table(apps);
         pexTable(apps, 'cloud-starters', getPEXConfig(), doShowTable);
         return response;
     }
-    // resolve();
-    // });
 };
 
 showApps = function () {
@@ -360,13 +346,13 @@ showApps = function () {
 const getClaimsURL = cloudURL + getProp('Claims_URE');
 showCloudInfo = function (showTable) {
     return new Promise(function (resolve, reject) {
-        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
+        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
         let doShowTable = true;
         if (showTable != null) {
             doShowTable = showTable;
         }
         var response = callURL(getClaimsURL);
-        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
+        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
         let nvs = createTableValue('REGION', getRegion());
         nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
         nvs = createTableValue('FIRST NAME', response.firstName, nvs);
@@ -382,7 +368,7 @@ showCloudInfo = function (showTable) {
         if (doShowTable) {
             console.table(nvs);
         }
-        if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
+        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
         resolve();
     });
 };
@@ -398,31 +384,40 @@ const sharedStateBaseURL = cloudURL + 'clientstate/v1/';
 const sharedStateURL = sharedStateBaseURL + 'states';
 const SHARED_STATE_STEP_SIZE = 400;
 const SHARED_STATE_MAX_CALLS = 20;
-
-// Shared state scope (picked up from configuration if exists)
 let SHARED_STATE_SCOPE = 'APPLICATION';
-if (getProp('Shared_State_Scope') != null) {
-    SHARED_STATE_SCOPE = getProp('Shared_State_Scope');
-} else {
-    log(INFO, 'No Shared State Scope Property found; Adding APPLICATION to ' + getPropFileName());
-    addOrUpdateProperty(getPropFileName(), 'Shared_State_Scope', 'APPLICATION');
-}
-
-// Shared state scope (picked up from configuration if exists)
 let SHARED_STATE_DOUBLE_CHECK = 'YES';
-if (getProp('Shared_State_Double_Check') != null) {
-    SHARED_STATE_DOUBLE_CHECK = getProp('Shared_State_Double_Check');
-} else {
-    log(INFO, 'No Shared State Scope Double Check Property found; Adding YES to ' + getPropFileName());
-    addOrUpdateProperty(getPropFileName(), 'Shared_State_Double_Check', 'YES');
-}
-const DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() == 'no'));
+let SHARED_STATE_FOLDER = './Shared_State/';
+let DO_SHARED_STATE_DOUBLE_CHECK = true;
 
+prepSharedStateProps = function () {
+    // Shared state scope (picked up from configuration if exists)
+    if (getProp('Shared_State_Scope') != null) {
+        SHARED_STATE_SCOPE = getProp('Shared_State_Scope');
+    } else {
+        log(INFO, 'No Shared State Scope Property found; Adding APPLICATION to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Shared_State_Scope', 'APPLICATION');
+    }
+    // Shared state scope (picked up from configuration if exists)
+    if (getProp('Shared_State_Double_Check') != null) {
+        SHARED_STATE_DOUBLE_CHECK = getProp('Shared_State_Double_Check');
+    } else {
+        log(INFO, 'No Shared State Scope Double Check Property found; Adding YES to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Shared_State_Double_Check', 'YES');
+    }
+    DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() == 'no'));
+    // Shared state folder (picked up from configuration if exists)
+    if (getProp('Shared_State_Folder') != null) {
+        SHARED_STATE_FOLDER = getProp('Shared_State_Folder');
+    } else {
+        addOrUpdateProperty(getPropFileName(), 'Shared_State_Folder', SHARED_STATE_FOLDER);
+    }
+}
 
 // Function to return a JSON with the shared state entries from a set scope
 getSharedState = function (showTable) {
-    var lCookie = cLogin();
-    log(DEBUG, 'Login Cookie: ', lCookie);
+    prepSharedStateProps();
+    // var lCookie = cLogin();
+    // log(DEBUG, 'Login Cookie: ', lCookie);
     //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
     let ALLsState = [];
     var i = 0;
@@ -486,10 +481,7 @@ getSharedState = function (showTable) {
         sTemp['LAST MODIFIED'] = modified.toLocaleDateString("en-US", options);
         states[appN] = sTemp;
     }
-    //if (showTable) {
-    //    console.table(states);
     pexTable(states, 'shared-states', getPEXConfig(), showTable);
-    //}
     return sState;
 }
 
@@ -555,21 +547,7 @@ showSharedStateDetails = function () {
 };
 
 deleteSharedState = function (sharedStateID) {
-    //const lCookie = cLogin();
-    //log(DEBUG, 'Login Cookie: ', lCookie);
-    /*
-    const response = syncClient.del(sharedStateURL + '/' + sharedStateID, {
-        headers: {
-            "accept": "application/json",
-            "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-        }
-    });*/
     const response = callURL(sharedStateURL + '/' + sharedStateID, 'DEL');
-
-
-    //var re = response;
-    //let re = Object.assign({}, response.body);
-    //logO(INFO, re);
     let ok = true;
     if (response != null) {
         if (response.errorMsg != null) {
@@ -596,12 +574,9 @@ removeSharedStateEntry = function () {
             if (DO_SHARED_STATE_DOUBLE_CHECK) {
                 decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
             }
-            // console.log(decision);
             // Remove shared state entry
             if (decision == 'YES') {
                 deleteSharedState(selectedState.id);
-                //deleteSharedState(8088);
-
             } else {
                 log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
             }
@@ -649,14 +624,6 @@ clearSharedStateScope = function () {
     });
 };
 
-// Shared state folder (picked up from configuration if exists)
-let SHARED_STATE_FOLDER = './Shared_State/';
-if (getProp('Shared_State_Folder') != null) {
-    SHARED_STATE_FOLDER = getProp('Shared_State_Folder');
-} else {
-    addOrUpdateProperty(getPropFileName(), 'Shared_State_Folder', SHARED_STATE_FOLDER);
-}
-
 
 // Export the Shared state scope to a folder
 exportSharedStateScope = function () {
@@ -671,13 +638,6 @@ exportSharedStateScope = function () {
             // Check if folder exist
             let ssExportFolder = SHARED_STATE_FOLDER;
             // TODO: think about setting up a structure with the organization (so that import get it directly from the right org)
-            /*
-            if(getOrganization() && getOrganization().trim() != ''){
-                ssExportFolder = SHARED_STATE_FOLDER + getOrganization() + '/';
-            } else {
-                log(WARNING, 'No organization for folder export...');
-            }*/
-
             mkdirIfNotExist(ssExportFolder);
             mkdirIfNotExist(ssExportFolder + 'CONTENT/');
             // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
@@ -695,14 +655,14 @@ exportSharedStateScope = function () {
                             sSEntry.content.json = {'FILESTORE': contentFileName};
                             writeContentSeparate = true;
                             // And store them in a file / folder
-                            jsonfile.writeFileSync(contentFileName, contentObject, storeOptions);
+                            require('jsonfile').writeFileSync(contentFileName, contentObject, storeOptions);
                             log(INFO, '[STORED CONTENT]: ' + contentFileName);
                         } catch (e) {
                             log(ERROR, 'Parse Error on: ' + sSEntry.name + 'Writing directly...');
                         }
                     }
                 }
-                jsonfile.writeFileSync(ssExportFolder + sSEntry.name + '.json', sSEntry, storeOptions);
+                require('jsonfile').writeFileSync(ssExportFolder + sSEntry.name + '.json', sSEntry, storeOptions);
                 log(INFO, '[STORED CONTEXT]: ' + contextFileName);
                 if (!writeContentSeparate) {
                     log(ERROR, 'Stored all in: ' + contextFileName)
@@ -717,6 +677,7 @@ exportSharedStateScope = function () {
 
 // Load shared state contents from a file
 importSharedStateFile = function (ssFile) {
+    prepSharedStateProps();
     log(DEBUG, 'Importing: ' + ssFile);
     var contentContextFile = fs.readFileSync(ssFile);
     var ssObject = {};
@@ -750,19 +711,10 @@ importSharedStateFile = function (ssFile) {
 }
 
 putSharedState = function (sharedStateObject) {
+    prepSharedStateProps();
     if (sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
-        /*const lCookie = cLogin();
-        log(DEBUG, 'Login Cookie: ', lCookie);
-        const response = syncClient.put(encodeURI(sharedStateURL), {
-            headers: {
-                "accept": "application/json",
-                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-            },
-            payload: [sharedStateObject]
-        });*/
         callURL(sharedStateURL, 'PUT', [sharedStateObject]);
-        //console.log(response.body);
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
         // var re = response;
         // TODO: Check for errors, and if the state does not exist use post..
@@ -774,6 +726,7 @@ putSharedState = function (sharedStateObject) {
 // Import the Shared state scope from a folder
 importSharedStateScope = function () {
     return new Promise(async function (resolve, reject) {
+            prepSharedStateProps();
             //console.log('ORG: ', getOrganization());
             let importOptions = [];
             // Go Over Shared State files
@@ -821,8 +774,7 @@ importSharedStateScope = function () {
 //wrapper function around the watcher on shared state
 watchSharedStateScopeMain = function () {
     return new Promise(async function (resolve, reject) {
-        //const commandSTDO = 'cd ' + __dirname  + '/../ && gulp watch-shared-state-scope-do --cwd "' + process.cwd() + '" --gulpfile "' + __dirname + '/../manage-project.js" --pass "' + getProp('CloudLogin.pass + '"';
-        // console.log('propFileNameGl: ' + getPropFileName());
+        prepSharedStateProps();
         //TODO: What if the password is not specified in properties file, needs to be send...
         const commandSTDO = 'tcli watch-shared-state-scope-do -p "' + getPropFileName() + '"';
         const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state scope ?', ['YES', 'NO']);
@@ -843,6 +795,7 @@ watchSharedStateScope = function () {
     const chokidar = require('chokidar');
     return new Promise(async function (resolve, reject) {
         //Do the login now, so it does not have to be done later
+        prepSharedStateProps();
         cLogin();
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
@@ -860,7 +813,6 @@ watchSharedStateScope = function () {
                 } else {
                     log(INFO, 'CONTEXT File UPDATED: ' + path);
                     log(INFO, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
-                    //putSharedState(importSharedStateFile(path));
                 }
             }
 
@@ -872,8 +824,6 @@ watchSharedStateScope = function () {
             if (key.ctrl && key.name === 'c') {
                 process.exit();
             }
-            // console.log(key);
-            // console.log(key.name);
             if (key.name == 'escape' || key.name === 'q') {
                 // console.log('ESCAPE...');
                 resolve();
@@ -887,21 +837,6 @@ watchSharedStateScope = function () {
     });
 };
 
-// Get details from a specific Cloud URL
-
-/*
-getCloud = function (url) {
-    const lCookie = cLogin();
-    log(DEBUG, 'Login Cookie: ', lCookie);
-    const response = syncClient.get(url, {
-        headers: {
-            "accept": "application/json",
-            "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-        }
-    });
-    var re = response.body;
-    return re;
-}*/
 
 const getApplicationDetailsURL = cloudURL + getProp('appURE');
 getApplicationDetails = function (application, version, showTable) {
@@ -926,8 +861,6 @@ getApplicationDetails = function (application, version, showTable) {
         } else {
             hasMoreArtefacts = false;
         }
-        // console.log('Export Artefacts ', appDet);
-        // logLine('Getting Artefacts: (' + i + ')...');
     }
 
     // logO(INFO, appDet);
@@ -963,28 +896,20 @@ getAppLinks = function (showTable) {
         var appTemp = {};
         appTemp['APP NAME'] = app.name;
         var appN = i++;
-        // appTemp['PUBLISHED VERSION'] = parseInt(app.publishedVersion);
-        // console.log(app.name, app.publishedVersion);
         var tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
         logLine("Processing App: (" + appN + '/' + apps.length + ')...');
-        //console.log(/[^/]*$/.exec(getProp('Descriptor_File'))[0]);
         if (isIterable(tempDet)) {
             for (let appD of tempDet) {
-                //console.log(appD.name);
                 // Get file after last slash in Descriptor file name; expected cloudstarter.json
                 if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
-                    //console.log(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name);
                     const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
-                    //console.log(csInfo);
                     if (csInfo && csInfo.cloudstarter) {
                         appTemp['CS VERSION'] = csInfo.cloudstarter.version;
                         appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
                     }
                 }
                 if (appD.name.includes("index.html")) {
-                    // console.log('FOUND INDEX of ' + app.name + ': ' + appD.name);
                     const tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
-                    // console.log('LOCATION: ' + tempLink);
                     appTemp['LINK'] = tempLink;
                 }
             }
@@ -998,10 +923,6 @@ getAppLinks = function (showTable) {
         appLinkTable[appN] = appTemp;
     }
     process.stdout.write('\n');
-    /*
-    if (showTable) {
-        console.table(appLinkTable);
-    }*/
     pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), showTable);
     return appLinkTable;
 }
@@ -1020,8 +941,6 @@ uploadApp = function (application) {
         let formData = new require('form-data')();
         log(INFO, 'UPLOADING APP: ' + application);
         var uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
-        //formData.append('key1', 1);
-        // formData.setHeader("cookie", "tsc="+lCookie.tsc + "; domain=" + lCookie.domain);
         formData.append('appContents', require("fs").createReadStream('./dist/' + application + '.zip'));
         const header = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
@@ -1032,15 +951,11 @@ uploadApp = function (application) {
             var lCookie = cLogin();
             header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
         }
-
         let query = require('https').request({
             hostname: cloudHost,
             path: uploadAppLocation,
             method: 'POST',
-            headers: header /*{
-                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain,
-                'Content-Type': 'multipart/form-data; charset=UTF-8'
-            },*/
+            headers: header
         }, (res) => {
             let data = '';
             res.on("data", (chunk) => {
@@ -1051,31 +966,18 @@ uploadApp = function (application) {
                 resolve();
             })
         });
-
         query.on("error", (e) => {
             console.error(e);
             resolve();
         });
-
         formData.pipe(query);
-
     });
 }
 
 // Function to publish the application to the cloud
 publishApp = function (application) {
     return new Promise(function (resolve, reject) {
-        // var lCookie = cLogin();
-        // var lCookie = cloudLoginV3();
-        // console.log('Login Cookie: ' , lCookie);
         var publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
-        /*
-        var response = syncClient.put(publishLocation, {
-            headers: {
-                "accept": "application/json",
-                "cookie": "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain
-            }
-        });*/
         var response = callURL(publishLocation, 'PUT');
         log(INFO, 'Publish Result: ', response);
         resolve();
@@ -1151,7 +1053,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
         });
     }
     if (response.body.errorMsg != null) {
-        if(doErrorOutside){
+        if (doErrorOutside) {
             return response.body;
         } else {
             log(ERROR, response.body.errorMsg);
@@ -1184,14 +1086,10 @@ getProductionSandbox = function () {
 const getTypesURL = cloudURL + 'case/v1/types'; // getProp('Claims_URE');
 // Function to
 showLiveApps = function (doShowTable, doCountCases) {
-    // https://eu.liveapps.cloud.tibco.com/case/v1/types?%24sandbox=31
-
     //TODO: Call can be optimized by only requesting the basics
     const caseTypes = callURL(getTypesURL + '?$sandbox=' + getProductionSandbox() + '&$top=1000');
     log(DEBUG, 'Case Types: ', caseTypes)
-
     // TODO: (maybe) get case owner
-
     var cases = {};
     for (var curCase in caseTypes) {
         var caseTemp = {};
@@ -1205,44 +1103,26 @@ showLiveApps = function (doShowTable, doCountCases) {
             logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
             caseTemp['NUMBER OF CASES'] = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true', 'GET', null, null, false);
         }
-
-        //https://eu.liveapps.cloud.tibco.com/?%24sandbox=31&%24filter=applicationId%20eq%202880&%24count=true
         cases[appN] = caseTemp;
-
     }
     console.log('\n');
-    //logO(INFO,apps);
-    // if (doShowTable) console.table(cases);
     pexTable(cases, 'live-apps', getPEXConfig(), doShowTable);
-
     return caseTypes;
-
-
 }
 
 // Shared state folder (picked up from configuration if exists)
-let CASE_FOLDER = './Cases/';
-if (getProp('Case_Folder') != null) {
-    CASE_FOLDER = getProp('Case_Folder');
-} else {
-    addOrUpdateProperty(getPropFileName(), 'Case_Folder', CASE_FOLDER);
-}
-
-/*
-getCaseType = async function(question){
-    const cTypes = showLiveApps(true, false);
-    let cTypeArray = new Array();
-    for (var curCase in cTypes) {
-        cTypeArray.push(cTypes[curCase].name);
+checkCaseFolder = function () {
+    let CASE_FOLDER = './Cases/';
+    if (getProp('Case_Folder') != null) {
+        CASE_FOLDER = getProp('Case_Folder');
+    } else {
+        addOrUpdateProperty(getPropFileName(), 'Case_Folder', CASE_FOLDER);
     }
-    let choosenCT = await askMultipleChoiceQuestionSearch(question, cTypeArray);
-    let re = { 'choosenCT' : choosenCT,
-        'cTypes' : cTypes };
-    return re;
-}*/
+}
 
 const storeOptions = {spaces: 2, EOL: '\r\n'};
 exportLiveAppsCaseType = async function () {
+    checkCaseFolder();
     const cTypes = showLiveApps(true, false);
     let cTypeArray = new Array();
     for (var curCase in cTypes) {
@@ -1258,7 +1138,7 @@ exportLiveAppsCaseType = async function () {
             if (fName == '') {
                 fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion + '.type.json';
             }
-            jsonfile.writeFileSync(fileName, cTypes[curCase], storeOptions);
+            require('jsonfile').writeFileSync(fileName, cTypes[curCase], storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
         }
         ;
@@ -1268,6 +1148,7 @@ exportLiveAppsCaseType = async function () {
 const exportCaseStepSize = 30;
 // Function to export case data
 exportLiveAppsData = async function () {
+    checkCaseFolder();
     const cTypes = showLiveApps(true, true);
     let cTypeArray = new Array();
     for (var curCase in cTypes) {
@@ -1315,13 +1196,13 @@ exportLiveAppsData = async function () {
                         AllCaseArray.push(contentObject);
                         exCase.casedata = {'FILESTORE': contentFileName};
                         // And store them in a file / folder
-                        jsonfile.writeFileSync(contentFileName, contentObject, storeOptions);
+                        require('jsonfile').writeFileSync(contentFileName, contentObject, storeOptions);
                         writeContentSeparate = true;
                         //log(INFO, '[STORED CONTENT]: ' + contentFileName);
                     } catch (e) {
                         log(ERROR, 'Parse Error on: ' + exCase.name + 'Writing directly...');
                     }
-                    jsonfile.writeFileSync(contextFileName, exCase, storeOptions);
+                    require('jsonfile').writeFileSync(contextFileName, exCase, storeOptions);
                     // log(INFO, 'Exported Case To: ' + cfName);
                     log(INFO, '[STORED CONTEXT]: ' + contextFileName);
                     if (writeContentSeparate) {
@@ -1335,7 +1216,7 @@ exportLiveAppsData = async function () {
             let AllCaseFileName = cfName + 'CONTENT/' + typeForExport + '-ALL.CONTENT.json';
             //TODO: Put the app name around the AllCaseArray
 
-            jsonfile.writeFileSync(AllCaseFileName, AllCaseArray, storeOptions);
+            require('jsonfile').writeFileSync(AllCaseFileName, AllCaseArray, storeOptions);
             log(INFO, '[STORED ALL CONTENT]: ' + AllCaseFileName);
             //}
         }
@@ -1345,6 +1226,7 @@ exportLiveAppsData = async function () {
 //DONE: Add Export Feature to one file. (Just the data and to use for import)
 
 createLAImportFile = async function () {
+    checkCaseFolder();
     log(INFO, ' -- Generate Live Aps Import Configuration file --- ');
     //TODO: Create a generator for the input feature. (based on the template and ask to add steps)
     //TODO: Make sure you are not overwriting a current import file.
@@ -1375,6 +1257,7 @@ createLAImportFile = async function () {
 
 // Function to Import LiveApps Case Data based on Config File
 importLiveAppsData = async function () {
+    checkCaseFolder();
     log(INFO, ' -- Gathering Import Configuration --- ');
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
     let importFile = importFolder + 'import-live-apps-data-configuration.json';
@@ -1394,7 +1277,7 @@ importLiveAppsData = async function () {
 
     //Loop over all the data
     if (impConf[impConf[impConf['import-steps'][0]].data].FILESTORE != null) {
-        dataForImport = jsonfile.readFileSync(importFolder + impConf[impConf[impConf['import-steps'][0]].data].FILESTORE)
+        dataForImport = require('jsonfile').readFileSync(importFolder + impConf[impConf[impConf['import-steps'][0]].data].FILESTORE)
     } else {
         dataForImport = impConf[impConf['import-steps'][0]].data;
     }
@@ -1491,7 +1374,7 @@ importLiveAppsData = async function () {
                 //TODO: put this in seperate function
                 if (impConf[stepConf.data].FILESTORE != null) {
                     // console.log(impConf[stepConf.data].FILESTORE);
-                    dataForImport = jsonfile.readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
+                    dataForImport = require('jsonfile').readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
                 } else {
                     dataForImport = impConf[stepConf.data];
                 }
@@ -1729,7 +1612,7 @@ monitorTCI = async function () {
         if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
         if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
         if (pass == '') {
-            pass = argv.pass;
+            pass = require('yargs').argv.pass;
             // console.log('Pass from args: ' + pass);
         }
         if (pass.charAt(0) == '#') {
@@ -1762,7 +1645,7 @@ generateCloudPropertyFiles = async function () {
     for (let org of response.accountsInfo) {
         extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU);
         // Check for Children
-        if(org.childAccountsInfo && org.childAccountsInfo.length > 0){
+        if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
             for (let childOrg of org.childAccountsInfo) {
                 extractCloudInfo(childOrg, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU);
             }
@@ -1823,7 +1706,7 @@ generateCloudPropertyFiles = async function () {
 }
 
 // Extract Helper
-extractCloudInfo = function(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU) {
+extractCloudInfo = function (org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU) {
     let orgName = '' + org.accountDisplayName;
     let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
     let tOrgNameEU = {
@@ -2189,7 +2072,7 @@ validate = async function () {
             let val = null;
             let valueFound = true;
             try {
-               val = getProp(prop)
+                val = getProp(prop)
             } catch (e) {
                 valueFound = false;
             }
@@ -2600,9 +2483,6 @@ tcli add-or-update-property -a default,Messaging.discodev.Authentication_Key,non
 
 
  */
-
-
-
 
 
 // Set log debug level from local property

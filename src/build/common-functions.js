@@ -333,9 +333,6 @@ askMultipleChoiceQuestion = async function (question, options) {
         }).catch(error => {
             log(ERROR, error);
         });
-        //let name = require.resolve('inquirer');
-        //delete require.cache[name];
-        //console.log(re);
         return re;
     } else {
         return getLastGlobalAnswer(question);
@@ -357,10 +354,7 @@ askMultipleChoiceQuestionSearch = async function (question, options) {
             suggestOnly: false,
             message: question,
             source: searchAnswerF,
-            pageSize: 4/*,
-            validate: function (val) {
-                return val ? true : 'Type something!';
-            }*/
+            pageSize: 4
         }]).then((answers) => {
             // console.log('answers: ' , answers);
             logO(DEBUG, answers);
@@ -589,7 +583,6 @@ addOrUpdateProperty = function (location, property, value, comment) {
 // Get the global configuration
 // TODO: Get rid of this function
 getGlobalConfig = function () {
-    // const globalTCpropFile = __dirname + '/../../common/global-tibco-cloud.properties';
     if (doesFileExist(globalTCpropFile)) {
         const PropertiesReader = require('properties-reader');
         return PropertiesReader(globalTCpropFile).path();
@@ -846,8 +839,7 @@ log = function (level, ...message) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level == DEBUG && !useDebug)) {
         var timeStamp = new Date();
-        //console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-
+        // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
         if (level == global.ERROR) {
             console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', '\x1b[31m', ...message, '\033[0m');
             process.exitCode = 1;
@@ -872,8 +864,6 @@ logO = function (level, message) {
 logLine = function (message) {
     const readline = require('readline');
     readline.cursorTo(process.stdout, 0);
-    //process.stdout.clearLine();
-    //process.stdout.cursorTo(0);
     process.stdout.write(message);
 }
 
