@@ -125,18 +125,13 @@ export async function cli(args) {
     }
     // Run multiple management
     if (options.doMultiple || options.doMultipleInteraction) {
-        // const gulp = require('gulp');
         require('./manage-multiple');
         if (options.doMultiple) {
             await processMultipleFile();
-            // gulp.series('run-multiple')();
         }
         if (options.doMultipleInteraction) {
-            console.log('Gulpless interaction');
             await multipleInteraction();
-            // gulp.series('run-multiple-interaction')();
         }
-
         process.exit(0);
     }
 
@@ -148,8 +143,6 @@ export async function cli(args) {
 
     // Update the TCLI
     if (options.update) {
-        // console.log('TIBCO Cloud CLI Version: ' + require('./package.json').version);
-        // options.task = 'update-tcli';
         updateTCLI();
         process.exit(0);
     }
@@ -210,24 +203,18 @@ export async function cli(args) {
                         }
                         break;
                     case tMultiple:
-                        // options.task = 'create-multiple-property-file';
                         await require('./manage-application').createMultiplePropertyFileWrapper();
                         process.exit();
-                        // projectManagementMode = false;
                         break;
                     case tManageG:
-                        //options.task = 'manage-global-config';
                         await require('./manage-application').manageGlobalConfig();
                         process.exit();
-                        // projectManagementMode = false;
                         break;
                     case tCreate:
                         log(INFO, 'Creating new Cloud starter...');
-                        // Use different Gulp file to create a new cloud starter
+                        // create a new cloud starter
                         await require('./manage-application').newStarter();
                         process.exit();
-                        // options.task = 'new-starter';
-                        // projectManagementMode = false;
                         break;
                     default:
                         console.log('\x1b[36m%s\x1b[0m', "Ok I won't do anything :-(  ...");
@@ -242,14 +229,11 @@ export async function cli(args) {
     }
 
     if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
-
-        // Start the specified Gulp Task
+        // Start the specified Task
         if (projectManagementMode) {
-            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
+            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Tasks');
             require('./tasks');
-
-
-            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
+            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Tasks');
         } else {
             require('./manage-application');
         }
@@ -257,9 +241,6 @@ export async function cli(args) {
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
         if (options.task == '') {
-            // const gulp = require('gulp');
-            //  initGulp();
-            // gulp.series('default')();
             displayOpeningMessage();
             await require('./tasks').mainT();
         } else {
@@ -304,14 +285,6 @@ export async function cli(args) {
                     tasks[directTaskMethod]();
                 } else {
                     log(ERROR, 'No Implementation Task found for ' + options.task);
-                    /*
-                    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
-                    const gulp = require('gulp');
-                    if (projectManagementMode) {
-                        initGulp();
-                    }
-                    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
-                    gulp.series(options.task)();*/
                 }
             }
         }
@@ -320,10 +293,6 @@ export async function cli(args) {
 
 // Display commandline usage
 function helptcli() {
-    /*
-    console.log('GULP DETAILS:');
-    var cwdir = process.cwd();
-    run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');*/
     // TODO: Display the version from generic config
     console.log('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]');
     console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
@@ -338,7 +307,6 @@ function helptcli() {
     console.log(' --multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties');
     console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.');
     console.log('These are the available TIBCO CLOUD CLI Tasks:');
-    // run('gulp -T  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
     const cliTaskConfigCLI = require('./config/config-cli-task.json');
     var cTsks = cliTaskConfigCLI.cliTasks;
     for (var cliTask in cTsks) {

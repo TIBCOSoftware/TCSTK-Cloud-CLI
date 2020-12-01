@@ -98,7 +98,7 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
             loginC = cloudLoginV3(tentantID, clientID, email, pass, setLoginURL);
         }
         if (loginC == 'ERROR') {
-            // TODO: exit the gulp task properly
+            // TODO: exit the task properly
             log(INFO, 'Error Exiting..');
             process.exit(1);
         }
@@ -853,13 +853,6 @@ getApplicationDetails = function (application, version, showTable) {
     return allArteFacts;
 };
 
-//Show all the applications links
-showLinks = function () {
-    return new Promise(function (resolve, reject) {
-        getAppLinks(true);
-        resolve();
-    });
-}
 
 //Get Links to all the applications
 getAppLinks = function (showTable) {
@@ -1409,18 +1402,16 @@ importLiveAppsData = async function () {
 
 // Function to
 csvToJsonLiveAppsData = function () {
-
+    // TODO: Implement
 }
 
 // Function to
 jsonToCsvLiveAppsData = function () {
-
+    // TODO: Implement
 }
-
 
 // Get the TIBCO Cloud Starter Development Kit from GIT
 getGit = function (source, target, tag) {
-    // const git = require('gulp-git');
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
     if (tag == null || tag == 'LATEST' || tag == '') {
         run('git clone "' + source + '" "' + target + '" ');

@@ -6,10 +6,14 @@ if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.get
 const version = require('../package.json').version;
 // const isWindows = process.platform == 'win32';
 
-
 // Function to show cloud info
 export async function showCloud() {
     await showCloudInfo();
+}
+
+//Show all the applications links
+export async function showLinks() {
+    getAppLinks(true);
 }
 
 // Function to build the cloud starter
@@ -153,20 +157,8 @@ export async function changeRegion() {
     await updateRegion(getPropFileName());
 };
 
-
-/*
-openingMessage = function () {
-    return new Promise(async function (resolve, reject) {
-        displayOpeningMessage();
-        resolve()
-    });
-}*/
-
-
+// Function to display help
 export async function helptcli() {
-    // log(INFO', 'GULP DETAILS:');
-    // const cwdir = process.cwd();
-    // run('gulp --version  --cwd "' + cwdir + '" --gulpfile "' + __filename + '"');
     log(INFO, 'These are the available TIBCO CLOUD CLI Tasks:');
     const cTsks = cliTaskConfig.cliTasks;
     for (let cliTask in cTsks) {
@@ -191,7 +183,6 @@ export async function helptcli() {
 }
 
 // Required to be valid for more than a week (default generation 2 weeks)
-// const OAUTH_REQUIRED_HOURS_VALID = 168;
 // Start Cloudstarter Locally
 export async function start() {
     log(INFO, 'Starting: ' + getProp('App_Name'));
@@ -239,6 +230,7 @@ export async function start() {
     }
 }
 
+// Wrapper to main task
 export async function mainT() {
     console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
     var appRoot = process.cwd();
@@ -250,7 +242,6 @@ export async function mainT() {
     await promptTask(__dirname, appRoot);
 };
 
-// const getAppOwner = false;
 
 export async function test() {
     console.log('Test...');
@@ -348,175 +339,118 @@ export async function watchSharedStateScopeWrapper() {
 }
 
 
-
-
-
 // Function to export liveApps cases
 export async function exportLiveAppsDataWrapper() {
-
     exportLiveAppsData();
-
 }
 
 export async function generateLiveAppsImportConfiguration() {
-
     createLAImportFile();
-
 }
 
 // Function to
 export async function importLiveAppsDataWrapper() {
-
     importLiveAppsData();
-
 }
 
 // Function to
 export async function csvToJsonLiveAppsDataWrapper() {
-
     csvToJsonLiveAppsData();
-
 }
 
 // Function to
 export async function jsonToCsvLiveAppsDataWrapper() {
-
     jsonToCsvLiveAppsData();
-
 }
 
 export async function exportLiveAppsCaseTypeWrapper() {
-
     exportLiveAppsCaseType();
-
 }
 
 export async function generateCloudDescriptorWrapper() {
-
     generateCloudDescriptor();
-
 }
 
 export async function updateCloudPackagesWrapper() {
-
     updateCloudPackages();
-
 }
 
 export async function showTCIWrapper() {
-
     showTCI();
-
 }
 
 export async function monitorTCIWrapper() {
-
     await monitorTCI();
-
 }
 
 
 export async function showSpotfireReportsWrapper() {
-
     showSpotfire();
-
 }
 
 export async function generateOauthTokenWrapper() {
-
     generateOauthToken();
-
 }
 
 export async function showOauthTokenWrapper() {
-
     showOauthToken();
-
 }
 
 export async function revokeOauthTokenWrapper() {
-
     revokeOauthToken();
-
 }
 
 export async function rotateOauthTokenWrapper() {
-
     rotateOauthToken();
-
 }
 
 export async function validateAndRotateOauthTokenWrapper() {
-
     validateAndRotateOauthToken(false);
-
 }
 
 export async function showOrgFoldersWrapper() {
-
     showOrgFolders();
-
 }
 
 export async function generateCloudPropertyFilesWrapper() {
-
     generateCloudPropertyFiles();
-
 }
 
 export async function exportOrgFolderWrapper() {
-
     exportOrgFolder();
-
 }
 
 export async function importOrgFolderWrapper() {
-
     importOrgFolder();
-
 }
 
 export async function watchOrgFolderWrapper() {
-
     watchOrgFolder();
-
 }
 
 export async function showLiveAppsGroupsWrapper() {
-
     showLiveAppsGroups();
-
 }
 
 export async function createLiveAppsGroupWrapper() {
-
     createLiveAppsGroup();
-
 }
 
 export async function showLiveAppsUsersWrapper() {
-
     showLiveAppsUsers(true, false);
-
 }
 
 
 export async function addUserToGroupWrapper() {
-
     addUserToGroup();
-
 }
 
 export async function validateWrapper() {
-
     validate();
-
 }
 
 export async function updatePropertyWrapper() {
-
     updateProperty();
-
 }
 
 
@@ -524,142 +458,6 @@ export async function updatePropertyWrapper() {
 let gtasks = [];
 const cliTaskConfig = require('./config/config-cli-task.json');
 const cTsks = cliTaskConfig.cliTasks;
-
-/*
-export function initGulp() {
-    // This file manages all the tasks within a project
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Second GulP');
-    const gulp = require('gulp');
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Second GulP');
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Before gulp init');
-    //gulp.task('test', test);
-//gulp.task('test-wsu', testWSU);
-    // gulp.task('wsu-add-tci', wsuAddTci);
-    // gulp.task('wsu-list-tci', wsuListTci);
-    // gulp.task('schematic-add', schematicAdd);
-   // gulp.task('help-tcli', helptcli);
-// helptcli.description = 'Displays this message';
-    //gulp.task('main', mainT);
-    //gulp.task('opening', openingMessage);
-    //gulp.task('default', gulp.series('opening', 'main'));
-    // gulp.task('start', start);
-// start.description = 'Starts the cloud starter locally';
-    // gulp.task('change-region', changeRegion);
-    // changeRegion.description = 'Change the tenant to login to';
-    // gulp.task('obfuscate', obfuscate);
-// obfuscate.description = 'Obfuscates a Password';
-// mainT.description = 'Displays this message';
-    // gulp.task('show-cloud', showCloudInfo);
-// showCloudInfo.description = 'Shows basic information on your cloud login. (use this to test your cloud login details)';
-    // gulp.task('show-cloud-starters', showApps);
-// showAvailableApps.description = 'Shows all the applications that are deployed in the cloud and their versions.';
-    // gulp.task('show-cloud-starter-links', showLinks);
-// showLinks.description = 'Shows all the links to the deployed applications (that have and index.html file).';
-    // gulp.task('delete-cloud-starter', deleteApp);
-// deleteApp.description = 'Delete a Cloud Starter.';
-    // gulp.task('show-live-apps-cases', showLiveAppsWrapper);
-// showLiveAppsWrapper.description = 'Show Live Apps';
-    // gulp.task('export-live-apps-cases', exportLiveAppsDataWrapper);
-// exportLiveAppsDataWrapper.description = 'Export Data from Live Apps';
-    // gulp.task('import-live-apps-cases', importLiveAppsDataWrapper);
-// importLiveAppsDataWrapper.description = 'Import Data to Live Apps';
-    //gulp.task('csv-to-json-liveapps-data', csvToJsonLiveAppsDataWrapper);
-// csvToJsonLiveAppsDataWrapper.description = 'Convert CSV to JSON for LiveApps data';
-    //gulp.task('json-to-csv-liveapps-data', jsonToCsvLiveAppsDataWrapper);
-// jsonToCsvLiveAppsDataWrapper.description = 'Convert JSON to CSV for LiveApps data';
-    // gulp.task('export-live-apps-case-type', exportLiveAppsCaseTypeWrapper);
-// exportLiveAppsCaseTypeWrapper.description = 'Export the details of a Live Apps Case Type';
-    // gulp.task('show-tci-apps', showTCIWrapper);
-// showTCIWrapper.description = 'List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).';
-// monitor-tci-app
-    //gulp.task('monitor-tci-app', monitorTCIWrapper);
-// monitorTCIWrapper.description = 'Monitor the logs of a TIBCO Cloud Integration Flogo Application';
-   // gulp.task('show-spotfire-reports', showSpotfireReportsWrapper);
-// showSpotfireReportsWrapper.description = 'List all Spotfire Analytical Reports.';
-    //  gulp.task('describe-cloud', gulp.series('show-cloud', 'show-tci-apps', 'show-spotfire-reports', 'show-live-apps-cases', 'show-cloud-starters'));
-   // gulp.task('generate-oauth-token', generateOauthTokenWrapper);
-// generateOauthTokenWrapper.description = 'Generate a new OAUTH token to authenticate to the TIBCO Cloud.';
-    // gulp.task('show-oauth-tokens', showOauthTokenWrapper);
-// showOauthTokenWrapper.description = 'Displays OAUTH tokens to authenticate to the TIBCO Cloud.';
-    // gulp.task('revoke-oauth-token', revokeOauthTokenWrapper);
-// revokeOauthTokenWrapper.description = 'Revokes an existing OAUTH token.';
-    // gulp.task('rotate-oauth-token', rotateOauthTokenWrapper);
-// rotateOauthTokenWrapper.description = 'Revokes your existing OAUTH token and then generates a new one.';
-    // gulp.task('validate-and-rotate-oauth-token', validateAndRotateOauthTokenWrapper);
-// validateAndRotateOauthTokenWrapper.description = 'Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it.';
-    //gulp.task('generate-cloud-property-files', generateCloudPropertyFilesWrapper);
-// generateCloudPropertyFilesWrapper.description = 'Generates a list of cloud property files.';
-    // gulp.task('show-org-folders', showOrgFoldersWrapper);
-// showOrgFoldersWrapper.description = 'Displays the content of the LiveApps Organization Folders.';
-    // gulp.task('export-org-folder', exportOrgFolderWrapper);
-// exportOrgFolderWrapper.description = 'Exports the content of a LiveApps Organization Folder to disk.';
-   // gulp.task('import-org-folder', importOrgFolderWrapper);
-// importOrgFolderWrapper.description = 'Imports the content of a folder on disk to a LiveApps Organization Folder.';
-   // gulp.task('watch-org-folder', watchOrgFolderWrapper);
-// watchOrgFolderWrapper.description = 'Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.';
-    // gulp.task('show-live-apps-groups', showLiveAppsGroupsWrapper);
-// showLiveAppsGroupsWrapper.description = 'Displays the LiveApps groups and their users.';
-    // gulp.task('create-live-apps-group', createLiveAppsGroupWrapper);
-// createLiveAppsGroupWrapper.description = 'Creates a new LiveApps group.';
-   // gulp.task('show-live-apps-users', showLiveAppsUsersWrapper);
-// showLiveAppsUsersWrapper.description = 'Shows the users in LiveApps (which can be added to groups).';
-    // gulp.task('add-user-to-group', addUserToGroupWrapper);
-// addUserToGroupWrapper.description = 'Adds a user to a LiveApps group.';
-   // gulp.task('validate', validateWrapper);
-// validateWrapper.description = 'Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.';
-    // gulp.task('add-or-update-property', updatePropertyWrapper);
-// updatePropertyWrapper.description = 'Updates a property in a file.';
-    // gulp.task('clean-dist', cleanDist);
-    // gulp.task('buildZip', build);
-    // gulp.task('build', gulp.series('clean-dist', 'buildZip'));
-// build.description = 'Build the ZIP file for your project.';
-    // gulp.task('deploy', deploy);
-// deploy.description = 'Deploys your application to the cloud.';
-    // gulp.task('publish', publish);
-// publish.description = 'Publishes the latest version of your application.';
-    // gulp.task('build-deploy', gulp.series('build', 'deploy'));
-    //gulp.task('get-cloud-libs-from-git', getCLgit);
-// getCLgit.description = 'Get the library sources from GIT';
-    //gulp.task('format-project-for-lib-sources', injectLibSources);
-// injectLibSources.description = '(INTERNAL TASK) Used to reformat your project so you can work with the library sources (for debugging)';
-    // gulp.task('clean', cleanTemp);
-// cleanTemp.description = '(INTERNAL TASK) Used to clean the temporary folders';
-    //gulp.task('inject-lib-sources', gulp.series('clean', 'get-cloud-libs-from-git', 'format-project-for-lib-sources', 'clean'));
-    // gulp.task('undo-lib-sources', undoLibSources);
-// undoLibSources.description = 'UNDO task for inject-lib-sources, use this when you want to go back to normal mode';
-    // gulp.task('view-global-config', viewGlobalConfig);
-// viewGlobalConfig.description = 'A task to View the Global Connection Configuration.';
-    // gulp.task('update-global-config', updateGlobalConfig);
-// updateGlobalConfig.description = 'A task to Update the Global Connection Configuration.';
-    // gulp.task('show-shared-state', showSharedState);
-// showSharedState.description = 'Show the Shared State contents.';
-    // gulp.task('show-shared-state-details', showSharedStateDetails);
-// showSharedStateDetails.description = 'Shows the details of one Shared State entry.';
-    //gulp.task('clear-shared-state-entry', removeSharedStateEntry);
-// removeSharedStateEntry.description = 'Removes one Shared State entry.';
-    //gulp.task('clear-shared-state-scope', clearSharedStateScope);
-// clearSharedStateScope.description = 'Removes all shared state entries in the configured scope.';
-    // gulp.task('export-shared-state-scope', exportSharedStateScope);
-// exportSharedStateScope.description = 'Downloads all shared state entries from the configured scope to the local file system.';
-    //gulp.task('generate-live-apps-import-configuration', generateLiveAppsImportConfiguration);
-// generateLiveAppsImportConfiguration.description = 'Generate the Live Apps Import configuration file.';
-   // gulp.task('import-shared-state-scope', importSharedStateScope);
-// importSharedStateScope.description = 'Uploads one entry or the configured scope from the local file system to the shared state.';
-    // gulp.task('watch-shared-state-scope', watchSharedStateScopeMain);
-// watchSharedStateScopeMain.description = 'Monitors the local shared state and when changes are detected it is uploaded to the cloud.';
-    // gulp.task('watch-shared-state-scope-do', watchSharedStateScope);
-    // gulp.task('update-cloud-packages', updateCloudPackagesWrapper);
-// updateCloudPackagesWrapper.description = 'Updates the NPM packges in the @tibco-tcstk scope in your project.';
-   // gulp.task('update-tcli', updateTCLIwrapper);
-// updateTCLIwrapper.description = 'Update the Cloud CLI.';
-    // gulp.task('replace-string-in-file', replaceStringInFileWrapper);
-// replaceStringInFileWrapper.description = 'Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties';
-    // gulp.task('generate-cloud-descriptor', generateCloudDescriptorWrapper);
-// generateCloudDescriptorWrapper.description = 'Generates the configured Public Cloud Descriptor';
-    // gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
-// createMultiplePropertyFileWrapper.description = 'Creating an initial property file to manage multiple cloud starters and environments.';
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After gulp init');
-}*/
 
 export function loadTaskDesc() {
     for (let cliTask in cTsks) {
@@ -746,7 +544,6 @@ export async function promptTask(stDir, cwdDir) {
         });
     });
 }
-
 
 //User interaction
 export async function searchAnswer(answers, input) {

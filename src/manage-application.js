@@ -1,15 +1,10 @@
 // This file manages the applications
 require('./build/common-functions');
-// const gulp = require('gulp');
-//const inquirerA = require('inquirer');
 const configApp = require('./config/config-template.json');
-// var templatesToUse = ['Template1', 'Template2', 'TCSTK-case-manager-app'];
 var templatesToUse = [];
 const isWindows = process.platform == 'win32';
 
-
 // Funcation called from the cli to pick up info and call the create starter
-// function
 export async function newStarter() {
     log(INFO, 'Creating New Starter...');
     // console.log(configApp);
@@ -178,14 +173,6 @@ export async function manageGlobalConfig() {
 export async function createMultiplePropertyFileWrapper() {
     await createMultiplePropertyFile();
 }
-
-
-// Gulp task definition
-/*
-gulp.task('new-starter', newStarter);
-gulp.task('manage-global-config', manageGlobalConfig);
-gulp.task('create-multiple-property-file', createMultiplePropertyFileWrapper);
-*/
 
 // Set log debug level from local property
 setLogDebug(configApp.useDebug);
