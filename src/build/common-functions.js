@@ -647,7 +647,8 @@ doesFileExist = function (checkFile) {
             return false;
         }
     } catch (err) {
-        console.error(err);
+        // console.error(err);
+        log(ERROR, 'Error on checking if file exists: ', err);
     }
 }
 
