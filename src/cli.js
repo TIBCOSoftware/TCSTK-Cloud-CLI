@@ -238,10 +238,8 @@ export async function cli(args) {
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
         if (options.task == '') {
-            // displayOpeningMessage();
             await require('./tasks').mainT();
         } else {
-            // console.log('TASK: ' + options.task);
             if (options.task == 'help') {
                 options.task = 'help-tcli';
             }
@@ -266,7 +264,6 @@ export async function cli(args) {
                         directTaskMethod = cTsks[cliTask].task;
                     }
                 }
-                // console.log(cTsks[cliTask].taskName);
                 taskArray.push(cTsks[cliTask].taskName);
             }
             if (!taskExist) {
@@ -276,8 +273,6 @@ export async function cli(args) {
                 log(INFO, 'Did you mean ? \x1b[34m' + taskArray[matches.bestMatchIndex]);
             } else {
                 if (directTask) {
-                    //require(__dirname + directTaskFile);
-                    console.log('calling: ' + directTaskMethod);
                     const tasks = require('./tasks');
                     tasks[directTaskMethod]();
                 } else {

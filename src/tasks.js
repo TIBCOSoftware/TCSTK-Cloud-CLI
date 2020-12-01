@@ -492,7 +492,6 @@ let globalLastCommand = 'help-tcli';
 // TODO: look at double answers
 export async function promptTask(stDir, cwdDir) {
     const inquirer = require('inquirer');
-    // loadTaskDesc();
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
@@ -517,7 +516,7 @@ export async function promptTask(stDir, cwdDir) {
                     selectedTaskConfig = cTsks[cliTask];
                 }
             }
-            var com = selectedTask;
+            let com = selectedTask;
             if (com == 'q' || com == 'quit' || com == 'exit') {
                 console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
@@ -566,11 +565,4 @@ export async function searchAnswer(answers, input) {
             );
         }, _.random(30, 60));
     });
-}
-
-
-function fakeForUsage() {
-    buildDeploy();
-    deleteApp();
-    changeRegion();
 }
