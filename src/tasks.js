@@ -236,11 +236,13 @@ export async function start() {
 
 // Wrapper to main task
 export async function mainT() {
+    loadTaskDesc();
+    displayOpeningMessage();
     console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
-    var appRoot = process.cwd();
+    const appRoot = process.cwd();
     if (getProp('CloudLogin.pass') == '' && !isOauthUsed()) {
         // When password is empty ask it manually for the session.
-        var pass = await askQuestion('Please provide your password: ', 'password');
+        const pass = await askQuestion('Please provide your password: ', 'password');
         setProperty('CloudLogin.pass', obfuscatePW(pass));
     }
     await promptTask(__dirname, appRoot);
@@ -490,7 +492,7 @@ let globalLastCommand = 'help-tcli';
 // TODO: look at double answers
 export async function promptTask(stDir, cwdDir) {
     const inquirer = require('inquirer');
-    loadTaskDesc();
+    // loadTaskDesc();
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {

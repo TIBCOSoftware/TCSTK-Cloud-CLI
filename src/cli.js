@@ -238,7 +238,7 @@ export async function cli(args) {
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
         if (options.task == '') {
-            displayOpeningMessage();
+            // displayOpeningMessage();
             await require('./tasks').mainT();
         } else {
             // console.log('TASK: ' + options.task);
