@@ -187,7 +187,6 @@ generateCloudDescriptor = function () {
     const workdir = process.cwd();
     const path = require('path');
     const packageJson = workdir + path.sep + 'package.json';
-    console.log('Package JSON file: ' + packageJson);
     if (doesFileExist(packageJson)) {
         let now = "";
         let buildOn = "";
@@ -195,7 +194,7 @@ generateCloudDescriptor = function () {
             now = (new Date()).getTime();
             buildOn = new Date();
         }
-        const pJsonObj = require(packageJson);
+        const pJsonObj = require('jsonfile').readFileSync(packageJson);
         let name = "";
         if (pJsonObj.name) {
             name = pJsonObj.name;
@@ -1228,7 +1227,7 @@ importLiveAppsData = async function () {
     if (!doesFileExist(importFile)) {
         importFile = process.cwd() + '/' + await askQuestion('Default Import file (' + importFile + ') not found, which import configuration file would you like to use ?');
     }
-    const impConf = require(importFile);
+    const impConf = require('jsonfile').readFileSync(importFile);
     const cSteps = impConf['import-steps'];
     log(INFO, 'Configured Steps: ', cSteps);
 
