@@ -11,7 +11,12 @@ export async function showCloud() {
     await showCloudInfo();
 }
 
-//Show all the applications links
+// Show all the cloud starters
+export async function showApps() {
+    showAvailableApps(true);
+}
+
+//Show all the cloud starter links
 export async function showLinks() {
     getAppLinks(true);
 }

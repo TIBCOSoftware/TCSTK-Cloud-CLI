@@ -331,13 +331,6 @@ showAvailableApps = function (showTable) {
     }
 };
 
-showApps = function () {
-    return new Promise(function (resolve, reject) {
-        showAvailableApps(true);
-        resolve();
-    });
-}
-
 
 // Function to show claims for the configured user
 const getClaimsURL = cloudURL + getProp('Claims_URE');
