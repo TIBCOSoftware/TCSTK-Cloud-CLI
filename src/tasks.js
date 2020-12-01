@@ -22,7 +22,7 @@ export async function showLinks() {
 }
 
 // Function to build the cloud starter
-async function buildCloudStarter() {
+export async function buildCloudStarter() {
     await cleanDist();
     log('INFO', 'Building... ' + getProp('App_Name'));
     buildCloudStarterZip(getProp('App_Name'));
