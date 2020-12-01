@@ -389,7 +389,6 @@ export async function monitorTCIWrapper() {
     await monitorTCI();
 }
 
-
 export async function showSpotfireReportsWrapper() {
     showSpotfire();
 }
@@ -457,6 +456,10 @@ export async function validateWrapper() {
 
 export async function updatePropertyWrapper() {
     updateProperty();
+}
+
+export async function schematicAddWrapper() {
+    await schematicAdd();
 }
 
 

@@ -59,7 +59,7 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
     }
     if (!isOauthUsed() || !isOAUTHValid || fClientID) {
         if (!toldClientID) {
-            log(INFO, 'Using CLIENT-ID Authentication...');
+            log(INFO, 'Using CLIENT-ID Authentication (consider using OAUTH)...');
             toldClientID = true;
         }
         var setLoginURL = loginURL;
@@ -239,41 +239,38 @@ showAppLinkInfo = function () {
 
 // Build the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
-    return new Promise(async function (resolve, reject) {
-        // Check for Build Command
-        let BUILD_COMMAND = 'HASHROUTING';
-        if (getProp('BUILD_COMMAND') != null) {
-            BUILD_COMMAND = getProp('BUILD_COMMAND');
-        } else {
-            log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
-            addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
-        }
-        const csURL = '/webresource/apps/' + cloudStarter + '/';
-        deleteFile('./dist/' + cloudStarter + '.zip');
-        //Add the cloudstarter.json file
-        if (getProp('Add_Descriptor') === 'YES') {
-            generateCloudDescriptor();
-        }
-        //hashrouting build configurable
-        let buildCommand = BUILD_COMMAND;
-        let bType = 'CUSTOM';
-        if (BUILD_COMMAND === 'HASHROUTING') {
-            bType = 'HASHROUTING';
-            buildCommand = 'ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL;
-        }
-        if (BUILD_COMMAND === 'NON-HASHROUTING') {
-            bType = 'NON-HASHROUTING';
-            buildCommand = 'ng build --prod --base-href ' + csURL + ' --deploy-url ' + csURL;
-        }
-        log(INFO, 'Building Cloudstarter Using Command(Type: ' + bType + '): ' + buildCommand);
-        run(buildCommand);
-        //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud... (perhaps use no compression)
-        //const folderToZip = './dist/' + cloudStarter + '/';
-        //const fileForZip = './dist/' + cloudStarter + '.zip';
-        run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
-        log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
-        resolve();
-    });
+    // Check for Build Command
+    let BUILD_COMMAND = 'HASHROUTING';
+    if (getProp('BUILD_COMMAND') != null) {
+        BUILD_COMMAND = getProp('BUILD_COMMAND');
+    } else {
+        log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
+    }
+    const csURL = '/webresource/apps/' + cloudStarter + '/';
+    deleteFile('./dist/' + cloudStarter + '.zip');
+    //Add the cloudstarter.json file
+    if (getProp('Add_Descriptor') === 'YES') {
+        generateCloudDescriptor();
+    }
+    //hashrouting build configurable
+    let buildCommand = BUILD_COMMAND;
+    let bType = 'CUSTOM';
+    if (BUILD_COMMAND === 'HASHROUTING') {
+        bType = 'HASHROUTING';
+        buildCommand = 'ng build --prod --base-href ' + csURL + 'index.html --deploy-url ' + csURL;
+    }
+    if (BUILD_COMMAND === 'NON-HASHROUTING') {
+        bType = 'NON-HASHROUTING';
+        buildCommand = 'ng build --prod --base-href ' + csURL + ' --deploy-url ' + csURL;
+    }
+    log(INFO, 'Building Cloudstarter Using Command(Type: ' + bType + '): ' + buildCommand);
+    run(buildCommand);
+    //TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud... (perhaps use no compression)
+    //const folderToZip = './dist/' + cloudStarter + '/';
+    //const fileForZip = './dist/' + cloudStarter + '.zip';
+    run('cd ./dist/' + cloudStarter + '/ && zip -r ./../' + cloudStarter + '.zip .');
+    log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip');
 }
 
 // function that shows all the availible applications in the cloud
@@ -334,32 +331,29 @@ showAvailableApps = function (showTable) {
 // Function to show claims for the configured user
 const getClaimsURL = cloudURL + getProp('Claims_URE');
 showCloudInfo = function (showTable) {
-    return new Promise(function (resolve, reject) {
-        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
-        let doShowTable = true;
-        if (showTable != null) {
-            doShowTable = showTable;
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
+    let doShowTable = true;
+    if (showTable != null) {
+        doShowTable = showTable;
+    }
+    var response = callURL(getClaimsURL);
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
+    let nvs = createTableValue('REGION', getRegion());
+    nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
+    nvs = createTableValue('FIRST NAME', response.firstName, nvs);
+    nvs = createTableValue('LAST NAME', response.lastName, nvs);
+    nvs = createTableValue('EMAIL', response.email, nvs);
+    if (response.sandboxes) {
+        for (var i = 0; i < response.sandboxes.length; i++) {
+            nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
+            nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
         }
-        var response = callURL(getClaimsURL);
-        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
-        let nvs = createTableValue('REGION', getRegion());
-        nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
-        nvs = createTableValue('FIRST NAME', response.firstName, nvs);
-        nvs = createTableValue('LAST NAME', response.lastName, nvs);
-        nvs = createTableValue('EMAIL', response.email, nvs);
-        if (response.sandboxes) {
-            for (var i = 0; i < response.sandboxes.length; i++) {
-                nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
-                nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
-            }
-        }
-        // TODO: display groups
-        if (doShowTable) {
-            console.table(nvs);
-        }
-        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
-        resolve();
-    });
+    }
+    // TODO: display groups
+    if (doShowTable) {
+        console.table(nvs);
+    }
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
 };
 
 doDeleteApp = function (appToDelete) {
@@ -1485,45 +1479,42 @@ wsuListTci = function () {
 }
 
 const posSchematics = require('../config/config-schematics.json').schematicConfig;
-schematicAdd = function () {
-    return new Promise(async function (resolve, reject) {
-        log(INFO, 'Adding Schematic...');
-        const LIST_ALL = 'List All Possible Schematics';
-        // Check if schematic is allowed
-        let listing = true;
-        let initialList = true;
-        let sType = '';
-        while (listing) {
-            const appType = getProp('App_Type');
-            let possibleSchematics = posSchematics.descriptions;
-            let question = 'What type of schematic would you like to add ?';
-            if (appType != null && initialList) {
-                possibleSchematics = [LIST_ALL];
-                for (let sNr in posSchematics.AvailableInTemplate) {
-                    for (let availableSchematic of posSchematics.AvailableInTemplate[sNr]) {
-                        // console.log('App Type: ', appType, ' availableSchematic: ', availableSchematic);
-                        if (appType == availableSchematic) {
-                            possibleSchematics.unshift(posSchematics.descriptions[sNr]);
-                        }
+schematicAdd = async function () {
+    log(INFO, 'Adding Schematic...');
+    const LIST_ALL = 'List All Possible Schematics';
+    // Check if schematic is allowed
+    let listing = true;
+    let initialList = true;
+    let sType = '';
+    while (listing) {
+        const appType = getProp('App_Type');
+        let possibleSchematics = posSchematics.descriptions;
+        let question = 'What type of schematic would you like to add ?';
+        if (appType != null && initialList) {
+            possibleSchematics = [LIST_ALL];
+            for (let sNr in posSchematics.AvailableInTemplate) {
+                for (let availableSchematic of posSchematics.AvailableInTemplate[sNr]) {
+                    // console.log('App Type: ', appType, ' availableSchematic: ', availableSchematic);
+                    if (appType == availableSchematic) {
+                        possibleSchematics.unshift(posSchematics.descriptions[sNr]);
                     }
                 }
-                question = 'Based on your application type ' + colors.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
-                initialList = false;
             }
-            sType = await askMultipleChoiceQuestion(question, possibleSchematics);
-            if (sType != LIST_ALL) {
-                listing = false;
-            }
+            question = 'Based on your application type ' + colors.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
+            initialList = false;
         }
-        const sName = await askQuestion('What is the name of your schematic ?');
-        run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
-        // Run npm install only after certain schematics.
-        log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
-        if (posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]) {
-            run('npm install');
+        sType = await askMultipleChoiceQuestion(question, possibleSchematics);
+        if (sType != LIST_ALL) {
+            listing = false;
         }
-        resolve();
-    });
+    }
+    const sName = await askQuestion('What is the name of your schematic ?');
+    run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
+    // Run npm install only after certain schematics.
+    log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
+    if (posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]) {
+        run('npm install');
+    }
 }
 
 //var art = require('ascii-art');
@@ -1727,68 +1718,62 @@ showOauthToken = function () {
 }
 
 // Function to revoke an OAUTH Token
-revokeOauthToken = function (tokenName) {
-    return new Promise(async function (resolve, reject) {
-        if (!tokenName) {
-            //No token name provided so choose on from list
-            const possibleTokensArrObj = showOauthToken();
-            let possibleTokens = ['NO TOKEN'];
-            for (let tok of iterateTable(possibleTokensArrObj)) {
-                possibleTokens = possibleTokens.filter(f => f != tok.Name).concat([tok.Name])
-            }
-            // console.log(possibleTokens);
-            tokenName = await askMultipleChoiceQuestion('Which token would you like to revoke ?', possibleTokens);
+revokeOauthToken = async function (tokenName) {
+    if (!tokenName) {
+        //No token name provided so choose on from list
+        const possibleTokensArrObj = showOauthToken();
+        let possibleTokens = ['NO TOKEN'];
+        for (let tok of iterateTable(possibleTokensArrObj)) {
+            possibleTokens = possibleTokens.filter(f => f != tok.Name).concat([tok.Name])
         }
-        if (tokenName != 'NO TOKEN') {
-            log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
-            let revokeOauthUrl = 'https://' + getCurrentRegion() + clURI.revoke_oauth;
-            const postRequest = 'name=' + tokenName;
-            const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-            log(INFO, 'Result: ', colors.blue(response.message));
-        } else {
-            log(INFO, 'OK, I won\'t do anything :-)');
-        }
-        resolve();
-    });
+        // console.log(possibleTokens);
+        tokenName = await askMultipleChoiceQuestion('Which token would you like to revoke ?', possibleTokens);
+    }
+    if (tokenName != 'NO TOKEN') {
+        log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
+        let revokeOauthUrl = 'https://' + getCurrentRegion() + clURI.revoke_oauth;
+        const postRequest = 'name=' + tokenName;
+        const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+        log(INFO, 'Result: ', colors.blue(response.message));
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
 }
 
 // Function to rotate an OAUTH Token
 rotateOauthToken = function () {
-    return new Promise(async function (resolve, reject) {
-        if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
-            const tokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
+    if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
+        const tokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
 
-            const tokenNumber = Number(tokenName.split('_').pop().trim());
-            let newTokenNumber = 0;
-            let newTokenName = '';
-            let doRotate = false;
-            //console.log('Token Number: |' + tokenNumber + '|');
-            if (!isNaN(tokenNumber)) {
-                newTokenNumber = tokenNumber + 1;
-                newTokenName = tokenName.replace(tokenNumber, newTokenNumber);
-                doRotate = true;
-            } else {
-                log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1)')
-            }
-            //console.log('New Token Number: ' , newTokenNumber);
-            // console.log('New Token Name: ' , newTokenName);
-            if (doRotate) {
-                log(INFO, 'Rotating OAUTH Token:  ' + tokenName);
-                log(INFO, '     New OAUTH Token:  ' + newTokenName);
-                // Generate new Token
-                generateOauthToken(newTokenName, true);
-                // Update token name
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
-                // Revoke old token
-                revokeOauthToken(tokenName);
-                log(INFO, 'Successfully Rotated Token: ' + tokenName + ' --> ' + newTokenName);
-
-            }
+        const tokenNumber = Number(tokenName.split('_').pop().trim());
+        let newTokenNumber = 0;
+        let newTokenName = '';
+        let doRotate = false;
+        //console.log('Token Number: |' + tokenNumber + '|');
+        if (!isNaN(tokenNumber)) {
+            newTokenNumber = tokenNumber + 1;
+            newTokenName = tokenName.replace(tokenNumber, newTokenNumber);
+            doRotate = true;
         } else {
-            log(ERROR, 'No CloudLogin.OAUTH_Generate_Token_Name Property found (Perhaps you want to run generate-oauth-token first...)')
+            log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1)')
         }
-        resolve();
-    });
+        //console.log('New Token Number: ' , newTokenNumber);
+        // console.log('New Token Name: ' , newTokenName);
+        if (doRotate) {
+            log(INFO, 'Rotating OAUTH Token:  ' + tokenName);
+            log(INFO, '     New OAUTH Token:  ' + newTokenName);
+            // Generate new Token
+            generateOauthToken(newTokenName, true);
+            // Update token name
+            addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
+            // Revoke old token
+            revokeOauthToken(tokenName);
+            log(INFO, 'Successfully Rotated Token: ' + tokenName + ' --> ' + newTokenName);
+
+        }
+    } else {
+        log(ERROR, 'No CloudLogin.OAUTH_Generate_Token_Name Property found (Perhaps you want to run generate-oauth-token first...)')
+    }
 }
 
 validateAndRotateOauthToken = async function (isInteractive) {
@@ -1830,98 +1815,95 @@ validateAndRotateOauthToken = async function (isInteractive) {
 }
 
 // Function to generate an OAUTH Token
-generateOauthToken = function (tokenNameOverride, verbose) {
-    return new Promise(async function (resolve, reject) {
-        log(INFO, 'Generating OAUTH Token...');
-        const generateOauthUrl = 'https://' + getCurrentRegion() + clURI.generate_oauth
-        let skipCall = false;
-        // Check for Token name
-        let OauthTokenName = 'MyCLIToken_1';
-        if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
-            OauthTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
+generateOauthToken = async function (tokenNameOverride, verbose) {
+    log(INFO, 'Generating OAUTH Token...');
+    const generateOauthUrl = 'https://' + getCurrentRegion() + clURI.generate_oauth
+    let skipCall = false;
+    // Check for Token name
+    let OauthTokenName = 'MyCLIToken_1';
+    if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
+        OauthTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
+    } else {
+        log(INFO, 'No OAUTH_Generate_Token_Name found; This is needed to specify the name of your OAUTH Token.');
+        let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
+        if (decision == 'YES') {
+            addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', 'MyCLIToken_1', 'Name of the OAUTH token to be generated.');
         } else {
-            log(INFO, 'No OAUTH_Generate_Token_Name found; This is needed to specify the name of your OAUTH Token.');
-            let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
-            if (decision == 'YES') {
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', 'MyCLIToken_1', 'Name of the OAUTH token to be generated.');
-            } else {
-                skipCall = true;
-            }
+            skipCall = true;
         }
-        // Override name in case of rotation
-        if (tokenNameOverride) {
-            OauthTokenName = tokenNameOverride;
-        }
-        // Check for Tenants
-        let OauthTenants = 'TSC+BPM';
-        if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
-            OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(/,/g, "+");
+    }
+    // Override name in case of rotation
+    if (tokenNameOverride) {
+        OauthTokenName = tokenNameOverride;
+    }
+    // Check for Tenants
+    let OauthTenants = 'TSC+BPM';
+    if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
+        OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(/,/g, "+");
+    } else {
+        log(INFO, 'No OAUTH_Generate_For_Tenants Property found; This is needed to specify for which tenants you would like to generate an OAUTH Token');
+        let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
+        if (decision == 'YES') {
+            addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_For_Tenants', 'TSC,BPM', 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n# NOTE: You need to be part of the specified subscription.');
         } else {
-            log(INFO, 'No OAUTH_Generate_For_Tenants Property found; This is needed to specify for which tenants you would like to generate an OAUTH Token');
-            let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
-            if (decision == 'YES') {
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_For_Tenants', 'TSC,BPM', 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n# NOTE: You need to be part of the specified subscription.');
-            } else {
-                skipCall = true;
-            }
+            skipCall = true;
         }
-        // Check for valid hours (336 by default; 2 weeks)
-        let OauthHours = 336;
-        if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
-            OauthHours = getProp('CloudLogin.OAUTH_Generate_Valid_Hours');
+    }
+    // Check for valid hours (336 by default; 2 weeks)
+    let OauthHours = 336;
+    if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
+        OauthHours = getProp('CloudLogin.OAUTH_Generate_Valid_Hours');
+    } else {
+        log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
+        let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
+        if (decision == 'YES') {
+            addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '336', 'Number of Hours the generated OAUTH token should be valid.');
         } else {
-            log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
-            let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
-            if (decision == 'YES') {
-                addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '336', 'Number of Hours the generated OAUTH token should be valid.');
-            } else {
-                skipCall = true;
-            }
+            skipCall = true;
         }
-        let OauthSeconds = OauthHours * 3600;
-        const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants;
-        if (!skipCall) {
-            // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
-            // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
-            const responseClaims = callURL(getClaimsURL, null, null, null, false);
-            const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
-            log(INFO, response);
-            if (response) {
-                if (response.error) {
-                    log(ERROR, response.error_description);
+    }
+    let OauthSeconds = OauthHours * 3600;
+    const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants;
+    if (!skipCall) {
+        // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
+        // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
+        const responseClaims = callURL(getClaimsURL, null, null, null, false);
+        const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+        log(INFO, response);
+        if (response) {
+            if (response.error) {
+                log(ERROR, response.error_description);
+            } else {
+                // Display Table
+                let nvs = createTableValue('OAUTH TOKEN NAME', OauthTokenName);
+                nvs = createTableValue('NEW OAUTH TOKEN', response.access_token, nvs);
+                nvs = createTableValue('VALID TENANTS', response.scope, nvs);
+                nvs = createTableValue('TYPE', response.token_type, nvs);
+                nvs = createTableValue('EXPIRY (SECONDS)', response.expires_in, nvs);
+                nvs = createTableValue('EXPIRY (HOURS)', ((response.expires_in) / 3600), nvs);
+                nvs = createTableValue('EXPIRY (DAYS)', (((response.expires_in) / 3600) / 24), nvs);
+                console.table(nvs);
+                // Ask to update
+                let decision = '';
+                if (verbose) {
+                    decision = 'YES';
                 } else {
-                    // Display Table
-                    let nvs = createTableValue('OAUTH TOKEN NAME', OauthTokenName);
-                    nvs = createTableValue('NEW OAUTH TOKEN', response.access_token, nvs);
-                    nvs = createTableValue('VALID TENANTS', response.scope, nvs);
-                    nvs = createTableValue('TYPE', response.token_type, nvs);
-                    nvs = createTableValue('EXPIRY (SECONDS)', response.expires_in, nvs);
-                    nvs = createTableValue('EXPIRY (HOURS)', ((response.expires_in) / 3600), nvs);
-                    nvs = createTableValue('EXPIRY (DAYS)', (((response.expires_in) / 3600) / 24), nvs);
-                    console.table(nvs);
-                    // Ask to update
-                    let decision = '';
-                    if (verbose) {
-                        decision = 'YES';
-                    } else {
-                        decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
-                    }
-                    if (decision == 'YES') {
-                        //console.log('Response: ', response);
-                        const expiryDate = new Date((new Date()).getTime() + (response.expires_in * 1000));
-                        // ADD Get Claims Call here...
-                        // console.log(responseClaims);
-                        const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
-                        console.log(tokenToInject);
-                        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
-                    }
+                    decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
+                }
+                if (decision == 'YES') {
+                    //console.log('Response: ', response);
+                    const expiryDate = new Date((new Date()).getTime() + (response.expires_in * 1000));
+                    // ADD Get Claims Call here...
+                    // console.log(responseClaims);
+                    const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
+                    console.log(tokenToInject);
+                    addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
                 }
             }
-        } else {
-            log(INFO, 'OK, I won\'t do anything :-)');
         }
-        resolve();
-    });
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
 }
 
 const SPECIAL = 'SPECIAL';

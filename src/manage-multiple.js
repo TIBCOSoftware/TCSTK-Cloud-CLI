@@ -7,7 +7,6 @@ const colors = require('colors');
 // Function to process the multiple property file
 // processMultipleFile = function (propfileName) {
 processMultipleFile = function () {
-    // return new Promise(async function (resolve, reject) {
     // setLogDebug('true');
     let mOpts = getMultipleOptions();
     mFile = mOpts.name;
@@ -165,7 +164,6 @@ processMultipleFile = function () {
 const TCLI_INTERACTVIE = 'tcli-interactive';
 
 multipleInteraction = async function () {
-    // return new Promise(async function (resolve, reject) {
     const PropertiesReader = require('properties-reader');
     let mOpts = getMultipleOptions();
     mFile = mOpts.name;

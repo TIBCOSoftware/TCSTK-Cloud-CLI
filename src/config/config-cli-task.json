@@ -76,6 +76,14 @@
       "taskName": "deploy",
       "availableOnOs": ["all"]
     },
+    "9. build-deploy": {
+      "description": "Builds and Deploys your local project to the cloud",
+      "enabled": true,
+      "internal": false,
+      "task": "buildDeploy",
+      "taskName": "build-deploy",
+      "availableOnOs": ["all"]
+    },
     "publish": {
       "description": "Publish your cloud starter project in the cloud",
       "enabled": false,
@@ -84,7 +92,15 @@
       "taskName": "publish",
       "availableOnOs": ["all"]
     },
-    "9. clean": {
+    "10. delete-cloud-starter": {
+      "description": "Delete a LiveApps WebApp",
+      "enabled": true,
+      "internal": false,
+      "task": "deleteApp",
+      "taskName": "delete-cloud-starter",
+      "availableOnOs": ["all"]
+    },
+    "11. clean": {
       "description": "Clean the temporary folders",
       "enabled": true,
       "internal": true,
@@ -92,15 +108,7 @@
       "taskName": "clean",
       "availableOnOs": ["all"]
     },
-    "10. build-deploy": {
-      "description": "Builds and Deploys your local project to the cloud",
-      "enabled": true,
-      "internal": false,
-      "task": "buildDeploy",
-      "taskName": "build-deploy",
-      "availableOnOs": ["all"]
-    },
-    "11. get-cloud-libs-from-git": {
+    "12. get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
       "enabled": true,
       "internal": true,
@@ -108,7 +116,7 @@
       "taskName": "get-cloud-libs-from-git",
       "availableOnOs": ["darwin"]
     },
-    "12. inject-lib-sources": {
+    "13. inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
@@ -116,7 +124,7 @@
       "taskName": "inject-lib-sources",
       "availableOnOs": ["darwin"]
     },
-    "13. undo-lib-sources": {
+    "14. undo-lib-sources": {
       "description": "Undo's the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
@@ -124,15 +132,15 @@
       "taskName": "undo-lib-sources",
       "availableOnOs": ["darwin"]
     },
-    "14. schematic-add": {
+    "15. schematic-add": {
       "description": "Add a schematic into your project",
       "enabled": true,
       "internal": false,
-      "task": "schematicAdd",
+      "task": "schematicAddWrapper",
       "taskName": "schematic-add",
       "availableOnOs": ["all"]
     },
-    "15. view-global-config": {
+    "16. view-global-config": {
       "description": "View the global cloud connection configuration",
       "enabled": true,
       "internal": false,
@@ -140,7 +148,7 @@
       "taskName": "view-global-config",
       "availableOnOs": ["all"]
     },
-    "16. update-global-config": {
+    "17. update-global-config": {
       "description": "Update the global cloud connection configuration",
       "enabled": true,
       "internal": false,
@@ -148,7 +156,7 @@
       "taskName": "update-global-config",
       "availableOnOs": ["all"]
     },
-    "17. show-shared-state": {
+    "18. show-shared-state": {
       "description": "Show the shared state contents",
       "enabled": true,
       "internal": false,
@@ -157,7 +165,7 @@
       "taskName": "show-shared-state",
       "availableOnOs": ["all"]
     },
-    "18. show-shared-state-details": {
+    "19. show-shared-state-details": {
       "description": "Shows the details of one Shared State entry.",
       "enabled": true,
       "internal": false,
@@ -166,7 +174,7 @@
       "taskName": "show-shared-state-details",
       "availableOnOs": ["all"]
     },
-    "19. clear-shared-state-entry": {
+    "20. clear-shared-state-entry": {
       "description": "Removes one Shared State entry.",
       "enabled": true,
       "internal": false,
@@ -174,7 +182,7 @@
       "taskName": "clear-shared-state-entry",
       "availableOnOs": ["all"]
     },
-    "20. clear-shared-state-scope": {
+    "21. clear-shared-state-scope": {
       "description": "Removes all shared state entries in the configured scope.",
       "enabled": true,
       "internal": false,
@@ -182,7 +190,7 @@
       "taskName": "clear-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "21. export-shared-state-scope": {
+    "22. export-shared-state-scope": {
       "description": "Downloads all shared state entries from the configured scope to the local file system.",
       "enabled": true,
       "internal": false,
@@ -191,7 +199,7 @@
       "taskName": "export-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "22. import-shared-state-scope": {
+    "23. import-shared-state-scope": {
       "description": "Uploads one entry or the configured scope from the local file system to the shared state.",
       "enabled": true,
       "internal": false,
@@ -200,7 +208,7 @@
       "taskName": "import-shared-state-scope",
       "availableOnOs": ["all"]
     },
-    "23. watch-shared-state-scope": {
+    "24. watch-shared-state-scope": {
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
       "enabled": true,
       "internal": false,
@@ -218,7 +226,7 @@
       "taskName": "watch-shared-state-scope-do",
       "availableOnOs": ["all"]
     },
-    "24. create-multiple-property-file": {
+    "25. create-multiple-property-file": {
       "description": "Creating an initial property file to manage multiple cloud starters and environments.",
       "enabled": true,
       "internal": false,
@@ -226,20 +234,12 @@
       "taskName": "create-multiple-property-file",
       "availableOnOs": ["all"]
     },
-    "25. replace-string-in-file": {
+    "26. replace-string-in-file": {
       "description": "Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties",
       "enabled": true,
       "internal": false,
       "task": "replaceStringInFileWrapper",
       "taskName": "replace-string-in-file",
-      "availableOnOs": ["all"]
-    },
-    "26. delete-cloud-starter": {
-      "description": "Delete a LiveApps WebApp",
-      "enabled": true,
-      "internal": false,
-      "task": "deleteApp",
-      "taskName": "delete-cloud-starter",
       "availableOnOs": ["all"]
     },
     "27. show-live-apps-cases": {
