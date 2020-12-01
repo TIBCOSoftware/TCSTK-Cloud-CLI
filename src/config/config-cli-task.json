@@ -4,7 +4,8 @@
       "description": "Run Test",
       "enabled": false,
       "internal": false,
-      "gulpTask": "test",
+      "task": "test",
+      "taskName": "test",
       "availableOnOs": ["win32","darwin"],
       "availableOnTemplate": ["all"]
     },
@@ -13,8 +14,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "task": "showCloudInfo",
-      "gulpTask": "show-cloud",
+      "task": "showCloud",
+      "taskName": "show-cloud",
       "availableOnOs": ["all"]
     },
     "2. show-cloud-starters": {
@@ -23,7 +24,7 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showApps",
-      "gulpTask": "show-cloud-starters",
+      "taskName": "show-cloud-starters",
       "availableOnOs": ["all"]
     },
     "3. show-cloud-starter-links": {
@@ -31,119 +32,120 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-cloud-starter-links",
+      "task": "showLinks",
+      "taskName": "show-cloud-starter-links",
       "availableOnOs": ["all"]
     },
     "4. change-region": {
       "description": "Change the Region in the cloud-properties file",
       "enabled": true,
       "internal": false,
-      "gulpTask": "change-region",
+      "task": "changeRegion",
+      "taskName": "change-region",
       "availableOnOs": ["darwin"]
     },
     "5. obfuscate": {
       "description": "Obfuscate a password and put it in the cloud-properties file",
       "enabled": true,
       "internal": false,
-      "gulpTask": "obfuscate",
+      "task": "obfuscate",
+      "taskName": "obfuscate",
       "availableOnOs": ["darwin"]
     },
     "6. start": {
       "description": "Start your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "start",
+      "task": "start",
+      "taskName": "start",
       "availableOnOs": ["all"]
     },
     "7. build": {
       "description": "Build your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "build",
+      "task": "buildCloudStarter",
+      "taskName": "build",
       "availableOnOs": ["all"]
     },
     "8. deploy": {
       "description": "Deploy your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "deploy",
+      "task": "deploy",
+      "taskName": "deploy",
       "availableOnOs": ["all"]
     },
     "publish": {
       "description": "Publish your cloud starter project in the cloud",
       "enabled": false,
       "internal": false,
-      "gulpTask": "publish",
+      "task": "publish",
+      "taskName": "publish",
       "availableOnOs": ["all"]
     },
     "9. clean": {
       "description": "Clean the temporary folders",
       "enabled": true,
       "internal": true,
-      "gulpTask": "clean",
+      "task": "cleanTemp",
+      "taskName": "clean",
       "availableOnOs": ["all"]
     },
     "10. build-deploy": {
       "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
-      "gulpTask": "build-deploy",
+      "task": "buildDeploy",
+      "taskName": "build-deploy",
       "availableOnOs": ["all"]
     },
     "11. get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
       "enabled": true,
       "internal": true,
-      "gulpTask": "get-cloud-libs-from-git",
+      "task": "getCLgit",
+      "taskName": "get-cloud-libs-from-git",
       "availableOnOs": ["darwin"]
     },
     "12. inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
-      "gulpTask": "inject-lib-sources",
+      "task": "injectLibSourcesWrapper",
+      "taskName": "inject-lib-sources",
       "availableOnOs": ["darwin"]
     },
     "13. undo-lib-sources": {
       "description": "Undo's the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
-      "gulpTask": "undo-lib-sources",
-      "availableOnOs": ["darwin"]
-    },
-    "wsu-list-tci": {
-      "description": "[BETA] Get a list of TCI Services using the Web Scaffolding Utility(WSU)",
-      "enabled": false,
-      "internal": false,
-      "gulpTask": "wsu-list-tci",
-      "availableOnOs": ["darwin"]
-    },
-    "wsu-add-tci": {
-      "description": "[BETA] Add a TCI Service with the Web Scaffolding Utility(WSU) ",
-      "enabled": false,
-      "internal": false,
-      "gulpTask": "wsu-add-tci",
+      "task": "undoLibSources",
+      "taskName": "undo-lib-sources",
       "availableOnOs": ["darwin"]
     },
     "14. schematic-add": {
       "description": "Add a schematic into your project",
       "enabled": true,
       "internal": false,
-      "gulpTask": "schematic-add",
+      "task": "schematicAdd",
+      "taskName": "schematic-add",
       "availableOnOs": ["all"]
     },
     "15. view-global-config": {
       "description": "View the global cloud connection configuration",
       "enabled": true,
       "internal": false,
-      "gulpTask": "view-global-config",
+      "task": "viewGlobalConfig",
+      "taskName": "view-global-config",
       "availableOnOs": ["all"]
     },
     "16. update-global-config": {
       "description": "Update the global cloud connection configuration",
       "enabled": true,
       "internal": false,
-      "gulpTask": "update-global-config",
+      "task": "update-global-config",
+      "taskName": "update-global-config",
       "availableOnOs": ["all"]
     },
     "17. show-shared-state": {
@@ -151,7 +153,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-shared-state",
+      "task": "showSharedState",
+      "taskName": "show-shared-state",
       "availableOnOs": ["all"]
     },
     "18. show-shared-state-details": {
@@ -159,21 +162,24 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-shared-state-details",
+      "task": "showSharedStateDetailsWrapper",
+      "taskName": "show-shared-state-details",
       "availableOnOs": ["all"]
     },
     "19. clear-shared-state-entry": {
       "description": "Removes one Shared State entry.",
       "enabled": true,
       "internal": false,
-      "gulpTask": "clear-shared-state-entry",
+      "task": "removeSharedStateEntryWrapper",
+      "taskName": "clear-shared-state-entry",
       "availableOnOs": ["all"]
     },
     "20. clear-shared-state-scope": {
       "description": "Removes all shared state entries in the configured scope.",
       "enabled": true,
       "internal": false,
-      "gulpTask": "clear-shared-state-scope",
+      "task": "clearSharedStateScopeWrapper",
+      "taskName": "clear-shared-state-scope",
       "availableOnOs": ["all"]
     },
     "21. export-shared-state-scope": {
@@ -181,7 +187,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "export-shared-state-scope",
+      "task": "exportSharedStateScopeWrapper",
+      "taskName": "export-shared-state-scope",
       "availableOnOs": ["all"]
     },
     "22. import-shared-state-scope": {
@@ -189,7 +196,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "import-shared-state-scope",
+      "task": "importSharedStateScopeWrapper",
+      "taskName": "import-shared-state-scope",
       "availableOnOs": ["all"]
     },
     "23. watch-shared-state-scope": {
@@ -197,28 +205,41 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "watch-shared-state-scope",
+      "task": "watchSharedStateScopeMainWrapper",
+      "taskName": "watch-shared-state-scope",
+      "availableOnOs": ["all"]
+    },
+    "watch-shared-state-scope-do": {
+      "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
+      "NOTE": "LEAVE THIS ONE DISBLED SO IT DOES NOT SHOW UP IN THE LIST",
+      "enabled": false,
+      "internal": true,
+      "task": "watchSharedStateScopeWrapper",
+      "taskName": "watch-shared-state-scope-do",
       "availableOnOs": ["all"]
     },
     "24. create-multiple-property-file": {
       "description": "Creating an initial property file to manage multiple cloud starters and environments.",
       "enabled": true,
       "internal": false,
-      "gulpTask": "create-multiple-property-file",
+      "task": "createMultiplePropertyFileWrapper",
+      "taskName": "create-multiple-property-file",
       "availableOnOs": ["all"]
     },
     "25. replace-string-in-file": {
       "description": "Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties",
       "enabled": true,
       "internal": false,
-      "gulpTask": "replace-string-in-file",
+      "task": "replaceStringInFileWrapper",
+      "taskName": "replace-string-in-file",
       "availableOnOs": ["all"]
     },
     "26. delete-cloud-starter": {
       "description": "Delete a LiveApps WebApp",
       "enabled": true,
       "internal": false,
-      "gulpTask": "delete-cloud-starter",
+      "task": "deleteApp",
+      "taskName": "delete-cloud-starter",
       "availableOnOs": ["all"]
     },
     "27. show-live-apps-cases": {
@@ -226,7 +247,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-live-apps-cases",
+      "task": "showLiveAppsWrapper",
+      "taskName": "show-live-apps-cases",
       "availableOnOs": ["all"]
     },
     "28. export-live-apps-case-type": {
@@ -234,56 +256,64 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "export-live-apps-case-type",
+      "task": "exportLiveAppsCaseTypeWrapper",
+      "taskName": "export-live-apps-case-type",
       "availableOnOs": ["all"]
     },
     "29. export-live-apps-cases": {
       "description": "Export Data from Live Apps",
       "enabled": true,
       "internal": false,
-      "gulpTask": "export-live-apps-cases",
+      "task": "exportLiveAppsDataWrapper",
+      "taskName": "export-live-apps-cases",
       "availableOnOs": ["all"]
     },
     "30. generate-live-apps-import-configuration": {
       "description": "Generate the Live Apps Import configuration file",
       "enabled": true,
       "internal": false,
-      "gulpTask": "generate-live-apps-import-configuration",
+      "task": "generateLiveAppsImportConfiguration",
+      "taskName": "generate-live-apps-import-configuration",
       "availableOnOs": ["all"]
     },
     "31. import-live-apps-cases": {
       "description": "Import Cases to Live Apps",
       "enabled": true,
       "internal": false,
-      "gulpTask": "import-live-apps-cases",
+      "task": "importLiveAppsDataWrapper",
+      "taskName": "import-live-apps-cases",
       "availableOnOs": ["all"]
     },
     "csv-to-json-live-apps-data": {
       "description": "Convert CSV to JSON for LiveApps data",
       "enabled": false,
       "internal": false,
-      "gulpTask": "csv-to-json-liveapps-data",
+      "task": "csvToJsonLiveAppsDataWrapper",
+      "taskName": "csv-to-json-liveapps-data",
       "availableOnOs": ["all"]
     },
     "json-to-csv-liveapps-data": {
       "description": "Convert JSON to CSV for LiveApps data",
       "enabled": false,
       "internal": false,
-      "gulpTask": "json-to-csv-liveapps-data",
+      "task": "jsonToCsvLiveAppsDataWrapper",
+      "taskName": "json-to-csv-liveapps-data",
       "availableOnOs": ["all"]
     },
     "32. generate-cloud-descriptor": {
       "description": "Generates the configured Public Cloud Descriptor",
       "enabled": true,
       "internal": false,
-      "gulpTask": "generate-cloud-descriptor",
+      "task": "generateCloudDescriptorWrapper",
+      "taskName": "generate-cloud-descriptor",
       "availableOnOs": ["all"]
     },
     "33. update-cloud-packages": {
       "description": "Updates the NPM packges in the @tibco-tcstk scope in your project.",
       "enabled": true,
       "internal": false,
-      "gulpTask": "update-cloud-packages",
+      "task": "updateCloudPackagesWrapper",
+      "taskName": "update-cloud-packages",
       "availableOnOs": ["all"]
     },
     "34. show-tci-apps": {
@@ -291,7 +321,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-tci-apps",
+      "task": "showTCIWrapper",
+      "taskName": "show-tci-apps",
       "availableOnOs": ["all"]
     },
     "35. monitor-tci-app": {
@@ -299,7 +330,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "monitor-tci-app",
+      "task": "monitorTCIWrapper",
+      "taskName": "monitor-tci-app",
       "availableOnOs": ["all"]
     },
     "36. describe-cloud": {
@@ -307,7 +339,8 @@
       "enabled": false,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "describe-cloud",
+      "task": "showCloud",
+      "taskName": "describe-cloud",
       "availableOnOs": ["all"]
     },
     "37. show-oauth-tokens": {
@@ -315,7 +348,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-oauth-tokens",
+      "task": "showOauthTokenWrapper",
+      "taskName": "show-oauth-tokens",
       "availableOnOs": ["all"]
     },
     "38. generate-oauth-token": {
@@ -323,14 +357,16 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "generate-oauth-token",
+      "task": "generateOauthTokenWrapper",
+      "taskName": "generate-oauth-token",
       "availableOnOs": ["all"]
     },
     "39. revoke-oauth-token": {
       "description": "Revokes an existing OAUTH token.",
       "enabled": true,
       "internal": false,
-      "gulpTask": "revoke-oauth-token",
+      "task": "revokeOauthTokenWrapper",
+      "taskName": "revoke-oauth-token",
       "availableOnOs": ["all"]
     },
     "40. rotate-oauth-token": {
@@ -338,7 +374,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "rotate-oauth-token",
+      "task": "rotateOauthTokenWrapper",
+      "taskName": "rotate-oauth-token",
       "availableOnOs": ["all"]
     },
     "41. validate-and-rotate-oauth-token": {
@@ -346,7 +383,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "validate-and-rotate-oauth-token",
+      "task": "validateAndRotateOauthTokenWrapper",
+      "taskName": "validate-and-rotate-oauth-token",
       "availableOnOs": ["all"]
     },
     "42. generate-cloud-property-files": {
@@ -354,7 +392,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "generate-cloud-property-files",
+      "task": "generateCloudPropertyFilesWrapper",
+      "taskName": "generate-cloud-property-files",
       "availableOnOs": ["all"]
     },
     "43. show-org-folders": {
@@ -362,7 +401,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-org-folders",
+      "task": "showOrgFoldersWrapper",
+      "taskName": "show-org-folders",
       "availableOnOs": ["all"]
     },
     "44. export-org-folder": {
@@ -370,7 +410,8 @@
       "enabled": false,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "export-org-folder",
+      "task": "exportOrgFolderWrapper",
+      "taskName": "export-org-folder",
       "availableOnOs": ["all"]
     },
     "45. import-org-folder": {
@@ -378,7 +419,8 @@
       "enabled": false,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "import-org-folder",
+      "task": "importOrgFolderWrapper",
+      "taskName": "import-org-folder",
       "availableOnOs": ["all"]
     },
     "46. watch-org-folder": {
@@ -386,7 +428,8 @@
       "enabled": false,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "watch-org-folder",
+      "task": "watchOrgFolderWrapper",
+      "taskName": "watch-org-folder",
       "availableOnOs": ["all"]
     },
     "47. show-live-apps-groups": {
@@ -394,7 +437,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-live-apps-groups",
+      "task": "showLiveAppsGroupsWrapper",
+      "taskName": "show-live-apps-groups",
       "availableOnOs": ["all"]
     },
     "48. create-live-apps-group": {
@@ -402,7 +446,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "create-live-apps-group",
+      "task": "createLiveAppsGroupWrapper",
+      "taskName": "create-live-apps-group",
       "availableOnOs": ["all"]
     },
     "49. show-live-apps-users": {
@@ -410,7 +455,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "show-live-apps-users",
+      "task": "showLiveAppsUsersWrapper",
+      "taskName": "show-live-apps-users",
       "availableOnOs": ["all"]
     },
     "50. add-user-to-group": {
@@ -418,7 +464,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "gulpTask": "add-user-to-group",
+      "task": "addUserToGroupWrapper",
+      "taskName": "add-user-to-group",
       "availableOnOs": ["all"]
     },
     "51. validate": {
@@ -426,7 +473,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "validate",
+      "task": "validateWrapper",
+      "taskName": "validate",
       "availableOnOs": ["all"]
     },
     "52. add-or-update-property": {
@@ -434,7 +482,8 @@
       "enabled": true,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "add-or-update-property",
+      "task": "updatePropertyWrapper",
+      "taskName": "add-or-update-property",
       "availableOnOs": ["all"]
     },
     "show-spotfire-reports": {
@@ -442,42 +491,45 @@
       "enabled": false,
       "internal": false,
       "multipleInteraction": false,
-      "gulpTask": "show-spotfire-reports",
+      "task": "showSpotfireReportsWrapper",
+      "taskName": "show-spotfire-reports",
       "availableOnOs": ["all"]
     },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,
       "internal": false,
-      "gulpTask": "update-tcli",
+      "task": "updateTCLIwrapper",
+      "taskName": "update-tcli",
       "availableOnOs": ["all"]
     },
     "q": {
       "description": "Quit the console",
       "enabled": true,
       "internal": true,
-      "gulpTask": "",
+      "taskName": "",
       "availableOnOs": ["all"]
     },
     "exit": {
       "description": "Quit the console",
       "enabled": true,
       "internal": false,
-      "gulpTask": "",
+      "taskName": "",
       "availableOnOs": ["all"]
     },
     "quit": {
       "description": "Quit the console",
       "enabled": true,
       "internal": true,
-      "gulpTask": "",
+      "taskName": "",
       "availableOnOs": ["all"]
     },
     "help": {
       "description": "Display's help message",
       "enabled": true,
       "internal": false,
-      "gulpTask": "help-tcli",
+      "task": "helptcli",
+      "taskName": "help-tcli",
       "availableOnOs": ["all"]
     },
     "repeat-last-task": {
@@ -485,7 +537,7 @@
       "description": "Repeats the last executed task",
       "enabled": true,
       "internal": true,
-      "gulpTask": "repeat-last-task",
+      "taskName": "repeat-last-task",
       "availableOnOs": ["all"]
     }
   }

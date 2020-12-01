@@ -18,4 +18,4 @@ console.log("\x1b[92m      T:::::::::T                CCC::::::::::::C     L::::
 console.log("\x1b[92m      TTTTTTTTTTT                   CCCCCCCCCCCCC     LLLLLLLLLLLLLLLLLLLLLLLL     IIIIIIIIII");
 console.log("\x1b[92m----------------------------------------------------------------------------------------------");
 console.log('\x1b[92m  BY TIBCO LABS - VERSION: ' + version);
-console.log("\x1b[92m----------------------------------------------------------------------------------------------\033[0m");
+console.log("\x1b[92m----------------------------------------------------------------------------------------------\x1b[0m");

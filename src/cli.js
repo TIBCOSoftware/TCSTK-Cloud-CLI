@@ -1,5 +1,7 @@
 'use strict';
 // File to manage the CLI Interaction
+import {createMultiplePropertyFileWrapper, manageGlobalConfig, newStarter} from "./manage-application";
+
 require('./build/common-functions');
 import arg from 'arg';
 
@@ -154,6 +156,7 @@ export async function cli(args) {
 
 
     var projectManagementMode = true;
+
     if (!(options.doMultiple || options.doMultipleInteraction)) {
         if (options.task == 'new' || options.task == 'new-starter') {
             options.task = 'new-starter';
@@ -199,7 +202,7 @@ export async function cli(args) {
                                 log('INFO', 'No Package.json file found...');
                             }
                         } catch (e) {
-                            console.log(e)
+                            log(ERROR, e);
                         }
                         //Add used template to property file
                         if (options.template) {
@@ -207,18 +210,24 @@ export async function cli(args) {
                         }
                         break;
                     case tMultiple:
-                        options.task = 'create-multiple-property-file';
-                        projectManagementMode = false;
+                        // options.task = 'create-multiple-property-file';
+                        await require('./manage-application').createMultiplePropertyFileWrapper();
+                        process.exit();
+                        // projectManagementMode = false;
                         break;
                     case tManageG:
-                        options.task = 'manage-global-config';
-                        projectManagementMode = false;
+                        //options.task = 'manage-global-config';
+                        await require('./manage-application').manageGlobalConfig();
+                        process.exit();
+                        // projectManagementMode = false;
                         break;
                     case tCreate:
-                        console.log('Creating new Cloud starter...');
+                        log(INFO, 'Creating new Cloud starter...');
                         // Use different Gulp file to create a new cloud starter
-                        options.task = 'new-starter';
-                        projectManagementMode = false;
+                        await require('./manage-application').newStarter();
+                        process.exit();
+                        // options.task = 'new-starter';
+                        // projectManagementMode = false;
                         break;
                     default:
                         console.log('\x1b[36m%s\x1b[0m', "Ok I won't do anything :-(  ...");
@@ -237,8 +246,8 @@ export async function cli(args) {
         // Start the specified Gulp Task
         if (projectManagementMode) {
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Project');
-            require('./manage-project');
-            // TODO: HIER VERDER Only run this for task defined in gulp
+            require('./tasks');
+
 
             if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Project');
         } else {
@@ -252,7 +261,7 @@ export async function cli(args) {
             //  initGulp();
             // gulp.series('default')();
             displayOpeningMessage();
-            await mainT();
+            await require('./tasks').mainT();
         } else {
             // console.log('TASK: ' + options.task);
             if (options.task == 'help') {
@@ -265,14 +274,13 @@ export async function cli(args) {
             let taskExist = false;
             let directTask = false;
             let directTaskMethod = '';
-            let directTaskFile = '';
             for (var cliTask of taskArray) {
                 if (cliTask == options.task) {
                     taskExist = true;
                 }
             }
             for (var cliTask in cTsks) {
-                if (cTsks[cliTask].gulpTask == options.task) {
+                if (cTsks[cliTask].taskName == options.task) {
                     taskExist = true;
                     if (cTsks[cliTask].task) {
                         directTask = true;
@@ -280,26 +288,30 @@ export async function cli(args) {
                         directTaskMethod = cTsks[cliTask].task;
                     }
                 }
-                // console.log(cTsks[cliTask].gulpTask);
-                taskArray.push(cTsks[cliTask].gulpTask);
+                // console.log(cTsks[cliTask].taskName);
+                taskArray.push(cTsks[cliTask].taskName);
             }
             if (!taskExist) {
                 log(ERROR, 'TASK: ' + options.task + ' does not exist...');
-                var stringSimilarity = require('string-similarity');
-                var matches = stringSimilarity.findBestMatch(options.task, taskArray);
+                const stringSimilarity = require('string-similarity');
+                const matches = stringSimilarity.findBestMatch(options.task, taskArray);
                 log(INFO, 'Did you mean ? \x1b[34m' + taskArray[matches.bestMatchIndex]);
             } else {
                 if (directTask) {
                     //require(__dirname + directTaskFile);
-                    global[directTaskMethod]();
+                    console.log('calling: ' + directTaskMethod);
+                    const tasks = require('./tasks');
+                    tasks[directTaskMethod]();
                 } else {
+                    log(ERROR, 'No Implementation Task found for ' + options.task);
+                    /*
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Gulp');
                     const gulp = require('gulp');
                     if (projectManagementMode) {
                         initGulp();
                     }
                     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Gulp');
-                    gulp.series(options.task)();
+                    gulp.series(options.task)();*/
                 }
             }
         }

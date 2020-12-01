@@ -3,11 +3,6 @@ const cloudConfig = require('../config/config-cloud.json');
 const clURI = cloudConfig.endpoints;
 const mappings = cloudConfig.mappings;
 
-// Clean temp folder
-cleanTemp = function () {
-    log(INFO, 'Cleaning Temp Directory: ' + getProp('Workspace_TMPFolder'));
-    return deleteFolder(getProp('Workspace_TMPFolder'));
-}
 
 // Function that determines which cloud login method to use
 // function to login to the cloud
@@ -191,7 +186,7 @@ generateCloudDescriptor = function () {
     // Get the version from the JSON File
     const workdir = process.cwd();
     const path = require('path');
-    const packageJson = workdir + path.sep +'package.json';
+    const packageJson = workdir + path.sep + 'package.json';
     console.log('Package JSON file: ' + packageJson);
     if (doesFileExist(packageJson)) {
         let now = "";
@@ -487,13 +482,6 @@ getSharedState = function (showTable) {
     return sState;
 }
 
-// Display the shared state entries to a user
-showSharedState = function () {
-    return new Promise(function (resolve, reject) {
-        getSharedState(true);
-        resolve();
-    });
-};
 
 selectSharedState = async function (sharedStateEntries, question) {
     // console.log('Shared State Entries: ' , sharedStateEntries);
@@ -514,40 +502,6 @@ selectSharedState = async function (sharedStateEntries, question) {
 }
 
 
-// Display the details of a shared state
-showSharedStateDetails = function () {
-    return new Promise(async function (resolve, reject) {
-        // Show Shared State list
-        const sStateList = getSharedState(true);
-        if (sStateList.length > 0) {
-            // Pick Item from the list
-            let selectedState = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
-            // Show details on the item
-            log(INFO, 'CONTEXT:' + selectedState.name + ' (' + selectedState.id + ')\n', selectedState, '\n------------------------------');
-            log(INFO, 'JSON CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')\n', JSON.parse(selectedState.content.json), '\n------------------------------');
-
-            // Show Details:  /states/{id}
-            // TODO: Think about:
-
-            // Show Links From
-            // Show Links To
-
-            // Show Attributes
-            // Show Attribute Details
-
-            // Get Roles
-            // Show Role Details
-
-            // Show State Links
-            // Show State Link Details
-        } else {
-            log(ERROR, 'No Shared States available to show details of in the scope: ' + getProp('Shared_State_Scope'))
-        }
-
-        resolve();
-    });
-};
-
 deleteSharedState = function (sharedStateID) {
     const response = callURL(sharedStateURL + '/' + sharedStateID, 'DEL');
     let ok = true;
@@ -562,125 +516,148 @@ deleteSharedState = function (sharedStateID) {
     }
 }
 
+// Display the details of a shared state
+showSharedStateDetails = async function () {
+    // Show Shared State list
+    const sStateList = getSharedState(true);
+    if (sStateList.length > 0) {
+        // Pick Item from the list
+        let selectedState = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
+        // Show details on the item
+        log(INFO, 'CONTEXT:' + selectedState.name + ' (' + selectedState.id + ')\n', selectedState, '\n------------------------------');
+        log(INFO, 'JSON CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')\n', JSON.parse(selectedState.content.json), '\n------------------------------');
+
+        // Show Details:  /states/{id}
+        // TODO: Think about:
+
+        // Show Links From
+        // Show Links To
+
+        // Show Attributes
+        // Show Attribute Details
+
+        // Get Roles
+        // Show Role Details
+
+        // Show State Links
+        // Show State Link Details
+    } else {
+        log(ERROR, 'No Shared States available to show details of in the scope: ' + getProp('Shared_State_Scope'))
+    }
+};
+
+
 // Removes a Shared State Entry
-removeSharedStateEntry = function () {
-    return new Promise(async function (resolve, reject) {
-        // Show Shared State list
-        const sStateList = getSharedState(true);
-        if (sStateList.length > 0) {
-            // Pick Item from the list
-            let selectedState = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
-            log(INFO, 'Removing Shared State: ' + selectedState.name + ' (' + selectedState.id + ')');
-            // Ask if you really want to delete the selected shared state entry
-            let decision = 'YES';
-            if (DO_SHARED_STATE_DOUBLE_CHECK) {
-                decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
-            }
-            // Remove shared state entry
-            if (decision == 'YES') {
-                deleteSharedState(selectedState.id);
-            } else {
-                log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
-            }
-        } else {
-            log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
+removeSharedStateEntry = async function () {
+    // Show Shared State list
+    const sStateList = getSharedState(true);
+    if (sStateList.length > 0) {
+        // Pick Item from the list
+        let selectedState = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
+        log(INFO, 'Removing Shared State: ' + selectedState.name + ' (' + selectedState.id + ')');
+        // Ask if you really want to delete the selected shared state entry
+        let decision = 'YES';
+        if (DO_SHARED_STATE_DOUBLE_CHECK) {
+            decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
         }
-        resolve();
-    });
+        // Remove shared state entry
+        if (decision == 'YES') {
+            deleteSharedState(selectedState.id);
+        } else {
+            log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
+        }
+    } else {
+        log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
+    }
 };
 
 // Removes a Shared State Scope
-clearSharedStateScope = function () {
-    return new Promise(async function (resolve, reject) {
-        // Show Shared State list
-        const sStateList = getSharedState(true);
-        if (sStateList.length > 0) {
-            // Ask if you really want to delete this shared state scope
-            let decision = 'YES';
+clearSharedStateScope = async function () {
+    // Show Shared State list
+    const sStateList = getSharedState(true);
+    if (sStateList.length > 0) {
+        // Ask if you really want to delete this shared state scope
+        let decision = 'YES';
 
-            if (DO_SHARED_STATE_DOUBLE_CHECK) {
-                decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: ' + getProp('Shared_State_Scope') + ') ?', ['YES', 'NO']);
+        if (DO_SHARED_STATE_DOUBLE_CHECK) {
+            decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: ' + getProp('Shared_State_Scope') + ') ?', ['YES', 'NO']);
+        }
+        // If the scope is set to * then really double check...
+        if (getProp('Shared_State_Scope') == '*') {
+            decision = 'NO';
+            const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
+            if (secondDecision == 'YES') {
+                decision = 'YES';
             }
-            // If the scope is set to * then really double check...
-            if (getProp('Shared_State_Scope') == '*') {
-                decision = 'NO';
-                const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
-                if (secondDecision == 'YES') {
-                    decision = 'YES';
-                }
-            }
-            // Remove shared state entries
-            if (decision == 'YES') {
-                for (sStateToDelete of sStateList) {
-                    // Remove entries one by one
-                    log(INFO, 'REMOVING SHARED STATE - NAME: ' + sStateToDelete.name + ' ID: ' + sStateToDelete.id);
-                    deleteSharedState(sStateToDelete.id);
-                }
-            } else {
-                log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
+        }
+        // Remove shared state entries
+        if (decision == 'YES') {
+            for (sStateToDelete of sStateList) {
+                // Remove entries one by one
+                log(INFO, 'REMOVING SHARED STATE - NAME: ' + sStateToDelete.name + ' ID: ' + sStateToDelete.id);
+                deleteSharedState(sStateToDelete.id);
             }
         } else {
-            log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
+            log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
         }
-        resolve();
-    });
+    } else {
+        log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
+    }
 };
 
 
 // Export the Shared state scope to a folder
-exportSharedStateScope = function () {
-    return new Promise(async function (resolve, reject) {
-        // Show Shared State List
-        let sharedStateEntries = getSharedState(true);
-        let decision = 'YES';
-        if (DO_SHARED_STATE_DOUBLE_CHECK) {
-            decision = await askMultipleChoiceQuestion('Are you sure you want to export all the states above ?', ['YES', 'NO']);
-        }
-        if (decision == 'YES') {
-            // Check if folder exist
-            let ssExportFolder = SHARED_STATE_FOLDER;
-            // TODO: think about setting up a structure with the organization (so that import get it directly from the right org)
-            mkdirIfNotExist(ssExportFolder);
-            mkdirIfNotExist(ssExportFolder + 'CONTENT/');
-            // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
-            const storeOptions = {spaces: 2, EOL: '\r\n'};
-            for (let sSEntry of sharedStateEntries) {
-                let writeContentSeparate = false;
-                let contentObject = {};
-                let contextFileName = ssExportFolder + sSEntry.name + '.json';
-                let contentFileName = ssExportFolder + 'CONTENT/' + sSEntry.name + '.CONTENT.json';
-                if (sSEntry.content != null) {
-                    if (sSEntry.content.json != null) {
-                        try {
-                            // Get the details for every shared state entry
-                            contentObject = JSON.parse(sSEntry.content.json);
-                            sSEntry.content.json = {'FILESTORE': contentFileName};
-                            writeContentSeparate = true;
-                            // And store them in a file / folder
-                            require('jsonfile').writeFileSync(contentFileName, contentObject, storeOptions);
-                            log(INFO, '[STORED CONTENT]: ' + contentFileName);
-                        } catch (e) {
-                            log(ERROR, 'Parse Error on: ' + sSEntry.name + 'Writing directly...');
-                        }
+exportSharedStateScope = async function () {
+    // Show Shared State List
+    let sharedStateEntries = getSharedState(true);
+    let decision = 'YES';
+    if (DO_SHARED_STATE_DOUBLE_CHECK) {
+        decision = await askMultipleChoiceQuestion('Are you sure you want to export all the states above ?', ['YES', 'NO']);
+    }
+    if (decision == 'YES') {
+        // Check if folder exist
+        let ssExportFolder = SHARED_STATE_FOLDER;
+        // TODO: think about setting up a structure with the organization (so that import get it directly from the right org)
+        mkdirIfNotExist(ssExportFolder);
+        mkdirIfNotExist(ssExportFolder + 'CONTENT/');
+        // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
+        const storeOptions = {spaces: 2, EOL: '\r\n'};
+        for (let sSEntry of sharedStateEntries) {
+            let writeContentSeparate = false;
+            let contentObject = {};
+            let contextFileName = ssExportFolder + sSEntry.name + '.json';
+            let contentFileName = ssExportFolder + 'CONTENT/' + sSEntry.name + '.CONTENT.json';
+            if (sSEntry.content != null) {
+                if (sSEntry.content.json != null) {
+                    try {
+                        // Get the details for every shared state entry
+                        contentObject = JSON.parse(sSEntry.content.json);
+                        sSEntry.content.json = {'FILESTORE': contentFileName};
+                        writeContentSeparate = true;
+                        // And store them in a file / folder
+                        require('jsonfile').writeFileSync(contentFileName, contentObject, storeOptions);
+                        log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                    } catch (e) {
+                        log(ERROR, 'Parse Error on: ' + sSEntry.name + 'Writing directly...');
                     }
                 }
-                require('jsonfile').writeFileSync(ssExportFolder + sSEntry.name + '.json', sSEntry, storeOptions);
-                log(INFO, '[STORED CONTEXT]: ' + contextFileName);
-                if (!writeContentSeparate) {
-                    log(ERROR, 'Stored all in: ' + contextFileName)
-                }
             }
-        } else {
-            log(INFO, 'Don\'t worry I have not exported anything :-) ... ');
+            require('jsonfile').writeFileSync(ssExportFolder + sSEntry.name + '.json', sSEntry, storeOptions);
+            log(INFO, '[STORED CONTEXT]: ' + contextFileName);
+            if (!writeContentSeparate) {
+                log(ERROR, 'Stored all in: ' + contextFileName)
+            }
         }
-        resolve();
-    });
+    } else {
+        log(INFO, 'Don\'t worry I have not exported anything :-) ... ');
+    }
 };
 
 // Load shared state contents from a file
 importSharedStateFile = function (ssFile) {
     prepSharedStateProps();
     log(DEBUG, 'Importing: ' + ssFile);
+    const fs = require('fs');
     var contentContextFile = fs.readFileSync(ssFile);
     var ssObject = {};
     try {
@@ -726,51 +703,47 @@ putSharedState = function (sharedStateObject) {
 }
 
 // Import the Shared state scope from a folder
-importSharedStateScope = function () {
-    return new Promise(async function (resolve, reject) {
-            prepSharedStateProps();
-            //console.log('ORG: ', getOrganization());
-            let importOptions = [];
-            // Go Over Shared State files
-            var states = {};
-            let it = 1;
-            fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
-                if (file != 'CONTENT') {
-                    importOptions.push(file);
-                    var sTemp = {};
-                    var appN = it;
-                    sTemp['FILE'] = file;
-                    states[appN] = sTemp;
-                    it++;
-                }
-            });
-            if (importOptions.length > 0) {
-                log(INFO, 'Shared states found in: ' + SHARED_STATE_FOLDER);
-                console.table(states);
-                importOptions.unshift('ALL SHARED STATES');
-                // Provide the option to select one or upload all
-                let answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions);
-                if (answer == 'ALL SHARED STATES') {
-                    // Import all shared states
-                    for (curState of importOptions) {
-                        if (curState != 'ALL SHARED STATES') {
-                            // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
-                            putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
-                        }
-                    }
-                } else {
-                    putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + answer));
-                }
-            } else {
-                log(ERROR, 'No Shared States found for import in: ' + SHARED_STATE_FOLDER);
-            }
-            // TODO: Check which shared states will be overwritten
-            // Provide a summary to the user
-            // Ask if you are sure to import the shared state ?
-            // Upload the shared states one by one
-            resolve();
+importSharedStateScope = async function () {
+    prepSharedStateProps();
+    //console.log('ORG: ', getOrganization());
+    let importOptions = [];
+    // Go Over Shared State files
+    var states = {};
+    let it = 1;
+    fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
+        if (file != 'CONTENT') {
+            importOptions.push(file);
+            var sTemp = {};
+            var appN = it;
+            sTemp['FILE'] = file;
+            states[appN] = sTemp;
+            it++;
         }
-    );
+    });
+    if (importOptions.length > 0) {
+        log(INFO, 'Shared states found in: ' + SHARED_STATE_FOLDER);
+        console.table(states);
+        importOptions.unshift('ALL SHARED STATES');
+        // Provide the option to select one or upload all
+        let answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions);
+        if (answer == 'ALL SHARED STATES') {
+            // Import all shared states
+            for (curState of importOptions) {
+                if (curState != 'ALL SHARED STATES') {
+                    // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
+                    putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
+                }
+            }
+        } else {
+            putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + answer));
+        }
+    } else {
+        log(ERROR, 'No Shared States found for import in: ' + SHARED_STATE_FOLDER);
+    }
+    // TODO: Check which shared states will be overwritten
+    // Provide a summary to the user
+    // Ask if you are sure to import the shared state ?
+    // Upload the shared states one by one
 };
 
 //wrapper function around the watcher on shared state
@@ -1447,15 +1420,12 @@ jsonToCsvLiveAppsData = function () {
 
 // Get the TIBCO Cloud Starter Development Kit from GIT
 getGit = function (source, target, tag) {
-    const git = require('gulp-git');
+    // const git = require('gulp-git');
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
-    // git clone --branch bp-baseV1 https://github.com/TIBCOSoftware/TCSDK-Angular
-    if (tag == 'LATEST') {
-        return git.clone(source, {args: target}, function (err) {
-        });
+    if (tag == null || tag == 'LATEST' || tag == '') {
+        run('git clone "' + source + '" "' + target + '" ');
     } else {
-        return git.clone(source, {args: '--branch ' + tag + ' ' + target}, function (err) {
-        });
+        run('git clone "' + source + '" "' + target + '" -b ' + tag);
     }
 }
 
