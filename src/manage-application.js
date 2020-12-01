@@ -7,41 +7,29 @@ const isWindows = process.platform == 'win32';
 // Funcation called from the cli to pick up info and call the create starter
 export async function newStarter() {
     log(INFO, 'Creating New Starter...');
-    // console.log(configApp);
-
-    for (var key in configApp.templates) {
+    for (let key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
-            // console.log(key + " -> " + configApp.templates[key]);
             if (configApp.templates[key].enabled) {
                 templatesToUse.push(configApp.templates[key].displayName);
             }
         }
     }
-    // console.log(process.argv);
-    var starterName = '';
-    var starterTemplate = '';
+    let starterName = '';
+    let starterTemplate = '';
     let doStart = true;
     for (let arg in process.argv) {
-        // console.log(process.argv[arg]);
         if (process.argv[arg] == 'new') {
             if (process.argv.length - 1 > arg) {
-                var temp = parseInt(arg) + 1;
-                // console.log('Name: ('+arg+')('+temp+') ' +
-                // process.argv[temp]);
+                const temp = parseInt(arg) + 1;
                 starterName = process.argv[temp];
             }
         }
         if (process.argv[arg] == '--template' || process.argv[arg] == '-t') {
             if (process.argv.length - 1 > arg) {
-                var temp = parseInt(arg) + 1;
-                // console.log('Template: ('+arg+')('+temp+') ' +
-                // process.argv[temp]);
+                const temp = parseInt(arg) + 1;
                 starterTemplate = process.argv[temp];
-
-                for (var key in configApp.templates) {
-                    // console.log('KEY: ' + key );
+                for (let key in configApp.templates) {
                     if (configApp.templates.hasOwnProperty(key)) {
-                        // console.log(key + " -> " + configApp.templates[key]);
                         if (starterTemplate == key) {
                             starterTemplate = configApp.templates[key].displayName;
                         }
@@ -61,8 +49,8 @@ export async function newStarter() {
         starterTemplate = await askMultipleChoiceQuestion('Which Template would you like to use for your cloud starter ?', templatesToUse);
     }
     log(INFO, '    Cloud Starter Name: ' + starterName);
-    var stTempJson = {};
-    for (var key in configApp.templates) {
+    let stTempJson = {};
+    for (let key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
             if (starterTemplate == configApp.templates[key].displayName) {
                 stTempJson = configApp.templates[key];
@@ -72,7 +60,7 @@ export async function newStarter() {
     }
     log(INFO, 'Cloud Starter Template: ', stTempJson.displayName);
     log(DEBUG, 'Cloud Starter Template: ', stTempJson);
-    return createNewStarter(starterName, stTempJson, doStart);
+    createNewStarter(starterName, stTempJson, doStart);
 }
 
 // Function to create a new starter, based on a template

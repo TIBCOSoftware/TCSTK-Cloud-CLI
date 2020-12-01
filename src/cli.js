@@ -134,26 +134,23 @@ export async function cli(args) {
         }
         process.exit(0);
     }
-
     // Show the version
     if (options.version) {
         console.log('TIBCO Cloud CLI Version: ' + require('../package.json').version);
         process.exit(0);
     }
-
     // Update the TCLI
     if (options.update) {
         updateTCLI();
         process.exit(0);
     }
-
-
     var projectManagementMode = true;
-
     if (!(options.doMultiple || options.doMultipleInteraction)) {
         if (options.task == 'new' || options.task == 'new-starter') {
-            options.task = 'new-starter';
-            var projectManagementMode = false;
+            // options.task = 'new-starter';
+            await require('./manage-application').newStarter();
+            process.exit();
+            // var projectManagementMode = false;
         } else {
             // Test if tibco-cloud.properties exists
             const fs = require("fs");

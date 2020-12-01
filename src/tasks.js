@@ -82,7 +82,6 @@ export async function deleteApp() {
     }
 }
 
-
 // Function to publish the cloud starter
 export async function publish() {
     await publishApp(getProp('App_Name'));
