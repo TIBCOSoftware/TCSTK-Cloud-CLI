@@ -190,7 +190,9 @@ generateCloudDescriptor = function () {
     log(INFO, 'Adding descriptor file: ' + DESCRIPTOR_FILE + ' Adding Timestamp: ' + ADD_DESCRIPTOR_TIMESTAMP);
     // Get the version from the JSON File
     const workdir = process.cwd();
-    const packageJson = workdir + '/package.json';
+    const path = require('path');
+    const packageJson = workdir + path.sep +'package.json';
+    console.log('Package JSON file: ' + packageJson);
     if (doesFileExist(packageJson)) {
         let now = "";
         let buildOn = "";

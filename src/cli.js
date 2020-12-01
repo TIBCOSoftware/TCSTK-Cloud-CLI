@@ -179,7 +179,7 @@ export async function cli(args) {
                         // if we use a global config
                         if (getGlobalConfig()) {
                             log(INFO, 'Using Global Connection Configuration...');
-                            console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
+                            // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
                         } else {
                             log(INFO, 'Using Local Connection Configuration...');
