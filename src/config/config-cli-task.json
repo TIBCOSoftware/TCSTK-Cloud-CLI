@@ -486,6 +486,15 @@
       "taskName": "add-or-update-property",
       "availableOnOs": ["all"]
     },
+    "53. messaging-show-summary": {
+      "description": "Show summary of the cloud messaging ",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "showMessagingSummaryWrapper",
+      "taskName": "messaging-show-summary",
+      "availableOnOs": ["all"]
+    },
     "show-spotfire-reports": {
       "description": "List all Spotfire Analytical Reports.",
       "enabled": false,

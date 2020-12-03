@@ -462,6 +462,11 @@ export async function schematicAddWrapper() {
     await schematicAdd();
 }
 
+export async function showMessagingSummaryWrapper() {
+    const messaging = require('./build/messaging');
+    await messaging.showSummary();
+}
+
 
 // Comes from prop file now...
 let gtasks = [];

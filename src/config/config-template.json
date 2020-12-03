@@ -11,8 +11,8 @@
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
       "PostCommands": [
-        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib",
-        "npm install --save-dev @tibco-tcstk/component-template"
+        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib --legacy-peer-deps",
+        "npm install --save-dev @tibco-tcstk/component-template --legacy-peer-deps"
       ],
       "PostCommandsWin": [],
       "replacements": [
@@ -39,8 +39,8 @@
       ],
       "gitPostCommandsWin": [],
       "PostCommands": [
-        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib",
-        "npm install --save-dev @tibco-tcstk/component-template"
+        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib --legacy-peer-deps",
+        "npm install --save-dev @tibco-tcstk/component-template --legacy-peer-deps"
       ],
       "PostCommandsWin": [],
       "replacements": [
@@ -84,8 +84,8 @@
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
       "PostCommands": [
-        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib @tibco-tcstk/tc-spotfire-lib @tibco/spotfire-wrapper",
-        "npm install --save-dev @tibco-tcstk/component-template"
+        "npm install @tibco-tcstk/tc-core-lib @tibco-tcstk/tc-forms-lib @tibco-tcstk/tc-liveapps-lib @tibco-tcstk/tc-spotfire-lib @tibco/spotfire-wrapper --legacy-peer-deps",
+        "npm install --save-dev @tibco-tcstk/component-template --legacy-peer-deps"
       ],
       "PostCommandsWin": [],
       "replacements": [

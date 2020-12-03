@@ -105,7 +105,7 @@ function createNewStarter(name, template, doStart) {
             replaceInFile(rep.from, repTo, toDir + '/**');
         }
         log(INFO, '\x1b[34mInstalling NPM packages for ' + name + '...\x1b[0m');
-        run('cd ' + name + ' && npm install');
+        run('cd ' + name + ' && npm install --legacy-peer-deps');
         run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
         // create a new tibco-cloud.properties file
         if (isWindows) {
