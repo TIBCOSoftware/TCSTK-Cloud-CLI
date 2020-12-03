@@ -8,5 +8,5 @@ if(process.argv && process.argv.length > 0){
 }
 if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'First ');
 // console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI]', '\033[0m', 'V' + require('./../package.json').version);
-require = require('esm')(module);
+require = require('esm')(module, {cache:false});
 require('../cli').cli(process.argv);
