@@ -152,7 +152,7 @@
       "description": "Update the global cloud connection configuration",
       "enabled": true,
       "internal": false,
-      "task": "update-global-config",
+      "task": "updateGlobalConfig",
       "taskName": "update-global-config",
       "availableOnOs": ["all"]
     },
