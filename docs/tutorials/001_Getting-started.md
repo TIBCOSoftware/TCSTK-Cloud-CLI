@@ -81,14 +81,6 @@ Be carefully, your angular cli should be installed with -g (for global)
 npm install -g @angular/cli
 ```
 
-
-##### 4.) Then install GULP
-Be carefully, your GULP should be installed with -g (for global)
-
-```console
-npm install gulp-cli -g
-```
-
 #### Reference websites
 
 In case, here are the references websites

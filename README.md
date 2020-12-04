@@ -5,7 +5,7 @@ Command Line Interface for creating TIBCO Cloud™ Starter Projects
 
 ### TIBCO Cloud™ CLI) Installation:
 ```
-npm install -g gulp-cli @tibco-tcstk/cloud-cli
+npm install -g @tibco-tcstk/cloud-cli
 ``` 
 
 ###TIBCO Cloud™ CLI) Usage: 
