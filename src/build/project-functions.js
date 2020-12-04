@@ -696,6 +696,7 @@ importSharedStateScope = async function () {
     // Go Over Shared State files
     var states = {};
     let it = 1;
+    const fs = require('fs');
     fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
         if (file != 'CONTENT') {
             importOptions.push(file);
