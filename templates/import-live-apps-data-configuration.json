@@ -10,6 +10,17 @@
     "data": "cases-to-import",
     "sleep": 0
   },
+  "validate-case": {
+    "process-id": "<OPTIONAL-PROCESS-ID>",
+    "applicationId": "<OPTIONAL-APPLICATION-ID>",
+    "type": "VALIDATE",
+    "validation-action_OPTIONS" : "CASE_IN_STATE,CASE_EXISTS,CASE_DOES_NOT_EXIST",
+    "validation-action" : "CASE_IN_STATE",
+    "expected-state": "<STATE-YOU-EXPECT-THE-CASE-IN>",
+    "fail-on-validation-error": true,
+    "caseref": "FROM-CREATOR",
+    "sleep": 0
+  },
   "action-cases": {
     "process-id": "<OPTIONAL-PROCESS-ID>",
     "applicationId": "<OPTIONAL-APPLICATION-ID>",

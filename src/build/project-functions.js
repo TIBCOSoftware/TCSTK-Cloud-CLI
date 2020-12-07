@@ -1297,7 +1297,10 @@ importLiveAppsData = async function () {
         log(INFO, '\x1b[33m -                    STEP: ' + stepN);
         log(INFO, '\x1b[34m -                    NAME: ' + stepConf.name);
         log(INFO, '\x1b[34m -                    TYPE: ' + stepConf.type);
-        log(INFO, '\x1b[34m -              PROCESS ID: ' + stepConf['process-id']);
+        if(stepConf.type.toString().toLowerCase() != 'validate'){
+            log(INFO, '\x1b[34m -              PROCESS ID: ' + stepConf['process-id']);
+        }
+
         log(INFO, '\x1b[34m -              SLEEP TIME: ' + stepConf['sleep']);
         stepN++;
     }
@@ -1305,13 +1308,11 @@ importLiveAppsData = async function () {
     log(INFO, '\033[0m');
 
 
-    let runImport = true;
+    let runImport = false;
     const doOverWrite = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
-    if (doOverWrite == 'NO') {
-        runImport = false;
-        log(INFO, 'OK, I won\'t do anything :-)');
+    if (doOverWrite == 'YES') {
+        runImport = true;
     }
-
 
     if (runImport) {
         for (let i = 0; i < numberOfImports; i++) {
@@ -1347,7 +1348,7 @@ importLiveAppsData = async function () {
                     //Get Case ID
                     caseRef = response.caseReference;
                 }
-                /* TODO: TEST this... */
+
                 if (stepConf.type.toString().toLowerCase() == 'action') {
                     if (stepConf.caseref) {
                         if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
@@ -1377,12 +1378,18 @@ importLiveAppsData = async function () {
                     // log(INFO, 'Response: ' , response);
 
                 }
+                if (stepConf.type.toString().toLowerCase() == 'validate') {
+                    // TODO: Hier verder; implement valiation step
+                }
+
                 if (stepConf.sleep && stepConf.sleep > 0) {
                     log(INFO, 'Sleeping for ' + stepConf.sleep + ' ms...');
                     await sleep(stepConf.sleep);
                 }
             }
         }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
     }
 }
 
