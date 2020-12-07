@@ -236,7 +236,6 @@ showAppLinkInfo = function () {
     }
 }
 
-
 // Build the zip for deployment
 buildCloudStarterZip = function (cloudStarter) {
     // Check for Build Command
@@ -2000,7 +1999,7 @@ validate = async function () {
     //console.log('Validate ',new Date());
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
     // TODO: Add; case_folder_exist,
-    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist'];
+    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist'];
     const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();
     log(INFO, 'Validating: ', valD);
     if (valD == 'property_exist' || valD == 'property_is_set' || valD == 'property_is_set_ask') {
@@ -2040,7 +2039,7 @@ validate = async function () {
     // Validate if a liveApps App exist
     if (valD == 'liveapps_app_exist') {
         const apps = showLiveApps(false, false);
-        await validationAppHelper(apps, 'LiveApps App', 'name')
+        await validationItemHelper(apps, 'LiveApps App', 'name')
     }
 
     // Validate if a liveApps Group exist
@@ -2048,35 +2047,46 @@ validate = async function () {
     if (valD == 'live_apps_group_exist') {
         const groups = getGroupsTable(false);
         // console.log(iterateTable(groups));
-
-        await validationAppHelper(iterateTable(groups), 'LiveApps Group', 'Name');
+        await validationItemHelper(iterateTable(groups), 'LiveApps Group', 'Name');
     }
 
     // Validate if a Flogo App exist
     if (valD == 'tci_app_exist') {
         const apps = showTCI(false);
-        await validationAppHelper(iterateTable(apps), 'TCI App', 'Name');
+        await validationItemHelper(iterateTable(apps), 'TCI App', 'Name');
     }
 
     // Validate if a Cloud Starter exist
     if (valD == 'cloud_starter_exist') {
         const apps = showAvailableApps(true);
         // console.log(apps);
-        await validationAppHelper(apps, 'Cloudstarter', 'name');
+        await validationItemHelper(apps, 'Cloudstarter', 'name');
+    }
+
+    // Validate if an org folder exist (and possibly contains file)
+    if (valD == 'org_folder_exist' || valD == 'org_folder_and_file_exist') {
+        const folders = await getOrgFolders(false, false);
+        // console.log(folders);
+        const chosenFolder = await validationItemHelper(iterateTable(folders), 'Org Folder', 'Name');
+        if(valD == 'org_folder_and_file_exist'){
+            const files = getOrgFolderFiles(folders,chosenFolder,false);
+            await validationItemHelper(iterateTable(files), 'Org File', 'Name');
+        }
     }
 }
 
-validationAppHelper = async function (apps, type, search) {
-    let appToValidate = await askQuestion('Which ' + type + ' would you like to validate (Use plus character to validate multiple ' + type + 's, for example: app1+app2) ?');
-    let appArray = appToValidate.split('+');
-    for (let app of appArray) {
-        let laApp = apps.find(e => e[search] == app.trim());
+validationItemHelper = async function (items, type, search) {
+    let itemsToValidate = await askQuestion('Which ' + type + ' would you like to validate (Use plus character to validate multiple ' + type + 's, for example: item1+item2) ?');
+    let itemArray = itemsToValidate.split('+');
+    for (let app of itemArray) {
+        let laApp = items.find(e => e[search] == app.trim());
         if (laApp != null) {
             validationOk(type + ' ' + colors.blue(app) + '\033[0m exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
         } else {
             validationFailed(type + ' ' + colors.blue(app) + '\033[0m does not exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
         }
     }
+    return itemsToValidate;
 }
 
 
@@ -2089,66 +2099,110 @@ validationFailed = function (message) {
     process.exit(1);
 }
 
-// Function to show org folders
-showOrgFolders = async function () {
-    let OrgFolderLocation = './LA_Organization_Folder/'
-    if (getProp('LA_Organization_Folder') != null) {
-        OrgFolderLocation = getProp('LA_Organization_Folder');
-    } else {
+let OrgFolderLocation = getProp('LA_Organization_Folder');
+// Function to get org folders
+checkOrgFolderLocation = function () {
+    if (getProp('LA_Organization_Folder') == null) {
+        const OrgFolderLocationDef = './LA_Organization_Folder/'
         log(INFO, 'No LA_Organization_Folder property found; We are adding it to: ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'LA_Organization_Folder', OrgFolderLocation, 'The location for exports and imports of the LiveApps organization folders');
+        addOrUpdateProperty(getPropFileName(), 'LA_Organization_Folder', OrgFolderLocationDef, 'The location for exports and imports of the LiveApps organization folders');
+        OrgFolderLocation = OrgFolderLocationDef;
     }
-    const getOrgFolderURL = 'https://' + getCurrentRegion() + clURI.la_org_folders + '?$top=200';
-    const oResponse = callURL(getOrgFolderURL);
-    const folderTable = createTable(oResponse, mappings.la_org_folders, false);
+}
 
-    //TODO: Perhaps allow all let chFolder = ['NONE', 'ALL']; (for export)
-    let chFolder = ['NONE'];
-    for (let fNr in folderTable) {
-        let noItems = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
-        logLine('Processing folder (' + fNr + '/' + iterateTable(folderTable).length + ')');
-        folderTable[fNr]['Number of Items'] = noItems;
-        if (noItems > 0) {
-            chFolder.push(folderTable[fNr].Name);
+getOrgFolders = function (showFolders, countItems) {
+    const folderStepSize = 200;
+    let hasMoreFolders = true;
+    let allFolders = [];
+    for (let i = 0; hasMoreFolders; i = i + folderStepSize) {
+        // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+        let skip = '';
+        if (i != 0) {
+            skip = '&$skip=' + i
+        }
+        const folderDet = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '?$top=' + folderStepSize + skip, 'GET', null, null, false);
+        if (folderDet) {
+            if (folderDet.length < folderStepSize) {
+                hasMoreFolders = false;
+            }
+            allFolders = allFolders.concat(folderDet);
+        } else {
+            hasMoreFolders = false;
         }
     }
-    pexTable(folderTable, 'live-apps-org-folders', getPEXConfig(), true);
+    const folderTable = createTable(allFolders, mappings.la_org_folders, false);
+    if (countItems) {
+        for (let fNr in folderTable) {
+            let noItems = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
+            logLine('Processing folder (' + fNr + '/' + iterateTable(folderTable).length + ')');
+            folderTable[fNr]['Number of Items'] = noItems;
+
+        }
+    }
+    pexTable(folderTable, 'live-apps-org-folders', getPEXConfig(), showFolders);
+    return folderTable;
+}
+
+
+// Function to get org folders
+getOrgFolderFiles = function (folderTable, folder, showFiles) {
+    const folderResp = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folder + '/artifacts/');
+    const folderContentTable = createTable(folderResp, mappings.la_org_folder_content, false);
+    const users = showLiveAppsUsers(false, false);
+    for (let cont in folderContentTable) {
+        for (let usr of iterateTable(users)) {
+            if (usr.Id == folderContentTable[cont]['Author']) {
+                folderContentTable[cont]['Author'] = usr['First Name'] + ' ' + usr['Last Name'];
+            }
+            if (usr.Id == folderContentTable[cont]['Modified By']) {
+                folderContentTable[cont]['Modified By'] = usr['First Name'] + ' ' + usr['Last Name'];
+            }
+        }
+
+    }
+    pexTable(folderContentTable, 'live-apps-folder-folder-content', getPEXConfig(), showFiles);
+    return folderContentTable;
+}
+
+// Funtion to download an org folder file
+downLoadOrgFolderFile = function (folder, file) {
+    checkOrgFolderLocation();
+    mkdirIfNotExist(OrgFolderLocation);
+    mkdirIfNotExist(OrgFolderLocation + '/' + folder);
+    const dataForFile = callURL('https://' + getCurrentRegion() + clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', null, null, null, true);
+    const fs = require('fs');
+    const fileName = OrgFolderLocation + '/' + folder + '/' + file;
+    fs.writeFileSync(fileName, dataForFile, 'utf8');
+    log(INFO, 'LA Orgfolder data exported: ' + fileName);
+
+}
+
+showOrgFolders = async function () {
+    const folderT = getOrgFolders(true, true);
+    let chFolder = ['NONE'];
+    // TODO: Use mapping
+    for (let fol of iterateTable(folderT)) {
+        if (fol['Number of Items'] > 0) {
+            chFolder.push(fol.Name);
+        }
+    }
     const folderDecision = await askMultipleChoiceQuestionSearch('For which folder would you like to see the contents ?', chFolder);
     if (folderDecision != 'NONE') {
-        const folderResp = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folderDecision + '/artifacts/');
-        const folderContentTable = createTable(folderResp, mappings.la_org_folder_content, false);
-        const users = showLiveAppsUsers(false, false);
-        let chContent = ['NONE'];
-        for (let cont in folderContentTable) {
-            for (let usr of iterateTable(users)) {
-                if (usr.Id == folderContentTable[cont]['Author']) {
-                    folderContentTable[cont]['Author'] = usr['First Name'] + ' ' + usr['Last Name'];
-                }
-                if (usr.Id == folderContentTable[cont]['Modified By']) {
-                    folderContentTable[cont]['Modified By'] = usr['First Name'] + ' ' + usr['Last Name'];
-                }
-            }
-            chContent.push(folderContentTable[cont]['Name']);
+        const orgFFiles = getOrgFolderFiles(folderT, folderDecision, true);
+        const chContent = ['NONE'];
+        for (let fil of iterateTable(orgFFiles)) {
+            chContent.push(fil.Name);
         }
-        pexTable(folderContentTable, 'live-apps-folder-folder-content', getPEXConfig(), true);
         const fileDecision = await askMultipleChoiceQuestionSearch('Which file would you like to download ?', chContent);
         if (fileDecision != 'NONE') {
-            mkdirIfNotExist(OrgFolderLocation);
-            mkdirIfNotExist(OrgFolderLocation + '/' + folderDecision);
-            const dataForFile = callURL('https://' + getCurrentRegion() + clURI.la_org_folder_download + '/' + folderDecision + '/' + fileDecision + '?$download=true', null, null, null, true);
-            const fs = require('fs');
-            const fileName = OrgFolderLocation + '/' + folderDecision + '/' + fileDecision;
-            fs.writeFileSync(fileName, dataForFile, 'utf8');
-            log(INFO, 'LA Orgfolder data exported: ' + fileName);
+            downLoadOrgFolderFile(folderDecision, fileDecision);
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
         }
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
-    return folderTable;
 }
-
 
 /*
 ORG FOLDERS:
