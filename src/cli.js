@@ -159,7 +159,9 @@ export async function cli(args) {
             const tManageG = 'Manage Global Cloud Connection Configuration';
             const tMultiple = 'Create New Multiple Properties file';
             const tNothing = 'Nothing';
-            if (!fs.existsSync(cwdir + dirDelimiter + propFileName) || options.createCP) {
+            //if (!fs.existsSync(cwdir + dirDelimiter + propFileName) || options.createCP) {
+            console.log('Workdir: ' + cwdir);
+            if (!fs.existsSync(propFileName) || options.createCP) {
                 var cif = tCProp;
                 if (!options.createCP) {
                     displayOpeningMessage();
