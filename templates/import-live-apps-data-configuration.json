@@ -14,10 +14,9 @@
     "process-id": "<OPTIONAL-PROCESS-ID>",
     "applicationId": "<OPTIONAL-APPLICATION-ID>",
     "type": "VALIDATE",
-    "validation-action_OPTIONS" : "CASE_IN_STATE,CASE_EXISTS,CASE_DOES_NOT_EXIST",
+    "validation-action_OPTIONS" : "CASE_IN_STATE (Note: Case_In_State, also checks if a case exists),CASE_EXIST,CASE_NOT_EXIST",
     "validation-action" : "CASE_IN_STATE",
     "expected-state": "<STATE-YOU-EXPECT-THE-CASE-IN>",
-    "fail-on-validation-error": true,
     "caseref": "FROM-CREATOR",
     "sleep": 0
   },

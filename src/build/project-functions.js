@@ -1022,6 +1022,15 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
     }
 }
 
+// Get a LiveApps Case by Reference
+getLaCaseByReference = function (caseRef) {
+    const caseData = callURL('https://' + getCurrentRegion() + clURI.la_cases + '/' + caseRef + '?$sandbox=' + getProductionSandbox(), 'GET', null, null, false, null, null, null, null, null, true);
+    if (!caseData) {
+        log(ERROR, 'Error Retrieving Case Data for ref: ', caseRef);
+    }
+    return caseData;
+}
+
 let globalProductionSandbox = null;
 getProductionSandbox = function () {
     if (!globalProductionSandbox) {
@@ -1095,7 +1104,6 @@ exportLiveAppsCaseType = async function () {
             require('jsonfile').writeFileSync(fileName, cTypes[curCase], storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
         }
-        ;
     }
 }
 
@@ -1230,13 +1238,15 @@ importLiveAppsData = async function () {
     //TODO: Check if the first step is a creator
 
     //Loop over all the data
-    if (impConf[impConf[impConf['import-steps'][0]].data].FILESTORE != null) {
-        dataForImport = require('jsonfile').readFileSync(importFolder + impConf[impConf[impConf['import-steps'][0]].data].FILESTORE)
-    } else {
-        dataForImport = impConf[impConf['import-steps'][0]].data;
+    let numberOfImports = 1;
+    if (impConf[impConf['import-steps'][0]].data) {
+        if (impConf[impConf[impConf['import-steps'][0]].data].FILESTORE != null) {
+            dataForImport = require('jsonfile').readFileSync(importFolder + impConf[impConf[impConf['import-steps'][0]].data].FILESTORE)
+        } else {
+            dataForImport = impConf[impConf['import-steps'][0]].data;
+        }
+        numberOfImports = dataForImport.length;
     }
-    const numberOfImports = dataForImport.length;
-
     const sBid = getProductionSandbox();
     let importAppName = '';
     let importAppId = '';
@@ -1279,7 +1289,6 @@ importLiveAppsData = async function () {
                 }
             }
         }
-
     }
     // console.log(impConf);
     showCloudInfo();
@@ -1297,24 +1306,24 @@ importLiveAppsData = async function () {
         log(INFO, '\x1b[33m -                    STEP: ' + stepN);
         log(INFO, '\x1b[34m -                    NAME: ' + stepConf.name);
         log(INFO, '\x1b[34m -                    TYPE: ' + stepConf.type);
-        if(stepConf.type.toString().toLowerCase() != 'validate'){
+        if (stepConf.type.toString().toLowerCase() != 'validate') {
             log(INFO, '\x1b[34m -              PROCESS ID: ' + stepConf['process-id']);
+        } else {
+            log(INFO, '\x1b[34m -       VALIDATION ACTION: ' + stepConf['validation-action']);
+            if (stepConf['validation-action'].toLowerCase() == 'case_in_state') {
+                log(INFO, '\x1b[34m -          EXPECTED STATE: ' + stepConf['expected-state']);
+            }
         }
-
-        log(INFO, '\x1b[34m -              SLEEP TIME: ' + stepConf['sleep']);
+        if (stepConf['sleep']) {
+            stepConf['sleep-min'] = +(stepConf['sleep'] / 60000).toFixed(2);
+            log(INFO, '\x1b[34m -              SLEEP TIME: ' + stepConf['sleep'] + 'ms (' + stepConf['sleep-min'] + ' Minutes)');
+        }
         stepN++;
     }
 
     log(INFO, '\033[0m');
-
-
-    let runImport = false;
-    const doOverWrite = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
-    if (doOverWrite == 'YES') {
-        runImport = true;
-    }
-
-    if (runImport) {
+    const doImport = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
+    if (doImport.toLowerCase() == 'yes') {
         for (let i = 0; i < numberOfImports; i++) {
             //Loop over all cases
             let caseRef = '';
@@ -1322,18 +1331,20 @@ importLiveAppsData = async function () {
                 const stepConf = impConf[impStep];
                 // TODO: Add option to provide process name and type and then look up the application ID an process ID
                 log(INFO, '           Step: ' + impStep);
-                log(INFO, '     Process ID: ' + stepConf['process-id']);
-                log(INFO, ' Application ID: ' + stepConf.applicationId);
                 //Option to point to file for importing data
                 let dataForImport = [];
-                //TODO: put this in seperate function
-                if (impConf[stepConf.data].FILESTORE != null) {
-                    // console.log(impConf[stepConf.data].FILESTORE);
-                    dataForImport = require('jsonfile').readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
-                } else {
-                    dataForImport = impConf[stepConf.data];
+                let dataToImport;
+                if (stepConf.type.toString().toLowerCase() != 'validate') {
+                    log(INFO, '     Process ID: ' + stepConf['process-id']);
+                    log(INFO, ' Application ID: ' + stepConf.applicationId);
+                    //TODO: put this in seperate function
+                    if (impConf[stepConf.data].FILESTORE != null) {
+                        dataForImport = require('jsonfile').readFileSync(importFolder + impConf[stepConf.data].FILESTORE)
+                    } else {
+                        dataForImport = impConf[stepConf.data];
+                    }
+                    dataToImport = dataForImport[i];
                 }
-                const dataToImport = dataForImport[i];
                 if (stepConf.type.toString().toLowerCase() == 'creator') {
                     log(INFO, 'Creating LiveApps Case (' + i + ')');
                     let postRequest = {
@@ -1342,29 +1353,30 @@ importLiveAppsData = async function () {
                         applicationId: stepConf.applicationId,
                         data: JSON.stringify(dataToImport)
                     }
-                    //console.log(postRequest);
                     const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
                     log(INFO, 'Response: ', response);
                     //Get Case ID
                     caseRef = response.caseReference;
                 }
-
                 if (stepConf.type.toString().toLowerCase() == 'action') {
-                    if (stepConf.caseref) {
-                        if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
-                            if (caseRef == '') {
-                                log(ERROR, 'Caseref to be configured from creator but no caseref is set...');
-                            }
+                    if (stepConf.caseref) { // TODO: Duplicate code, move to one function
+                        if (Number.isInteger(stepConf.caseref)) {
+                            caseRef = stepConf.caseref;
                         } else {
-                            const _F = require('lodash');
-                            caseRef = _F.get(dataToImport, stepConf.caseref);
-                            log(INFO, 'Using CaseRef: ' + caseRef);
-                            if (stepConf['delete-caseref'].toLowerCase() == 'true') {
-                                _F.unset(dataToImport, stepConf.caseref);
+                            if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
+                                if (caseRef == '') {
+                                    log(ERROR, 'Caseref to be configured from creator but no caseref is set...');
+                                }
+                            } else {
+                                const _F = require('lodash');
+                                caseRef = _F.get(dataToImport, stepConf.caseref);
+                                log(INFO, 'Using CaseRef: ' + caseRef);
+                                if (stepConf['delete-caseref'].toLowerCase() == 'true') {
+                                    _F.unset(dataToImport, stepConf.caseref);
+                                }
                             }
                         }
                     }
-                    //console.log('Data to Import:', dataToImport);
                     log(INFO, 'Actioning LiveApps Case (' + i + ') Ref ' + caseRef);
                     let postRequest = {
                         id: stepConf['process-id'],
@@ -1376,14 +1388,57 @@ importLiveAppsData = async function () {
                     }
                     const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
                     // log(INFO, 'Response: ' , response);
-
                 }
                 if (stepConf.type.toString().toLowerCase() == 'validate') {
-                    // TODO: Hier verder; implement valiation step
+                    // TODO: Add this to config: "fail-on-validation-error": true,
+                    if (stepConf.caseref) {
+                        if (Number.isInteger(stepConf.caseref)) {
+                            caseRef = stepConf.caseref;
+                        } else {
+                            if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
+                                if (caseRef == '') {
+                                    log(ERROR, 'Caseref to be configured from creator but no caseref is set...');
+                                    process.exit(1);
+                                }
+                            } else {
+                                const _F = require('lodash');
+                                caseRef = _F.get(dataToImport, stepConf.caseref);
+                                log(INFO, 'Using CaseRef for Validation: ' + caseRef);
+                                if (stepConf['delete-caseref'].toLowerCase() == 'true') {
+                                    _F.unset(dataToImport, stepConf.caseref);
+                                }
+                            }
+                        }
+                    } else {
+                        log(ERROR, 'caseref not found on ', stepConf);
+                        process.exit(1);
+                    }
+                    if (stepConf['validation-action']) {
+                        const vAction = stepConf['validation-action'].toLowerCase().trim();
+                        let actFound = false;
+                        if(vAction == 'case_exist' || vAction == 'case_not_exist'){
+                            validateLACase(caseRef.toString(), vAction);
+                            actFound = true;
+                        }
+                        if(vAction == 'case_in_state'){
+                            if (stepConf['expected-state'] != null) {
+                                validateLACaseState(caseRef.toString(), stepConf['expected-state']);
+                            } else {
+                                log(ERROR, 'expected-state not found on ', stepConf);
+                            }
+                            actFound = true;
+                        }
+                        if(!actFound){
+                            log(ERROR, 'validation-action not recognized: |', vAction + '|');
+                            process.exit(1);
+                        }
+                    } else {
+                        log(ERROR, 'validation-action not found on ', stepConf);
+                        process.exit(1);
+                    }
                 }
-
                 if (stepConf.sleep && stepConf.sleep > 0) {
-                    log(INFO, 'Sleeping for ' + stepConf.sleep + ' ms...');
+                    log(INFO, 'Sleeping for ' + stepConf.sleep + ' ms (' + stepConf['sleep-min'] + ' Minutes)...');
                     await sleep(stepConf.sleep);
                 }
             }
@@ -2006,7 +2061,7 @@ validate = async function () {
     //console.log('Validate ',new Date());
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
     // TODO: Add; case_folder_exist,
-    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist'];
+    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_Exist', 'Case_Not_Exist', 'Case_In_State'];
     const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();
     log(INFO, 'Validating: ', valD);
     if (valD == 'property_exist' || valD == 'property_is_set' || valD == 'property_is_set_ask') {
@@ -2075,12 +2130,69 @@ validate = async function () {
         const folders = await getOrgFolders(false, false);
         // console.log(folders);
         const chosenFolder = await validationItemHelper(iterateTable(folders), 'Org Folder', 'Name');
-        if(valD == 'org_folder_and_file_exist'){
-            const files = getOrgFolderFiles(folders,chosenFolder,false);
+        if (valD == 'org_folder_and_file_exist') {
+            const files = getOrgFolderFiles(folders, chosenFolder, false);
             await validationItemHelper(iterateTable(files), 'Org File', 'Name');
         }
     }
+
+    // Validate if a LiveApps Case exist or not
+    if (valD == 'case_exist' || valD == 'case_not_exist') {
+        const casesToValidate = await askQuestion('Which case reference would you like to validate (Use plus character to validate multiple case\'s, for example: caseRef1+caseRef2) ?');
+        validateLACase(casesToValidate, valD);
+    }
+
+    // Validate if a LiveApps Case is in a specific state
+    if (valD == 'case_in_state') {
+        const caseRef = await askQuestion('For which case reference would you like to validate the state ?');
+        const caseState = await askQuestion('For state would you like to validate ?');
+        validateLACaseState(caseRef, caseState)
+    }
 }
+
+// Validate the state of a case
+validateLACaseState = function (caseRefToValidate, stateToValidate) {
+    // First check if case exists
+    validateLACase(caseRefToValidate, 'case_exist');
+    const caseData = JSON.parse(getLaCaseByReference(caseRefToValidate).untaggedCasedata);
+    if (caseData.state == stateToValidate) {
+        validationOk('Case with Reference ' + colors.blue(caseRefToValidate) + '\033[0m is in the expected state ' + colors.blue(stateToValidate) + '\033[0m on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+    } else {
+        validationFailed('Case with Reference ' + colors.blue(caseRefToValidate) + '\033[0m EXISTS BUT is NOT in the expected state ' + colors.yellow(stateToValidate) + '\033[0m But in this State: ' + colors.blue(caseData.state) + '\033[0m  on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+    }
+}
+
+// Validate if case exists or not
+validateLACase = function (casesToValidate, valType) {
+    const caseRefArray = casesToValidate.split('+');
+    for (let casRef of caseRefArray) {
+        let validCase = false;
+        const caseData = getLaCaseByReference(casRef);
+        if (caseData.casedata) {
+            validCase = true;
+        } else {
+            if (caseData.errorCode == 'CM_CASEREF_NOTEXIST') {
+                validCase = false;
+            } else {
+                log(ERROR, 'Unexpected error on validating case ', caseData);
+            }
+        }
+        // console.log('Valid: ', validCase, ' casesToValidate: ', casesToValidate, ' valType: ', valType);
+        if (validCase && valType == 'case_exist') {
+            validationOk('Case with Reference ' + colors.blue(casRef) + '\033[0m exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+        }
+        if (!validCase && valType == 'case_exist') {
+            validationFailed('Case with Reference ' + colors.blue(casRef) + '\033[0m does not exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+        }
+        if (!validCase && valType == 'case_not_exist') {
+            validationOk('Case with Reference ' + colors.blue(casRef) + '\033[0m was NOT EXPECTED to exist on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+        }
+        if (validCase && valType == 'case_not_exist') {
+            validationFailed('Case with Reference ' + colors.blue(casRef) + '\033[0m was NOT EXPECTED to exist(but it DOES) on organization: ' + colors.blue(getOrganization()) + '\033[0m...');
+        }
+    }
+}
+
 
 validationItemHelper = async function (items, type, search) {
     let itemsToValidate = await askQuestion('Which ' + type + ' would you like to validate (Use plus character to validate multiple ' + type + 's, for example: item1+item2) ?');
@@ -2101,6 +2213,7 @@ validationOk = function (message) {
     log(INFO, colors.green(' [VALIDATION --OK--] \033[0m' + message))
 }
 
+// TODO: Add option to exit on validation failure
 validationFailed = function (message) {
     log(ERROR, colors.red('[VALIDATION FAILED] \033[0m' + message));
     process.exit(1);
