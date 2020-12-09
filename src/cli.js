@@ -277,11 +277,8 @@ export async function cli(args) {
                 if (directTask) {
                     const tasks = require('./tasks');
                     try {
-                        console.log('Before Task: ' + options.task);
                         await tasks[directTaskMethod]();
-                        console.log('After Task: ' + options.task);
                     } catch (err) {
-                        console.log('Error');
                         log(ERROR, 'Task ' + options.task + ' failed: ' + err.message);
                     }
                 } else {
