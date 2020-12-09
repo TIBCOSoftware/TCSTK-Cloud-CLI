@@ -599,7 +599,7 @@ run = function (command, failOnError) {
         doFail = failOnError;
     }
     const execSync = require('child_process').execSync;
-    return new Promise(function (resolve, reject) {
+    // return new Promise(function (resolve, reject) {
         log(DEBUG, 'Executing Command: ' + command);
         try {
             execSync(
@@ -613,10 +613,10 @@ run = function (command, failOnError) {
             if (doFail) {
                 process.exit(1);
             }
-            reject(err);
+            // reject(err);
         }
-        resolve();
-    })
+    // resolve();
+    // })
 }
 
 // Delete a folder

@@ -154,7 +154,7 @@ processMultipleFile = function () {
                 }
                 log(DEBUG, logT + 'Command (before replacing): ' + command);
                 command = replaceAtSign(command, currLoc + propFile);
-                log(INFO, logT + ' Command: ' + command);
+                log(INFO, logT + ' Command: ' + command + ' (Fail on Error: ' + doFailOnError + ')');
                 run(command, doFailOnError);
             }
         }
