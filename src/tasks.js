@@ -12,12 +12,12 @@ export async function showCloud() {
 }
 
 // Show all the cloud starters
-export async function showApps() {
+export function showApps() {
     showAvailableApps(true);
 }
 
 //Show all the cloud starter links
-export async function showLinks() {
+export function showLinks() {
     getAppLinks(true);
 }
 
@@ -263,12 +263,12 @@ export async function obfuscate() {
     console.log('\nObfuscated password is is: ' + obfuscatePW(password));
 }
 
-export async function viewGlobalConfig() {
+export function viewGlobalConfig() {
     displayGlobalConnectionConfig();
 }
 
 export async function updateGlobalConfig() {
-    updateGlobalConnectionConfig();
+    await updateGlobalConnectionConfig();
 }
 
 // Function to replace a string in a file
@@ -306,12 +306,12 @@ export async function createMultiplePropertyFileWrapper() {
 }
 
 // Function to show liveApps
-export async function showLiveAppsWrapper() {
+export function showLiveAppsWrapper() {
     showLiveApps(true, true);
 }
 
 // Display the shared state entries to a user
-export async function showSharedState() {
+export function showSharedState() {
     getSharedState(true);
 };
 
@@ -347,41 +347,41 @@ export async function watchSharedStateScopeWrapper() {
 
 // Function to export liveApps cases
 export async function exportLiveAppsDataWrapper() {
-    exportLiveAppsData();
+    await exportLiveAppsData();
 }
 
 export async function generateLiveAppsImportConfiguration() {
-    createLAImportFile();
+    await  createLAImportFile();
 }
 
 // Function to
 export async function importLiveAppsDataWrapper() {
-    importLiveAppsData();
+    await importLiveAppsData();
 }
 
 // Function to
 export async function csvToJsonLiveAppsDataWrapper() {
-    csvToJsonLiveAppsData();
+    await csvToJsonLiveAppsData();
 }
 
 // Function to
 export async function jsonToCsvLiveAppsDataWrapper() {
-    jsonToCsvLiveAppsData();
+    await jsonToCsvLiveAppsData();
 }
 
 export async function exportLiveAppsCaseTypeWrapper() {
-    exportLiveAppsCaseType();
+    await exportLiveAppsCaseType();
 }
 
-export async function generateCloudDescriptorWrapper() {
+export function generateCloudDescriptorWrapper() {
     generateCloudDescriptor();
 }
 
-export async function updateCloudPackagesWrapper() {
+export function updateCloudPackagesWrapper() {
     updateCloudPackages();
 }
 
-export async function showTCIWrapper() {
+export function showTCIWrapper() {
     showTCI();
 }
 
@@ -390,72 +390,72 @@ export async function monitorTCIWrapper() {
 }
 
 export async function showSpotfireReportsWrapper() {
-    showSpotfire();
+    await showSpotfire();
 }
 
 export async function generateOauthTokenWrapper() {
-    generateOauthToken();
+    await generateOauthToken();
 }
 
-export async function showOauthTokenWrapper() {
+export function showOauthTokenWrapper() {
     showOauthToken();
 }
 
 export async function revokeOauthTokenWrapper() {
-    revokeOauthToken();
+    await revokeOauthToken();
 }
 
-export async function rotateOauthTokenWrapper() {
+export function rotateOauthTokenWrapper() {
     rotateOauthToken();
 }
 
 export async function validateAndRotateOauthTokenWrapper() {
-    validateAndRotateOauthToken(false);
+    await validateAndRotateOauthToken(false);
 }
 
 export async function showOrgFoldersWrapper() {
-    showOrgFolders();
+    await showOrgFolders();
 }
 
 export async function generateCloudPropertyFilesWrapper() {
-    generateCloudPropertyFiles();
+    await generateCloudPropertyFiles();
 }
 
 export async function exportOrgFolderWrapper() {
-    exportOrgFolder();
+    await exportOrgFolder();
 }
 
 export async function importOrgFolderWrapper() {
-    importOrgFolder();
+    await importOrgFolder();
 }
 
 export async function watchOrgFolderWrapper() {
-    watchOrgFolder();
+    await watchOrgFolder();
 }
 
 export async function showLiveAppsGroupsWrapper() {
-    showLiveAppsGroups();
+    await showLiveAppsGroups();
 }
 
 export async function createLiveAppsGroupWrapper() {
-    createLiveAppsGroup();
+    await createLiveAppsGroup();
 }
 
-export async function showLiveAppsUsersWrapper() {
+export function showLiveAppsUsersWrapper() {
     showLiveAppsUsers(true, false);
 }
 
 
 export async function addUserToGroupWrapper() {
-    addUserToGroup();
+    await addUserToGroup();
 }
 
 export async function validateWrapper() {
-    validate();
+    await validate();
 }
 
 export async function updatePropertyWrapper() {
-    updateProperty();
+    await updateProperty();
 }
 
 export async function schematicAddWrapper() {

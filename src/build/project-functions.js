@@ -2040,10 +2040,10 @@ updateProperty = async function () {
                         doUpdate = false;
                     } else {
                         let laAction = laActions.find(e => e.name == laActD);
-                        if (laApp != null) {
+                        if (laAction != null) {
                             pValue = laAction.id
                         } else {
-                            log(ERROR, 'LA Action not found: ' + laAction);
+                            log(ERROR, 'LA Action not found: ' + laActD);
                             doUpdate = false;
                         }
                     }
