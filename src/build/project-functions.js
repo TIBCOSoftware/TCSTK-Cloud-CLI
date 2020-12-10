@@ -527,7 +527,7 @@ showSharedStateDetails = async function () {
         // Show State Links
         // Show State Link Details
     } else {
-        log(ERROR, 'No Shared States available to show details of in the scope: ' + getProp('Shared_State_Scope'))
+        log(WARNING, 'No Shared States available to show details of in the scope: ' + getProp('Shared_State_Scope'))
     }
 };
 
