@@ -11,7 +11,8 @@
     "la_groups": "liveapps.cloud.tibco.com/organisation/v1/groups",
     "la_users": "liveapps.cloud.tibco.com/organisation/v1/users",
     "la_user_group_mapping": "liveapps.cloud.tibco.com/organisation/v1/userGroupMappings",
-    "la_cases" : "liveapps.cloud.tibco.com/case/v1/cases"
+    "la_cases": "liveapps.cloud.tibco.com/case/v1/cases",
+    "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo"
   },
   "mappings": {
     "oauth": {
@@ -203,6 +204,31 @@
           "header": "Modified On",
           "field": "lastModifiedDate",
           "format": "DATE"
+        }
+      ]
+    },
+    "sf_reports": {
+      "entries": [
+        {
+          "header": "Type",
+          "field": "ItemType"
+        },
+        {
+          "header": "Created By",
+          "field": "CreatedByName"
+        },
+        {
+          "header": "Created On",
+          "field": "CreatedTimestamp",
+          "format": "DATE"
+        },
+        {
+          "header": "Path",
+          "field": "DisplayPath"
+        },
+        {
+          "header": "Title",
+          "field": "Title"
         }
       ]
     }

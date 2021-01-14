@@ -390,7 +390,8 @@ export async function monitorTCIWrapper() {
 }
 
 export async function showSpotfireReportsWrapper() {
-    await showSpotfire();
+    const spotfire = require('./build/spotfire');
+    await spotfire.showSpotfire();
 }
 
 export async function generateOauthTokenWrapper() {

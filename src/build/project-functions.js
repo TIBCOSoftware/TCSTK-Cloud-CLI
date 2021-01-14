@@ -10,7 +10,7 @@ let loginC = null;
 // var useOAuth = false;
 let cloudURL = getProp('Cloud_URL');
 let cloudHost = getProp('cloudHost');
-// Check if a global config exists and if it is required
+// Check if a global config exi sts and if it is required
 //TODO: Manage global config in common functions
 if (getGlobalConfig()) {
     const propsG = getGlobalConfig();
@@ -43,7 +43,7 @@ cLogin = function (tenant, customLoginURL, forceClientID) {
             var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
-                log(ERROR, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
+                log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
                 // process.exit();
             }
             if (response.selectedAccount) {
@@ -762,7 +762,7 @@ watchSharedStateScope = function () {
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
             // console.log(event, path);
             if (event == 'change') {
-                if (path.includes('/CONTENT/')) {
+                if (path.includes('CONTENT')) {
                     log(INFO, 'CONTENT File UPDATED: ' + path);
                     const contextFile = path.replace('/CONTENT/', '/').replace('.CONTENT.', '.');
                     // console.log(contextFile);
@@ -1005,6 +1005,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
             headers: header,
             payload: body
         });
+        // console.log('Response: ', response.statusCode);
     }
     if (response.body.errorMsg != null) {
         if (doErrorOutside) {
@@ -1018,6 +1019,7 @@ callURL = function (url, method, postRequest, contentType, doLog, tenant, custom
         if (reResponse) {
             return response;
         }
+        // log(INFO, '-  RESPONSE: ', response.body);
         return response.body;
     }
 }
@@ -1416,11 +1418,11 @@ importLiveAppsData = async function () {
                     if (stepConf['validation-action']) {
                         const vAction = stepConf['validation-action'].toLowerCase().trim();
                         let actFound = false;
-                        if(vAction == 'case_exist' || vAction == 'case_not_exist'){
+                        if (vAction == 'case_exist' || vAction == 'case_not_exist') {
                             validateLACase(caseRef.toString(), vAction);
                             actFound = true;
                         }
-                        if(vAction == 'case_in_state'){
+                        if (vAction == 'case_in_state') {
                             if (stepConf['expected-state'] != null) {
                                 validateLACaseState(caseRef.toString(), stepConf['expected-state']);
                             } else {
@@ -1428,7 +1430,7 @@ importLiveAppsData = async function () {
                             }
                             actFound = true;
                         }
-                        if(!actFound){
+                        if (!actFound) {
                             log(ERROR, 'validation-action not recognized: |', vAction + '|');
                             process.exit(1);
                         }
@@ -1900,6 +1902,7 @@ generateOauthToken = async function (tokenNameOverride, verbose) {
     }
     // Check for Tenants
     let OauthTenants = 'TSC+BPM';
+    //TODO: Add the following subs: TSC BPM SPOTFIRE TCE TCI TCM TCMD TCTA
     if (getProp('CloudLogin.OAUTH_Generate_For_Tenants') != null) {
         OauthTenants = getProp('CloudLogin.OAUTH_Generate_For_Tenants').replace(/,/g, "+");
     } else {
@@ -2510,14 +2513,6 @@ addUserToGroup = async function () {
 
 }
 
-// Function to show spotfire reports
-showSpotfire = function () {
-    return new Promise(async function (resolve, reject) {
-        // TODO: Implement
-        console.log('TODO: Implement');
-        resolve();
-    });
-}
 
 
 getTIBCli = function () {
