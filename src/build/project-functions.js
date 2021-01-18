@@ -762,8 +762,8 @@ watchSharedStateScope = function () {
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
             // console.log(event, path);
             if (event == 'change') {
-                // TODO: Add path type (windows / linux)
-                console.log('Platform: ', process.platform);
+                // Add path type (windows / linux)
+                // console.log('Platform: ', process.platform);
                 let pS = '/';
                 if(process.platform == 'win32') {
                     pS = '\\';

@@ -1,6 +1,6 @@
 require('./common-functions');
 
-callCloud = function (url, doLog, config) {
+function callCloud(url, doLog, config) {
     // TODO: Implement
     /*
     if(config == null){
@@ -11,3 +11,7 @@ callCloud = function (url, doLog, config) {
     return callURL(url, config.method, )
     */
 }
+
+const cloudConfig = require('../config/config-cloud.json');
+export const clURI = cloudConfig.endpoints;
+export const mappings = cloudConfig.mappings;

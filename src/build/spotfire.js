@@ -1,7 +1,5 @@
 require('./project-functions');
-const cloudConfig = require('../config/config-cloud.json');
-const clURI = cloudConfig.endpoints;
-const mappings = cloudConfig.mappings;
+const CCOM = require('./cloud-communications');
 
 // Function to show spotfire reports
 export function showSpotfire() {
@@ -13,7 +11,7 @@ export function showSpotfire() {
             "types":["spotfire.folder","spotfire.dxp","spotfire.sbdf","spotfire.mod"]
         }
 
-        const folderEndpoint = 'https://' + getCurrentRegion() + clURI.sf_reports;
+        const folderEndpoint = 'https://' + getCurrentRegion() + CCOM.clURI.sf_reports;
         const response = callURL(folderEndpoint, 'POST', request, null, false, null, null, true);
         // console.log('Response: ', response.headers);
 
@@ -43,7 +41,7 @@ export function showSpotfire() {
         // console.log(secondResponse.body);
         const sfReports = secondResponse.body;
         log(INFO, 'Current folder: ' , sfReports.CurrentFolder.DisplayName)
-        let tObject = createTable(sfReports.Children, mappings.sf_reports, false);
+        let tObject = createTable(sfReports.Children, CCOM.mappings.sf_reports, false);
         pexTable(tObject, 'spotfire-reports', getPEXConfig(), true);
 
         /*
