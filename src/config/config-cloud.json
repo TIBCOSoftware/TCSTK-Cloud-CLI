@@ -1,6 +1,15 @@
 {
   "endpoints": {
     "_note": "ALL ENDPOINTS START AFTER THE REGION",
+    "_from" : "loginURE",
+    "login": "liveapps.cloud.tibco.com/idm/v3/login-oauth",
+    "_from2": "Claims_URE",
+    "claims": "liveapps.cloud.tibco.com/organisation/claims/",
+    "from3": "appURE",
+    "app_info": "liveapps.cloud.tibco.com/webresource/v1/applications/",
+    "apps": "liveapps.cloud.tibco.com/webresource/apps/",
+    "types": "liveapps.cloud.tibco.com/case/v1/types",
+    "shared_state": "liveapps.cloud.tibco.com/clientstate/v1/states",
     "account_info": "account.cloud.tibco.com/tsc-ws/v1/my-accounts/info",
     "general_login": "account.cloud.tibco.com/idm/v3/login-oauth",
     "generate_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate",
@@ -12,6 +21,8 @@
     "la_users": "liveapps.cloud.tibco.com/organisation/v1/users",
     "la_user_group_mapping": "liveapps.cloud.tibco.com/organisation/v1/userGroupMappings",
     "la_cases": "liveapps.cloud.tibco.com/case/v1/cases",
+    "la_process": "liveapps.cloud.tibco.com/process/v1/processes",
+    "tci_apps": "integration.cloud.tibco.com/api/v1/apps",
     "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo"
   },
   "mappings": {

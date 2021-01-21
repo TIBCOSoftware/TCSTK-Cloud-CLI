@@ -1,15 +1,9 @@
 // Package Definitions
-const cloudConfig = require('../config/config-cloud.json');
-const clURI = cloudConfig.endpoints;
-const mappings = cloudConfig.mappings;
-
-
-// Function that determines which cloud login method to use
-// function to login to the cloud
-let loginC = null;
-// var useOAuth = false;
+const CCOM = require('./cloud-communications');
+//TODO: Remove these values
 let cloudURL = getProp('Cloud_URL');
 let cloudHost = getProp('cloudHost');
+
 // Check if a global config exi sts and if it is required
 //TODO: Manage global config in common functions
 if (getGlobalConfig()) {
@@ -21,126 +15,10 @@ if (getGlobalConfig()) {
         cloudHost = propsG.cloudHost;
     }
 }
-
 const colors = require('colors');
-//Function to manage the login from the cloud
-let loginURL = cloudURL + getProp('loginURE');
-let doOAuthNotify = true;
-let isOAUTHValid = false;
-let toldClientID = false;
-
-cLogin = function (tenant, customLoginURL, forceClientID) {
-    const fClientID = forceClientID || false;
-    if (isOauthUsed() && !fClientID) {
-        log(DEBUG, 'Using OAUTH for Authentication...');
-        // isOAUTHValid = true;
-        // Getting the organization info
-        // console.log('Get Org: ' , getOrganization());
-        // TODO: think of a fix for OAUTH Tokens that just have LA Access (get orgname from a live apps api)
-        if (getOrganization() == null || getOrganization().trim() == '') {
-            // Setting this to temp so it breaks the call stack
-            // setOrganization('TEMP');
-            var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
-            log(DEBUG, 'Got Account info: ', response);
-            if (response == 'Unauthorized') {
-                log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
-                // process.exit();
-            }
-            if (response.selectedAccount) {
-                if (doOAuthNotify) {
-                    log(INFO, 'Using OAUTH Authentication, ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
-                    doOAuthNotify = false;
-                }
-
-                setOrganization(response.selectedAccount.displayName);
-                isOAUTHValid = true;
-            }
-        }
-    }
-    if (!isOauthUsed() || !isOAUTHValid || fClientID) {
-        if (!toldClientID) {
-            log(INFO, 'Using CLIENT-ID Authentication (consider using OAUTH)...');
-            toldClientID = true;
-        }
-        var setLoginURL = loginURL;
-        if (customLoginURL) {
-            setLoginURL = customLoginURL;
-            // Delete the previous cookie on a custom login
-            loginC = null;
-        }
-
-        var tentantID = getProp('CloudLogin.tenantID');
-        if (tenant) {
-            tentantID = tenant;
-        }
-        //TODO: Set a timer, if login was too long ago login again...
-        var pass = getProp('CloudLogin.pass');
-        var clientID = getProp('CloudLogin.clientID');
-        var email = getProp('CloudLogin.email');
-        //
-        //TODO: Manage global config in common functions
-        if (getGlobalConfig()) {
-            const propsG = getGlobalConfig();
-            if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-            if (tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
-            if (clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
-            if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
-        }
-
-        if (pass == '') {
-            pass = require('yargs').argv.pass;
-            // console.log('Pass from args: ' + pass);
-        }
-        if (pass.charAt(0) == '#') {
-            pass = Buffer.from(pass, 'base64').toString()
-        }
-        if (loginC == null) {
-            loginC = cloudLoginV3(tentantID, clientID, email, pass, setLoginURL);
-        }
-        if (loginC == 'ERROR') {
-            // TODO: exit the task properly
-            log(INFO, 'Error Exiting..');
-            process.exit(1);
-        }
-        // console.log("RETURN: " , loginC);
-    }
-    return loginC;
-}
 
 
-// Function that logs into the cloud and returns a cookie
-function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
-    var postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
-    log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
-    log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
-    //log(DEBUG,'With Form: ' + postForm);
-    const syncClient = require('sync-rest-client');
-    var response = syncClient.post(encodeURI(TCbaseURL), {
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        payload: postForm
-    });
-    var re = '';
-    //console.log(response.body);
-    if (response.body.errorMsg != null) {
-        log(ERROR, response.body.errorMsg);
-        re = 'ERROR';
-    } else {
-        if (response.body.orgName) {
-            setOrganization(response.body.orgName);
-        }
-        var loginCookie = response.headers['set-cookie'];
-        logO(DEBUG, loginCookie);
-        var rxd = /domain=(.*?);/g;
-        var rxt = /tsc=(.*?);/g;
-        re = {"domain": rxd.exec(loginCookie)[1], "tsc": rxt.exec(loginCookie)[1]};
-        logO(DEBUG, re.domain);
-        logO(DEBUG, re.tsc);
-        logO(DEBUG, re);
-        log(INFO, 'Login Successful of ' + email + '(' + tenantID + ')...');
-    }
-    return re;
-}
-
+// TODO: Move to common
 getRegion = function () {
     let re = 'US';
     let myHost = getProp('cloudHost').toString().toUpperCase();
@@ -273,11 +151,12 @@ buildCloudStarterZip = function (cloudStarter) {
 }
 
 // function that shows all the availible applications in the cloud
-const getAppURL = cloudURL + getProp('appURE') + '?$top=200';
 showAvailableApps = function (showTable) {
     //TODO: Use table config
-    var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
-    var response = callURL(getAppURL, null, null, null, null, null, null, null, null, null, true);
+    const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
+    // TODO: loop over if there are more than 200
+    const response = CCOM.callTC(CCOM.clURI.app_info + '?$top=200', false, {handleErrorOutside: true});
+    // console.log(response)
     if (response.errorMsg) {
         if (response.errorMsg == 'Application does not exist') {
             log(INFO, 'No Cloud Starters deployed yet...');
@@ -291,10 +170,10 @@ showAvailableApps = function (showTable) {
         const users = iterateTable(showLiveAppsUsers(false, true));
         // console.log('USERS: ', users);
         // TODO: Apparently apps can have tags, look into this...
-        var apps = {};
-        for (var app in response) {
-            var appTemp = {};
-            var appN = parseInt(app) + 1;
+        let apps = {};
+        for (const app in response) {
+            const appTemp = {};
+            const appN = parseInt(app) + 1;
             //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
             appTemp['APP NAME'] = response[app].name;
             let owner = 'Unknown';
@@ -305,26 +184,26 @@ showAvailableApps = function (showTable) {
             }
             appTemp['OWNER'] = owner;
             // TODO: Use the API (get artifacts) to find an index.htm(l) and provide highest
-            var publV = parseInt(response[app].publishedVersion);
+            const publV = parseInt(response[app].publishedVersion);
             appTemp['PUBLISHED VERSION'] = publV;
-            var latestV = parseInt(response[app].latestVersion);
+            const latestV = parseInt(response[app].latestVersion);
             appTemp['LATEST VERSION'] = latestV;
             //appTemp['PUBLISHED / LATEST VERSION'] = '(' + publV + '/' + latestV + ')';
-            var latestDeployed = false;
+            let latestDeployed = false;
             if (publV == latestV) {
                 latestDeployed = true;
             }
             appTemp['LATEST DEPLOYED'] = latestDeployed;
             apps[appN] = appTemp;
-            var created = new Date(response[app].creationDate);
-            var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-            var optionsT = {hour: 'numeric'};
+            const created = new Date(response[app].creationDate);
+            const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            const optionsT = {hour: 'numeric'};
             appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
             //appTemp['CREATED TIME'] = created.toLocaleTimeString();
-            var lastModified = new Date(response[app].lastModifiedDate);
+            const lastModified = new Date(response[app].lastModifiedDate);
             //appTemp['LAST MODIFIED'] = lastModified.toLocaleDateString("en-US", options);
             //appTemp['LAST MODIFIED TIME'] = lastModified.toLocaleTimeString();
-            var now = new Date();
+            const now = new Date();
             appTemp['AGE(DAYS)'] = Math.round((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
             appTemp['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
         }
@@ -335,14 +214,13 @@ showAvailableApps = function (showTable) {
 
 
 // Function to show claims for the configured user
-const getClaimsURL = cloudURL + getProp('Claims_URE');
 showCloudInfo = function (showTable) {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
     }
-    var response = callURL(getClaimsURL);
+    const response = CCOM.callTC(CCOM.clURI.claims);
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
     let nvs = createTableValue('REGION', getRegion());
     nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
@@ -350,7 +228,7 @@ showCloudInfo = function (showTable) {
     nvs = createTableValue('LAST NAME', response.lastName, nvs);
     nvs = createTableValue('EMAIL', response.email, nvs);
     if (response.sandboxes) {
-        for (var i = 0; i < response.sandboxes.length; i++) {
+        for (let i = 0; i < response.sandboxes.length; i++) {
             nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
             nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
         }
@@ -363,14 +241,10 @@ showCloudInfo = function (showTable) {
 };
 
 doDeleteApp = function (appToDelete) {
-    const location = cloudURL + 'webresource/v1/applications/' + appToDelete + '/';
-    return callURL(location, 'DEL');
+    return CCOM.callTC(CCOM.clURI.app_info + appToDelete + '/', false ,{method: 'DEL'});
 }
 
-
 //TODO: Move this to prop file
-const sharedStateBaseURL = cloudURL + 'clientstate/v1/';
-const sharedStateURL = sharedStateBaseURL + 'states';
 const SHARED_STATE_STEP_SIZE = 400;
 const SHARED_STATE_MAX_CALLS = 20;
 let SHARED_STATE_SCOPE = 'APPLICATION';
@@ -405,11 +279,11 @@ prepSharedStateProps = function () {
 // Function to return a JSON with the shared state entries from a set scope
 getSharedState = function (showTable) {
     prepSharedStateProps();
-    // var lCookie = cLogin();
+    // const lCookie = cLogin();
     // log(DEBUG, 'Login Cookie: ', lCookie);
     //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
     let ALLsState = [];
-    var i = 0;
+    let i = 0;
     let moreStates = true;
     let filterType = 'PUBLIC';
     if (getProp('Shared_State_Type') != null) {
@@ -423,7 +297,7 @@ getSharedState = function (showTable) {
         //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         //TODO: Rename scope for shared state
         let filter = '&$filter=type=' + filterType;
-        let sStateTemp = callURL(sharedStateURL + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter, null, null, null, false);
+        let sStateTemp = CCOM.callTC(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -440,7 +314,7 @@ getSharedState = function (showTable) {
     let sState = [];
     log(INFO, 'Applying Filter) Shared State Scope: ' + SHARED_STATE_SCOPE);
     if (SHARED_STATE_SCOPE != '*') {
-        for (var state in ALLsState) {
+        for (const state in ALLsState) {
             if (ALLsState[state] && ALLsState[state].name && ALLsState[state].name.startsWith(SHARED_STATE_SCOPE)) {
                 sState.push(ALLsState[state]);
             }
@@ -455,18 +329,18 @@ getSharedState = function (showTable) {
         b = new Date(b.createdDate);
         return a > b ? 1 : a < b ? -1 : 0;
     });
-    var states = {};
-    for (var state in sState) {
-        var sTemp = {};
-        var appN = parseInt(state) + 1;
+    const states = {};
+    for (const state in sState) {
+        const sTemp = {};
+        const appN = parseInt(state) + 1;
         sTemp['ID'] = sState[state].id;
         sTemp['NAME'] = sState[state].name;
         sTemp['CREATED BY'] = sState[state].createdByName;
-        var created = new Date(sState[state].createdDate);
-        var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+        const created = new Date(sState[state].createdDate);
+        const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
         sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
         sTemp['MODIFIED BY'] = sState[state].modifiedByName;
-        var modified = new Date(sState[state].modifiedDate);
+        const modified = new Date(sState[state].modifiedDate);
         sTemp['LAST MODIFIED'] = modified.toLocaleDateString("en-US", options);
         states[appN] = sTemp;
     }
@@ -477,15 +351,15 @@ getSharedState = function (showTable) {
 
 selectSharedState = async function (sharedStateEntries, question) {
     // console.log('Shared State Entries: ' , sharedStateEntries);
-    var stateNames = [];
-    for (var state of sharedStateEntries) {
+    const stateNames = [];
+    for (const state of sharedStateEntries) {
         stateNames.push(state.name);
     }
     // console.log('Shared state names: ' , stateNames);
     // Pick Item from the list
     let answer = await askMultipleChoiceQuestionSearch(question, stateNames);
     let re = {};
-    for (var state of sharedStateEntries) {
+    for (const state of sharedStateEntries) {
         if (state.name == answer) {
             re = state;
         }
@@ -495,7 +369,7 @@ selectSharedState = async function (sharedStateEntries, question) {
 
 
 deleteSharedState = function (sharedStateID) {
-    const response = callURL(sharedStateURL + '/' + sharedStateID, 'DEL');
+    const response = CCOM.callTC(CCOM.clURI.shared_state + '/' + sharedStateID, false, {method: 'DEL'});
     let ok = true;
     if (response != null) {
         if (response.errorMsg != null) {
@@ -650,8 +524,8 @@ importSharedStateFile = function (ssFile) {
     prepSharedStateProps();
     log(DEBUG, 'Importing: ' + ssFile);
     const fs = require('fs');
-    var contentContextFile = fs.readFileSync(ssFile);
-    var ssObject = {};
+    const contentContextFile = fs.readFileSync(ssFile);
+    let ssObject = {};
     try {
         ssObject = JSON.parse(contentContextFile);
     } catch (e) {
@@ -664,7 +538,7 @@ importSharedStateFile = function (ssFile) {
             if (ssObject.content.json['FILESTORE'] != null) {
                 const contentFile = ssObject.content.json['FILESTORE'];
                 log(INFO, 'Getting content from: ' + contentFile);
-                var contentContentFile = fs.readFileSync(contentFile, "utf8");
+                const contentContentFile = fs.readFileSync(contentFile, "utf8");
                 // console.log('GOT: ' , contentContentFile);
                 try {
                     ssObject.content.json = contentContentFile;
@@ -685,9 +559,9 @@ putSharedState = function (sharedStateObject) {
     prepSharedStateProps();
     if (sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
-        callURL(sharedStateURL, 'PUT', [sharedStateObject]);
+        CCOM.callTC(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
-        // var re = response;
+        // const re = response;
         // TODO: Check for errors, and if the state does not exist use post..
     } else {
         log(ERROR, 'NOT Posting Empty Shared State: ', sharedStateObject)
@@ -700,14 +574,14 @@ importSharedStateScope = async function () {
     //console.log('ORG: ', getOrganization());
     let importOptions = [];
     // Go Over Shared State files
-    var states = {};
+    const states = {};
     let it = 1;
     const fs = require('fs');
     fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
         if (file != 'CONTENT') {
             importOptions.push(file);
-            var sTemp = {};
-            var appN = it;
+            const sTemp = {};
+            const appN = it;
             sTemp['FILE'] = file;
             states[appN] = sTemp;
             it++;
@@ -813,10 +687,10 @@ watchSharedStateScope = function () {
 };
 
 
-const getApplicationDetailsURL = cloudURL + getProp('appURE');
+// const getApplicationDetailsURL = cloudURL + getProp('appURE');
 getApplicationDetails = function (application, version, showTable) {
-    var doShowTable = (typeof showTable === 'undefined') ? false : showTable;
-    var details = {};
+    const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
+    const details = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
     const artefactStepSize = 200;
     let hasMoreArtefacts = true;
@@ -827,7 +701,7 @@ getApplicationDetails = function (application, version, showTable) {
         if (i != 0) {
             skip = '&$skip=' + i
         }
-        const appDet = callURL(getApplicationDetailsURL + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip, 'GET', null, null, false);
+        const appDet = CCOM.callTC(CCOM.clURI.app_info + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip);
         if (appDet) {
             if (appDet.length < artefactStepSize) {
                 hasMoreArtefacts = false;
@@ -839,9 +713,9 @@ getApplicationDetails = function (application, version, showTable) {
     }
 
     // logO(INFO, appDet);
-    var i = 0;
-    for (var det in allArteFacts) {
-        var appTemp = {};
+    let i = 0;
+    for (const det in allArteFacts) {
+        const appTemp = {};
         appN = i;
         i++;
         appTemp['CLOUD STARTER'] = application;
@@ -857,20 +731,21 @@ getApplicationDetails = function (application, version, showTable) {
 //Get Links to all the applications
 getAppLinks = function (showTable) {
     log(INFO, 'Getting Cloud Starter Links...');
-    var appLinkTable = {};
-    var apps = showAvailableApps(false);
-    var i = 1;
+    const appLinkTable = {};
+    const apps = showAvailableApps(false);
+    let i = 1;
     for (let app of apps) {
-        var appTemp = {};
+        const appTemp = {};
         appTemp['APP NAME'] = app.name;
-        var appN = i++;
-        var tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
+        const appN = i++;
+        const tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
         logLine("Processing App: (" + appN + '/' + apps.length + ')...');
         if (isIterable(tempDet)) {
             for (let appD of tempDet) {
                 // Get file after last slash in Descriptor file name; expected cloudstarter.json
                 if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
-                    const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
+                    const csInfo = CCOM.callTC(CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name, false);
+                    // const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
                     if (csInfo && csInfo.cloudstarter) {
                         appTemp['CS VERSION'] = csInfo.cloudstarter.version;
                         appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
@@ -908,7 +783,7 @@ uploadApp = function (application) {
     return new Promise(function (resolve, reject) {
         let formData = new require('form-data')();
         log(INFO, 'UPLOADING APP: ' + application);
-        var uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
+        const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
         formData.append('appContents', require("fs").createReadStream('./dist/' + application + '.zip'));
         const header = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
@@ -916,7 +791,7 @@ uploadApp = function (application) {
         if (isOauthUsed()) {
             header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         } else {
-            var lCookie = cLogin();
+            const lCookie = CCOM.cLogin();
             header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
         }
         let query = require('https').request({
@@ -945,102 +820,17 @@ uploadApp = function (application) {
 // Function to publish the application to the cloud
 publishApp = function (application) {
     return new Promise(function (resolve, reject) {
-        var publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
-        var response = callURL(publishLocation, 'PUT');
+        // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
+        const response = CCOM.callTC(CCOM.clURI.app_info , false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);
         resolve();
     });
 }
 
-// Function to call the Tibco Cloud
-// TODO: Accept, URL, doLog and possible config
-callURL = function (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside) {
-    const doErrorOutside = handleErrorOutside || false;
-    const fOAUTH = forceOAUTH || false;
-    const fCLIENTID = forceCLIENTID || false;
-    const reResponse = returnResponse || false;
-    let lCookie = {};
-    if (!fOAUTH) {
-        lCookie = cLogin(tenant, customLoginURL);
-    }
-    if (fCLIENTID) {
-        lCookie = cLogin(tenant, customLoginURL, true);
-    }
-    const cMethod = method || 'GET';
-    let cdoLog = false;
-    if (doLog != null) {
-        cdoLog = doLog;
-    }
-    const cType = contentType || 'application/json';
-    let body = null;
-    if (cMethod.toLowerCase() != 'get') {
-        if (cType === 'application/json') {
-            body = JSON.stringify(postRequest);
-        } else {
-            body = postRequest;
-        }
-    }
-
-    const header = {};
-    header["accept"] = 'application/json';
-    header["Content-Type"] = cType;
-    // Check if we need to provide the OAUTH token
-    if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
-        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
-    } else {
-        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-    }
-    if (fCLIENTID) {
-        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-        delete header.Authorization;
-    }
-
-    if (cdoLog) {
-        log(INFO, '--- CALLING SERVICE ---');
-        log(INFO, '- URL(' + cMethod + '): ' + url);
-        log(DEBUG, '-  METHOD: ' + cMethod);
-        log(DEBUG, '- CONTENT: ' + cType);
-        log(DEBUG, '-  HEADER: ', header);
-    }
-    if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
-        if (cdoLog) {
-            log(INFO, '-    BODY: ' + body);
-        }
-    }
-
-    let response = {};
-    const syncClient = require('sync-rest-client');
-    if (cMethod.toLowerCase() === 'get') {
-        response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
-            headers: header
-        });
-    } else {
-        response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
-            headers: header,
-            payload: body
-        });
-        // console.log('Response: ', response.statusCode);
-    }
-    if (response.body.errorMsg != null) {
-        if (doErrorOutside) {
-            return response.body;
-        } else {
-            log(ERROR, response.body.errorMsg);
-            log(ERROR, response.body);
-        }
-        return null;
-    } else {
-        if (reResponse) {
-            return response;
-        }
-        // log(INFO, '-  RESPONSE: ', response.body);
-        return response.body;
-    }
-}
-
 // Get a LiveApps Case by Reference
 getLaCaseByReference = function (caseRef) {
-    const caseData = callURL('https://' + getCurrentRegion() + clURI.la_cases + '/' + caseRef + '?$sandbox=' + getProductionSandbox(), 'GET', null, null, false, null, null, null, null, null, true);
+    // const caseData = callURL(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + getProductionSandbox(), 'GET', null, null, false, null, null, null, null, null, true);
+    const caseData = CCOM.callTC(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + getProductionSandbox(), false ,{handleErrorOutside: true });
     if (!caseData) {
         log(ERROR, 'Error Retrieving Case Data for ref: ', caseRef);
     }
@@ -1050,7 +840,7 @@ getLaCaseByReference = function (caseRef) {
 let globalProductionSandbox = null;
 getProductionSandbox = function () {
     if (!globalProductionSandbox) {
-        const claims = callURL(getClaimsURL);
+        const claims = CCOM.callTC(CCOM.clURI.claims);
         for (let sb of claims.sandboxes) {
             if (sb.type === 'Production') {
                 globalProductionSandbox = sb.id;
@@ -1061,18 +851,16 @@ getProductionSandbox = function () {
     return globalProductionSandbox;
 }
 
-
-const getTypesURL = cloudURL + 'case/v1/types'; // getProp('Claims_URE');
-// Function to
+// Function to show LiveApps cases
 showLiveApps = function (doShowTable, doCountCases) {
     //TODO: Call can be optimized by only requesting the basics
-    const caseTypes = callURL(getTypesURL + '?$sandbox=' + getProductionSandbox() + '&$top=1000');
+    const caseTypes = CCOM.callTC(CCOM.clURI.types + '?$sandbox=' + getProductionSandbox() + '&$top=1000');
     log(DEBUG, 'Case Types: ', caseTypes)
     // TODO: (maybe) get case owner
-    var cases = {};
-    for (var curCase in caseTypes) {
-        var caseTemp = {};
-        var appN = parseInt(curCase) + 1;
+    const cases = {};
+    for (const curCase in caseTypes) {
+        const caseTemp = {};
+        const appN = parseInt(curCase) + 1;
         //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
         caseTemp['CASE NAME'] = caseTypes[curCase].name;
         caseTemp['APPLICATION ID'] = caseTypes[curCase].applicationId;
@@ -1080,7 +868,7 @@ showLiveApps = function (doShowTable, doCountCases) {
         caseTemp['IS CASE'] = caseTypes[curCase].isCase;
         if (doCountCases) {
             logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
-            caseTemp['NUMBER OF CASES'] = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true', 'GET', null, null, false);
+            caseTemp['NUMBER OF CASES'] = CCOM.callTC(CCOM.clURI.la_cases + '?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true');
         }
         cases[appN] = caseTemp;
     }
@@ -1104,12 +892,12 @@ exportLiveAppsCaseType = async function () {
     checkCaseFolder();
     const cTypes = showLiveApps(true, false);
     let cTypeArray = new Array();
-    for (var curCase in cTypes) {
+    for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
     let fName = await askQuestion('What file name would you like to export to ? (press enter for default)');
-    for (var curCase in cTypes) {
+    for (const curCase in cTypes) {
         if (typeForExport == cTypes[curCase].name) {
 
             mkdirIfNotExist(CASE_FOLDER);
@@ -1129,7 +917,7 @@ exportLiveAppsData = async function () {
     checkCaseFolder();
     const cTypes = showLiveApps(true, true);
     let cTypeArray = new Array();
-    for (var curCase in cTypes) {
+    for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
@@ -1139,12 +927,12 @@ exportLiveAppsData = async function () {
     for (let curCase in cTypeArray) {
         if (cTypeArray[curCase] == typeForExport) {
             // count cases
-            const numberOfCasesForExport = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true', 'GET', null, null, false);
+            const numberOfCasesForExport = CCOM.callTC(CCOM.clURI.la_cases + '?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
             log(INFO, 'Number of cases for export: ' + numberOfCasesForExport);
             const typeIdString = ' and typeId eq 1';
             // get cases in batch sizes
             for (let i = 0; i <= numberOfCasesForExport; i = i + exportCaseStepSize) {
-                let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+                let exportBatch = CCOM.callTC(CCOM.clURI.la_cases + '?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
                 // console.log('Export Batch', exportBatch);
                 logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
                 allCases = allCases.concat(exportBatch);
@@ -1202,7 +990,6 @@ exportLiveAppsData = async function () {
 }
 
 //DONE: Add Export Feature to one file. (Just the data and to use for import)
-
 createLAImportFile = async function () {
     checkCaseFolder();
     log(INFO, ' -- Generate Live Aps Import Configuration file --- ');
@@ -1369,7 +1156,7 @@ importLiveAppsData = async function () {
                         applicationId: stepConf.applicationId,
                         data: JSON.stringify(dataToImport)
                     }
-                    const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
+                    const response = CCOM.callTC(CCOM.clURI.la_process , false, {method: 'POST', postRequest: postRequest });
                     log(INFO, 'Response: ', response);
                     //Get Case ID
                     caseRef = response.caseReference;
@@ -1402,7 +1189,7 @@ importLiveAppsData = async function () {
                         data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
                         caseReference: caseRef
                     }
-                    const response = callURL(cloudURL + 'process/v1/processes', 'POST', postRequest, null, true);
+                    const response = CCOM.callTC(CCOM.clURI.la_process , true, {method: 'POST', postRequest: postRequest});
                     // log(INFO, 'Response: ' , response);
                 }
                 if (stepConf.type.toString().toLowerCase() == 'validate') {
@@ -1498,7 +1285,7 @@ npmInstall = function (location, packageToUse) {
 
 // Function to test features
 testFunction = async function (propFile) {
-    var re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+    const re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     return re;
 }
 
@@ -1529,9 +1316,6 @@ checkPW = function () {
     }
 }
 
-//var readline = require('readline');
-//var Writable = require('stream').Writable;
-
 // Use WSU to generate TCI code
 wsuAddTci = function () {
     return new Promise(async function (resolve, reject) {
@@ -1544,11 +1328,11 @@ wsuAddTci = function () {
 wsuListTci = function () {
     return new Promise(async function (resolve, reject) {
         // TODO: Remove web scaffolding utility ?
-        /*var wsu = require('@tibco-tcstk/web-scaffolding-utility');
+        /*const wsu = require('@tibco-tcstk/web-scaffolding-utility');
         console.log(wsu.API.getVersion());
         wsu.API.login(getProp('CloudLogin.clientID'), getProp('CloudLogin.email'), getProp('CloudLogin.pass'));
         // console.log(wsu.API.getArtefactList("TCI").createTable());
-        var afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
+        const afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
         console.table(afList.createTable());
         */
         resolve();
@@ -1595,7 +1379,7 @@ schematicAdd = async function () {
     }
 }
 
-//var art = require('ascii-art');
+//const art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
 showTCI = function (showTable) {
@@ -1605,9 +1389,10 @@ showTCI = function (showTable) {
     }
     log(INFO, 'Getting TCI Apps...');
     const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
-    const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
-    const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
-    let tObject = createTable(response, mappings.tci_apps, false);
+    // const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
+    // const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
+    const response = CCOM.callTC(CCOM.clURI.tci_apps, false, {tenant: 'TCI', customLoginURL: loginEndpoint, forceCLIENTID: true});
+    let tObject = createTable(response, CCOM.mappings.tci_apps, false);
     pexTable(tObject, 'tci-apps', getPEXConfig(), doShowTable);
     log(DEBUG, 'TCI Object: ', tObject);
     return tObject;
@@ -1632,7 +1417,7 @@ monitorTCI = async function () {
         // run(tibCli + ' logout');
         // TODO: move this logic to common lib
         let email = getProp('CloudLogin.email');
-        var pass = getProp('CloudLogin.pass');
+        let pass = getProp('CloudLogin.pass');
         if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
         if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
         if (pass == '') {
@@ -1655,7 +1440,7 @@ monitorTCI = async function () {
 // Function to generate other property files next to the existing ones
 generateCloudPropertyFiles = async function () {
     log(INFO, 'Generating Cloud Property Files');
-    const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+    const response = CCOM.callTC(CCOM.clURI.account_info, false, {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
     // console.log(JSON.stringify(response));
     let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
     if (projectName.trim() != '') {
@@ -1776,8 +1561,7 @@ configurePropFile = function (fileName, region) {
 // Function to display all OAUTH Tokens...
 showOauthToken = function () {
     log(INFO, 'Displaying OAUTH Tokens...');
-    let getOauthUrl = 'https://' + getCurrentRegion() + clURI.get_oauth;
-    const response = callURL(getOauthUrl, 'GET', null, null, false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+    const response = CCOM.callTC(CCOM.clURI.get_oauth,true  , {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
     // console.log(response);
     for (let rep in response) {
         if (response[rep]['lastAccessed']) {
@@ -1790,7 +1574,7 @@ showOauthToken = function () {
         response[rep]['generatedTime'] = response[rep]['generatedTime'] * 1000;
         response[rep]['expirationTime'] = response[rep]['expirationTime'] * 1000;
     }
-    const tObject = createTable(response, mappings.oauth, true);
+    const tObject = createTable(response, CCOM.mappings.oauth, true);
     log(DEBUG, 'OAUTH Object: ', tObject);
     return tObject;
 }
@@ -1809,9 +1593,8 @@ revokeOauthToken = async function (tokenName) {
     }
     if (tokenName != 'NO TOKEN') {
         log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
-        let revokeOauthUrl = 'https://' + getCurrentRegion() + clURI.revoke_oauth;
         const postRequest = 'name=' + tokenName;
-        const response = callURL(revokeOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+        const response = CCOM.callTC(CCOM.clURI.revoke_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
         log(INFO, 'Result: ', colors.blue(response.message));
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
@@ -1895,7 +1678,7 @@ validateAndRotateOauthToken = async function (isInteractive) {
 // Function to generate an OAUTH Token
 generateOauthToken = async function (tokenNameOverride, verbose) {
     log(INFO, 'Generating OAUTH Token...');
-    const generateOauthUrl = 'https://' + getCurrentRegion() + clURI.generate_oauth
+    // const generateOauthUrl = 'https://' + getCurrentRegion() + CCOM.clURI.generate_oauth
     let skipCall = false;
     // Check for Token name
     let OauthTokenName = 'MyCLIToken_1';
@@ -1946,8 +1729,8 @@ generateOauthToken = async function (tokenNameOverride, verbose) {
     if (!skipCall) {
         // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
         // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
-        const responseClaims = callURL(getClaimsURL, null, null, null, false);
-        const response = callURL(generateOauthUrl, 'POST', postRequest, 'application/x-www-form-urlencoded', false, 'TSC', 'https://' + getCurrentRegion() + clURI.general_login);
+        const responseClaims = CCOM.callTC(CCOM.clURI.claims);
+        const response = CCOM.callTC(CCOM.clURI.generate_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
         log(INFO, response);
         if (response) {
             if (response.error) {
@@ -2257,7 +2040,7 @@ getOrgFolders = function (showFolders, countItems) {
         if (i != 0) {
             skip = '&$skip=' + i
         }
-        const folderDet = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '?$top=' + folderStepSize + skip, 'GET', null, null, false);
+        const folderDet = CCOM.callTC(CCOM.clURI.la_org_folders + '?$top=' + folderStepSize + skip);
         if (folderDet) {
             if (folderDet.length < folderStepSize) {
                 hasMoreFolders = false;
@@ -2267,10 +2050,10 @@ getOrgFolders = function (showFolders, countItems) {
             hasMoreFolders = false;
         }
     }
-    const folderTable = createTable(allFolders, mappings.la_org_folders, false);
+    const folderTable = createTable(allFolders, CCOM.mappings.la_org_folders, false);
     if (countItems) {
         for (let fNr in folderTable) {
-            let noItems = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
+            let noItems = CCOM.callTC(CCOM.clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
             logLine('Processing folder (' + fNr + '/' + iterateTable(folderTable).length + ')');
             folderTable[fNr]['Number of Items'] = noItems;
 
@@ -2283,8 +2066,8 @@ getOrgFolders = function (showFolders, countItems) {
 
 // Function to get org folders
 getOrgFolderFiles = function (folderTable, folder, showFiles) {
-    const folderResp = callURL('https://' + getCurrentRegion() + clURI.la_org_folders + '/' + folder + '/artifacts/');
-    const folderContentTable = createTable(folderResp, mappings.la_org_folder_content, false);
+    const folderResp = CCOM.callTC(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/');
+    const folderContentTable = createTable(folderResp, CCOM.mappings.la_org_folder_content, false);
     const users = showLiveAppsUsers(false, false);
     for (let cont in folderContentTable) {
         for (let usr of iterateTable(users)) {
@@ -2306,7 +2089,7 @@ downLoadOrgFolderFile = function (folder, file) {
     checkOrgFolderLocation();
     mkdirIfNotExist(OrgFolderLocation);
     mkdirIfNotExist(OrgFolderLocation + '/' + folder);
-    const dataForFile = callURL('https://' + getCurrentRegion() + clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', null, null, null, true);
+    const dataForFile = CCOM.callTC(CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', true);
     const fs = require('fs');
     const fileName = OrgFolderLocation + '/' + folder + '/' + file;
     fs.writeFileSync(fileName, dataForFile, 'utf8');
@@ -2382,8 +2165,8 @@ getGroupsTable = function (showTable) {
     if (showTable != null) {
         doShowTable = showTable;
     }
-    const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups);
-    const groupTable = createTable(oResponse, mappings.la_groups, false);
+    const oResponse =CCOM.callTC(CCOM.clURI.la_groups);
+    const groupTable = createTable(oResponse, CCOM.mappings.la_groups, false);
     pexTable(groupTable, 'live-apps-groups', getPEXConfig(), doShowTable);
     return groupTable;
 }
@@ -2399,8 +2182,8 @@ showLiveAppsGroups = async function () {
     if (decision != 'NONE') {
         for (let gr of iterateTable(groupT)) {
             if (decision == gr.Name || decision == 'ALL') {
-                const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
-                const userGroupTable = createTable(oResponse, mappings.la_groups_users, false)
+                const oResponse =CCOM.callTC(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
+                const userGroupTable = createTable(oResponse, CCOM.mappings.la_groups_users, false)
                 for (let uGr in userGroupTable) {
                     //userGroupTable[uGr].assign({Group: gr.Name}, userGroupTable[uGr]);
                     userGroupTable[uGr] = Object.assign({Group: gr.Name}, userGroupTable[uGr])
@@ -2425,7 +2208,7 @@ createLiveAppsGroup = async function () {
             "description": gDescription,
             "type": "SubscriptionDefined"
         }
-        const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups, 'POST', postGroup);
+        const oResponse =CCOM.callTC(CCOM.clURI.la_groups, false ,{method: 'POST',  postRequest: postGroup} );
         if (oResponse != null) {
             log(INFO, 'Successfully create group with ID: ', oResponse);
         }
@@ -2436,8 +2219,8 @@ createLiveAppsGroup = async function () {
 
 // Function that shows the LiveApps Users
 showLiveAppsUsers = function (showTable, hideTestUsers) {
-    const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_users);
-    const usersTable = createTable(oResponse, mappings.la_users, false);
+    const oResponse =CCOM.callTC(CCOM.clURI.la_users);
+    const usersTable = createTable(oResponse, CCOM.mappings.la_users, false);
     if (hideTestUsers) {
         for (let usr in usersTable) {
             if (usersTable[usr] && usersTable[usr].Type == 'Test') {
@@ -2467,9 +2250,9 @@ addUserToGroup = async function () {
         for (let gr of iterateTable(groupT)) {
             if (groupDecision == gr.Name) {
                 groupIdToAdd = gr.Id;
-                const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
+                const oResponse = CCOM.callTC(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
                 log(INFO, 'CURRENT USERS IN GROUP: ' + groupDecision);
-                currentUsersInGroupT = createTable(oResponse, mappings.la_groups_users, true)
+                currentUsersInGroupT = createTable(oResponse, CCOM.mappings.la_groups_users, true)
 
             }
         }
@@ -2512,7 +2295,7 @@ addUserToGroup = async function () {
                 groupId: groupIdToAdd,
                 userId: userIdToAdd
             }
-            const oResponse = callURL('https://' + getCurrentRegion() + clURI.la_user_group_mapping, 'POST', postGroupMapping);
+            const oResponse = CCOM.callTC( CCOM.clURI.la_user_group_mapping, false, {method: 'POST',  postRequest: postGroupMapping});
             if (oResponse != null) {
                 log(INFO, 'Successfully added user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
 

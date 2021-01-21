@@ -4,6 +4,7 @@
   "scripts": {
     "postinstall": "node message.js",
     "testO": "node ./test/run-test-cases.js",
+    "cleanTest": "rm -rf ./test/tmpTest",
     "test": "jasmine --config=test/support/jasmine.json",
     "testB": "jasmine --config=test/support/jasmine.json --filter='Basic Operations'",
     "build": "webpack --config webpack.config.js",
@@ -37,8 +38,8 @@
     "webpack-cli": "^4.3.1"
   },
   "bin": {
-    "tcli": "dist/tcli/main.js",
-    "tcli_dev": "src/bin/cloud-cli.js"
+    "tcli_prod": "dist/tcli/main.js",
+    "tcli": "src/bin/cloud-cli.js"
   },
   "pkg": {
     "assets": [

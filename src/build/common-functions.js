@@ -459,6 +459,7 @@ updateRegion = async function (propFile) {
     }
 }
 
+
 getCurrentRegion = function (showRegion) {
     let displayRegion = false;
     if (showRegion) {
