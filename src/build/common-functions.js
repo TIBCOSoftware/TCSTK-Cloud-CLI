@@ -459,7 +459,6 @@ updateRegion = async function (propFile) {
     }
 }
 
-
 getCurrentRegion = function (showRegion) {
     let displayRegion = false;
     if (showRegion) {
@@ -506,6 +505,18 @@ getCurrentAWSRegion = function () {
     return re
 }
 
+// gets region (in Capitals)
+getRegion = function () {
+    let re = 'US';
+    let myHost = getProp('cloudHost').toString().toUpperCase();
+    if (myHost.includes('EU.')) {
+        re = 'EU';
+    }
+    if (myHost.includes('AU.')) {
+        re = 'AU';
+    }
+    return re;
+}
 
 updateTCLI = function () {
     log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../../package.json').version);
@@ -618,6 +629,25 @@ run = function (command, failOnError) {
         }
     // resolve();
     // })
+}
+
+// Function to copy a directory
+copyDir = function (fromDir, toDir) {
+    const fse = require('fs-extra');
+    log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
+    fse.copySync(fromDir, toDir, {overwrite: true});
+}
+
+// Function to delete a file but does not fail when the file does not exits
+deleteFile = function (file) {
+    log(INFO, 'Deleting File: ' + file);
+    try {
+        fs.unlinkSync(file);
+        //file removed
+    } catch (err) {
+        log(INFO, 'Could not delete file, maybe file does not exist ?... (' + err.code + ')');
+        //console.log(err)
+    }
 }
 
 // Delete a folder
@@ -810,6 +840,48 @@ pexTable = function (tObject, tName, config, doPrint) {
     }
 }
 
+// Provide configuration for exporting table
+getPEXConfig = function () {
+    const re = {};
+    // table-export-to-csv= YES | NO
+    let table_export_to_csv = 'NO';
+    if (getProp('Table_Export_To_CSV') != null) {
+        table_export_to_csv = getProp('Table_Export_To_CSV');
+    } else {
+        log(INFO, 'No Table_Export_To_CSV property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_To_CSV', table_export_to_csv, 'Export tables to CSV files. Possible values YES | NO');
+    }
+    // table-export-folder= ./table-exports
+    let table_export_folder = './table-exports/';
+    if (getProp('Table_Export_Folder') != null) {
+        table_export_folder = getProp('Table_Export_Folder');
+    } else {
+        log(INFO, 'No Table_Export_Folder property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_Folder', table_export_folder, 'Folder to export the CSV files to.');
+    }
+
+    // table-export-file-prefix=table-export-
+    let table_export_file_prefix = 'table-export-';
+    if (getProp('Table_Export_File_Prefix') != null) {
+        table_export_file_prefix = getProp('Table_Export_File_Prefix');
+    } else {
+        log(INFO, 'No Table_Export_File_Prefix property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_File_Prefix', table_export_file_prefix, 'Prefix to use for the export to table CSV files.');
+    }
+    // table-export-tables=cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
+    let table_export_tables = 'ALL';
+    if (getProp('Table_Export_Tables') != null) {
+        table_export_tables = getProp('Table_Export_Tables');
+    } else {
+        log(INFO, 'No Table_Export_Tables property found; We are adding it to: ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states');
+    }
+    re.export = table_export_to_csv.toLowerCase() == 'yes';
+    re.folder = table_export_folder;
+    re.filePreFix = table_export_file_prefix;
+    re.tables = table_export_tables;
+    return re;
+}
 
 isOauthUsed = function () {
     let re = false;
@@ -820,6 +892,14 @@ isOauthUsed = function () {
     }
     // console.log('Is Oauth used: ' , re);
     return re;
+}
+
+isIterable = function (obj) {
+    // checks for null and undefined
+    if (obj == null) {
+        return false;
+    }
+    return typeof obj[Symbol.iterator] === 'function';
 }
 
 

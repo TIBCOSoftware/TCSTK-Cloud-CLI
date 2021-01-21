@@ -191,7 +191,8 @@ export async function helptcli() {
 export async function start() {
     log(INFO, 'Starting: ' + getProp('App_Name'));
     if (isOauthUsed()) {
-        await validateAndRotateOauthToken(true);
+        const oauth = require('./build/oauth');
+        await oauth.validateAndRotateOauthToken(true);
     }
     //Check if port 4200 is available, if not use 4201, 4202 etc.
     let port = 4200;
@@ -305,72 +306,86 @@ export async function createMultiplePropertyFileWrapper() {
     await createMultiplePropertyFile();
 }
 
-// Function to show liveApps
-export function showLiveAppsWrapper() {
-    showLiveApps(true, true);
-}
-
 // Display the shared state entries to a user
 export function showSharedState() {
-    getSharedState(true);
+    const SHST = require('./build/shared-state');
+    SHST.getSharedState(true);
 };
 
 // Display the details of a shared state
 export async function showSharedStateDetailsWrapper() {
-    await showSharedStateDetails();
+    const SHST = require('./build/shared-state');
+    await SHST.showSharedStateDetails();
 };
 
 export async function removeSharedStateEntryWrapper() {
-    await removeSharedStateEntry();
+    const SHST = require('./build/shared-state');
+    await SHST.removeSharedStateEntry();
 }
 
 export async function clearSharedStateScopeWrapper() {
-    await clearSharedStateScope();
+    const SHST = require('./build/shared-state');
+    await SHST.clearSharedStateScope();
 }
 
 export async function exportSharedStateScopeWrapper() {
-    await exportSharedStateScope();
+    const SHST = require('./build/shared-state');
+    await SHST.exportSharedStateScope();
 }
 
 export async function importSharedStateScopeWrapper() {
-    await importSharedStateScope();
+    const SHST = require('./build/shared-state');
+    await SHST.importSharedStateScope();
 }
 
 export async function watchSharedStateScopeMainWrapper() {
-    await watchSharedStateScopeMain();
+    const SHST = require('./build/shared-state');
+    await SHST.watchSharedStateScopeMain();
 }
 
 export async function watchSharedStateScopeWrapper() {
-    await watchSharedStateScope();
+    const SHST = require('./build/shared-state');
+    await SHST.watchSharedStateScope();
 }
 
+// Function to show liveApps
+export function showLiveAppsWrapper() {
+    const LA = require('./build/liveApps');
+    LA.showLiveApps(true, true);
+}
 
 // Function to export liveApps cases
 export async function exportLiveAppsDataWrapper() {
-    await exportLiveAppsData();
+    const LA = require('./build/liveApps');
+    await LA.exportLiveAppsData();
 }
 
 export async function generateLiveAppsImportConfiguration() {
-    await  createLAImportFile();
+    const LA = require('./build/liveApps');
+    await LA.createLAImportFile();
 }
 
 // Function to
 export async function importLiveAppsDataWrapper() {
-    await importLiveAppsData();
+    const LA = require('./build/liveApps');
+    await LA.importLiveAppsData();
 }
 
 // Function to
 export async function csvToJsonLiveAppsDataWrapper() {
-    await csvToJsonLiveAppsData();
+    const LA = require('./build/liveApps');
+    await LA.csvToJsonLiveAppsData();
 }
 
 // Function to
 export async function jsonToCsvLiveAppsDataWrapper() {
-    await jsonToCsvLiveAppsData();
+    const LA = require('./build/liveApps');
+    await LA.jsonToCsvLiveAppsData();
 }
 
 export async function exportLiveAppsCaseTypeWrapper() {
-    await exportLiveAppsCaseType();
+    const LA = require('./build/liveApps');
+    await LA.exportLiveAppsCaseType();
 }
 
 export function generateCloudDescriptorWrapper() {
@@ -382,40 +397,48 @@ export function updateCloudPackagesWrapper() {
 }
 
 export function showTCIWrapper() {
-    showTCI();
+    const TCI = require('./build/tci');
+    TCI.showTCI();
 }
 
 export async function monitorTCIWrapper() {
-    await monitorTCI();
+    const TCI = require('./build/tci');
+    await TCI.monitorTCI();
 }
 
 export async function showSpotfireReportsWrapper() {
-    const spotfire = require('./build/spotfire');
-    await spotfire.showSpotfire();
+    const SPOTFIRE = require('./build/spotfire');
+    await SPOTFIRE.showSpotfire();
 }
 
 export async function generateOauthTokenWrapper() {
-    await generateOauthToken();
+    const OAUTH = require('./build/oauth');
+    await OAUTH.generateOauthToken();
 }
 
 export function showOauthTokenWrapper() {
-    showOauthToken();
+    const OAUTH = require('./build/oauth');
+    OAUTH.showOauthToken();
 }
 
 export async function revokeOauthTokenWrapper() {
-    await revokeOauthToken();
+    const OAUTH = require('./build/oauth');
+    await OAUTH.revokeOauthToken();
 }
 
 export function rotateOauthTokenWrapper() {
-    rotateOauthToken();
+    const OAUTH = require('./build/oauth');
+    OAUTH.rotateOauthToken();
 }
 
 export async function validateAndRotateOauthTokenWrapper() {
-    await validateAndRotateOauthToken(false);
+    const OAUTH = require('./build/oauth');
+    await OAUTH.validateAndRotateOauthToken(false);
 }
 
 export async function showOrgFoldersWrapper() {
-    await showOrgFolders();
+    const CFILES = require('./build/cloud-files');
+    await CFILES.showOrgFolders();
 }
 
 export async function generateCloudPropertyFilesWrapper() {
@@ -423,36 +446,44 @@ export async function generateCloudPropertyFilesWrapper() {
 }
 
 export async function exportOrgFolderWrapper() {
-    await exportOrgFolder();
+    const CFILES = require('./build/cloud-files');
+    await CFILES.exportOrgFolder();
 }
 
 export async function importOrgFolderWrapper() {
-    await importOrgFolder();
+    const CFILES = require('./build/cloud-files');
+    await CFILES.importOrgFolder();
 }
 
 export async function watchOrgFolderWrapper() {
-    await watchOrgFolder();
+    const CFILES = require('./build/cloud-files');
+    await CFILES.watchOrgFolder();
 }
 
 export async function showLiveAppsGroupsWrapper() {
-    await showLiveAppsGroups();
+    const USERGROUPS = require('./build/user-groups');
+    await USERGROUPS.showLiveAppsGroups();
 }
 
 export async function createLiveAppsGroupWrapper() {
-    await createLiveAppsGroup();
+    const USERGROUPS = require('./build/user-groups');
+    await USERGROUPS.createLiveAppsGroup();
 }
 
 export function showLiveAppsUsersWrapper() {
-    showLiveAppsUsers(true, false);
+    const USERGROUPS = require('./build/user-groups');
+    USERGROUPS.showLiveAppsUsers(true, false);
 }
 
 
 export async function addUserToGroupWrapper() {
-    await addUserToGroup();
+    const USERGROUPS = require('./build/user-groups');
+    await USERGROUPS.addUserToGroup();
 }
 
 export async function validateWrapper() {
-    await validate();
+    const VAL = require('./build/validation');
+    await VAL.validate();
 }
 
 export async function updatePropertyWrapper() {
@@ -464,8 +495,8 @@ export async function schematicAddWrapper() {
 }
 
 export async function showMessagingSummaryWrapper() {
-    const messaging = require('./build/messaging');
-    await messaging.showSummary();
+    const MESSAGING = require('./build/messaging');
+    await MESSAGING.showSummary();
 }
 
 

@@ -1,5 +1,5 @@
-// Function to build the cloud starter
-require('./project-functions');
+const CCOM = require('./cloud-communications');
+const colors = require('colors');
 
 export async function showSummary() {
     log(INFO, 'Show Messaging Summary... ');
