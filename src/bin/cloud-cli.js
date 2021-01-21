@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+// #!/usr/bin/env node
 global.TIME = new Date();
 global.SHOW_START_TIME = false;
 global.PROJECT_ROOT = __dirname + '/../../';
