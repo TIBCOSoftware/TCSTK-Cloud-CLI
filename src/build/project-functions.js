@@ -287,7 +287,9 @@ showAvailableApps = function (showTable) {
             process.exit(1);
         }
     } else {
-        //console.log('APPS: ' , response);
+        // console.log('APPS: ' , response);
+        const users = iterateTable(showLiveAppsUsers(false, true));
+        // console.log('USERS: ', users);
         // TODO: Apparently apps can have tags, look into this...
         var apps = {};
         for (var app in response) {
@@ -295,9 +297,14 @@ showAvailableApps = function (showTable) {
             var appN = parseInt(app) + 1;
             //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
             appTemp['APP NAME'] = response[app].name;
-            //appTemp['LINK'] = 'https://eu.liveapps.cloud.tibco.com/webresource/apps/'+response[app].name+'/index.html';
+            let owner = 'Unknown';
+            for (const user of users){
+                if(user.Id == response[app].owner){
+                    owner = user['First Name'] + ' ' + user['Last Name'];
+                }
+            }
+            appTemp['OWNER'] = owner;
             // TODO: Use the API (get artifacts) to find an index.htm(l) and provide highest
-            // TODO: Use right eu / us link
             var publV = parseInt(response[app].publishedVersion);
             appTemp['PUBLISHED VERSION'] = publV;
             var latestV = parseInt(response[app].latestVersion);
