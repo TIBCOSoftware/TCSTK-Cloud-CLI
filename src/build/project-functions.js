@@ -638,7 +638,7 @@ watchSharedStateScope = function () {
     return new Promise(async function (resolve, reject) {
         //Do the login now, so it does not have to be done later
         prepSharedStateProps();
-        cLogin();
+        CCOM.cLogin();
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
             // console.log(event, path);
