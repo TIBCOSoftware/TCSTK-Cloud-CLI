@@ -1,6 +1,6 @@
 const CCOM = require('./cloud-communications');
 const LA = require('./liveApps');
-const colors = require('colors');
+// const colors = require('colors');
 
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {

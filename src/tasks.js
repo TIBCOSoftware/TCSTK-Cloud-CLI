@@ -137,8 +137,13 @@ export async function injectLibSourcesWrapper() {
     await getCLgit();
     CS.injectLibSources();
     await cleanDist();
-};
+}
 
+// Function to generate the cloud descriptor
+export function generateCloudDescriptorWrapper() {
+    const CS = require('./build/cloud-starters');
+    CS.generateCloudDescriptor();
+}
 
 // Function to change the tenant in the properties file
 export async function changeRegion() {
@@ -280,11 +285,8 @@ export async function exportLiveAppsCaseTypeWrapper() {
     await LA.exportLiveAppsCaseType();
 }
 
-export function generateCloudDescriptorWrapper() {
-    generateCloudDescriptor();
-}
-
 export function updateCloudPackagesWrapper() {
+    // Is coming from common
     updateCloudPackages();
 }
 
@@ -334,7 +336,8 @@ export async function showOrgFoldersWrapper() {
 }
 
 export async function generateCloudPropertyFilesWrapper() {
-    await generateCloudPropertyFiles();
+    const PROPM = require('./build/property-file-management');
+    await PROPM.generateCloudPropertyFiles();
 }
 
 export async function exportOrgFolderWrapper() {
@@ -366,7 +369,6 @@ export function showLiveAppsUsersWrapper() {
     const USERGROUPS = require('./build/user-groups');
     USERGROUPS.showLiveAppsUsers(true, false);
 }
-
 
 export async function addUserToGroupWrapper() {
     const USERGROUPS = require('./build/user-groups');

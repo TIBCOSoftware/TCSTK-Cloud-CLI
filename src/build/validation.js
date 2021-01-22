@@ -3,6 +3,8 @@ const LA = require('./liveApps');
 const CFILES = require('./cloud-files');
 const USERGROUPS = require('./user-groups');
 const TCI = require('./tci');
+const CS = require('./cloud-starters');
+
 
 // Function, that does all sorts of validations
 export async function validate() {
@@ -68,7 +70,7 @@ export async function validate() {
 
     // Validate if a Cloud Starter exist
     if (valD == 'cloud_starter_exist') {
-        const apps = showAvailableApps(true);
+        const apps = CS.showAvailableApps(true);
         // console.log(apps);
         await validationItemHelper(apps, 'Cloudstarter', 'name');
     }
