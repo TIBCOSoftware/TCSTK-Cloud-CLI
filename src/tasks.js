@@ -247,41 +247,41 @@ export async function watchSharedStateScopeWrapper() {
 
 // Function to show liveApps
 export function showLiveAppsWrapper() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     LA.showLiveApps(true, true);
 }
 
 // Function to export liveApps cases
 export async function exportLiveAppsDataWrapper() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     await LA.exportLiveAppsData();
 }
 
 export async function generateLiveAppsImportConfiguration() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     await LA.createLAImportFile();
 }
 
 // Function to
 export async function importLiveAppsDataWrapper() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     await LA.importLiveAppsData();
 }
 
 // Function to
 export async function csvToJsonLiveAppsDataWrapper() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     await LA.csvToJsonLiveAppsData();
 }
 
 // Function to
 export async function jsonToCsvLiveAppsDataWrapper() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     await LA.jsonToCsvLiveAppsData();
 }
 
 export async function exportLiveAppsCaseTypeWrapper() {
-    const LA = require('./build/liveApps');
+    const LA = require('./build/live-apps');
     await LA.exportLiveAppsCaseType();
 }
 

@@ -1,5 +1,5 @@
 const CCOM = require('./cloud-communications');
-const LA = require('./liveApps');
+const LA = require('./live-apps');
 // const colors = require('colors');
 
 // Function to generate other property files next to the existing ones

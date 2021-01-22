@@ -1,5 +1,5 @@
 const colors = require('colors');
-const LA = require('./liveApps');
+const LA = require('./live-apps');
 const CFILES = require('./cloud-files');
 const USERGROUPS = require('./user-groups');
 const TCI = require('./tci');
