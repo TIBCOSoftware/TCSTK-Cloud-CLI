@@ -414,7 +414,6 @@ getLastGlobalAnswer = function (question) {
     return re;
 }
 
-
 // Update the cloud login properties
 updateCloudLogin = async function (propFile) {
     // Client ID
@@ -439,23 +438,20 @@ obfuscatePW = function (toObfuscate) {
     return '#' + Buffer.from(toObfuscate).toString('base64');
 }
 
-
 // function to update the tenant
 updateRegion = async function (propFile) {
-    let re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
-    switch (re) {
-        case 'US - Oregon':
-            addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
-            addOrUpdateProperty(propFile, 'Cloud_URL', 'https://liveapps.cloud.tibco.com/');
-            break;
-        case 'EU - Ireland':
-            addOrUpdateProperty(propFile, 'cloudHost', 'eu.liveapps.cloud.tibco.com');
-            addOrUpdateProperty(propFile, 'Cloud_URL', 'https://eu.liveapps.cloud.tibco.com/');
-            break;
-        case 'AU - Sydney':
-            addOrUpdateProperty(propFile, 'cloudHost', 'au.liveapps.cloud.tibco.com');
-            addOrUpdateProperty(propFile, 'Cloud_URL', 'https://au.liveapps.cloud.tibco.com/');
-            break;
+    const re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
+    if (re === 'US - Oregon') {
+        addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
+        addOrUpdateProperty(propFile, 'Cloud_URL', 'https://liveapps.cloud.tibco.com/');
+    }
+    if (re === 'EU - Ireland') {
+        addOrUpdateProperty(propFile, 'cloudHost', 'eu.liveapps.cloud.tibco.com');
+        addOrUpdateProperty(propFile, 'Cloud_URL', 'https://eu.liveapps.cloud.tibco.com/');
+    }
+    if (re === 'AU - Sydney') {
+        addOrUpdateProperty(propFile, 'cloudHost', 'au.liveapps.cloud.tibco.com');
+        addOrUpdateProperty(propFile, 'Cloud_URL', 'https://au.liveapps.cloud.tibco.com/');
     }
 }
 
@@ -612,21 +608,21 @@ run = function (command, failOnError) {
     }
     const execSync = require('child_process').execSync;
     // return new Promise(function (resolve, reject) {
-        log(DEBUG, 'Executing Command: ' + command);
-        try {
-            execSync(
-                command,
-                {stdio: 'inherit'}
-            )
-        } catch (err) {
-            // console.log('Got Error ' , err);
-            // logO(DEBUG, reason);
-            log(ERROR, 'Error Running command: ' + err.message);
-            if (doFail) {
-                process.exit(1);
-            }
-            // reject(err);
+    log(DEBUG, 'Executing Command: ' + command);
+    try {
+        execSync(
+            command,
+            {stdio: 'inherit'}
+        )
+    } catch (err) {
+        // console.log('Got Error ' , err);
+        // logO(DEBUG, reason);
+        log(ERROR, 'Error Running command: ' + err.message);
+        if (doFail) {
+            process.exit(1);
         }
+        // reject(err);
+    }
     // resolve();
     // })
 }
@@ -890,7 +886,6 @@ isOauthUsed = function () {
             re = true
         }
     }
-    // console.log('Is Oauth used: ' , re);
     return re;
 }
 
@@ -900,6 +895,28 @@ isIterable = function (obj) {
         return false;
     }
     return typeof obj[Symbol.iterator] === 'function';
+}
+
+// Get the TIBCO Cloud Starter Development Kit from GIT
+getGit = function (source, target, tag) {
+    log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
+    if (tag == null || tag === 'LATEST' || tag === '') {
+        run('git clone "' + source + '" "' + target + '" ');
+    } else {
+        run('git clone "' + source + '" "' + target + '" -b ' + tag);
+    }
+}
+
+// Function to install NPM packages
+npmInstall = function (location, packageToUse) {
+    return new Promise(function (resolve, reject) {
+        if (packageToUse != null) {
+            run('cd ' + location + ' && npm install ' + packageToUse);
+        } else {
+            run('cd ' + location + ' && npm install');
+        }
+        resolve();
+    });
 }
 
 

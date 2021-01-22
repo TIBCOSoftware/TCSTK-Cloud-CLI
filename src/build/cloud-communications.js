@@ -27,7 +27,7 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
         if (getOrganization() == null || getOrganization().trim() == '') {
             // Setting this to temp so it breaks the call stack
             // setOrganization('TEMP');
-            var response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
+            const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
                 log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
@@ -49,21 +49,21 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
             log(INFO, 'Using CLIENT-ID Authentication (consider using OAUTH)...');
             toldClientID = true;
         }
-        var setLoginURL = loginURL;
+        let setLoginURL = loginURL;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
             // Delete the previous cookie on a custom login
             loginC = null;
         }
 
-        var tentantID = getProp('CloudLogin.tenantID');
+        let tentantID = getProp('CloudLogin.tenantID');
         if (tenant) {
             tentantID = tenant;
         }
         //TODO: Set a timer, if login was too long ago login again...
-        var pass = getProp('CloudLogin.pass');
-        var clientID = getProp('CloudLogin.clientID');
-        var email = getProp('CloudLogin.email');
+        let pass = getProp('CloudLogin.pass');
+        let clientID = getProp('CloudLogin.clientID');
+        let email = getProp('CloudLogin.email');
         //
         //TODO: Manage global config in common functions
         if (getGlobalConfig()) {
@@ -97,16 +97,16 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
 
 // Function that logs into the cloud and returns a cookie
 function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
-    var postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
+    const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
     log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
     log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
     //log(DEBUG,'With Form: ' + postForm);
     const syncClient = require('sync-rest-client');
-    var response = syncClient.post(encodeURI(TCbaseURL), {
+    const response = syncClient.post(encodeURI(TCbaseURL), {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         payload: postForm
     });
-    var re = '';
+    let re = '';
     //console.log(response.body);
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
@@ -115,10 +115,10 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         if (response.body.orgName) {
             setOrganization(response.body.orgName);
         }
-        var loginCookie = response.headers['set-cookie'];
+        const loginCookie = response.headers['set-cookie'];
         logO(DEBUG, loginCookie);
-        var rxd = /domain=(.*?);/g;
-        var rxt = /tsc=(.*?);/g;
+        const rxd = /domain=(.*?);/g;
+        const rxt = /tsc=(.*?);/g;
         re = {"domain": rxd.exec(loginCookie)[1], "tsc": rxt.exec(loginCookie)[1]};
         logO(DEBUG, re.domain);
         logO(DEBUG, re.tsc);
@@ -215,26 +215,48 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
     }
 }
 
-
+// Wrapper around the callURL function that takes a config object
 export function callTC(url, doLog, conf) {
-    // TODO: Implement
-    // console.log('calling: ', url);
     if(conf == null){
         conf = {};
     }
     const urlToCall = 'https://' + getCurrentRegion() + url;
     //url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
-    // (url, 'GET', null, null, false, null, null, null, null, null, true)
     return callURL(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside);
-
-    /*
-    if(config == null){
-
-    }
-
-    // (url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside)
-    return callURL(url, config.method, )
-    */
 }
 
 
+// Function to show claims for the configured user
+export function showCloudInfo(showTable) {
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
+    let doShowTable = true;
+    if (showTable != null) {
+        doShowTable = showTable;
+    }
+    const response = callTC(clURI.claims);
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
+    let nvs = createTableValue('REGION', getRegion());
+    nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
+    nvs = createTableValue('FIRST NAME', response.firstName, nvs);
+    nvs = createTableValue('LAST NAME', response.lastName, nvs);
+    nvs = createTableValue('EMAIL', response.email, nvs);
+    if (response.sandboxes) {
+        for (let i = 0; i < response.sandboxes.length; i++) {
+            nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
+            nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);
+        }
+    }
+    // TODO: display groups
+    if (doShowTable) {
+        console.table(nvs);
+    }
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
+}
+
+// TODO: What to do with passwords and where is this used ?
+function checkPW() {
+    if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') === '') {
+        log(ERROR, 'Please provide your password to login to the tibco cloud in the file tibco-cloud.properties (for property: CloudLogin.pass)');
+        process.exit();
+    }
+}

@@ -69,3 +69,27 @@ function getTIBCli() {
     }
     return re;
 }
+
+// Use WSU to generate TCI code
+function wsuAddTci() {
+    return new Promise(async function (resolve, reject) {
+        // TODO: Implement
+        console.log('TODO: Implement');
+        resolve();
+    });
+}
+
+function wsuListTci() {
+    return new Promise(async function (resolve, reject) {
+        // TODO: Remove web scaffolding utility ?
+        /*const wsu = require('@tibco-tcstk/web-scaffolding-utility');
+        console.log(wsu.API.getVersion());
+        wsu.API.login(getProp('CloudLogin.clientID'), getProp('CloudLogin.email'), getProp('CloudLogin.pass'));
+        // console.log(wsu.API.getArtefactList("TCI").createTable());
+        const afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
+        console.table(afList.createTable());
+        */
+        resolve();
+
+    });
+}

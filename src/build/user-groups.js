@@ -2,7 +2,7 @@ const CCOM = require('./cloud-communications');
 const LA = require('./liveApps');
 const colors = require('colors');
 
-function getGroupsTable(showTable) {
+export function getGroupsTable(showTable) {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;

@@ -1,172 +1,14 @@
 //import functions
 require('./build/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
-require('./build/project-functions');
-if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Projects');
 const version = require('../package.json').version;
-// const isWindows = process.platform == 'win32';
-
-// Function to show cloud info
-export async function showCloud() {
-    await showCloudInfo();
-}
-
-// Show all the cloud starters
-export function showApps() {
-    showAvailableApps(true);
-}
-
-//Show all the cloud starter links
-export function showLinks() {
-    getAppLinks(true);
-}
-
-// Function to build the cloud starter
-export async function buildCloudStarter() {
-    await cleanDist();
-    log('INFO', 'Building... ' + getProp('App_Name'));
-    buildCloudStarterZip(getProp('App_Name'));
-}
-
-// Function to delpoy the cloud starter
-export async function deploy() {
-    log(INFO, 'Deploying ' + getProp('App_Name') + ' to:');
-    showCloudInfo();
-    await uploadApp(getProp('App_Name'));
-    log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
-    showAppLinkInfo();
-}
-
-export async function buildDeploy() {
-    await buildCloudStarter();
-    await deploy();
-}
-
-// TODO: look at exporting all functions at once
-//module.exports = {deploy, buildCloudStarter, buildDeploy}
-
-// Function to delete a WebApplication
-export async function deleteApp() {
-    // Get the list of applications
-    log(INFO, 'Getting Applications...');
-    const appArray = new Array();
-    appArray.push('NONE');
-    let deleteApp = false;
-    const apps = showAvailableApps(true);
-    for (let app of apps) {
-        appArray.push(app.name);
-    }
-    const appToDelete = await askMultipleChoiceQuestionSearch('Which APP Would you like to delete ? ', appArray);
-    if (appToDelete != 'NONE') {
-        const confirm = await askMultipleChoiceQuestion('Are you sure you want to delete ? ' + appToDelete, ['YES', 'NO']);
-        if (confirm == 'YES') {
-            deleteApp = true;
-        }
-    }
-    if (deleteApp) {
-        log(INFO, 'Deleting ' + appToDelete + '...');
-        const da = doDeleteApp(appToDelete);
-
-        if (da) {
-            if (da.message) {
-                log(INFO, da.message);
-            } else {
-                log(ERROR, 'Error On Delete: ', da);
-            }
-        } else {
-            log(ERROR, 'No Body Returned on Delete:  ', da);
-        }
-
-    } else {
-        log(INFO, 'Ok I won\'t do anything...');
-    }
-}
-
-// Function to publish the cloud starter
-export async function publish() {
-    await publishApp(getProp('App_Name'));
-    log(INFO, 'APP PUBLISHED: ' + getProp('App_Name'));
-    showAppLinkInfo();
-}
-
-// Clean temp folder
-export async function cleanTemp() {
-    log(INFO, 'Cleaning Temp Directory: ' + getProp('Workspace_TMPFolder'));
-    return deleteFolder(getProp('Workspace_TMPFolder'));
-}
-
-// Function to get the cloud library sources from GIT
-export async function getCLgit() {
-    return getGit(getProp('GIT_Source_TCSTLocation'), getProp('TCSTLocation'), getProp('GIT_Tag_TCST'));
-}
-
-// Function that injects the sources of the library into this project
-export function injectLibSources() {
-    log('INFO', 'Injecting Lib Sources');
-    //run('mkdir tmp');
-    mkdirIfNotExist('./projects/tibco-tcstk');
-    copyDir('./tmp/TCSDK-Angular/projects/tibco-tcstk', './projects/tibco-tcstk');
-    //use debug versions
-    var now = new Date();
-    mkdirIfNotExist('./backup/');
-    // Make Backups in the back up folder
-    copyFile('./tsconfig.json', './backup/tsconfig-Before-Debug(' + now + ').json');
-    copyFile('./angular.json', './backup/angular-Before-Debug(' + now + ').json');
-    copyFile('./package.json', './backup/package-Before-Debug(' + now + ').json');
-    copyFile('./tsconfig.debug.json', './tsconfig.json');
-    copyFile('./angular.debug.json', './angular.json');
-    //copyFile('./package.debug.json', './package.json');
-    run('npm uninstall ' + getProp('TCSTDebugPackages'));
-    //do NPM install
-    //npmInstall('./');
-    npmInstall('./', 'lodash-es');
-    log('INFO', 'Now you can debug the cloud library sources in your browser !!');
-}
-
-// Inject the sources from the libs into a cloud starter project
-export async function injectLibSourcesWrapper() {
-    //'clean', 'get-cloud-libs-from-git', 'format-project-for-lib-sources', 'clean'
-    await cleanDist();
-    await getCLgit();
-    injectLibSources();
-    await cleanDist();
-};
-
-// Function to go back to the compiled versions of the libraries
-export function undoLibSources() {
-    log('INFO', 'Undo-ing Injecting Lib Sources');
-    //Move back to Angular build files
-    var now = new Date();
-    mkdirIfNotExist('./backup/');
-    // Make Backups in the back up folder
-    copyFile('./tsconfig.json', './backup/tsconfig-Before-Build(' + now + ').json');
-    copyFile('./angular.json', './backup/angular-Before-Build(' + now + ').json');
-    copyFile('./package.json', './backup/package-Before-Build(' + now + ').json');
-    copyFile('./tsconfig.build.json', './tsconfig.json');
-    copyFile('./angular.build.json', './angular.json');
-    // copyFile('./package.build.json', './package.json');
-    //Delete Project folder
-    //FIX: Just delete those folders imported...
-    deleteFolder('./projects/tibco-tcstk/tc-core-lib');
-    deleteFolder('./projects/tibco-tcstk/tc-forms-lib');
-    deleteFolder('./projects/tibco-tcstk/tc-liveapps-lib');
-    deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
-    //FIX: just install those npm packages (instead of removing the entire package.json file...)
-    run('npm install ' + getProp('TCSTDebugPackages'));
-
-}
-
-// Function to change the tenant in the properties file
-export async function changeRegion() {
-    await updateRegion(getPropFileName());
-};
 
 // Function to display help
 export async function helptcli() {
     log(INFO, 'These are the available TIBCO CLOUD CLI Tasks:');
     const cTsks = cliTaskConfig.cliTasks;
     for (let cliTask in cTsks) {
-        var allowed = false;
+        let allowed = false;
         if (cTsks[cliTask].availableOnOs != null) {
             for (let allowedOS of cTsks[cliTask].availableOnOs) {
                 // console.log('OS:' + allowedOS);
@@ -176,62 +18,13 @@ export async function helptcli() {
             }
         }
         if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
-            var str = cliTask;
-            var x = 30 - cliTask.length;
+            let str = cliTask;
+            const x = 30 - cliTask.length;
             for (let i = 0; i < x; i++) {
                 str = ' ' + str;
             }
             console.log('\x1b[36m%s\x1b[0m', str + ':', ' ' + cTsks[cliTask].description);
         }
-    }
-}
-
-// Required to be valid for more than a week (default generation 2 weeks)
-// Start Cloudstarter Locally
-export async function start() {
-    log(INFO, 'Starting: ' + getProp('App_Name'));
-    if (isOauthUsed()) {
-        const oauth = require('./build/oauth');
-        await oauth.validateAndRotateOauthToken(true);
-    }
-    //Check if port 4200 is available, if not use 4201, 4202 etc.
-    let port = 4200;
-    const range = 50;
-    let portToUse = 0;
-    for (let i = 0; i < range; i++) {
-        let pAv = await isPortAvailable(port + i);
-        if (pAv) {
-            portToUse = port + i;
-            i = range;
-        }
-    }
-    if (portToUse != 0) {
-        log('INFO', 'Using Port: ' + portToUse);
-        let myHost = getProp('cloudHost');
-        if (portToUse == 4200) {
-            // TODO: Fix bug, can not read includes of undefined (no global config, and no password)
-            if (myHost.includes('eu')) {
-                run('npm run serve_eu');
-            } else {
-                if (myHost.includes('au')) {
-                    run('npm run serve_au');
-                } else {
-                    run('npm run serve_us');
-                }
-            }
-        } else {
-            if (myHost.includes('eu')) {
-                run('ng serve --proxy-config proxy.conf.prod.eu.js --ssl true --source-map --aot --port ' + portToUse);
-            } else {
-                if (myHost.includes('au')) {
-                    run('ng serve --proxy-config proxy.conf.prod.au.js --ssl true --source-map --aot --port ' + portToUse);
-                } else {
-                    run('ng serve --proxy-config proxy.conf.prod.us.js --ssl true --source-map --aot --port ' + portToUse);
-                }
-            }
-        }
-    } else {
-        log('ERROR', 'No available port found (started at ' + port + ', with range: ' + range + ')');
     }
 }
 
@@ -247,33 +40,131 @@ export async function mainT() {
         setProperty('CloudLogin.pass', obfuscatePW(pass));
     }
     await promptTask(__dirname, appRoot);
-};
-
+}
 
 export async function test() {
     console.log('Test...');
-    var now = new Date();
+    const now = new Date();
     console.log(now);
     //addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token',  'NEW-' + now);
     console.log(' OAUTH Token: ', getProp('CloudLogin.OAUTH_Token'));
     console.log('OAUTH Token2: ', getProp('CloudLogin.OAUTH_Token'));
 }
 
+// Function to show cloud info
+export async function showCloud() {
+    const CCOM = require('./build/cloud-communications');
+    await CCOM.showCloudInfo();
+}
+
+// Required to be valid for more than a week (default generation 2 weeks)
+// Start Cloudstarter Locally
+export async function startWrapper() {
+    const CS = require('./build/cloud-starters');
+    await CS.start();
+}
+
+// Function to publish the cloud starter
+export async function publish() {
+    const CS = require('./build/cloud-starters');
+    await CS.publishApp(getProp('App_Name'));
+    log(INFO, 'APP PUBLISHED: ' + getProp('App_Name'));
+    CS.showAppLinkInfo();
+}
+
+// Show all the cloud starters
+export function showApps() {
+    const CS = require('./build/cloud-starters');
+    CS.showAvailableApps(true);
+}
+
+// Show all the cloud starters
+export async function deleteAppWrapper() {
+    const CS = require('./build/cloud-starters');
+    await CS.deleteApp();
+}
+
+
+//Show all the cloud starter links
+export function showLinks() {
+    const CS = require('./build/cloud-starters');
+    CS.getAppLinks(true);
+}
+
+// Function to build the cloud starter
+export async function buildCloudStarter() {
+    const CS = require('./build/cloud-starters');
+    await CS.cleanDist();
+    log('INFO', 'Building... ' + getProp('App_Name'));
+    CS.buildCloudStarterZip(getProp('App_Name'));
+}
+
+// Function to delpoy the cloud starter
+export async function deploy() {
+    const CCOM = require('./build/cloud-communications');
+    const CS = require('./build/cloud-starters');
+    log(INFO, 'Deploying ' + getProp('App_Name') + ' to:');
+    CCOM.showCloudInfo();
+    await CS.uploadApp(getProp('App_Name'));
+    log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
+    CS.showAppLinkInfo();
+}
+
+export async function buildDeploy() {
+    // Getting these functions from self
+    await buildCloudStarter();
+    await deploy();
+}
+
+// Clean temp folder
+export async function cleanTemp() {
+    // Getting this from common
+    log(INFO, 'Cleaning Temp Directory: ' + getProp('Workspace_TMPFolder'));
+    return deleteFolder(getProp('Workspace_TMPFolder'));
+}
+
+// Function to get the cloud library sources from GIT
+export async function getCLgit() {
+    // Getting this from common
+    return getGit(getProp('GIT_Source_TCSTLocation'), getProp('TCSTLocation'), getProp('GIT_Tag_TCST'));
+}
+
+// Inject the sources from the libs into a cloud starter project
+export async function injectLibSourcesWrapper() {
+    //'clean', 'get-cloud-libs-from-git', 'format-project-for-lib-sources', 'clean'
+    const CS = require('./build/cloud-starters');
+    await cleanDist();
+    await getCLgit();
+    CS.injectLibSources();
+    await cleanDist();
+};
+
+
+// Function to change the tenant in the properties file
+export async function changeRegion() {
+    // Getting this from common
+    await updateRegion(getPropFileName());
+};
+
+
 export async function obfuscate() {
-    var password = await askQuestion('Please provide the password...', 'password');
+    const password = await askQuestion('Please provide the password...', 'password');
+    // Getting this fromo common
     console.log('\nObfuscated password is is: ' + obfuscatePW(password));
 }
 
 export function viewGlobalConfig() {
+    // Is coming from Common
     displayGlobalConnectionConfig();
 }
 
 export async function updateGlobalConfig() {
+    // Is coming from Common
     await updateGlobalConnectionConfig();
 }
 
 // Function to replace a string in a file
-export async function replaceStringInFileOne(prefix) {
+export function replaceStringInFileOne(prefix) {
     let rFrom = getProp(prefix + 'Replace_FROM');
     let rTo = getProp(prefix + 'Replace_TO');
     const rPat = getProp(prefix + 'Replace_PATTERN');
@@ -294,7 +185,7 @@ export async function replaceStringInFileWrapper() {
         replaceStringInFileOne('');
     } else {
         const replaceA = rMul.split(',');
-        for (var i = 0; i < replaceA.length; i++) {
+        for (let i = 0; i < replaceA.length; i++) {
             const currentRep = trim(replaceA[i]);
             replaceStringInFileOne(currentRep);
         }
@@ -303,6 +194,7 @@ export async function replaceStringInFileWrapper() {
 
 // Wrapper to create a multiple prop file
 export async function createMultiplePropertyFileWrapper() {
+    // Is coming from Common
     await createMultiplePropertyFile();
 }
 
@@ -487,11 +379,13 @@ export async function validateWrapper() {
 }
 
 export async function updatePropertyWrapper() {
-    await updateProperty();
+    const PROPM = require('./build/property-file-management');
+    await PROPM.updateProperty();
 }
 
 export async function schematicAddWrapper() {
-    await schematicAdd();
+    const SCHEMATICS = require('./build/schematics');
+    await SCHEMATICS.schematicAdd();
 }
 
 export async function showMessagingSummaryWrapper() {
@@ -500,7 +394,7 @@ export async function showMessagingSummaryWrapper() {
 }
 
 
-// Comes from prop file now...
+// Comes from prop file
 let gtasks = [];
 const cliTaskConfig = require('./config/config-cli-task.json');
 const cTsks = cliTaskConfig.cliTasks;
@@ -562,7 +456,7 @@ export async function promptTask(stDir, cwdDir) {
                 return resolve();
             } else {
                 // Check if we need to repeat the last task
-                var comToInject = selectedTaskConfig.taskName;
+                let comToInject = selectedTaskConfig.taskName;
                 if (com == 'repeat-last-task') {
                     log('INFO', 'Repeating Last Task: ' + globalLastCommand);
                     comToInject = globalLastCommand;
@@ -597,7 +491,7 @@ export async function searchAnswer(answers, input) {
     input = input || '';
     return new Promise(function (resolve) {
         setTimeout(function () {
-            var fuzzyResult = fuzzy.filter(input, gtasks);
+            const fuzzyResult = fuzzy.filter(input, gtasks);
             resolve(
                 fuzzyResult.map(function (el) {
                     return el.original;
@@ -606,3 +500,6 @@ export async function searchAnswer(answers, input) {
         }, _.random(30, 60));
     });
 }
+
+// Set log debug level from local property
+setLogDebug(getProp('Use_Debug'));

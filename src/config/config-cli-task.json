@@ -56,7 +56,7 @@
       "description": "Start your local cloud starter project",
       "enabled": true,
       "internal": false,
-      "task": "start",
+      "task": "startWrapper",
       "taskName": "start",
       "availableOnOs": ["all"]
     },
@@ -96,7 +96,7 @@
       "description": "Delete a LiveApps WebApp",
       "enabled": true,
       "internal": false,
-      "task": "deleteApp",
+      "task": "deleteAppWrapper",
       "taskName": "delete-cloud-starter",
       "availableOnOs": ["all"]
     },

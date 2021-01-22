@@ -1,6 +1,8 @@
 const colors = require('colors');
 const LA = require('./liveApps');
 const CFILES = require('./cloud-files');
+const USERGROUPS = require('./user-groups');
+const TCI = require('./tci');
 
 // Function, that does all sorts of validations
 export async function validate() {
@@ -46,21 +48,21 @@ export async function validate() {
 
     // Validate if a liveApps App exist
     if (valD == 'liveapps_app_exist') {
-        const apps = showLiveApps(false, false);
+        const apps = LA.showLiveApps(false, false);
         await validationItemHelper(apps, 'LiveApps App', 'name')
     }
 
     // Validate if a liveApps Group exist
     // Live_Apps_group_exist
     if (valD == 'live_apps_group_exist') {
-        const groups = getGroupsTable(false);
+        const groups = USERGROUPS.getGroupsTable(false);
         // console.log(iterateTable(groups));
         await validationItemHelper(iterateTable(groups), 'LiveApps Group', 'Name');
     }
 
     // Validate if a Flogo App exist
     if (valD == 'tci_app_exist') {
-        const apps = showTCI(false);
+        const apps = TCI.showTCI(false);
         await validationItemHelper(iterateTable(apps), 'TCI App', 'Name');
     }
 
