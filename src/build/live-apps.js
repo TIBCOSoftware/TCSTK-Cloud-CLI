@@ -268,7 +268,7 @@ export async function importLiveAppsData() {
         }
     }
     // console.log(impConf);
-    showCloudInfo();
+    CCOM.showCloudInfo();
     log(INFO, '\x1b[34m                   -- IMPORT SUMMARY --- ');
     log(INFO, '\x1b[34m -       Number of Imports: ' + numberOfImports);
     log(INFO, '\x1b[34m -              Sandbox ID: ' + sBid);
