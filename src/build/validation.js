@@ -101,7 +101,7 @@ export async function validate() {
 }
 
 // Validate the state of a case
-function validateLACaseState(caseRefToValidate, stateToValidate) {
+export function validateLACaseState(caseRefToValidate, stateToValidate) {
     // First check if case exists
     validateLACase(caseRefToValidate, 'case_exist');
     const caseData = JSON.parse(LA.getLaCaseByReference(caseRefToValidate).untaggedCasedata);
@@ -113,7 +113,7 @@ function validateLACaseState(caseRefToValidate, stateToValidate) {
 }
 
 // Validate if case exists or not
-function validateLACase(casesToValidate, valType) {
+export function validateLACase(casesToValidate, valType) {
     const caseRefArray = casesToValidate.split('+');
     for (let casRef of caseRefArray) {
         let validCase = false;

@@ -1,4 +1,6 @@
 const CCOM = require('./cloud-communications');
+//TODO Possibly circular dependency ???
+const VAL = require('./validation');
 
 let globalProductionSandbox = null;
 export function getProductionSandbox() {
@@ -400,12 +402,12 @@ export async function importLiveAppsData() {
                         const vAction = stepConf['validation-action'].toLowerCase().trim();
                         let actFound = false;
                         if (vAction == 'case_exist' || vAction == 'case_not_exist') {
-                            validateLACase(caseRef.toString(), vAction);
+                            VAL.validateLACase(caseRef.toString(), vAction);
                             actFound = true;
                         }
                         if (vAction == 'case_in_state') {
                             if (stepConf['expected-state'] != null) {
-                                validateLACaseState(caseRef.toString(), stepConf['expected-state']);
+                                VAL.validateLACaseState(caseRef.toString(), stepConf['expected-state']);
                             } else {
                                 log(ERROR, 'expected-state not found on ', stepConf);
                             }
