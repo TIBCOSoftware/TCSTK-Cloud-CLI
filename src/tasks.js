@@ -44,13 +44,7 @@ export async function mainT() {
 
 export async function test() {
     console.log('Test...');
-    // docs/tutorials/000_what-is-it.md
-    const fs = require('fs');
-    const mdFile = fs.readFileSync(global.PROJECT_ROOT + 'docs/use-cases/UC1_Get_Started.md', 'utf8');
-    // console.log(mdFile);
-    require('echomd')(mdFile);
-
-
+    displayMDFile('docs/use-cases/UC1_Get_Started.md');
 
 }
 

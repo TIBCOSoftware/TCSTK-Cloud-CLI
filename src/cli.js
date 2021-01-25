@@ -280,6 +280,7 @@ export async function cli(args) {
                         await tasks[directTaskMethod]();
                     } catch (err) {
                         log(ERROR, 'Task ' + options.task + ' failed: ' + err.message);
+                        console.log(err)
                     }
                 } else {
                     log(ERROR, 'No Implementation Task found for ' + options.task);

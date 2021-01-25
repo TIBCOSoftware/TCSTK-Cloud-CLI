@@ -46,7 +46,8 @@
     "assets": [
       "node_modules/**/*",
       "dist/**/*",
-      "templates/**/*"
+      "templates/**/*",
+      "docs/**/*"
     ],
     "targets": [
       "node12-macos-x64",

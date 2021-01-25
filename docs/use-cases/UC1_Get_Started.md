@@ -4,11 +4,11 @@
 
 In this tutorial we will do the following:
 
-1. Install the CLI
-2. Create a new cloud property file
-3. Add the Client ID (of the organization we want to work with)
-4. Create an OAUTH Token
-5. 
+* Install the CLI
+* Create a new cloud property file
+* Add the Client ID (of the organization we want to work with)
+* Create an OAUTH Token
+* 
 
 ## Step 1 - Install the CLI
 

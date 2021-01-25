@@ -919,6 +919,14 @@ npmInstall = function (location, packageToUse) {
     });
 }
 
+// Function to display an MD File in the Console
+displayMDFile = function (mdFile) {
+    const fs = require('fs');
+    console.log(global.PROJECT_ROOT + mdFile);
+    const mdFileContent = fs.readFileSync(global.PROJECT_ROOT + mdFile, 'utf8');
+    const ECHOMD = require('./../echomd/echomd').echomd;
+    console.log(ECHOMD(mdFileContent));
+}
 
 //Common log function
 global.INFO = 'INFO';
