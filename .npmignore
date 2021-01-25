@@ -27,7 +27,7 @@
 /applicationTemplate/template2
 
 # documentation
-/docs/**
+# /docs/**
 
 # White source stuff
 .whitesource
