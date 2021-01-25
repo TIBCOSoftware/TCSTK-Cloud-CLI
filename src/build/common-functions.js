@@ -6,7 +6,7 @@ const colors = require('colors');
 
 // Display opening
 displayOpeningMessage = function () {
-    //var pjson = require('./package.json');
+    //const pjson = require('./package.json');
     //console.log(process.env.npm_package_version);
     const version = require('../../package.json').version;
     console.log('\x1b[35m%s\x1b[0m', '# |-------------------------------------------|');
@@ -19,7 +19,7 @@ displayOpeningMessage = function () {
 // function to view the global connection configuration, and display's none if not set
 displayGlobalConnectionConfig = function () {
     // console.log('Global Connection Config: ');
-    var re = false;
+    let re = false;
     log(INFO, 'Global Tibco Cloud Propfile: ' + globalTCpropFile);
     //Global Prop file is __dirname (build folder in the global prop)
     // This folder ../../../ --> is the main node modules folder
@@ -34,7 +34,7 @@ displayGlobalConnectionConfig = function () {
         //file exists
         const PropertiesReader = require('properties-reader');
         const propsG = PropertiesReader(globalTCpropFile).path();
-        var passType = "STORED IN PLAIN TEXT !";
+        let passType = "STORED IN PLAIN TEXT !";
         if (propsG.CloudLogin.pass === "") {
             passType = "NOT STORED";
         }
@@ -42,7 +42,7 @@ displayGlobalConnectionConfig = function () {
             passType = "OBFUSCATED";
         }
         log(INFO, 'Global Connection Configuration:');
-        var globalConfig = {
+        const globalConfig = {
             "CLOUD HOST": propsG.cloudHost,
             "EMAIL": propsG.CloudLogin.email,
             "CLIENT ID": propsG.CloudLogin.clientID,
@@ -223,11 +223,11 @@ setProperty = function (name, value) {
 }
 
 function set(path, value, obj) {
-    var schema = obj;  // a moving reference to internal objects within obj
-    var pList = path.split('.');
-    var len = pList.length;
-    for (var i = 0; i < len - 1; i++) {
-        var elem = pList[i];
+    let schema = obj;  // a moving reference to internal objects within obj
+    const pList = path.split('.');
+    const len = pList.length;
+    for (let i = 0; i < len - 1; i++) {
+        const elem = pList[i];
         if (!schema[elem]) schema[elem] = {}
         schema = schema[elem];
     }
@@ -293,7 +293,7 @@ copyFile = function (fromFile, toFile) {
 askQuestion = async function (question, type = 'input') {
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
-        var re = 'result';
+        let re = 'result';
         // console.log('Type: ' , type);
         await inquirerF.prompt([{
             type: type,
@@ -340,7 +340,7 @@ askMultipleChoiceQuestion = async function (question, options) {
 
 }
 
-var gOptions = [];
+let gOptions = [];
 // Ask a question to a user, and allow the user to search through a possilbe set of options
 askMultipleChoiceQuestionSearch = async function (question, options) {
     let re = '';
@@ -373,7 +373,7 @@ searchAnswerF = function (answers, input) {
     input = input || '';
     return new Promise(function (resolve) {
         setTimeout(function () {
-            var fuzzyResult = fuzzyF.filter(input, gOptions);
+            const fuzzyResult = fuzzyF.filter(input, gOptions);
             resolve(
                 fuzzyResult.map(function (el) {
                     return el.original;
@@ -420,13 +420,13 @@ updateCloudLogin = async function (propFile) {
     log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
     // TODO: did not get question for  client ID... ???
     console.log('CLIENT ID');
-    var cid = await askQuestion('What is your Client ID ?');
+    const cid = await askQuestion('What is your Client ID ?');
     addOrUpdateProperty(propFile, 'CloudLogin.clientID', cid);
     // Username & Password (obfuscate)
-    var email = await askQuestion('What is your User Name (Email) ?');
+    const email = await askQuestion('What is your User Name (Email) ?');
     addOrUpdateProperty(propFile, 'CloudLogin.email', email);
     log('INFO', 'Your password will be obfuscated, but is not unbreakable (press enter to skip and enter manually later)');
-    var pass = await askQuestion('What is your Password ?', 'password');
+    const pass = await askQuestion('What is your Password ?', 'password');
     if (pass != '') {
         addOrUpdateProperty(propFile, 'CloudLogin.pass', obfuscatePW(pass));
     }
@@ -547,8 +547,8 @@ addOrUpdateProperty = function (location, property, value, comment) {
             //file exists
             log(DEBUG, 'Property file found: ' + location);
             // Check if file contains property
-            // var data = fs.readFileSync(location, 'utf8');
-            var dataLines = fs.readFileSync(location, 'utf8').split('\n');
+            // const data = fs.readFileSync(location, 'utf8');
+            const dataLines = fs.readFileSync(location, 'utf8').split('\n');
             let propFound = false;
             for (let lineNumber in dataLines) {
                 if (!dataLines[lineNumber].startsWith('#')) {
@@ -681,11 +681,11 @@ doesFileExist = function (checkFile) {
 
 // function to deternmine enabled tasks for workspace
 determineEnabledTasks = function (cliTaskConfig) {
-    var cTsks = cliTaskConfig.cliTasks;
-    var re = [];
+    const cTsks = cliTaskConfig.cliTasks;
+    const re = [];
     for (cliTask in cTsks) {
         console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
-        var allowed = false;
+        let allowed = false;
         if (cTsks[cliTask].availableOnOs != null) {
             for (allowedOS of cTsks[cliTask].availableOnOs) {
                 console.log('OS:' + allowedOS);
@@ -717,15 +717,15 @@ sleep = async function (ms) {
 }
 
 createTable = function (arrayObject, config, doShowTable) {
-    var tableObject = {};
-    for (var element in arrayObject) {
-        var tableRow = {};
-        var rowNumber = parseInt(element) + 1;
+    const tableObject = {};
+    for (const element in arrayObject) {
+        const tableRow = {};
+        const rowNumber = parseInt(element) + 1;
         // TODO: Change to debug
         //log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
         for (let conf of config.entries) {
             if (conf.format && conf.format.toLowerCase() == 'date') {
-                var options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+                const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
                 tableRow[conf.header] = new Date(_F.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
             } else {
                 tableRow[conf.header] = _F.get(arrayObject[element], conf.field);
@@ -937,7 +937,7 @@ setLogDebug = function (debug) {
 log = function (level, ...message) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level == DEBUG && !useDebug)) {
-        var timeStamp = new Date();
+        const timeStamp = new Date();
         // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
         if (level == global.ERROR) {
             console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', '\x1b[31m', ...message, '\033[0m');

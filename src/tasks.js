@@ -44,11 +44,14 @@ export async function mainT() {
 
 export async function test() {
     console.log('Test...');
-    const now = new Date();
-    console.log(now);
-    //addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token',  'NEW-' + now);
-    console.log(' OAUTH Token: ', getProp('CloudLogin.OAUTH_Token'));
-    console.log('OAUTH Token2: ', getProp('CloudLogin.OAUTH_Token'));
+    // docs/tutorials/000_what-is-it.md
+    const fs = require('fs');
+    const mdFile = fs.readFileSync(global.PROJECT_ROOT + 'docs/use-cases/UC1_Get_Started.md', 'utf8');
+    // console.log(mdFile);
+    require('echomd')(mdFile);
+
+
+
 }
 
 // Function to show cloud info

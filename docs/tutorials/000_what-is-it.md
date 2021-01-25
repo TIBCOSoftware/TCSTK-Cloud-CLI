@@ -16,9 +16,3 @@ Behind the scene, it will use technologies such as :
 - Gulp
 - NPM
 - Schematic
-
-
-
-TODO @Hugo how do we handle list of features ?
-
-
