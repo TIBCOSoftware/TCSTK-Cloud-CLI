@@ -297,9 +297,9 @@ export async function monitorTCIWrapper() {
     await TCI.monitorTCI();
 }
 
-export async function showSpotfireReportsWrapper() {
+export async function browseSpotfireLibraryWrapper() {
     const SPOTFIRE = require('./build/spotfire');
-    await SPOTFIRE.showSpotfire();
+    await SPOTFIRE.browseSpotfire();
 }
 
 export async function generateOauthTokenWrapper() {

@@ -131,7 +131,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
 
 // Function to call the Tibco Cloud
 // TODO: Accept, URL, doLog and possible config
-function callURL(url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside) {
+function callURL(url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside, customHeaders) {
     const doErrorOutside = handleErrorOutside || false;
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
@@ -157,15 +157,21 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
             body = postRequest;
         }
     }
-
-    const header = {};
+    let header = {};
+    if(customHeaders) {
+        header = customHeaders;
+    }
     header["accept"] = 'application/json';
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
     if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
     } else {
-        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        if(header["cookie"]){
+            header["cookie"] += "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        } else {
+            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        }
     }
     if (fCLIENTID) {
         header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -177,7 +183,7 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         log(INFO, '- URL(' + cMethod + '): ' + url);
         log(DEBUG, '-  METHOD: ' + cMethod);
         log(DEBUG, '- CONTENT: ' + cType);
-        log(DEBUG, '-  HEADER: ', header);
+        log(INFO, '-  HEADER: ', header);
     }
     if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
         if (cdoLog) {
@@ -198,31 +204,40 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         });
         // console.log('Response: ', response.statusCode);
     }
-    if (response.body.errorMsg != null) {
-        if (doErrorOutside) {
-            return response.body;
+    // console.log('Response: ', response.body);
+    if (response.body) {
+        if (response.body.errorMsg != null) {
+            if (doErrorOutside) {
+                return response.body;
+            } else {
+                log(ERROR, response.body.errorMsg);
+                log(ERROR, response.body);
+            }
+            return null;
         } else {
-            log(ERROR, response.body.errorMsg);
-            log(ERROR, response.body);
+            if (reResponse) {
+                return response;
+            }
+            // log(INFO, '-  RESPONSE: ', response.body);
+            return response.body;
         }
-        return null;
     } else {
         if (reResponse) {
             return response;
+        } else {
+            log(ERROR, 'No Body Returned, Status: ', response.statusCode);
         }
-        // log(INFO, '-  RESPONSE: ', response.body);
-        return response.body;
     }
 }
 
 // Wrapper around the callURL function that takes a config object
 export function callTC(url, doLog, conf) {
-    if(conf == null){
+    if (conf == null) {
         conf = {};
     }
     const urlToCall = 'https://' + getCurrentRegion() + url;
     //url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
-    return callURL(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside);
+    return callURL(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
 }
 
 

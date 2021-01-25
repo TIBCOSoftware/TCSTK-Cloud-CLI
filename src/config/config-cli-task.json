@@ -495,13 +495,13 @@
       "taskName": "messaging-show-summary",
       "availableOnOs": ["all"]
     },
-    "show-spotfire-reports": {
-      "description": "List all Spotfire Analytical Reports.",
-      "enabled": false,
+    "54. browse-spotfire-library": {
+      "description": "List Spotfire Analytical Reports and browse through folders on the Spotfire Library.",
+      "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
-      "task": "showSpotfireReportsWrapper",
-      "taskName": "show-spotfire-reports",
+      "multipleInteraction": true,
+      "task": "browseSpotfireLibraryWrapper",
+      "taskName": "browse-spotfire-library",
       "availableOnOs": ["all"]
     },
     "update-tcli": {
