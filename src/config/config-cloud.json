@@ -14,6 +14,7 @@
     "general_login": "account.cloud.tibco.com/idm/v3/login-oauth",
     "generate_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate",
     "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens",
+    "get_clientID": "account.cloud.tibco.com/idm/v1/clientID",
     "revoke_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke",
     "la_org_folders": "liveapps.cloud.tibco.com/webresource/v1/orgFolders",
     "la_org_folder_download": "liveapps.cloud.tibco.com/webresource/orgFolders",

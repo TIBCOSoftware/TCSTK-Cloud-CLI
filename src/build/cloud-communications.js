@@ -183,7 +183,7 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         log(INFO, '- URL(' + cMethod + '): ' + url);
         log(DEBUG, '-  METHOD: ' + cMethod);
         log(DEBUG, '- CONTENT: ' + cType);
-        log(INFO, '-  HEADER: ', header);
+        log(DEBUG, '-  HEADER: ', header);
     }
     if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
         if (cdoLog) {
@@ -205,7 +205,7 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         // console.log('Response: ', response.statusCode);
     }
     // console.log('Response: ', response.body);
-    if (response.body) {
+    if (response.body != null) {
         if (response.body.errorMsg != null) {
             if (doErrorOutside) {
                 return response.body;

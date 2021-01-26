@@ -210,3 +210,11 @@ export async function updateProperty() {
         addOrUpdateProperty(pFile, pName, pValue, pComment);
     }
 }
+
+// Function to get the Client ID
+export function getClientID(){
+    console.log('Getting Client ID...');
+    const ClientID = CCOM.callTC( CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
+    console.log('Client ID: ', ClientID);
+}
+// TODO: how to get a client ID for another ORG

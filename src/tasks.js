@@ -44,7 +44,11 @@ export async function mainT() {
 
 export async function test() {
     console.log('Test...');
-    displayMDFile('docs/use-cases/UC1_Get_Started.md');
+    // displayMDFile('docs/use-cases/UC1_Get_Started.md');
+    const PROPM = require('./build/property-file-management');
+    PROPM.getClientID();
+
+
 
 }
 

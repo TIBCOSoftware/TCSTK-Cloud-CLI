@@ -36,7 +36,7 @@ export function getOrgFolders(showFolders, countItems) {
     const folderTable = createTable(allFolders, CCOM.mappings.la_org_folders, false);
     if (countItems) {
         for (let fNr in folderTable) {
-            let noItems = CCOM.callTC(CCOM.clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
+            const noItems = CCOM.callTC(CCOM.clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
             logLine('Processing folder (' + fNr + '/' + iterateTable(folderTable).length + ')');
             folderTable[fNr]['Number of Items'] = noItems;
         }
