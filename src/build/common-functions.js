@@ -269,7 +269,7 @@ function set(path, value, obj) {
 
 setPropFileName = function (propFileName) {
     propFileNameGl = propFileName;
-    log(INFO, 'Using Property File: ' + propFileNameGl);
+    log(DEBUG, 'Using Property File: ' + propFileNameGl);
 }
 getPropFileName = function () {
     return propFileNameGl;
