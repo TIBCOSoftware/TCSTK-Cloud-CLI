@@ -48,7 +48,7 @@ export async function test() {
     console.log('Test...');
     // displayMDFile('docs/use-cases/UC1_Get_Started.md');
     const PROPM = require('./build/property-file-management');
-    PROPM.getClientID();
+    // PROPM.getClientID();
     // PROPM.disableProperty(getPropFileName(), 'test', 'Disabled for Upgrade to V2');
 
 }

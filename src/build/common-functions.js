@@ -1069,23 +1069,30 @@ upgradeToV2 = function(isGlobal, propFile){
     addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version');
     addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Orgeon) - US\n#  EU Cloud (Orgeon) - EU\n# AUS Cloud (Orgeon) - AU\n# Options: US | EU | AU');
     addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com');
-    createPropINE(propFile,'CloudLogin.OAUTH_Generate_Token_Name','MyCLIToken_1' , 'Name of the OAUTH token to be generated.');
-    createPropINE(propFile,'CloudLogin.OAUTH_Generate_For_Tenants','TSC,BPM' , 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
-    createPropINE(propFile,'CloudLogin.OAUTH_Generate_Valid_Hours','336', 'Number of Hours the generated OAUTH token should be valid.');
-    createPropINE(propFile,'CloudLogin.OAUTH_Required_Hours_Valid','168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
+    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Token_Name','MyCLIToken_1' , 'Name of the OAUTH token to be generated.');
+    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_For_Tenants','TSC,BPM' , 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
+    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Valid_Hours','336', 'Number of Hours the generated OAUTH token should be valid.');
+    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Required_Hours_Valid','168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
     if(!isGlobal) {
-        createPropINE(propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
+        createPropINE(isGlobal, propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
+        // Force a Refresh (not needed for global)
+        getProp('CloudLogin.Region',true, true);
     }
-    // Force a Refresh
-    getProp('CloudLogin.Region',true, true);
 
-    // --> TODO: Update Password if needed to new obfuscation method.
+    // --> TODO: HIER VERDER: Update Password if needed to new obfuscation method.
 }
 
 
 // Upgrade Helper: Create Propety If Not Exists
-function createPropINE (propFile, propName, value ,comment) {
-    if(getProp(propName) == undefined){
+function createPropINE (isGlobal, propFile, propName, value ,comment) {
+    let doUpdate;
+    if(isGlobal){
+        const propsG = PropertiesReader(globalTCpropFile).path();
+        doUpdate = propsG[propName] == undefined;
+    } else {
+        doUpdate = getProp(propName) == undefined;
+    }
+    if(doUpdate){
         addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment);
     } else {
         log(INFO, 'Not changed the value of ' + colors.green(propName) + '...')

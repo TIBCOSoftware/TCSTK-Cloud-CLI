@@ -2,7 +2,7 @@ const CCOM = require('./cloud-communications');
 const USERGROUPS = require('./user-groups');
 // const colors = require('colors');
 
-let OrgFolderLocation = getProp('LA_Organization_Folder');
+let OrgFolderLocation;
 // Function to get org folders
 function checkOrgFolderLocation() {
     if (getProp('LA_Organization_Folder') == null) {
@@ -10,6 +10,8 @@ function checkOrgFolderLocation() {
         log(INFO, 'No LA_Organization_Folder property found; We are adding it to: ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'LA_Organization_Folder', OrgFolderLocationDef, 'The location for exports and imports of the LiveApps organization folders');
         OrgFolderLocation = OrgFolderLocationDef;
+    } else {
+        OrgFolderLocation = getProp('LA_Organization_Folder');
     }
 }
 
