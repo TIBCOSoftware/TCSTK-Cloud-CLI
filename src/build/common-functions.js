@@ -38,18 +38,25 @@ displayGlobalConnectionConfig = function () {
         if (propsG.CloudLogin.pass === "") {
             passType = "NOT STORED";
         }
+        // TODO: Add new obfuscation mechanism
         if (propsG.CloudLogin.pass.charAt(0) == '#') {
             passType = "OBFUSCATED";
         }
         log(INFO, 'Global Connection Configuration:');
         const globalConfig = {
-            "CLOUD HOST": propsG.cloudHost,
+            "CLOUD REGION": propsG.CloudLogin.Region,
             "EMAIL": propsG.CloudLogin.email,
             "CLIENT ID": propsG.CloudLogin.clientID,
-            "PASSWORD TYPE": passType
+            "PASSWORD": passType,
+            "OAUTH TOKEN NAME" : propsG.CloudLogin.OAUTH_Generate_Token_Name
         };
-
         console.table(globalConfig);
+        if(Object.keys(parseOAUTHToken(propsG.CloudLogin.OAUTH_Token, false)).length === 0){
+            log(INFO, 'No Global OAUTH Configuration Set...');
+        } else {
+            log(INFO, 'Global OAUTH Configuration:');
+            parseOAUTHToken(propsG.CloudLogin.OAUTH_Token, true);
+        }
     } else {
         log(INFO, 'No Global Configuration Set...');
     }
@@ -78,7 +85,6 @@ replaceInFile = function (from, to, filePattern) {
     return results;
 }
 
-
 // function to set the global connection configuration
 updateGlobalConnectionConfig = async function () {
     log(INFO, 'Update Connection Config: ');
@@ -95,8 +101,17 @@ updateGlobalConnectionConfig = async function () {
     // Get Cloud Environment
     await updateRegion(globalTCpropFile);
     // Get the login details
-    await updateCloudLogin(globalTCpropFile);
 
+    // Bump up the OAUTH Token
+    const OTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
+    const tokenNumber = Number(OTokenName.split('_').pop().trim());
+    if (!isNaN(tokenNumber)) {
+        const newTokenNumber = tokenNumber + 1;
+        const newTokenName = OTokenName.replace(tokenNumber, newTokenNumber);
+        addOrUpdateProperty(globalTCpropFile, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
+        log(INFO, 'Updating Global Token Name: ' , newTokenName);
+    }
+    await updateCloudLogin(globalTCpropFile, false, true);
 }
 
 // Function to get an indexed object wiht a String
@@ -124,11 +139,16 @@ getOAUTHDetails = function () {
     return globalOAUTH;
 }
 
-getProp = function (propName) {
-    log(DEBUG, 'Getting Property: ' + propName);
+getProp = function (propName, forceRefresh, forceGlobalRefresh) {
+    log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh,  'Forcing a Global Refresh: ', forceGlobalRefresh);
+    if(forceRefresh){
+        propsGl = null;
+    }
     if (propsGl == null) {
-        propertiesGl = PropertiesReader(propFileNameGl);
-        propsGl = propertiesGl.path();
+        if (doesFileExist(propFileNameGl)) {
+            propertiesGl = PropertiesReader(propFileNameGl);
+            propsGl = propertiesGl.path();
+        }
     }
     let re;
     if (propsGl != null) {
@@ -141,7 +161,7 @@ getProp = function (propName) {
         log(DEBUG, 'Returning Property: ', re);
         if (re == 'USE-GLOBAL') {
             if (doesFileExist(globalTCpropFile)) {
-                if (globalProperties == null) {
+                if (globalProperties == null || forceGlobalRefresh) {
                     globalProperties = PropertiesReader(globalTCpropFile).path();
                 }
                 try {
@@ -203,10 +223,20 @@ parseOAUTHToken = function (stringToken, doLog) {
     return re;
 }
 
-
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
-getOrganization = function () {
+getOrganization = function (forceRefresh) {
+    if(forceRefresh){
+        OrganizationGl = '';
+    }
+    if(OrganizationGl == '' && isOauthUsed()) {
+        if (globalOAUTH == null) {
+            getProp('CloudLogin.OAUTH_Token')
+        }
+        if(globalOAUTH.Org) {
+            OrganizationGl = globalOAUTH.Org
+        }
+    }
     log(DEBUG, 'Returning org: ' + OrganizationGl);
     return OrganizationGl;
 }
@@ -218,6 +248,9 @@ setOrganization = function (org) {
 setProperty = function (name, value) {
     //console.log('BEFORE propsGl: ' , propsGl);
     log(DEBUG, 'Setting Property) Name: ', name, ' Value: ', value);
+    if(propsGl == null){
+        propsGl = {};
+    }
     set(name, value, propsGl);
     //console.log('AFTER propsGl: ' , propsGl);
 }
@@ -236,7 +269,7 @@ function set(path, value, obj) {
 
 setPropFileName = function (propFileName) {
     propFileNameGl = propFileName;
-    log(DEBUG, 'Using Property File: ' + propFileNameGl);
+    log(INFO, 'Using Property File: ' + propFileNameGl);
 }
 getPropFileName = function () {
     return propFileNameGl;
@@ -415,20 +448,27 @@ getLastGlobalAnswer = function (question) {
 }
 
 // Update the cloud login properties
-updateCloudLogin = async function (propFile) {
+updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh) {
     // Client ID
     log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
-    // TODO: did not get question for  client ID... ???
-    console.log('CLIENT ID');
     const cid = await askQuestion('What is your Client ID ?');
     addOrUpdateProperty(propFile, 'CloudLogin.clientID', cid);
     // Username & Password (obfuscate)
     const email = await askQuestion('What is your User Name (Email) ?');
     addOrUpdateProperty(propFile, 'CloudLogin.email', email);
-    log('INFO', 'Your password will be obfuscated, but is not unbreakable (press enter to skip and enter manually later)');
-    const pass = await askQuestion('What is your Password ?', 'password');
-    if (pass != '') {
+    // Force a refresh on the tibco-cloud property file
+    getRegion(forceRefresh, forceGlobalRefresh);
+    const pass = await askQuestion('Provide your password to Generate an OAUTH Token: ', 'password');
+    setProperty('CloudLogin.pass', obfuscatePW(pass));
+    const OAUTH = require('./oauth');
+    const token = await OAUTH.generateOauthToken(null, true, true);
+    addOrUpdateProperty(propFile, 'CloudLogin.OAUTH_Token', token);
+    log('INFO', 'Your password will be obfuscated locally, but this is not unbreakable.');
+    const storePW = await askMultipleChoiceQuestionSearch('Do you want to store your password (as a fallback mechanism) ? ', ['YES', 'NO']);
+    if (pass != '' && storePW == 'YES') {
         addOrUpdateProperty(propFile, 'CloudLogin.pass', obfuscatePW(pass));
+    } else {
+        addOrUpdateProperty(propFile, 'CloudLogin.pass', '');
     }
 }
 
@@ -442,16 +482,13 @@ obfuscatePW = function (toObfuscate) {
 updateRegion = async function (propFile) {
     const re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     if (re === 'US - Oregon') {
-        addOrUpdateProperty(propFile, 'cloudHost', 'liveapps.cloud.tibco.com');
-        addOrUpdateProperty(propFile, 'Cloud_URL', 'https://liveapps.cloud.tibco.com/');
+        addOrUpdateProperty(propFile, 'CloudLogin.Region', 'US');
     }
     if (re === 'EU - Ireland') {
-        addOrUpdateProperty(propFile, 'cloudHost', 'eu.liveapps.cloud.tibco.com');
-        addOrUpdateProperty(propFile, 'Cloud_URL', 'https://eu.liveapps.cloud.tibco.com/');
+        addOrUpdateProperty(propFile, 'CloudLogin.Region', 'EU');
     }
     if (re === 'AU - Sydney') {
-        addOrUpdateProperty(propFile, 'cloudHost', 'au.liveapps.cloud.tibco.com');
-        addOrUpdateProperty(propFile, 'Cloud_URL', 'https://au.liveapps.cloud.tibco.com/');
+        addOrUpdateProperty(propFile, 'CloudLogin.Region', 'AU');
     }
 }
 
@@ -460,13 +497,15 @@ getCurrentRegion = function (showRegion) {
     if (showRegion) {
         displayRegion = showRegion;
     }
-    let host = getProp('cloudHost').toLowerCase();
-    let curl = getProp('Cloud_URL').toLowerCase();
+    // let host = getProp('cloudHost').toLowerCase();
+    // let curl = getProp('Cloud_URL').toLowerCase();
+    let region = getRegion().toLowerCase();
+
     let re = '';
-    if (host.includes('eu') && curl.includes('eu')) {
+    if (region.includes('eu')) {
         re = 'eu.';
     }
-    if (host.includes('au') && curl.includes('au')) {
+    if (region.includes('au')) {
         re = 'au.';
     }
     if (displayRegion) {
@@ -501,6 +540,12 @@ getCurrentAWSRegion = function () {
     return re
 }
 
+// Gets region (in Capitals)
+getRegion = function (forceRefresh, forceGlobalRefresh) {
+    return getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh).toString().toUpperCase();
+}
+
+/*
 // gets region (in Capitals)
 getRegion = function () {
     let re = 'US';
@@ -512,7 +557,7 @@ getRegion = function () {
         re = 'AU';
     }
     return re;
-}
+}*/
 
 updateTCLI = function () {
     log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../../package.json').version);
@@ -537,8 +582,10 @@ updateTCLIwrapper = function () {
     });
 }
 
+// TODO: Move this function to PropFileManagement
+// TODO: Implement Check for global (see if the old value is USE-GLOBAL, and then update the global file)
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
-addOrUpdateProperty = function (location, property, value, comment) {
+addOrUpdateProperty = function (location, property, value, comment, checkForGlobal) {
     log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
     // Check if file exists
     const fs = require('fs');
@@ -565,10 +612,14 @@ addOrUpdateProperty = function (location, property, value, comment) {
                 }
             }
             let dataForFile = '';
-            for (let line of dataLines) {
-                dataForFile += line + '\n';
+            for (let line in dataLines) {
+                if(line != (dataLines.length - 1)){
+                    dataForFile += dataLines[line] + '\n';
+                } else {
+                    // The last one:
+                    dataForFile += dataLines[line];
+                }
             }
-            // TODO: cut off the last \n
             if (propFound) {
                 log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
             } else {
@@ -577,7 +628,7 @@ addOrUpdateProperty = function (location, property, value, comment) {
                 if (comment) {
                     dataForFile += '\n# ' + comment;
                 }
-                dataForFile += '\n' + property + '=' + value;
+                dataForFile += '\n' + property + '=' + value + '\n';
             }
             fs.writeFileSync(location, dataForFile, 'utf8');
         } else {
@@ -975,3 +1026,81 @@ logLine = function (message) {
 }
 
 
+
+// For future versions: if(getProp('Cloud_Properties_Version') != 'V3'){
+const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Property File V2 (You can remove this...)';
+const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Property File V2';
+
+upgradeToV2 = function(isGlobal, propFile){
+    let host = '';
+    let curl = '';
+    if(isGlobal){
+        const propsG = PropertiesReader(globalTCpropFile).path();
+        host = propsG.cloudHost || '';
+        curl = propsG.Cloud_URL || '';
+    } else {
+        host = getProp('cloudHost') || '';
+        curl = getProp('Cloud_URL') || '';
+    }
+    let newORG = 'US';
+    if (host.toLowerCase().includes('eu') && curl.toLowerCase().includes('eu')) {
+        newORG = 'EU';
+    }
+    if (host.toLowerCase().includes('au') && curl.toLowerCase().includes('au')) {
+        newORG = 'AU';
+    }
+    log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
+    if(isGlobal){
+        log(INFO, colors.rainbow('* AUTOMATICALLY Updating GLOBAL property file to V2.*'));
+    } else {
+        log(INFO, colors.rainbow('* AUTOMATICALLY Updating you property file to V2... *'));
+    }
+    log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
+    log(INFO, colors.rainbow('* * * ') + ' Disabling Properties...');
+    const PROPM = require('./property-file-management');
+    PROPM.disableProperty(propFile, 'CloudLogin.tenantID', DisableMessage);
+    PROPM.disableProperty(propFile, 'cloudHost', DisableMessage);
+    PROPM.disableProperty(propFile, 'Cloud_URL', DisableMessage);
+    PROPM.disableProperty(propFile, 'loginURE', DisableMessage);
+    PROPM.disableProperty(propFile, 'appURE', DisableMessage);
+    PROPM.disableProperty(propFile, 'Claims_URE', DisableMessage);
+    log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
+    log(INFO, colors.rainbow('* * * ') + ' Adding new Properties...');
+    addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version');
+    addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Orgeon) - US\n#  EU Cloud (Orgeon) - EU\n# AUS Cloud (Orgeon) - AU\n# Options: US | EU | AU');
+    addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com');
+    createPropINE(propFile,'CloudLogin.OAUTH_Generate_Token_Name','MyCLIToken_1' , 'Name of the OAUTH token to be generated.');
+    createPropINE(propFile,'CloudLogin.OAUTH_Generate_For_Tenants','TSC,BPM' , 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
+    createPropINE(propFile,'CloudLogin.OAUTH_Generate_Valid_Hours','336', 'Number of Hours the generated OAUTH token should be valid.');
+    createPropINE(propFile,'CloudLogin.OAUTH_Required_Hours_Valid','168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
+    if(!isGlobal) {
+        createPropINE(propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
+    }
+    // Force a Refresh
+    getProp('CloudLogin.Region',true, true);
+
+    // --> TODO: Update Password if needed to new obfuscation method.
+}
+
+
+// Upgrade Helper: Create Propety If Not Exists
+function createPropINE (propFile, propName, value ,comment) {
+    if(getProp(propName) == undefined){
+        addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment);
+    } else {
+        log(INFO, 'Not changed the value of ' + colors.green(propName) + '...')
+    }
+}
+
+
+checkGlobalForUpgrade = function() {
+    if (doesFileExist(globalTCpropFile)) {
+        const PropertiesReader = require('properties-reader');
+        const propsG = PropertiesReader(globalTCpropFile).path();
+        if(propsG.Cloud_Properties_Version == null) {
+            log(WARNING, 'Global file need to be upgraded...');
+            upgradeToV2(true, globalTCpropFile);
+        }
+    }
+}
+checkGlobalForUpgrade();

@@ -147,13 +147,19 @@ function copyDir(fromDir, toDir) {
 
 // Function to create a new starter, based on a template
 export async function manageGlobalConfig() {
+    // Set the props to use global
+    const itemsForGlobal = ['CloudLogin.clientID','CloudLogin.email','CloudLogin.pass','CloudLogin.OAUTH_Token','CloudLogin.Region','CloudLogin.OAUTH_Generate_Token_Name', 'CloudLogin.OAUTH_Generate_For_Tenants', 'CloudLogin.OAUTH_Generate_Valid_Hours', 'CloudLogin.OAUTH_Required_Hours_Valid'];
+    for(const item of itemsForGlobal){
+        setProperty(item,'USE-GLOBAL');
+    }
     if (displayGlobalConnectionConfig()) {
+        // There is a global config
         let updateGC = await askMultipleChoiceQuestion('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
         if (updateGC == 'YES') {
-            updateGlobalConnectionConfig();
+            await updateGlobalConnectionConfig();
         }
     } else {
-        updateGlobalConnectionConfig();
+        await updateGlobalConnectionConfig();
     }
 }
 

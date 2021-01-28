@@ -2,6 +2,7 @@
 require('./build/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;
+const colors = require('colors');
 
 // Function to display help
 export async function helptcli() {
@@ -26,6 +27,7 @@ export async function helptcli() {
             console.log('\x1b[36m%s\x1b[0m', str + ':', ' ' + cTsks[cliTask].description);
         }
     }
+    // TODO: Ask for which task to show details and then display the MD
 }
 
 // Wrapper to main task
@@ -47,8 +49,7 @@ export async function test() {
     // displayMDFile('docs/use-cases/UC1_Get_Started.md');
     const PROPM = require('./build/property-file-management');
     PROPM.getClientID();
-
-
+    // PROPM.disableProperty(getPropFileName(), 'test', 'Disabled for Upgrade to V2');
 
 }
 
@@ -104,7 +105,7 @@ export async function buildCloudStarter() {
 export async function deploy() {
     const CCOM = require('./build/cloud-communications');
     const CS = require('./build/cloud-starters');
-    log(INFO, 'Deploying ' + getProp('App_Name') + ' to:');
+    log(INFO, 'Deploying ' + getProp('App_Name') + ' to)');
     CCOM.showCloudInfo();
     await CS.uploadApp(getProp('App_Name'));
     log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
@@ -433,9 +434,10 @@ export async function promptTask(stDir, cwdDir) {
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
     return new Promise(function (resolve, reject) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-        let pMes = '[TCLI - CLOUD STARTER (\x1b[36m' + getRegion() + ' - ' + getProp('App_Name') + '\x1b[0m)]: ';
+        let pMes = '[TCLI - ' + colors.blue(getRegion(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
+        // TODO: Look at getting org
         if (getOrganization() != '') {
-            pMes = '[TCLI - CLOUD STARTER (\x1b[36m' + getRegion() + '(' + getOrganization() + ') - ' + getProp('App_Name') + '\x1b[0m)]: ';
+            pMes = '[TCLI - ' + colors.blue(getRegion(true) + ' - ' + getOrganization(true))+' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         }
         inquirer.prompt([{
             type: 'autocomplete',
@@ -506,3 +508,9 @@ export async function searchAnswer(answers, input) {
 
 // Set log debug level from local property
 setLogDebug(getProp('Use_Debug'));
+
+// Function to upgrade the prop file to V2
+if(getProp('Cloud_Properties_Version') == null){
+    upgradeToV2(false, getPropFileName());
+}
+

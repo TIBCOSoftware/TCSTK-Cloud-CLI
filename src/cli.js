@@ -116,7 +116,6 @@ export async function cli(args) {
         setGlobalAnswers(options.answers);
     }
 
-
     // Show help
     if (options.help) {
         helptcli();
@@ -144,13 +143,13 @@ export async function cli(args) {
         updateTCLI();
         process.exit(0);
     }
-    var projectManagementMode = true;
+    const projectManagementMode = true;
     if (!(options.doMultiple || options.doMultipleInteraction)) {
         if (options.task == 'new' || options.task == 'new-starter') {
             // options.task = 'new-starter';
             await require('./manage-application').newStarter();
             process.exit();
-            // var projectManagementMode = false;
+            // const projectManagementMode = false;
         } else {
             // Test if tibco-cloud.properties exists
             const fs = require("fs");
@@ -162,7 +161,7 @@ export async function cli(args) {
             // if (!fs.existsSync(cwdir + dirDelimiter + propFileName) || options.createCP) {
             // console.log('Workdir: ' + cwdir);
             if (!fs.existsSync(propFileName) || options.createCP) {
-                var cif = tCProp;
+                let cif = tCProp;
                 if (!options.createCP) {
                     displayOpeningMessage();
                     console.log('\x1b[36m%s\x1b[0m', "[TIBCO Cloud Starter CLI " + require('../package.json').version + "]");
@@ -180,7 +179,7 @@ export async function cli(args) {
                             log(INFO, 'Using Local Connection Configuration...');
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
                             await updateRegion(propFileName);
-                            await updateCloudLogin(propFileName);
+                            await updateCloudLogin(propFileName, true);
                         }
                         // Get the AppName Automatically from the package.json
                         try {
@@ -247,17 +246,17 @@ export async function cli(args) {
             }
             // Check if the task exists...
             const cliTaskConfigCLI = require('./config/config-cli-task.json');
-            var cTsks = cliTaskConfigCLI.cliTasks;
+            const cTsks = cliTaskConfigCLI.cliTasks;
             let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-scope-do'];
             let taskExist = false;
             let directTask = false;
             let directTaskMethod = '';
-            for (var cliTask of taskArray) {
+            for (const cliTask of taskArray) {
                 if (cliTask == options.task) {
                     taskExist = true;
                 }
             }
-            for (var cliTask in cTsks) {
+            for (const cliTask in cTsks) {
                 if (cTsks[cliTask].taskName == options.task) {
                     taskExist = true;
                     if (cTsks[cliTask].task) {
@@ -307,12 +306,12 @@ function helptcli() {
     console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.');
     console.log('These are the available TIBCO CLOUD CLI Tasks:');
     const cliTaskConfigCLI = require('./config/config-cli-task.json');
-    var cTsks = cliTaskConfigCLI.cliTasks;
-    for (var cliTask in cTsks) {
-        var allowed = false;
+    const cTsks = cliTaskConfigCLI.cliTasks;
+    for (const cliTask in cTsks) {
+        let allowed = false;
         if (cTsks[cliTask].availableOnOs != null) {
             //console.log('cTsks[cliTask].availableOnOs:' + cTsks[cliTask].availableOnOs);
-            for (var allowedOS of cTsks[cliTask].availableOnOs) {
+            for (const allowedOS of cTsks[cliTask].availableOnOs) {
                 //console.log('OS:' + allowedOS);
                 if (allowedOS == process.platform || allowedOS == 'all') {
                     allowed = true;
@@ -320,9 +319,9 @@ function helptcli() {
             }
         }
         if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
-            var str = cliTask;
-            var x = 30 - cliTask.length;
-            for (var i = 0; i < x; i++) {
+            let str = cliTask;
+            const x = 30 - cliTask.length;
+            for (let i = 0; i < x; i++) {
                 str = ' ' + str;
             }
             console.log('\x1b[36m%s\x1b[0m', str + ':', ' ' + cTsks[cliTask].description);

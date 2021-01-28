@@ -1,6 +1,14 @@
 const CCOM = require('./cloud-communications');
 const colors = require('colors');
 
+// Function to display current configured OAUTH Settings...
+export function displayCurrentOauthDetails() {
+    if(getOAUTHDetails() == null){
+        getProp('CloudLogin.OAUTH_Token');
+    }
+    console.table(getOAUTHDetails());
+}
+
 // Function to display all OAUTH Tokens...
 export function showOauthToken() {
     log(INFO, 'Displaying OAUTH Tokens...');
@@ -81,6 +89,15 @@ export function rotateOauthToken() {
 
 // Function that validates and rotates the OAUTH token if needed
 export async function validateAndRotateOauthToken(isInteractive) {
+
+    /* TODO: Actually check if the OAUTH Key Is valid...
+    if(CCOM.isOAUTHLoginValid()){
+           log(INFO, 'OAUTH is valid...');
+           // Show OAUTH Details:
+           parseOAUTHToken(getProp('CloudLogin.OAUTH_Token', true, true), true);
+        }
+     */
+
     let doInteraction = true;
     if (isInteractive != null) {
         doInteraction = isInteractive;
@@ -119,7 +136,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
 }
 
 // Function to generate an OAUTH Token
-export async function generateOauthToken(tokenNameOverride, verbose) {
+export async function generateOauthToken(tokenNameOverride, verbose, returnProp) {
     log(INFO, 'Generating OAUTH Token...');
     // const generateOauthUrl = 'https://' + getCurrentRegion() + CCOM.clURI.generate_oauth
     let skipCall = false;
@@ -201,8 +218,12 @@ export async function generateOauthToken(tokenNameOverride, verbose) {
                     // ADD Get Claims Call here...
                     // console.log(responseClaims);
                     const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
-                    console.log(tokenToInject);
-                    addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
+                    // console.log(tokenToInject);
+                    if(returnProp){
+                        return tokenToInject;
+                    } else {
+                        addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
+                    }
                 }
             }
         }

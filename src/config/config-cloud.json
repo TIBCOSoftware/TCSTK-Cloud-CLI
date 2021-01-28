@@ -1,11 +1,9 @@
 {
   "endpoints": {
     "_note": "ALL ENDPOINTS START AFTER THE REGION",
-    "_from" : "loginURE",
+    "la_host": "liveapps.cloud.tibco.com",
     "login": "liveapps.cloud.tibco.com/idm/v3/login-oauth",
-    "_from2": "Claims_URE",
     "claims": "liveapps.cloud.tibco.com/organisation/claims/",
-    "from3": "appURE",
     "app_info": "liveapps.cloud.tibco.com/webresource/v1/applications/",
     "apps": "liveapps.cloud.tibco.com/webresource/apps/",
     "types": "liveapps.cloud.tibco.com/case/v1/types",

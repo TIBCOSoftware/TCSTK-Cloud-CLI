@@ -1,6 +1,5 @@
 require('./common-functions');
 const colors = require('colors');
-
 const cloudConfig = require('../config/config-cloud.json');
 // TODO: if Cloud_Location provided replace |cloud.tibco.com|
 // see https://liveapps.tenant-integration.tcie.pro/webresource/apps/GatherSmart/index.html#/starterApp/splash
@@ -8,13 +7,10 @@ export const clURI = cloudConfig.endpoints;
 export const mappings = cloudConfig.mappings;
 
 let loginC = null;
-// let cloudURL = getProp('Cloud_URL');
-// let cloudHost = getProp('cloudHost');
-
-let loginURL = 'https://' + getCurrentRegion() + clURI.login; // cloudURL + getProp('loginURE');
 let doOAuthNotify = true;
-let isOAUTHValid = false;
+let isOAUTHValid;
 let toldClientID = false;
+let isOrgChecked = false;
 
 export function cLogin(tenant, customLoginURL, forceClientID) {
     const fClientID = forceClientID || false;
@@ -24,13 +20,24 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
         // Getting the organization info
         // console.log('Get Org: ' , getOrganization());
         // TODO: think of a fix for OAUTH Tokens that just have LA Access (get orgname from a live apps api)
-        if (getOrganization() == null || getOrganization().trim() == '') {
+        // if (getOrganization() == null || getOrganization().trim() == '') {
+        if (!isOrgChecked) {
             // Setting this to temp so it breaks the call stack
             // setOrganization('TEMP');
             const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
                 log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
+                isOAUTHValid = false;
+                /* TODO: When no pass is set, ask for it. (break the chain of await functions)
+                if(getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == ''){
+                    const tempPass = async () => {
+                        return await askQuestion('Provide your password to Continue: ', 'password');
+                    };
+                    console.log('SETTING PASS');
+                    setProperty('CloudLogin.pass', obfuscatePW(tempPass));
+                } */
+
                 // process.exit();
             }
             if (response.selectedAccount) {
@@ -38,10 +45,12 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
                     log(INFO, 'Using OAUTH Authentication, ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
                     doOAuthNotify = false;
                 }
-
                 setOrganization(response.selectedAccount.displayName);
                 isOAUTHValid = true;
+            } else {
+                isOAUTHValid = false;
             }
+            isOrgChecked = true;
         }
     }
     if (!isOauthUsed() || !isOAUTHValid || fClientID) {
@@ -49,40 +58,31 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
             log(INFO, 'Using CLIENT-ID Authentication (consider using OAUTH)...');
             toldClientID = true;
         }
-        let setLoginURL = loginURL;
+        let setLoginURL = 'https://' + getCurrentRegion() + clURI.login;
+        ;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
             // Delete the previous cookie on a custom login
             loginC = null;
         }
-
-        let tentantID = getProp('CloudLogin.tenantID');
+        // For default use BPM
+        let tenantID = 'bpm';
         if (tenant) {
-            tentantID = tenant;
+            tenantID = tenant;
         }
         //TODO: Set a timer, if login was too long ago login again...
+        const clientID = getProp('CloudLogin.clientID');
+        const email = getProp('CloudLogin.email');
         let pass = getProp('CloudLogin.pass');
-        let clientID = getProp('CloudLogin.clientID');
-        let email = getProp('CloudLogin.email');
-        //
-        //TODO: Manage global config in common functions
-        if (getGlobalConfig()) {
-            const propsG = getGlobalConfig();
-            if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-            if (tentantID == 'USE-GLOBAL') tentantID = propsG.CloudLogin.tenantID;
-            if (clientID == 'USE-GLOBAL') clientID = propsG.CloudLogin.clientID;
-            if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
-        }
-
         if (pass == '') {
             pass = require('yargs').argv.pass;
             // console.log('Pass from args: ' + pass);
         }
-        if (pass.charAt(0) == '#') {
+        if (pass && pass.charAt(0) == '#') {
             pass = Buffer.from(pass, 'base64').toString()
         }
         if (loginC == null) {
-            loginC = cloudLoginV3(tentantID, clientID, email, pass, setLoginURL);
+            loginC = cloudLoginV3(tenantID, clientID, email, pass, setLoginURL);
         }
         if (loginC == 'ERROR') {
             // TODO: exit the task properly
@@ -100,7 +100,7 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
     log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
     log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
-    //log(DEBUG,'With Form: ' + postForm);
+    // log(INFO, 'With Form: ' + postForm);
     const syncClient = require('sync-rest-client');
     const response = syncClient.post(encodeURI(TCbaseURL), {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -158,7 +158,7 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         }
     }
     let header = {};
-    if(customHeaders) {
+    if (customHeaders) {
         header = customHeaders;
     }
     header["accept"] = 'application/json';
@@ -167,7 +167,7 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
     if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
     } else {
-        if(header["cookie"]){
+        if (header["cookie"]) {
             header["cookie"] += "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
         } else {
             header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -274,4 +274,11 @@ function checkPW() {
         log(ERROR, 'Please provide your password to login to the tibco cloud in the file tibco-cloud.properties (for property: CloudLogin.pass)');
         process.exit();
     }
+}
+
+export function isOAUTHLoginValid() {
+    if (isOAUTHValid == null) {
+        cLogin();
+    }
+    return isOAUTHValid;
 }

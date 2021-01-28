@@ -1,6 +1,6 @@
 const CCOM = require('./cloud-communications');
 const LA = require('./live-apps');
-// const colors = require('colors');
+const colors = require('colors');
 
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {
@@ -109,16 +109,9 @@ function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesE
 function configurePropFile(fileName, region) {
     log(INFO, '[' + region + ']: Generating: ' + fileName);
     let regToAdd = '';
-    if (region === 'EU') {
-        regToAdd = 'eu.';
-    }
-    if (region === 'AU') {
-        regToAdd = 'au.';
-    }
     copyFile(getPropFileName(), fileName);
     addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://" + regToAdd + "account.cloud.tibco.com/manage/settings/oAuthTokens>");
-    addOrUpdateProperty(fileName, 'cloudHost', regToAdd + 'liveapps.cloud.tibco.com');
-    addOrUpdateProperty(fileName, 'Cloud_URL', 'https://' + regToAdd + 'liveapps.cloud.tibco.com/');
+    addOrUpdateProperty(fileName, 'CloudLogin.Region', region);
     log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
 }
 
@@ -218,3 +211,54 @@ export function getClientID(){
     console.log('Client ID: ', ClientID);
 }
 // TODO: how to get a client ID for another ORG
+
+
+
+// Function comment out a property in a prop file
+export function disableProperty(location, property, comment) {
+    log(DEBUG, 'Disabling: ' + property + ' in:' + location);
+    // Check if file exists
+    const fs = require('fs');
+    try {
+        if (fs.existsSync(location)) {
+            //file exists
+            log(DEBUG, 'Property file found: ' + location);
+            // Check if file contains property
+            // const data = fs.readFileSync(location, 'utf8');
+            const dataLines = fs.readFileSync(location, 'utf8').split('\n');
+            let propFound = false;
+            for (let lineNumber in dataLines) {
+                if (dataLines[lineNumber].startsWith(property)) {
+                    propFound = true;
+                    log(DEBUG, `Property found: ${property} We are disabeling it...`);
+                    if(comment && comment != ''){
+                        dataLines[lineNumber] = '#' + comment + '\n#' + dataLines[lineNumber];
+                    } else {
+                        dataLines[lineNumber] = '#' + dataLines[lineNumber];
+                    }
+
+                }
+            }
+            let dataForFile = '';
+            for (let line in dataLines) {
+                if(line != (dataLines.length - 1)){
+                    dataForFile += dataLines[line] + '\n';
+                } else {
+                    // The last one:
+                    dataForFile += dataLines[line];
+                }
+            }
+            if (propFound) {
+                fs.writeFileSync(location, dataForFile, 'utf8');
+                log(INFO, 'Disabled Property: ' + colors.blue(property) + ' (in:' + location + ')');
+            } else {
+                // append prop to the end.
+                log(WARNING, 'Property NOT found: ' + colors.blue(property) + ' to disable... (in:' + location + ')');
+            }
+        } else {
+            log(ERROR, 'Property File does not exist: ' + location);
+        }
+    } catch (err) {
+        console.error(err)
+    }
+}

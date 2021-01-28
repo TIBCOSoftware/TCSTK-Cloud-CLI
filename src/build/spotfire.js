@@ -6,8 +6,7 @@ let xSRF;
 
 function callSpotfire(url, doLog, conf) {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
-
-    if(isOauthUsed()) {
+    if(isOauthUsed() && CCOM.isOAUTHLoginValid()) {
         if (!jSession || !xSRF) {
             const originalConf = conf;
             if (conf) {
@@ -37,7 +36,7 @@ function callSpotfire(url, doLog, conf) {
             return CCOM.callTC(url, doLog, conf);
         }
     } else {
-        log(ERROR, 'OAUTH Needs to be enable for communication with SPOTFIRE, Please generate an OAUTH Token.');
+        log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.');
         process.exit(1);
     }
 }

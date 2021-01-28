@@ -1,27 +1,15 @@
 // Package Definitions
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
-// const colors = require('colors');
-
-//TODO: Remove these values
-let cloudURL = getProp('Cloud_URL');
-let cloudHost = getProp('cloudHost');
-// Check if a global config exi sts and if it is required
-//TODO: Manage global config in common functions
-if (getGlobalConfig()) {
-    const propsG = getGlobalConfig();
-    if (cloudURL === 'USE-GLOBAL') {
-        cloudURL = propsG.Cloud_URL;
-    }
-    if (cloudHost === 'USE-GLOBAL') {
-        cloudHost = propsG.cloudHost;
-    }
-}
+const USERGROUPS = require('./user-groups');
+const colors = require('colors');
 
 export async function start() {
     log(INFO, 'Starting: ' + getProp('App_Name'));
     if (isOauthUsed()) {
         await OAUTH.validateAndRotateOauthToken(true);
+        // Display OAUTH Details from Common
+        OAUTH.displayCurrentOauthDetails();
     }
     //Check if port 4200 is available, if not use 4201, 4202 etc.
     let port = 4200;
@@ -34,25 +22,25 @@ export async function start() {
             i = range;
         }
     }
-    if (portToUse != 0) {
+    if (portToUse !== 0) {
         log('INFO', 'Using Port: ' + portToUse);
-        let myHost = getProp('cloudHost');
-        if (portToUse == 4200) {
+        const region = getProp('CloudLogin.Region').toLowerCase();
+        if (portToUse === 4200) {
             // TODO: Fix bug, can not read includes of undefined (no global config, and no password)
-            if (myHost.includes('eu')) {
+            if (region === 'eu') {
                 run('npm run serve_eu');
             } else {
-                if (myHost.includes('au')) {
+                if (region === 'au') {
                     run('npm run serve_au');
                 } else {
                     run('npm run serve_us');
                 }
             }
         } else {
-            if (myHost.includes('eu')) {
+            if (region === 'eu') {
                 run('ng serve --proxy-config proxy.conf.prod.eu.js --ssl true --source-map --aot --port ' + portToUse);
             } else {
-                if (myHost.includes('au')) {
+                if (region === 'au') {
                     run('ng serve --proxy-config proxy.conf.prod.au.js --ssl true --source-map --aot --port ' + portToUse);
                 } else {
                     run('ng serve --proxy-config proxy.conf.prod.us.js --ssl true --source-map --aot --port ' + portToUse);
@@ -64,7 +52,6 @@ export async function start() {
     }
 }
 
-
 export async function cleanDist() {
     return deleteFolder('./dist/' + getProp('App_Name'));
 }
@@ -72,7 +59,7 @@ export async function cleanDist() {
 export function generateCloudDescriptor () {
     // Add Descriptor
     let ADD_DESCRIPTOR = 'YES';
-    if (getProp('Add_Descriptor') != null) {
+    if (getProp('Add_Descriptor') !== null) {
         ADD_DESCRIPTOR = getProp('Add_Descriptor');
     } else {
         log(INFO, 'No Add_Descriptor Property found; Adding Add_Descriptor to ' + getPropFileName());
@@ -80,7 +67,7 @@ export function generateCloudDescriptor () {
     }
     // Add Descriptor
     let ADD_DESCRIPTOR_TIMESTAMP = 'YES';
-    if (getProp('Add_Descriptor_Timestamp') != null) {
+    if (getProp('Add_Descriptor_Timestamp') !== null) {
         ADD_DESCRIPTOR_TIMESTAMP = getProp('Add_Descriptor_Timestamp');
     } else {
         log(INFO, 'No Add_Descriptor_Timestamp Property found; Adding Add_Descriptor_Timestamp to ' + getPropFileName());
@@ -88,7 +75,7 @@ export function generateCloudDescriptor () {
     }
     // Add Descriptor
     let DESCRIPTOR_FILE = './src/assets/cloudstarter.json';
-    if (getProp('Descriptor_File') != null) {
+    if (getProp('Descriptor_File') !== null) {
         DESCRIPTOR_FILE = getProp('Descriptor_File');
     } else {
         log(INFO, 'No Descriptor_File Property found; Adding Descriptor_File to ' + getPropFileName());
@@ -141,10 +128,10 @@ export function generateCloudDescriptor () {
 // Function to display the location on the deployed cloudstarter and possilby the descriptor.
 export function showAppLinkInfo() {
     //TODO: Get from global file
-    let cloudURLdisp = getProp('Cloud_URL');
-    log('INFO', "LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + "/index.html");
+    // let cloudURLdisp = getProp('Cloud_URL');
+    log('INFO', 'LOCATION: https://' + getCurrentRegion() + CCOM.clURI.apps + getProp('App_Name') + "/index.html");
     if (getProp('Add_Descriptor') === 'YES') {
-        log('INFO', "DESCRIPTOR LOCATION: " + cloudURLdisp + "webresource/apps/" + getProp('App_Name') + getProp('Descriptor_File').replace('./src', ''));
+        log('INFO', 'DESCRIPTOR LOCATION: https://' + getCurrentRegion() + CCOM.clURI.apps + getProp('App_Name') + getProp('Descriptor_File').replace('./src', ''));
     }
 }
 
@@ -152,7 +139,7 @@ export function showAppLinkInfo() {
 export function buildCloudStarterZip(cloudStarter) {
     // Check for Build Command
     let BUILD_COMMAND = 'HASHROUTING';
-    if (getProp('BUILD_COMMAND') != null) {
+    if (getProp('BUILD_COMMAND') !== null) {
         BUILD_COMMAND = getProp('BUILD_COMMAND');
     } else {
         log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
@@ -201,7 +188,7 @@ export function showAvailableApps(showTable) {
         }
     } else {
         // console.log('APPS: ' , response);
-        const users = iterateTable(require("./user-groups").showLiveAppsUsers(false, true));
+        const users = iterateTable(USERGROUPS.showLiveAppsUsers(false, true));
         // console.log('USERS: ', users);
         // TODO: Apparently apps can have tags, look into this...
         let apps = {};
@@ -244,7 +231,7 @@ export function showAvailableApps(showTable) {
         pexTable(apps, 'cloud-starters', getPEXConfig(), doShowTable);
         return response;
     }
-};
+}
 
 // Function to delete a WebApplication
 export async function deleteApp() {
@@ -258,9 +245,9 @@ export async function deleteApp() {
         appArray.push(app.name);
     }
     const appToDelete = await askMultipleChoiceQuestionSearch('Which APP Would you like to delete ? ', appArray);
-    if (appToDelete != 'NONE') {
+    if (appToDelete !== 'NONE') {
         const confirm = await askMultipleChoiceQuestion('Are you sure you want to delete ? ' + appToDelete, ['YES', 'NO']);
-        if (confirm == 'YES') {
+        if (confirm === 'YES') {
             deleteApp = true;
         }
     }
@@ -282,7 +269,7 @@ export async function deleteApp() {
     }
 }
 
-// const getApplicationDetailsURL = cloudURL + getProp('appURE');
+// Get details of a cloud starter
 function getApplicationDetails(application, version, showTable) {
     const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     const details = {};
@@ -306,8 +293,6 @@ function getApplicationDetails(application, version, showTable) {
             hasMoreArtefacts = false;
         }
     }
-
-    // logO(INFO, appDet);
     let i = 0;
     for (const det in allArteFacts) {
         const appTemp = {};
@@ -317,7 +302,6 @@ function getApplicationDetails(application, version, showTable) {
         appTemp['DETAIL NAME'] = allArteFacts[det].name;
         details[appN] = appTemp;
     }
-    // if (doShowTable) console.table(details);
     pexTable(details, 'cloud-starter-details', getPEXConfig(), doShowTable);
     return allArteFacts;
 };
@@ -347,7 +331,7 @@ export function getAppLinks(showTable) {
                     }
                 }
                 if (appD.name.includes("index.html")) {
-                    const tempLink = cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name;
+                    const tempLink = 'https://' + CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name;
                     appTemp['LINK'] = tempLink;
                 }
             }
@@ -369,7 +353,7 @@ export function getAppLinks(showTable) {
 
 // Function to upload a zip to the LiveApps ContentManagment API
 export function uploadApp(application) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         let formData = new require('form-data')();
         log(INFO, 'UPLOADING APP: ' + application);
         const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
@@ -377,14 +361,14 @@ export function uploadApp(application) {
         const header = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         // Possibly add OAUTH Header...
-        if (isOauthUsed()) {
+        if (isOauthUsed() && CCOM.isOAUTHLoginValid()) {
             header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         } else {
-            const lCookie = CCOM.cLogin();
+            const lCookie = await CCOM.cLogin();
             header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
         }
         let query = require('https').request({
-            hostname: cloudHost,
+            hostname: getCurrentRegion() + CCOM.clURI.la_host,   //cloudHost,*/
             path: uploadAppLocation,
             method: 'POST',
             headers: header
@@ -394,7 +378,17 @@ export function uploadApp(application) {
                 data += chunk.toString('utf8');
             });
             res.on('end', () => {
-                console.log(data);
+                // console.log(data);
+                if(data){
+                    const dataObj = JSON.parse(data);
+                    if(dataObj && dataObj.message) {
+                        log(INFO, 'UPLOAD RESULT:', colors.green(dataObj.message));
+                    } else {
+                        log(WARNING, 'UPLOAD RESULT:', data);
+                    }
+                } else {
+                    log(WARNING, 'UPLOAD RESULT:', data);
+                }
                 resolve();
             })
         });
