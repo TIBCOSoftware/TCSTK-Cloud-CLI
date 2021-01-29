@@ -1,7 +1,7 @@
 // This file does not depend on any other files
 // All inputs are provided as input to the functions
 const globalTCpropFolder = __dirname + '/../../../common/';
-const globalTCpropFile = globalTCpropFolder + 'global-tibco-cloud.properties';
+const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
 const colors = require('colors');
 
 // Display opening
@@ -20,7 +20,7 @@ displayOpeningMessage = function () {
 displayGlobalConnectionConfig = function () {
     // console.log('Global Connection Config: ');
     let re = false;
-    log(INFO, 'Global Tibco Cloud Propfile: ' + globalTCpropFile);
+    log(INFO, 'Global Tibco Cloud Propfile: ' + GLOBALPropertyFileName);
     //Global Prop file is __dirname (build folder in the global prop)
     // This folder ../../../ --> is the main node modules folder
     //         is: /Users/hpeters@tibco.com/.npm-global/lib
@@ -29,11 +29,10 @@ displayGlobalConnectionConfig = function () {
     // ../../global/global-tibco-cloud.properties
 
     // Check if global connection file exists
-    if (doesFileExist(globalTCpropFile)) {
+    if (doesFileExist(GLOBALPropertyFileName)) {
         re = true;
         //file exists
-        const PropertiesReader = require('properties-reader');
-        const propsG = PropertiesReader(globalTCpropFile).path();
+        const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         let passType = "STORED IN PLAIN TEXT !";
         if (propsG.CloudLogin.pass === "") {
             passType = "NOT STORED";
@@ -90,16 +89,16 @@ updateGlobalConnectionConfig = async function () {
     log(INFO, 'Update Connection Config: ');
     // update the config.
     // Check if the global propfile exists, if not create one
-    if (!doesFileExist(globalTCpropFile)) {
+    if (!doesFileExist(GLOBALPropertyFileName)) {
         // Create Global config from template
-        copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', globalTCpropFile);
+        copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName);
     }
     if (!doesFileExist(globalTCpropFolder + 'package.json')) {
         copyFile(global.PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json');
         log(INFO, 'Inserted package.json...');
     }
     // Get Cloud Environment
-    await updateRegion(globalTCpropFile);
+    await updateRegion(GLOBALPropertyFileName);
     // Get the login details
 
     // Bump up the OAUTH Token
@@ -108,10 +107,10 @@ updateGlobalConnectionConfig = async function () {
     if (!isNaN(tokenNumber)) {
         const newTokenNumber = tokenNumber + 1;
         const newTokenName = OTokenName.replace(tokenNumber, newTokenNumber);
-        addOrUpdateProperty(globalTCpropFile, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
+        addOrUpdateProperty(GLOBALPropertyFileName, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
         log(INFO, 'Updating Global Token Name: ' , newTokenName);
     }
-    await updateCloudLogin(globalTCpropFile, false, true);
+    await updateCloudLogin(GLOBALPropertyFileName, false, true);
 }
 
 // Function to get an indexed object wiht a String
@@ -126,10 +125,9 @@ indexObj = function (obj, is, value) {
         return indexObj(obj[is[0]], is.slice(1), value);
 }
 
-const PropertiesReader = require('properties-reader');
+// 
 let globalProperties;
-let propFileNameGl;
-let propertiesGl;
+let LOCALPropertyFileName;
 let propsGl;
 let globalMultipleOptions = {};
 // Function to get a property
@@ -145,9 +143,9 @@ getProp = function (propName, forceRefresh, forceGlobalRefresh) {
         propsGl = null;
     }
     if (propsGl == null) {
-        if (doesFileExist(propFileNameGl)) {
-            propertiesGl = PropertiesReader(propFileNameGl);
-            propsGl = propertiesGl.path();
+        if (doesFileExist(LOCALPropertyFileName)) {
+            const propLoad = require('properties-reader')(LOCALPropertyFileName);
+            propsGl = propLoad.path();
         }
     }
     let re;
@@ -160,9 +158,9 @@ getProp = function (propName, forceRefresh, forceGlobalRefresh) {
         }
         log(DEBUG, 'Returning Property: ', re);
         if (re == 'USE-GLOBAL') {
-            if (doesFileExist(globalTCpropFile)) {
+            if (doesFileExist(GLOBALPropertyFileName)) {
                 if (globalProperties == null || forceGlobalRefresh) {
-                    globalProperties = PropertiesReader(globalTCpropFile).path();
+                    globalProperties = require('properties-reader')(GLOBALPropertyFileName).path();
                 }
                 try {
                     re = indexObj(globalProperties, propName);
@@ -268,11 +266,11 @@ function set(path, value, obj) {
 }
 
 setPropFileName = function (propFileName) {
-    propFileNameGl = propFileName;
-    log(DEBUG, 'Using Property File: ' + propFileNameGl);
+    LOCALPropertyFileName = propFileName;
+    log(DEBUG, 'Using Property File: ' + LOCALPropertyFileName);
 }
 getPropFileName = function () {
-    return propFileNameGl;
+    return LOCALPropertyFileName;
 }
 setMultipleOptions = function (mOptions) {
     globalMultipleOptions = mOptions;
@@ -497,10 +495,7 @@ getCurrentRegion = function (showRegion) {
     if (showRegion) {
         displayRegion = showRegion;
     }
-    // let host = getProp('cloudHost').toLowerCase();
-    // let curl = getProp('Cloud_URL').toLowerCase();
     let region = getRegion().toLowerCase();
-
     let re = '';
     if (region.includes('eu')) {
         re = 'eu.';
@@ -545,20 +540,6 @@ getRegion = function (forceRefresh, forceGlobalRefresh) {
     return getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh).toString().toUpperCase();
 }
 
-/*
-// gets region (in Capitals)
-getRegion = function () {
-    let re = 'US';
-    let myHost = getProp('cloudHost').toString().toUpperCase();
-    if (myHost.includes('EU.')) {
-        re = 'EU';
-    }
-    if (myHost.includes('AU.')) {
-        re = 'AU';
-    }
-    return re;
-}*/
-
 updateTCLI = function () {
     log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../../package.json').version);
     run('npm -g install @tibco-tcstk/cloud-cli');
@@ -586,7 +567,21 @@ updateTCLIwrapper = function () {
 // TODO: Implement Check for global (see if the old value is USE-GLOBAL, and then update the global file)
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
 addOrUpdateProperty = function (location, property, value, comment, checkForGlobal) {
-    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ')');
+    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ') Use Global: ' ,checkForGlobal);
+    // Check for global is true by default
+    let doCheckForGlobal = true;
+    if(checkForGlobal != null){
+        doCheckForGlobal = checkForGlobal
+    }
+    // If we check for global and if the global file exist, see if we need to update the global file instead.
+    if (doCheckForGlobal && location == LOCALPropertyFileName && doesFileExist(GLOBALPropertyFileName)){
+        // We are updating the local prop file
+        const localProps = require('properties-reader')(LOCALPropertyFileName).path();
+        if(indexObj(localProps, property) == 'USE-GLOBAL'){
+            location = GLOBALPropertyFileName;
+            log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
+        }
+    }
     // Check if file exists
     const fs = require('fs');
     try {
@@ -642,9 +637,9 @@ addOrUpdateProperty = function (location, property, value, comment, checkForGlob
 // Get the global configuration
 // TODO: Get rid of this function
 getGlobalConfig = function () {
-    if (doesFileExist(globalTCpropFile)) {
-        const PropertiesReader = require('properties-reader');
-        return PropertiesReader(globalTCpropFile).path();
+    if (doesFileExist(GLOBALPropertyFileName)) {
+        
+        return require('properties-reader')(GLOBALPropertyFileName).path();
     } else {
         log(INFO, 'No Global Configuration Set...');
         return false;
@@ -1034,23 +1029,35 @@ const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Property 
 upgradeToV2 = function(isGlobal, propFile){
     let host = '';
     let curl = '';
+    let newORG = 'US';
     if(isGlobal){
-        const propsG = PropertiesReader(globalTCpropFile).path();
+        
+        const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         host = propsG.cloudHost || '';
         curl = propsG.Cloud_URL || '';
     } else {
         host = getProp('cloudHost') || '';
         curl = getProp('Cloud_URL') || '';
+        console.log('LOCALPropertyFileName: ', LOCALPropertyFileName);
+        
+        const oldLocalProps = require('properties-reader')(LOCALPropertyFileName).path();
+        console.log(oldLocalProps);
+        if(oldLocalProps.cloudHost == 'USE-GLOBAL' || oldLocalProps.Cloud_URL == 'USE-GLOBAL'){
+            newORG = 'USE-GLOBAL';
+        }
     }
-    let newORG = 'US';
+
     if (host.toLowerCase().includes('eu') && curl.toLowerCase().includes('eu')) {
         newORG = 'EU';
     }
     if (host.toLowerCase().includes('au') && curl.toLowerCase().includes('au')) {
         newORG = 'AU';
     }
+    console.log('newORG: ', newORG, 'host',host, 'curl',curl);
+    let initialTokenName = 'MyCLIToken_1'
     log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
     if(isGlobal){
+        initialTokenName = 'MyGlobalCLIToken_1'
         log(INFO, colors.rainbow('* AUTOMATICALLY Updating GLOBAL property file to V2.*'));
     } else {
         log(INFO, colors.rainbow('* AUTOMATICALLY Updating you property file to V2... *'));
@@ -1069,7 +1076,7 @@ upgradeToV2 = function(isGlobal, propFile){
     addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version');
     addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Orgeon) - US\n#  EU Cloud (Orgeon) - EU\n# AUS Cloud (Orgeon) - AU\n# Options: US | EU | AU');
     addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com');
-    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Token_Name','MyCLIToken_1' , 'Name of the OAUTH token to be generated.');
+    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Token_Name',initialTokenName , 'Name of the OAUTH token to be generated.');
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_For_Tenants','TSC,BPM' , 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Valid_Hours','336', 'Number of Hours the generated OAUTH token should be valid.');
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Required_Hours_Valid','168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
@@ -1087,7 +1094,8 @@ upgradeToV2 = function(isGlobal, propFile){
 function createPropINE (isGlobal, propFile, propName, value ,comment) {
     let doUpdate;
     if(isGlobal){
-        const propsG = PropertiesReader(globalTCpropFile).path();
+        
+        const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         doUpdate = propsG[propName] == undefined;
     } else {
         doUpdate = getProp(propName) == undefined;
@@ -1099,15 +1107,16 @@ function createPropINE (isGlobal, propFile, propName, value ,comment) {
     }
 }
 
-
+if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
 checkGlobalForUpgrade = function() {
-    if (doesFileExist(globalTCpropFile)) {
-        const PropertiesReader = require('properties-reader');
-        const propsG = PropertiesReader(globalTCpropFile).path();
+    if (doesFileExist(GLOBALPropertyFileName)) {
+        
+        const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         if(propsG.Cloud_Properties_Version == null) {
             log(WARNING, 'Global file need to be upgraded...');
-            upgradeToV2(true, globalTCpropFile);
+            upgradeToV2(true, GLOBALPropertyFileName);
         }
     }
+    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'AFTER Check for Global Upgrade');
 }
 checkGlobalForUpgrade();

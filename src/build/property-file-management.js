@@ -200,7 +200,7 @@ export async function updateProperty() {
         }
     }
     if (doUpdate) {
-        addOrUpdateProperty(pFile, pName, pValue, pComment);
+        addOrUpdateProperty(pFile, pName, pValue, pComment, false);
     }
 }
 
