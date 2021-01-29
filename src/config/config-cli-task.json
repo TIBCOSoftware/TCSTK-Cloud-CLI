@@ -188,6 +188,7 @@
       "internal": false,
       "task": "clearSharedStateScopeWrapper",
       "taskName": "clear-shared-state-scope",
+      "taskAlternativeNames": ["clear-shared-state-scope"],
       "availableOnOs": ["all"]
     },
     "22. export-shared-state-scope": {
