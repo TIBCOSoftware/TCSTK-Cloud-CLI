@@ -51,6 +51,9 @@ export async function test() {
     // PROPM.getClientID();
     // PROPM.disableProperty(getPropFileName(), 'test', 'Disabled for Upgrade to V2');
 
+    const fus = require('./build/fuzzy-search.js');
+    console.log(fus.search('test'));
+
 }
 
 // Function to show cloud info

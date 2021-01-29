@@ -1,7 +1,7 @@
 let TEMP_TEST_FOLDER = '';
 let OS_COMMAND_SEPARATOR = '';
 
-setFolderAndOperator = function(folder, oper){
+setFolderAndOperator = function (folder, oper) {
     TEMP_TEST_FOLDER = folder;
     OS_COMMAND_SEPARATOR = oper;
 }
@@ -44,4 +44,18 @@ mkdirIfNotExist = function (dir) {
     }
 }
 
+generateRandomString = function (length) {
+    const allCapsAlpha = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
+    const allLowerAlpha = [..."abcdefghijklmnopqrstuvwxyz"];
+    const allUniqueChars = [..."~!@#$%^&*()_+-=[]\{}|;:'\",./<>?"];
+    const allNumbers = [..."0123456789"];
+    const base = [...allCapsAlpha, ...allNumbers, ...allLowerAlpha, ...allUniqueChars];
+    const generator = (base, len) => {
+        return [...Array(len)]
+            .map(i => base[Math.random()*base.length|0])
+            .join('');
+    };
+    return generator(base, length);
+    // console.log('OUTPUT: ', generator(base, 28));
+}
 console.log('Test Helper Functions Loaded...');

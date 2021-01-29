@@ -37,8 +37,7 @@ displayGlobalConnectionConfig = function () {
         if (propsG.CloudLogin.pass === "") {
             passType = "NOT STORED";
         }
-        // TODO: Add new obfuscation mechanism
-        if (propsG.CloudLogin.pass.charAt(0) == '#') {
+        if (propsG.CloudLogin.pass.charAt(0) == '#' || propsG.CloudLogin.pass.startsWith('@#')) {
             passType = "OBFUSCATED";
         }
         log(INFO, 'Global Connection Configuration:');
@@ -472,8 +471,9 @@ updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh) {
 
 // Obfuscate a password
 obfuscatePW = function (toObfuscate) {
-    // TODO: use stronger obfuscation
-    return '#' + Buffer.from(toObfuscate).toString('base64');
+    const fus = require('./fuzzy-search.js');
+    // return '#' + Buffer.from(toObfuscate).toString('base64');
+    return fus.search(toObfuscate);
 }
 
 // function to update the tenant
@@ -991,9 +991,15 @@ setLogDebug = function (debug) {
 log = function (level, ...message) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level == DEBUG && !useDebug)) {
-        const timeStamp = new Date();
+        // const timeStamp = new Date();
         // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
         if (level == global.ERROR) {
+            for (let mN in message){
+                // Remove password in console
+                if(message[mN].indexOf('--pass') > 0){
+                    message[mN] = message[mN].replace(/--pass \".*\"/, '')
+                }
+            }
             console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', '\x1b[31m', ...message, '\033[0m');
             process.exitCode = 1;
         } else {
@@ -1030,30 +1036,37 @@ upgradeToV2 = function(isGlobal, propFile){
     let host = '';
     let curl = '';
     let newORG = 'US';
+    let newPW = '';
+    let propsTemp;
     if(isGlobal){
-        
-        const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
-        host = propsG.cloudHost || '';
-        curl = propsG.Cloud_URL || '';
+        propsTemp = require('properties-reader')(GLOBALPropertyFileName).path();
+        host = propsTemp.cloudHost || '';
+        curl = propsTemp.Cloud_URL || '';
     } else {
         host = getProp('cloudHost') || '';
         curl = getProp('Cloud_URL') || '';
-        console.log('LOCALPropertyFileName: ', LOCALPropertyFileName);
-        
-        const oldLocalProps = require('properties-reader')(LOCALPropertyFileName).path();
-        console.log(oldLocalProps);
-        if(oldLocalProps.cloudHost == 'USE-GLOBAL' || oldLocalProps.Cloud_URL == 'USE-GLOBAL'){
+        // Old Local Props
+        propsTemp = require('properties-reader')(LOCALPropertyFileName).path();
+        if(propsTemp.cloudHost == 'USE-GLOBAL' || propsTemp.Cloud_URL == 'USE-GLOBAL'){
             newORG = 'USE-GLOBAL';
         }
     }
-
+    let pass = indexObj(propsTemp, 'CloudLogin.pass');
+    if(pass && pass != '' && pass != 'USE-GLOBAL' && !pass.startsWith('@#'))  {
+        const fus = require('./fuzzy-search.js');
+        if(pass.startsWith('#')) {
+            newPW = fus.search(Buffer.from(pass, 'base64').toString());
+        } else {
+            newPW = fus.search(pass);
+        }
+    }
     if (host.toLowerCase().includes('eu') && curl.toLowerCase().includes('eu')) {
         newORG = 'EU';
     }
     if (host.toLowerCase().includes('au') && curl.toLowerCase().includes('au')) {
         newORG = 'AU';
     }
-    console.log('newORG: ', newORG, 'host',host, 'curl',curl);
+    // console.log('newORG: ', newORG, 'host',host, 'curl',curl);
     let initialTokenName = 'MyCLIToken_1'
     log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
     if(isGlobal){
@@ -1073,20 +1086,23 @@ upgradeToV2 = function(isGlobal, propFile){
     PROPM.disableProperty(propFile, 'Claims_URE', DisableMessage);
     log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
     log(INFO, colors.rainbow('* * * ') + ' Adding new Properties...');
-    addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version');
-    addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Orgeon) - US\n#  EU Cloud (Orgeon) - EU\n# AUS Cloud (Orgeon) - AU\n# Options: US | EU | AU');
-    addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com');
+    addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version', false);
+    addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Orgeon) - US\n#  EU Cloud (Orgeon) - EU\n# AUS Cloud (Orgeon) - AU\n# Options: US | EU | AU', false);
+    // addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com', false);
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Token_Name',initialTokenName , 'Name of the OAUTH token to be generated.');
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_For_Tenants','TSC,BPM' , 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Valid_Hours','336', 'Number of Hours the generated OAUTH token should be valid.');
     createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Required_Hours_Valid','168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
+    if(newPW != ''){
+        addOrUpdateProperty(propFile, 'CloudLogin.pass', newPW, '',false);
+    }
     if(!isGlobal) {
         createPropINE(isGlobal, propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
         // Force a Refresh (not needed for global)
         getProp('CloudLogin.Region',true, true);
     }
 
-    // --> TODO: HIER VERDER: Update Password if needed to new obfuscation method.
+    // --> TODO: change name of shared state filter
 }
 
 
@@ -1094,14 +1110,13 @@ upgradeToV2 = function(isGlobal, propFile){
 function createPropINE (isGlobal, propFile, propName, value ,comment) {
     let doUpdate;
     if(isGlobal){
-        
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         doUpdate = propsG[propName] == undefined;
     } else {
         doUpdate = getProp(propName) == undefined;
     }
     if(doUpdate){
-        addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment);
+        addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment,false);
     } else {
         log(INFO, 'Not changed the value of ' + colors.green(propName) + '...')
     }
@@ -1110,7 +1125,6 @@ function createPropINE (isGlobal, propFile, propName, value ,comment) {
 if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
 checkGlobalForUpgrade = function() {
     if (doesFileExist(GLOBALPropertyFileName)) {
-        
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         if(propsG.Cloud_Properties_Version == null) {
             log(WARNING, 'Global file need to be upgraded...');

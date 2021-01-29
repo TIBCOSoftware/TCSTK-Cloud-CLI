@@ -102,7 +102,7 @@ export async function cli(args) {
     if (options.pass != '') {
         // This call sets the properties object, to be able to add a property to it.
         getProp('CloudLogin.pass');
-        if (options.pass.charAt(0) == '#') {
+        if (options.pass.charAt(0) == '#' || options.pass.startsWith('@#')) {
             setProperty('CloudLogin.pass', options.pass);
         } else {
             setProperty('CloudLogin.pass', obfuscatePW(options.pass));

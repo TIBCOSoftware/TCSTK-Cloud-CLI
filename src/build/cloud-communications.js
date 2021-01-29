@@ -79,8 +79,13 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
             // console.log('Pass from args: ' + pass);
         }
         if (pass && pass.charAt(0) == '#') {
-            pass = Buffer.from(pass, 'base64').toString()
+            pass = Buffer.from(pass, 'base64').toString();
         }
+        if (pass && pass.startsWith('@#')) {
+             const fus = require('./fuzzy-search.js');
+            pass = fus.find(pass);
+        }
+
         if (loginC == null) {
             loginC = cloudLoginV3(tenantID, clientID, email, pass, setLoginURL);
         }
