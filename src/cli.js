@@ -176,6 +176,10 @@ export async function cli(args) {
                             log(INFO, 'Using Global Connection Configuration...');
                             // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
+                            if(!isGlobalOauthDefined()) {
+                                const PROPM = require('./build/property-file-management');
+                                PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
+                            }
                         } else {
                             log(INFO, 'Using Local Connection Configuration...');
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);

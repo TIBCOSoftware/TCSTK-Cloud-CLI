@@ -34,27 +34,28 @@ displayGlobalConnectionConfig = function () {
         //file exists
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         let passType = "STORED IN PLAIN TEXT !";
-        if (propsG.CloudLogin.pass === "") {
+        if (indexObj(propsG, 'CloudLogin.pass') === "") {
             passType = "NOT STORED";
         }
-        if (propsG.CloudLogin.pass.charAt(0) == '#' || propsG.CloudLogin.pass.startsWith('@#')) {
+        if (indexObj(propsG, 'CloudLogin.pass').charAt(0) == '#' || indexObj(propsG, 'CloudLogin.pass').startsWith('@#')) {
             passType = "OBFUSCATED";
         }
         log(INFO, 'Global Connection Configuration:');
         const globalConfig = {
-            "CLOUD REGION": propsG.CloudLogin.Region,
-            "EMAIL": propsG.CloudLogin.email,
-            "CLIENT ID": propsG.CloudLogin.clientID,
+            "CLOUD REGION": indexObj(propsG, 'CloudLogin.Region'),
+            "EMAIL": indexObj(propsG, 'CloudLogin.email'),
+            "CLIENT ID": indexObj(propsG, 'CloudLogin.clientID'),
             "PASSWORD": passType,
-            "OAUTH TOKEN NAME" : propsG.CloudLogin.OAUTH_Generate_Token_Name
+            "OAUTH TOKEN NAME" : indexObj(propsG, 'CloudLogin.OAUTH_Generate_Token_Name')
         };
         console.table(globalConfig);
-        if(Object.keys(parseOAUTHToken(propsG.CloudLogin.OAUTH_Token, false)).length === 0){
-            log(INFO, 'No Global OAUTH Configuration Set...');
-        } else {
+        if(isGlobalOauthDefined()){
             log(INFO, 'Global OAUTH Configuration:');
-            parseOAUTHToken(propsG.CloudLogin.OAUTH_Token, true);
+            parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), true);
+        } else {
+            log(INFO, 'No Global OAUTH Configuration Set...');
         }
+
     } else {
         log(INFO, 'No Global Configuration Set...');
     }
@@ -62,6 +63,22 @@ displayGlobalConnectionConfig = function () {
     // Returns true if the global file exists and false if it does not exists.
     return re;
 }
+
+isGlobalOauthDefined = function() {
+    const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
+    if(indexObj(propsG, 'CloudLogin.OAUTH_Token') == undefined ){
+       return false;
+    } else {
+        if(Object.keys(parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), false)).length === 0){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+}
+
 
 // Function to replace string in file
 replaceInFile = function (from, to, filePattern) {
@@ -1038,6 +1055,7 @@ upgradeToV2 = function(isGlobal, propFile){
     let newORG = 'US';
     let newPW = '';
     let propsTemp;
+    let defaultSharedStateFilter='APPLICATION'
     if(isGlobal){
         propsTemp = require('properties-reader')(GLOBALPropertyFileName).path();
         host = propsTemp.cloudHost || '';
@@ -1047,6 +1065,10 @@ upgradeToV2 = function(isGlobal, propFile){
         curl = getProp('Cloud_URL') || '';
         // Old Local Props
         propsTemp = require('properties-reader')(LOCALPropertyFileName).path();
+        if(propsTemp.Shared_State_Scope != null){
+            defaultSharedStateFilter = propsTemp.Shared_State_Scope;
+        }
+
         if(propsTemp.cloudHost == 'USE-GLOBAL' || propsTemp.Cloud_URL == 'USE-GLOBAL'){
             newORG = 'USE-GLOBAL';
         }
@@ -1097,12 +1119,15 @@ upgradeToV2 = function(isGlobal, propFile){
         addOrUpdateProperty(propFile, 'CloudLogin.pass', newPW, '',false);
     }
     if(!isGlobal) {
+        // Translate Shared_State_Scope to Shared_State_Filter
+        PROPM.disableProperty(propFile, 'Shared_State_Scope', DisableMessage);
+        createPropINE(isGlobal, propFile,'Shared_State_Filter',defaultSharedStateFilter , 'Shared_State_Scope was renamed to Shared_State_Filter\n# Filter for the shared state to manage (all shared states starting with this value will be managed)\n' +
+            '#  Use \'\'(empty) or APPLICATION for the current application. Use * for all values, or use a specific value to apply a filter.\n' +
+            '#  ( <Filter> | APPLICATION | * )');
         createPropINE(isGlobal, propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
         // Force a Refresh (not needed for global)
         getProp('CloudLogin.Region',true, true);
     }
-
-    // --> TODO: change name of shared state filter
 }
 
 
