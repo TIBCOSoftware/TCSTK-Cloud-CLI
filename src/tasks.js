@@ -225,29 +225,29 @@ export async function removeSharedStateEntryWrapper() {
     await SHST.removeSharedStateEntry();
 }
 
-export async function clearSharedStateScopeWrapper() {
+export async function clearSharedStateWrapper() {
     const SHST = require('./build/shared-state');
-    await SHST.clearSharedStateScope();
+    await SHST.clearSharedState();
 }
 
-export async function exportSharedStateScopeWrapper() {
+export async function exportSharedStateWrapper() {
     const SHST = require('./build/shared-state');
-    await SHST.exportSharedStateScope();
+    await SHST.exportSharedState();
 }
 
-export async function importSharedStateScopeWrapper() {
+export async function importSharedStateWrapper() {
     const SHST = require('./build/shared-state');
-    await SHST.importSharedStateScope();
+    await SHST.importSharedState();
 }
 
-export async function watchSharedStateScopeMainWrapper() {
+export async function watchSharedStateMainWrapper() {
     const SHST = require('./build/shared-state');
-    await SHST.watchSharedStateScopeMain();
+    await SHST.watchSharedStateMain();
 }
 
-export async function watchSharedStateScopeWrapper() {
+export async function watchSharedStateWrapper() {
     const SHST = require('./build/shared-state');
-    await SHST.watchSharedStateScope();
+    await SHST.watchSharedState();
 }
 
 // Function to show liveApps

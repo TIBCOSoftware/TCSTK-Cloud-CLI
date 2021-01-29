@@ -4,24 +4,24 @@ const colors = require('colors');
 //TODO: Move this to prop file
 const SHARED_STATE_STEP_SIZE = 400;
 const SHARED_STATE_MAX_CALLS = 20;
-let SHARED_STATE_SCOPE = 'APPLICATION';
+let SHARED_STATE_FILTER = 'APPLICATION';
 let SHARED_STATE_DOUBLE_CHECK = 'YES';
 let SHARED_STATE_FOLDER = './Shared_State/';
 let DO_SHARED_STATE_DOUBLE_CHECK = true;
 
 function prepSharedStateProps() {
-    // Shared state scope (picked up from configuration if exists)
-    if (getProp('Shared_State_Scope') != null) {
-        SHARED_STATE_SCOPE = getProp('Shared_State_Scope');
+    // Shared state filter (picked up from configuration if exists)
+    if (getProp('Shared_State_Filter') != null) {
+        SHARED_STATE_FILTER = getProp('Shared_State_Filter');
     } else {
-        log(INFO, 'No Shared State Scope Property found; Adding APPLICATION to ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'Shared_State_Scope', 'APPLICATION');
+        log(INFO, 'No Shared State Filter Property found; Adding APPLICATION to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), 'Shared_State_Filter', 'APPLICATION');
     }
-    // Shared state scope (picked up from configuration if exists)
+    // Shared state filter (picked up from configuration if exists)
     if (getProp('Shared_State_Double_Check') != null) {
         SHARED_STATE_DOUBLE_CHECK = getProp('Shared_State_Double_Check');
     } else {
-        log(INFO, 'No Shared State Scope Double Check Property found; Adding YES to ' + getPropFileName());
+        log(INFO, 'No Shared State Filter Double Check Property found; Adding YES to ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'Shared_State_Double_Check', 'YES');
     }
     DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() == 'no'));
@@ -33,7 +33,7 @@ function prepSharedStateProps() {
     }
 }
 
-// Function to return a JSON with the shared state entries from a set scope
+// Function to return a JSON with the shared state entries from a set filter
 export function getSharedState(showTable) {
     prepSharedStateProps();
     // const lCookie = cLogin();
@@ -52,7 +52,6 @@ export function getSharedState(showTable) {
         let end = (i + 1) * SHARED_STATE_STEP_SIZE;
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
-        //TODO: Rename scope for shared state
         let filter = '&$filter=type=' + filterType;
         let sStateTemp = CCOM.callTC(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
         if (sStateTemp.length < 1) {
@@ -65,14 +64,14 @@ export function getSharedState(showTable) {
     }
     console.log('');
     log(INFO, 'Total Number of Shared State Entries: ' + ALLsState.length);
-    if (SHARED_STATE_SCOPE == 'APPLICATION') {
-        SHARED_STATE_SCOPE = getProp('App_Name');
+    if (SHARED_STATE_FILTER == 'APPLICATION') {
+        SHARED_STATE_FILTER = getProp('App_Name');
     }
     let sState = [];
-    log(INFO, 'Applying Filter) Shared State Scope: ' + SHARED_STATE_SCOPE);
-    if (SHARED_STATE_SCOPE != '*') {
+    log(INFO, 'Applying Shared State Filter: ' + SHARED_STATE_FILTER);
+    if (SHARED_STATE_FILTER != '*') {
         for (const state in ALLsState) {
-            if (ALLsState[state] && ALLsState[state].name && ALLsState[state].name.startsWith(SHARED_STATE_SCOPE)) {
+            if (ALLsState[state] && ALLsState[state].name && ALLsState[state].name.startsWith(SHARED_STATE_FILTER)) {
                 sState.push(ALLsState[state]);
             }
         }
@@ -165,7 +164,7 @@ export async function showSharedStateDetails() {
         // Show State Links
         // Show State Link Details
     } else {
-        log(WARNING, 'No Shared States available to show details of in the scope: ' + getProp('Shared_State_Scope'))
+        log(WARNING, 'No Shared States available to show details of in the filter: ' + getProp('Shared_State_Filter'))
     }
 }
 
@@ -189,23 +188,23 @@ export async function removeSharedStateEntry() {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
         }
     } else {
-        log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
+        log(ERROR, 'No Shared States available to remove in the filter: ' + getProp('Shared_State_Filter'))
     }
 }
 
-// Removes a Shared State Scope
-export async function clearSharedStateScope() {
+// Removes a Shared State Filter
+export async function clearSharedState() {
     // Show Shared State list
     const sStateList = getSharedState(true);
     if (sStateList.length > 0) {
-        // Ask if you really want to delete this shared state scope
+        // Ask if you really want to delete this shared state filter
         let decision = 'YES';
 
         if (DO_SHARED_STATE_DOUBLE_CHECK) {
-            decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (From Scope: ' + getProp('Shared_State_Scope') + ') ?', ['YES', 'NO']);
+            decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (Filter: ' + getProp('Shared_State_Filter') + ') ?', ['YES', 'NO']);
         }
-        // If the scope is set to * then really double check...
-        if (getProp('Shared_State_Scope') == '*') {
+        // If the filter is set to * then really double check...
+        if (getProp('Shared_State_Filter') == '*') {
             decision = 'NO';
             const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
             if (secondDecision == 'YES') {
@@ -223,13 +222,13 @@ export async function clearSharedStateScope() {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
         }
     } else {
-        log(ERROR, 'No Shared States available to remove in the scope: ' + getProp('Shared_State_Scope'))
+        log(ERROR, 'No Shared States available to remove in the filter: ' + getProp('Shared_State_Filter'))
     }
 }
 
 
-// Export the Shared state scope to a folder
-export async function exportSharedStateScope() {
+// Export the Shared state filter to a folder
+export async function exportSharedState() {
     // Show Shared State List
     let sharedStateEntries = getSharedState(true);
     let decision = 'YES';
@@ -324,8 +323,8 @@ function putSharedState(sharedStateObject) {
     }
 }
 
-// Import the Shared state scope from a folder
-export async function importSharedStateScope() {
+// Import the Shared state filter from a folder
+export async function importSharedState() {
     prepSharedStateProps();
     //console.log('ORG: ', getOrganization());
     let importOptions = [];
@@ -370,14 +369,14 @@ export async function importSharedStateScope() {
 };
 
 //wrapper function around the watcher on shared state
-export function watchSharedStateScopeMain() {
+export function watchSharedStateMain() {
     return new Promise(async function (resolve, reject) {
         prepSharedStateProps();
         //TODO: What if the password is not specified in properties file, needs to be send...
-        const commandSTDO = 'tcli watch-shared-state-scope-do -p "' + getPropFileName() + '"';
-        const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state scope ?', ['YES', 'NO']);
+        const commandSTDO = 'tcli watch-shared-state-do -p "' + getPropFileName() + '"';
+        const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state (filtered) ?', ['YES', 'NO']);
         if (decision == 'YES') {
-            exportSharedStateScope().then(() => {
+            exportSharedState.then(() => {
                 run(commandSTDO);
                 resolve();
             })
@@ -389,7 +388,7 @@ export function watchSharedStateScopeMain() {
 }
 
 //A shared state watcher (every time the file changes, the shared state is updated)
-export function watchSharedStateScope() {
+export function watchSharedState() {
     const chokidar = require('chokidar');
     return new Promise(async function (resolve, reject) {
         //Do the login now, so it does not have to be done later

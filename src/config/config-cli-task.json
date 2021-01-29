@@ -16,6 +16,7 @@
       "multipleInteraction": true,
       "task": "showCloud",
       "taskName": "show-cloud",
+      "taskAlternativeNames": ["sc"],
       "availableOnOs": ["all"]
     },
     "2. show-cloud-starters": {
@@ -25,6 +26,7 @@
       "multipleInteraction": true,
       "task": "showApps",
       "taskName": "show-cloud-starters",
+      "taskAlternativeNames": ["scs"],
       "availableOnOs": ["all"]
     },
     "3. show-cloud-starter-links": {
@@ -34,6 +36,7 @@
       "multipleInteraction": true,
       "task": "showLinks",
       "taskName": "show-cloud-starter-links",
+      "taskAlternativeNames": ["scsl"],
       "availableOnOs": ["all"]
     },
     "4. change-region": {
@@ -82,6 +85,7 @@
       "internal": false,
       "task": "buildDeploy",
       "taskName": "build-deploy",
+      "taskAlternativeNames": ["bd"],
       "availableOnOs": ["all"]
     },
     "publish": {
@@ -182,49 +186,53 @@
       "taskName": "clear-shared-state-entry",
       "availableOnOs": ["all"]
     },
-    "21. clear-shared-state-scope": {
-      "description": "Removes all shared state entries in the configured scope.",
+    "21. clear-shared-state-filter": {
+      "description": "Removes all shared state entries in the configured filter.",
       "enabled": true,
       "internal": false,
-      "task": "clearSharedStateScopeWrapper",
-      "taskName": "clear-shared-state-scope",
+      "task": "clearSharedStateWrapper",
+      "taskName": "clear-shared-state-filter",
       "taskAlternativeNames": ["clear-shared-state-scope"],
       "availableOnOs": ["all"]
     },
-    "22. export-shared-state-scope": {
-      "description": "Downloads all shared state entries from the configured scope to the local file system.",
+    "22. export-shared-state": {
+      "description": "Downloads all shared state entries from the configured filter to the local file system.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "task": "exportSharedStateScopeWrapper",
-      "taskName": "export-shared-state-scope",
+      "task": "exportSharedStateWrapper",
+      "taskAlternativeNames": ["export-shared-state-scope"],
+      "taskName": "export-shared-state",
       "availableOnOs": ["all"]
     },
-    "23. import-shared-state-scope": {
-      "description": "Uploads one entry or the configured scope from the local file system to the shared state.",
+    "23. import-shared-state": {
+      "description": "Uploads one entry or the configured filter from the local file system to the shared state.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "task": "importSharedStateScopeWrapper",
-      "taskName": "import-shared-state-scope",
+      "task": "importSharedStateWrapper",
+      "taskAlternativeNames": ["import-shared-state-scope"],
+      "taskName": "import-shared-state",
       "availableOnOs": ["all"]
     },
-    "24. watch-shared-state-scope": {
+    "24. watch-shared-state": {
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
-      "task": "watchSharedStateScopeMainWrapper",
-      "taskName": "watch-shared-state-scope",
+      "task": "watchSharedStateMainWrapper",
+      "taskName": "watch-shared-state",
+      "taskAlternativeNames": ["watch-shared-state-scope"],
       "availableOnOs": ["all"]
     },
-    "watch-shared-state-scope-do": {
+    "watch-shared-state-do": {
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
-      "NOTE": "LEAVE THIS ONE DISBLED SO IT DOES NOT SHOW UP IN THE LIST",
+      "NOTE": "LEAVE THIS ONE DISABLED SO IT DOES NOT SHOW UP IN THE LIST",
       "enabled": false,
       "internal": true,
-      "task": "watchSharedStateScopeWrapper",
-      "taskName": "watch-shared-state-scope-do",
+      "task": "watchSharedStateWrapper",
+      "taskName": "watch-shared-state-do",
+      "taskAlternativeNames": ["watch-shared-state-scope-do"],
       "availableOnOs": ["all"]
     },
     "25. create-multiple-property-file": {

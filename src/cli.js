@@ -1,6 +1,7 @@
 'use strict';
 // File to manage the CLI Interaction
 import {createMultiplePropertyFileWrapper, manageGlobalConfig, newStarter} from "./manage-application";
+const colors = require('colors');
 
 require('./build/common-functions');
 import arg from 'arg';
@@ -235,7 +236,6 @@ export async function cli(args) {
         } else {
             require('./manage-application');
         }
-        // TODO: pass in commandline options
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
         if (options.task == '') {
@@ -243,11 +243,12 @@ export async function cli(args) {
         } else {
             if (options.task == 'help') {
                 options.task = 'help-tcli';
+                // TODO: Get specific help
             }
             // Check if the task exists...
             const cliTaskConfigCLI = require('./config/config-cli-task.json');
             const cTsks = cliTaskConfigCLI.cliTasks;
-            let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-scope-do'];
+            let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-do'];
             let taskExist = false;
             let directTask = false;
             let directTaskMethod = '';
@@ -257,6 +258,18 @@ export async function cli(args) {
                 }
             }
             for (const cliTask in cTsks) {
+                if(cTsks[cliTask].taskAlternativeNames){
+                    for (const altName of cTsks[cliTask].taskAlternativeNames) {
+                        if(altName == options.task) {
+                            taskExist = true;
+                            if (cTsks[cliTask].task) {
+                                directTask = true;
+                                directTaskMethod = cTsks[cliTask].task;
+                                log(INFO, 'Task: ' + options.task + ' --> ' + colors.blue(cTsks[cliTask].taskName));
+                            }
+                        }
+                    }
+                }
                 if (cTsks[cliTask].taskName == options.task) {
                     taskExist = true;
                     if (cTsks[cliTask].task) {

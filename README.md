@@ -67,10 +67,10 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |              show-shared-state|  Show the shared state contents |
  |      show-shared-state-details|  Shows the details of one Shared State entry |
  |       clear-shared-state-entry|  Removes one Shared State entry |
- |       clear-shared-state-scope|  Removes all shared state entries in the configured scope |
- |      export-shared-state-scope|  Downloads all shared state entries from the configured scope to the local file system |
- |      import-shared-state-scope|  Uploads one entry or the configured scope from the local file system to the shared state |
- |       watch-shared-state-scope|  Monitors the local shared state and when changes are detected it is uploaded to the cloud |
+ |      clear-shared-state-filter|  Removes all shared state entries in the configured filter |
+ |            export-shared-state|  Downloads all shared state entries from the configured filter to the local file system |
+ |            import-shared-state|  Uploads one entry or the configured filter from the local file system to the shared state |
+ |             watch-shared-state|  Monitors the local shared state and when changes are detected it is uploaded to the cloud |
  |  create-multiple-property-file|  Creating an initial property file to manage multiple cloud starters and environments |
  |         replace-string-in-file|  Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties |
  |           show-live-apps-cases|  Show Live Apps Cases |
