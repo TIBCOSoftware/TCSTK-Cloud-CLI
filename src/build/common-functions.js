@@ -1039,8 +1039,8 @@ log = function (level, ...message) {
         // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
         if (level == global.ERROR) {
             for (let mN in message){
-                // Remove password in console
-                if(message[mN].indexOf('--pass') > 0){
+                // Removes password in console
+                if(typeof message[mN] == 'string' && message[mN].indexOf('--pass') > 0){
                     message[mN] = message[mN].replace(/--pass \".*\"/, '')
                 }
             }

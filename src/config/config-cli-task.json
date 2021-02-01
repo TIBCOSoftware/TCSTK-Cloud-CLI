@@ -163,6 +163,15 @@
       "taskName": "update-global-config",
       "availableOnOs": ["all"]
     },
+    "create-shared-state-entry": {
+      "description": "Create a new shared state entry",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "createSharedStateWrapper",
+      "taskName": "create-shared-state-entry",
+      "availableOnOs": ["all"]
+    },
     "18. show-shared-state": {
       "description": "Show the shared state contents",
       "enabled": true,

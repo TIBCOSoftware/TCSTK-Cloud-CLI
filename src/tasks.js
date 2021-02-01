@@ -209,6 +209,12 @@ export async function createMultiplePropertyFileWrapper() {
 }
 
 // Display the shared state entries to a user
+export async function createSharedStateWrapper() {
+    const SHST = require('./build/shared-state');
+    await SHST.createSharedState();
+};
+
+// Display the shared state entries to a user
 export function showSharedState() {
     const SHST = require('./build/shared-state');
     SHST.getSharedState(true);

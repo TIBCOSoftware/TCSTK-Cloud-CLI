@@ -1,4 +1,5 @@
 const CCOM = require('./cloud-communications');
+const LA = require('./live-apps');
 const colors = require('colors');
 
 //TODO: Move this to prop file
@@ -169,6 +170,26 @@ export async function showSharedStateDetails() {
 }
 
 // Removes a Shared State Entry
+export async function createSharedState() {
+    const ssType = getProp('Shared_State_Type');
+    log(INFO, 'Creating Shared State Entry. Type: ' + colors.blue(ssType));
+    const ssName = await askQuestion('What is the name of the Shared State entry that you want to create ?');
+    const postSS = {
+        "name": ssName + '.' + ssType,
+        "content": {
+            "json": "{}"
+        },
+        "type": ssType,
+        "sandboxId": LA.getProductionSandbox()
+    }
+    const result = CCOM.callTC(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
+    console.log(result);
+    if(result != null){
+        log(INFO, 'Successfully created ' + colors.yellow('EMPTY') + ' shared state entry: ' + colors.green(ssName) + ' ('+colors.blue(ssType)+')...')
+    }
+}
+
+// Removes a Shared State Entry
 export async function removeSharedStateEntry() {
     // Show Shared State list
     const sStateList = getSharedState(true);
@@ -229,6 +250,7 @@ export async function clearSharedState() {
 
 // Export the Shared state filter to a folder
 export async function exportSharedState(verbose) {
+    let reNumberOfStates = 0;
     let doVerbose = verbose || false;
     // Show Shared State List
     let sharedStateEntries = getSharedState(true);
@@ -259,6 +281,7 @@ export async function exportSharedState(verbose) {
                         // And store them in a file / folder
                         require('jsonfile').writeFileSync(contentFileName, contentObject, storeOptions);
                         log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                        reNumberOfStates++;
                     } catch (e) {
                         log(ERROR, 'Parse Error on: ' + sSEntry.name + 'Writing directly...');
                     }
@@ -273,6 +296,7 @@ export async function exportSharedState(verbose) {
     } else {
         log(INFO, 'Don\'t worry I have not exported anything :-) ... ');
     }
+    return reNumberOfStates;
 }
 
 // Load shared state contents from a file
@@ -382,6 +406,7 @@ export async function watchSharedStateMain() {
     }
 }
 
+let ignoreChanges = 0;
 //A shared state watcher (every time the file changes, the shared state is updated)
 export function watchSharedState() {
     const chokidar = require('chokidar');
@@ -391,29 +416,28 @@ export function watchSharedState() {
         await CCOM.cLogin();
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
-            // console.log(event, path);
             if (event == 'change') {
-                // Add path type (windows / linux)
-                // console.log('Platform: ', process.platform);
-                let pS = '/';
-                if (process.platform == 'win32') {
-                    pS = '\\';
-                }
-                if (path.includes(pS + 'CONTENT' + pS)) {
-                    log(INFO, 'CONTENT File UPDATED: ' + path);
-                    const contextFile = path.replace(pS + 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
-                    // console.log(contextFile);
-                    if (doesFileExist(contextFile)) {
-                        putSharedState(importSharedStateFile(contextFile));
+                if(ignoreChanges <= 0) {
+                    let pS = '/';
+                    if (process.platform == 'win32') {
+                        pS = '\\';
+                    }
+                    if (path.includes(pS + 'CONTENT' + pS)) {
+                        log(INFO, 'CONTENT File UPDATED: ' + path);
+                        const contextFile = path.replace(pS + 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
+                        if (doesFileExist(contextFile)) {
+                            putSharedState(importSharedStateFile(contextFile));
+                        } else {
+                            log(ERROR, 'Can\'t find context file: ' + contextFile);
+                        }
                     } else {
-                        log(ERROR, 'Can\'t find context file: ' + contextFile);
+                        log(INFO, 'CONTEXT File UPDATED: ' + path);
+                        log(INFO, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
                     }
                 } else {
-                    log(INFO, 'CONTEXT File UPDATED: ' + path);
-                    log(INFO, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
+                    ignoreChanges--;
                 }
             }
-
         });
         const readline = require('readline');
         readline.emitKeypressEvents(process.stdin);
@@ -425,7 +449,8 @@ export function watchSharedState() {
             if (key.name == 'r') {
                 // Reload Shared State
                 log(INFO, 'Reloading Shared State from Cloud...');
-                await exportSharedState(true);
+                // Two files per update..
+                ignoreChanges = (await exportSharedState(true)) * 2;
             }
             if (key.name == 'escape' || key.name === 'q') {
                 // console.log('ESCAPE...');
