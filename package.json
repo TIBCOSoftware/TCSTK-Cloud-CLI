@@ -39,8 +39,8 @@
     "webpack-cli": "^4.3.1"
   },
   "bin": {
-    "tcli": "dist/tcli/main.js",
-    "tcli_dev": "src/bin/cloud-cli.js"
+    "tcli_prod": "dist/tcli/main.js",
+    "tcli": "src/bin/cloud-cli.js"
   },
   "pkg": {
     "assets": [

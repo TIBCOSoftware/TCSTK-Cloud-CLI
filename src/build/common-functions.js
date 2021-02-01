@@ -79,7 +79,6 @@ isGlobalOauthDefined = function() {
 
 }
 
-
 // Function to replace string in file
 replaceInFile = function (from, to, filePattern) {
     const patternToUse = filePattern || './**';
@@ -126,7 +125,9 @@ updateGlobalConnectionConfig = async function () {
         addOrUpdateProperty(GLOBALPropertyFileName, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
         log(INFO, 'Updating Global Token Name: ' , newTokenName);
     }
-    await updateCloudLogin(GLOBALPropertyFileName, false, true);
+    const defEmail = getProp('CloudLogin.email');
+    const defClientID = getProp('CloudLogin.clientID');
+    await updateCloudLogin(GLOBALPropertyFileName, false, true, defClientID, defEmail);
 }
 
 // Function to get an indexed object wiht a String
@@ -462,13 +463,31 @@ getLastGlobalAnswer = function (question) {
 }
 
 // Update the cloud login properties
-updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh) {
+updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh, defaultClientID, defaultEmail) {
     // Client ID
+    let cidQuestion = 'What is your Client ID ?';
+    let useCID = '';
+    if(defaultClientID != null){
+        useCID = defaultClientID;
+        cidQuestion += ' (Press enter to use: ' + useCID + ')';
+    }
     log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
-    const cid = await askQuestion('What is your Client ID ?');
+    let cid = await askQuestion(cidQuestion);
+    if(useCID != '' && cid == ''){
+        cid = useCID;
+    }
     addOrUpdateProperty(propFile, 'CloudLogin.clientID', cid);
+    let emailQuestion = 'What is your User Name (Email) ?'
+    let useEMAIL = '';
+    if(defaultEmail != null){
+        useEMAIL = defaultEmail;
+        emailQuestion += ' (Press enter to use: ' + useEMAIL + ')';
+    }
     // Username & Password (obfuscate)
-    const email = await askQuestion('What is your User Name (Email) ?');
+    let email = await askQuestion(emailQuestion);
+    if(useEMAIL != '' && email == ''){
+        email = useEMAIL;
+    }
     addOrUpdateProperty(propFile, 'CloudLogin.email', email);
     // Force a refresh on the tibco-cloud property file
     getRegion(forceRefresh, forceGlobalRefresh);
@@ -652,15 +671,23 @@ addOrUpdateProperty = function (location, property, value, comment, checkForGlob
 }
 
 // Get the global configuration
-// TODO: Get rid of this function
 getGlobalConfig = function () {
     if (doesFileExist(GLOBALPropertyFileName)) {
-        
         return require('properties-reader')(GLOBALPropertyFileName).path();
     } else {
         log(INFO, 'No Global Configuration Set...');
         return false;
     }
+}
+
+// Getter
+getGLOBALPropertyFileName = function() {
+    return GLOBALPropertyFileName;
+}
+
+// Getter
+getLOCALPropertyFileName = function() {
+    return LOCALPropertyFileName;
 }
 
 // Run an OS Command
