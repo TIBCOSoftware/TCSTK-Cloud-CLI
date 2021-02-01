@@ -200,23 +200,17 @@ export async function updateProperty() {
         }
     }
     if (doUpdate) {
-        console.log('GLOBALPropertyFileName: ', getGLOBALPropertyFileName());
-        console.log('LOCALPropertyFileName: ', getLOCALPropertyFileName());
         let checkForGlobal = false;
         if (doesFileExist(getGLOBALPropertyFileName())){
             // We are updating the local prop file
-            const localProps = require('properties-reader')(getLOCALPropertyFileName()).path();
+            const localProps = require('properties-reader')(getPropFileName()).path();
             if(indexObj(localProps, pName) == 'USE-GLOBAL'){
                 // location = GLOBALPropertyFileName;
                 const propToUse = await askMultipleChoiceQuestion('Found USE-GLOBAL for property: ' + pName + '. Do you want to update the GLOBAL or the LOCAL property file ?', ['GLOBAL', 'LOCAL']);
                 checkForGlobal = 'global' == propToUse.toLowerCase();
-
-
                 // log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
             }
         }
-
-
         addOrUpdateProperty(pFile, pName, pValue, pComment, checkForGlobal);
     }
 }

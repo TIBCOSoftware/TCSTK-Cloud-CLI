@@ -685,10 +685,10 @@ getGLOBALPropertyFileName = function() {
     return GLOBALPropertyFileName;
 }
 
-// Getter
+/* Getter
 getLOCALPropertyFileName = function() {
     return LOCALPropertyFileName;
-}
+}*/
 
 // Run an OS Command
 run = function (command, failOnError) {

@@ -61,6 +61,7 @@
       "internal": false,
       "task": "startWrapper",
       "taskName": "start",
+      "taskAlternativeNames": ["s"],
       "availableOnOs": ["all"]
     },
     "7. build": {
@@ -69,6 +70,7 @@
       "internal": false,
       "task": "buildCloudStarter",
       "taskName": "build",
+      "taskAlternativeNames": ["b"],
       "availableOnOs": ["all"]
     },
     "8. deploy": {
@@ -77,6 +79,7 @@
       "internal": false,
       "task": "deploy",
       "taskName": "deploy",
+      "taskAlternativeNames": ["d"],
       "availableOnOs": ["all"]
     },
     "9. build-deploy": {

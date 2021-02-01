@@ -228,11 +228,12 @@ export async function clearSharedState() {
 
 
 // Export the Shared state filter to a folder
-export async function exportSharedState() {
+export async function exportSharedState(verbose) {
+    let doVerbose = verbose || false;
     // Show Shared State List
     let sharedStateEntries = getSharedState(true);
     let decision = 'YES';
-    if (DO_SHARED_STATE_DOUBLE_CHECK) {
+    if (DO_SHARED_STATE_DOUBLE_CHECK && !doVerbose) {
         decision = await askMultipleChoiceQuestion('Are you sure you want to export all the states above ?', ['YES', 'NO']);
     }
     if (decision == 'YES') {
@@ -272,14 +273,14 @@ export async function exportSharedState() {
     } else {
         log(INFO, 'Don\'t worry I have not exported anything :-) ... ');
     }
-};
+}
 
 // Load shared state contents from a file
 function importSharedStateFile(ssFile) {
     prepSharedStateProps();
     log(DEBUG, 'Importing: ' + ssFile);
     const fs = require('fs');
-    const contentContextFile = fs.readFileSync(ssFile);
+    const contentContextFile = fs.readFileSync(ssFile).toString();
     let ssObject = {};
     try {
         ssObject = JSON.parse(contentContextFile);
@@ -369,22 +370,16 @@ export async function importSharedState() {
 };
 
 //wrapper function around the watcher on shared state
-export function watchSharedStateMain() {
-    return new Promise(async function (resolve, reject) {
-        prepSharedStateProps();
-        //TODO: What if the password is not specified in properties file, needs to be send...
-        const commandSTDO = 'tcli watch-shared-state-do -p "' + getPropFileName() + '"';
-        const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state (filtered) ?', ['YES', 'NO']);
-        if (decision == 'YES') {
-            exportSharedState.then(() => {
-                run(commandSTDO);
-                resolve();
-            })
-        } else {
-            run(commandSTDO);
-            resolve();
-        }
-    });
+export async function watchSharedStateMain() {
+    prepSharedStateProps();
+    const commandSTDO = 'tcli watch-shared-state-do -p "' + getPropFileName() + '"';
+    const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state (filtered) ?', ['YES', 'NO']);
+    if (decision == 'YES') {
+        await exportSharedState();
+        run(commandSTDO);
+    } else {
+        run(commandSTDO);
+    }
 }
 
 //A shared state watcher (every time the file changes, the shared state is updated)
@@ -401,13 +396,12 @@ export function watchSharedState() {
                 // Add path type (windows / linux)
                 // console.log('Platform: ', process.platform);
                 let pS = '/';
-                if(process.platform == 'win32') {
+                if (process.platform == 'win32') {
                     pS = '\\';
-                };
-
-                if (path.includes(pS+ 'CONTENT' + pS)) {
+                }
+                if (path.includes(pS + 'CONTENT' + pS)) {
                     log(INFO, 'CONTENT File UPDATED: ' + path);
-                    const contextFile = path.replace(pS+ 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
+                    const contextFile = path.replace(pS + 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
                     // console.log(contextFile);
                     if (doesFileExist(contextFile)) {
                         putSharedState(importSharedStateFile(contextFile));
@@ -424,9 +418,14 @@ export function watchSharedState() {
         const readline = require('readline');
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
-        process.stdin.on('keypress', (str, key) => {
+        process.stdin.on('keypress', async (str, key) => {
             if (key.ctrl && key.name === 'c') {
                 process.exit();
+            }
+            if (key.name == 'r') {
+                // Reload Shared State
+                log(INFO, 'Reloading Shared State from Cloud...');
+                await exportSharedState(true);
             }
             if (key.name == 'escape' || key.name === 'q') {
                 // console.log('ESCAPE...');
@@ -437,6 +436,6 @@ export function watchSharedState() {
                 });
             }
         });
-        console.log('Press Escape key or the \'q\'-key to stop listening for file changes...');
+        console.log('Press Escape key or the \'q\'-key to stop listening for file changes, or the \'r\'-key to reload from cloud...');
     });
 };
