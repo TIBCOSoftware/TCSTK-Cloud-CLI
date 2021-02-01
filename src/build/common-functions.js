@@ -1073,8 +1073,8 @@ logLine = function (message) {
 
 
 // For future versions: if(getProp('Cloud_Properties_Version') != 'V3'){
-const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Property File V2 (You can remove this...)';
-const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Property File V2';
+const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
+const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 
 upgradeToV2 = function(isGlobal, propFile){
     let host = '';
