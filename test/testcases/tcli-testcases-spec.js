@@ -192,15 +192,40 @@ describe("tcli testsuite", function () {
     // jasmine --config=test/support/jasmine.json --filter='Shared State Testcases'
     it("Shared State Testcases", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Scope:none:*')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Filter:none:*')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:SHARED')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PRIVATE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
-        // TODO: Provide details on shared state entry (maybe after importing one)
-        // expect(run(CLI_EXECUTOR + 'show-shared-state-details')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-shared-state-scope -a YES')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PUBLIC')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
+
+        // SET FILTER
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Filter:none:Jasmine')).toBe(true);
+
+        // PRIVATE
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PRIVATE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state-details -a Jasmine.TEST.PRIVATE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'clear-shared-state-entry -a Jasmine.TEST.PRIVATE:YES')).toBe(true);
+
+        // SHARED
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:SHARED')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state-details -a Jasmine.TEST.SHARED')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'clear-shared-state-entry -a Jasmine.TEST.SHARED:YES')).toBe(true);
+
+        // PUBLIC
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PUBLIC')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-shared-state-details -a Jasmine.TEST.PUBLIC')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'clear-shared-state-entry -a Jasmine.TEST.PUBLIC:YES')).toBe(true);
+
+        // ERROR
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:FAKE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(false);
     });
 
 
@@ -314,7 +339,6 @@ describe("tcli testsuite", function () {
         }
     });
 
-
     // Show cloud with Basic Authentication
     // jasmine --config=test/support/jasmine.json --filter='table testing'
     it("table testing", function () {
@@ -337,8 +361,7 @@ Difficult to TEST:
 // "48. create-live-apps-group": (need a remove group)
 "6. start":
 "16. update-global-config":
-"19. clear-shared-state-entry":
-show-shared-state-details
+
 "20. clear-shared-state-scope":
 "22. import-shared-state-scope":
 "23. watch-shared-state-scope":
