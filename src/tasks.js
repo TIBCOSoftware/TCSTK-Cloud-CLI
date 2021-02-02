@@ -60,8 +60,12 @@ export async function mainT() {
 
 export async function testTask() {
     console.log('Test...');
-    displayMDFile('docs/tasks/show-cloud-ren.md');
-    const PROPM = require('./build/property-file-management');
+    // displayMDFile('docs/tasks/show-cloud-ren.md');
+    // const PROPM = require('./build/property-file-management');
+    const MESSAGING = require('./build/messaging');
+    await MESSAGING.showClients();
+
+
     // PROPM.getClientID();
     // PROPM.disableProperty(getPropFileName(), 'test', 'Disabled for Upgrade to V2');
 
@@ -436,6 +440,14 @@ export async function showMessagingSummaryWrapper() {
     const MESSAGING = require('./build/messaging');
     await MESSAGING.showSummary();
 }
+
+export async function showMessagingClientsWrapper() {
+    const MESSAGING = require('./build/messaging');
+    await MESSAGING.showClients();
+}
+
+
+
 
 
 // Comes from prop file

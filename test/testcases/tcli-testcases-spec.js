@@ -337,7 +337,6 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'browse-spotfire-library -a "Parent) root:Child) TIBCO Community Mods:Child) Mods Library:MOD) Area Chart::NONE"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineSpotfireTest_1')).toBe(true);
         // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
-
     });
 
     // FS Testcases
@@ -348,6 +347,24 @@ describe("tcli testsuite", function () {
             let randomString = generateRandomString(Math.floor(Math.random() * 100));
             expect(fus.find(fus.search(randomString)) == randomString).toBe(true);
         }
+    });
+
+    // Spotfire Testcases
+    // jasmine --config=test/support/jasmine.json --filter='Messaging'
+    it("Messaging", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:NOT-GLOBAL:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'messaging-show-summary')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'messaging-show-clients')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_Token_Name:none:JasmineTcmTest_1:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_For_Tenants:none:TSC,BPM,TCM:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'generate-oauth-token -a YES:YES:YES')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'messaging-show-summary')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'messaging-show-clients')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineTcmTest_1')).toBe(true);
+        // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
     });
 
     // Show cloud with Basic Authentication

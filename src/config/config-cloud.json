@@ -23,7 +23,12 @@
     "la_process": "liveapps.cloud.tibco.com/process/v1/processes",
     "tci_apps": "integration.cloud.tibco.com/api/v1/apps",
     "sf_settings": "spotfire-next.cloud.tibco.com/spotfire/wp/settings",
-    "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo"
+    "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo",
+    "mes_system": "messaging.cloud.tibco.com/tcm/v1/system",
+    "mes_sum": "messaging.cloud.tibco.com/tcm/v1/system/summary",
+    "mes_durables": "messaging.cloud.tibco.com/tcm/v1/system/durables",
+    "mes_clients": "messaging.cloud.tibco.com/tcm/v1/system/eftl/clients",
+    "mes_keys": "messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keysInfo"
   },
   "mappings": {
     "oauth": {
@@ -240,6 +245,70 @@
         {
           "header": "Title",
           "field": "Title"
+        }
+      ]
+    },
+    "mes_sum": {
+      "entries": [
+        {
+          "header": "Connections",
+          "field": "total_connections"
+        },
+        {
+          "header": "EFTL Con.",
+          "field": "eftl_connections"
+        },
+        {
+          "header": "FTL Con.",
+          "field": "ftl_connections"
+        },
+        {
+          "header": "N Of Durables",
+          "field": "durable_count"
+        },
+        {
+          "header": "N Of Empty Durables",
+          "field": "durables_without_subscribers"
+        },
+        {
+          "header": "Stored Messages",
+          "field": "stored_messages"
+        },
+        {
+          "header": "Stored Bytes",
+          "field": "stored_bytes"
+        },
+        {
+          "header": "Messages This Month",
+          "field": "messages_this_month"
+        },
+        {
+          "header": "Max Connections",
+          "field": "max_connections_this_month"
+        }
+      ]
+    },
+    "mes_clients": {
+      "entries": [
+        {
+          "header": "Client ID",
+          "field": "client_id"
+        },
+        {
+          "header": "Type",
+          "field": "client_type"
+        },
+        {
+          "header": "Version",
+          "field": "client_version"
+        },
+        {
+          "header": "State",
+          "field": "state"
+        },
+        {
+          "header": "Subscriptions",
+          "field": "NOFSubscriptions"
         }
       ]
     }

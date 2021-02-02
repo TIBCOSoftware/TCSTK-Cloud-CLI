@@ -240,6 +240,13 @@ export function callTC(url, doLog, conf) {
     if (conf == null) {
         conf = {};
     }
+
+    // Check for another Cloud Location
+    if(getProp('CloudLogin.Cloud_Location') != null && getProp('CloudLogin.Cloud_Location') != 'cloud.tibco.com'){
+        url = url.replace('cloud.tibco.com' , getProp('CloudLogin.Cloud_Location'));
+        log(WARNING, 'Using another BASE URL: ' , getProp('CloudLogin.Cloud_Location'))
+    }
+
     const urlToCall = 'https://' + getCurrentRegion() + url;
     //url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
     return callURL(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);

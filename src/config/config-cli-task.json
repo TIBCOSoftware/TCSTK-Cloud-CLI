@@ -527,15 +527,24 @@
       "availableOnOs": ["all"]
     },
     "53. messaging-show-summary": {
-      "description": "Show summary of the cloud messaging ",
-      "enabled": false,
+      "description": "Show summary of cloud messaging",
+      "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "task": "showMessagingSummaryWrapper",
       "taskName": "messaging-show-summary",
       "availableOnOs": ["all"]
     },
-    "54. browse-spotfire-library": {
+    "54. messaging-show-clients": {
+      "description": "Show clients of cloud messaging",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showMessagingClientsWrapper",
+      "taskName": "messaging-show-clients",
+      "availableOnOs": ["all"]
+    },
+    "55. browse-spotfire-library": {
       "description": "List Spotfire Analytical Reports and browse through folders on the Spotfire Library.",
       "enabled": true,
       "internal": false,
