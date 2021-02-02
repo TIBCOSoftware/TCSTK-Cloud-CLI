@@ -93,7 +93,8 @@ replaceInFile = function (from, to, filePattern) {
     let results = replace.sync(options);
     for (result of results) {
         if (result.numReplacements > 0) {
-            log(INFO, '\x1b[0m[REPLACED] [FROM: |\x1b[32m' + from + '\x1b[0m|] [TO: |\x1b[32m' + to + '\x1b[0m|]', '(Number of Replacements: ' + result.numReplacements + ')\nFILE: ', result.file);
+            log(INFO, '\x1b[0m    [FILE] ', result.file);
+            log(INFO, '\x1b[0m[REPLACED] [FROM: |\x1b[32m' + from + '\x1b[0m|] [TO: |\x1b[32m' + to + '\x1b[0m|]', '(Number of Replacements: ' + result.numReplacements + ')');
         }
     }
     return results;
@@ -1012,7 +1013,6 @@ npmInstall = function (location, packageToUse) {
 // Function to display an MD File in the Console
 displayMDFile = function (mdFile) {
     const fs = require('fs');
-    console.log(global.PROJECT_ROOT + mdFile);
     const mdFileContent = fs.readFileSync(global.PROJECT_ROOT + mdFile, 'utf8');
     const ECHOMD = require('./../echomd/echomd').echomd;
     console.log(ECHOMD(mdFileContent));

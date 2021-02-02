@@ -64,6 +64,15 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
     });
 
+    // jasmine --config=test/support/jasmine.json --filter='Help'
+    it("Help", function () {
+        expect(run(CLI_EXECUTOR + '--help')).toBe(true);
+        expect(run(CLI_EXECUTOR + '-h')).toBe(true);
+        expect(run(CLI_EXECUTOR + '-h show-cloud')).toBe(true);
+        expect(run(CLI_EXECUTOR + '--help change-region')).toBe(true);
+        expect(run(CLI_EXECUTOR + '-h show-crap')).toBe(false);
+    });
+
     // jasmine --config=test/support/jasmine.json --filter='More Operations'
     // Show cloud with Basic Authentication
     it("More Operations", function () {

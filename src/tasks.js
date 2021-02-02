@@ -8,6 +8,7 @@ const colors = require('colors');
 export async function helptcli() {
     log(INFO, 'These are the available TIBCO CLOUD CLI Tasks:');
     const cTsks = cliTaskConfig.cliTasks;
+    const hTasks = ['NONE']
     for (let cliTask in cTsks) {
         let allowed = false;
         if (cTsks[cliTask].availableOnOs != null) {
@@ -19,15 +20,28 @@ export async function helptcli() {
             }
         }
         if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
+            hTasks.push(cTsks[cliTask].taskName);
             let str = cliTask;
-            const x = 30 - cliTask.length;
+            const x = 45 - cliTask.length;
             for (let i = 0; i < x; i++) {
                 str = ' ' + str;
             }
             console.log('\x1b[36m%s\x1b[0m', str + ':', ' ' + cTsks[cliTask].description);
         }
     }
-    // TODO: Ask for which task to show details and then display the MD
+    // Ask for which task to show details and then display the MD
+    let hDec = '';
+    while(hDec != 'NONE'){
+        hDec = await askMultipleChoiceQuestionSearch('For which task would you like more details ? ', hTasks);
+        if(hDec != 'NONE') {
+            const hFile = 'docs/tasks/'+hDec+'.md';
+            if(doesFileExist(global.PROJECT_ROOT + hFile)){
+                displayMDFile(hFile);
+            } else {
+                log(ERROR, 'No Help file found for: ' + hDec);
+            }
+        }
+    }
 }
 
 // Wrapper to main task
@@ -46,13 +60,13 @@ export async function mainT() {
 
 export async function testTask() {
     console.log('Test...');
-    // displayMDFile('docs/use-cases/UC1_Get_Started.md');
+    displayMDFile('docs/tasks/show-cloud-ren.md');
     const PROPM = require('./build/property-file-management');
     // PROPM.getClientID();
     // PROPM.disableProperty(getPropFileName(), 'test', 'Disabled for Upgrade to V2');
 
-    const fus = require('./build/fuzzy-search.js');
-    console.log(fus.search('test'));
+    // const fus = require('./build/fuzzy-search.js');
+    // console.log(fus.search('test'));
 
 }
 

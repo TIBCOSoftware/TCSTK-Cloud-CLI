@@ -62,6 +62,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
         surpressStart: args['--surpressStart'] || false,
         task: args._[0] || '',
+        taskHelp: args._[1] || '',
         pass: args['--pass'] || '',
         org: args['--org'] || '',
         answers: args['--answers'] || '',
@@ -118,8 +119,19 @@ export async function cli(args) {
     }
 
     // Show help
-    if (options.help) {
-        helptcli();
+    if (options.help || options.task == 'help') {
+        if(options.task != '' && options.task != 'help'){
+            const hFile = 'docs/tasks/'+options.task+'.md';
+            if(doesFileExist(global.PROJECT_ROOT + hFile)){
+                displayMDFile(hFile);
+            } else {
+                log(ERROR, 'No Help file found for: ' + options.task);
+                process.exit(1);
+            }
+        } else {
+            helptcli();
+            console.log('To get specific help on a task type: tcli -h <TASKNAME> or tcli --help <TASKNAME>');
+        }
         process.exit(0);
         //options.task = 'help-tcli';
     }
