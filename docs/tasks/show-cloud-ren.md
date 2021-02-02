@@ -20,14 +20,14 @@ tcli sc
 | (index) |      NAME      |        VALUE        |
 --- | --- | ---
 |    0    |    'REGION'    |        'EU'         |
-|    1    | 'ORGANIZATION' |  'TIBCO LABS DEV'   |
-|    2    |  'FIRST NAME'  |       'Hugo'        |
-|    3    |  'LAST NAME'   |      'Peters'       |
-|    4    |    'EMAIL'     | 'hpeters@tibco.com' |
+|    1    | 'ORGANIZATION' |     'TIBCO ORG'     |
+|    2    |  'FIRST NAME'  |       'John'        |
+|    3    |  'LAST NAME'   |        'Doe'        |
+|    4    |    'EMAIL'     |    'test@tibco.com' |
 |    5    |  'SANDBOX 0'   |    'Production'     |
-|    6    | 'SANDBOX 0 ID' |       '3100'        |
+|    6    | 'SANDBOX 0 ID' |       '1234'        |
 |    7    |  'SANDBOX 1'   |     'Developer'     |
-|    8    | 'SANDBOX 1 ID' |       '3341'        |
+|    8    | 'SANDBOX 1 ID' |       '4321'        |
 
 
 
