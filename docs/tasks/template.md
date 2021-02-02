@@ -10,6 +10,5 @@
 
 @@ALT@@
 @@ALTS@@
-
 ---
 ### Example Result:
