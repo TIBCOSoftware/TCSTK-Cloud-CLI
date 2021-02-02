@@ -1,11 +1,11 @@
 {
   "cliTasks": {
-   "test": {
+   "test-task": {
       "description": "Run Test",
       "enabled": false,
       "internal": false,
-      "task": "test",
-      "taskName": "test",
+      "task": "testTask",
+      "taskName": "test-task",
       "availableOnOs": ["win32","darwin"],
       "availableOnTemplate": ["all"]
     },
@@ -36,59 +36,73 @@
       "multipleInteraction": true,
       "task": "showLinks",
       "taskName": "show-cloud-starter-links",
-      "taskAlternativeNames": ["scsl"],
+      "taskAlternativeNames": ["sl"],
       "availableOnOs": ["all"]
     },
-    "4. change-region": {
-      "description": "Change the Region in the cloud-properties file",
+    "4. show-properties": {
+      "description": "Show the properties in your properties file (and possibly the global values)",
       "enabled": true,
       "internal": false,
-      "task": "changeRegion",
-      "taskName": "change-region",
-      "availableOnOs": ["darwin"]
+      "multipleInteraction": true,
+      "task": "showPropertiesWrapper",
+      "taskName": "show-properties",
+      "taskAlternativeNames": ["sp"],
+      "availableOnOs": ["all"]
     },
-    "5. obfuscate": {
-      "description": "Obfuscate a password and put it in the cloud-properties file",
-      "enabled": true,
-      "internal": false,
-      "task": "obfuscate",
-      "taskName": "obfuscate",
-      "availableOnOs": ["darwin"]
-    },
-    "6. start": {
+    "5. start-cloud-starter": {
       "description": "Start your local cloud starter project",
       "enabled": true,
       "internal": false,
       "task": "startWrapper",
-      "taskName": "start",
-      "taskAlternativeNames": ["s"],
+      "taskName": "start-cloud-starter",
+      "taskAlternativeNames": ["s", "start"],
       "availableOnOs": ["all"]
     },
-    "7. build": {
+    "6. build-cloud-starter": {
       "description": "Build your local cloud starter project",
       "enabled": true,
       "internal": false,
       "task": "buildCloudStarter",
-      "taskName": "build",
-      "taskAlternativeNames": ["b"],
+      "taskName": "build-cloud-starter",
+      "taskAlternativeNames": ["b", "build"],
       "availableOnOs": ["all"]
     },
-    "8. deploy": {
+    "7. test-cloud-starter": {
+      "description": "Run Test cases for your cloud starter",
+      "enabled": false,
+      "internal": false,
+      "task": "testCSWrapper",
+      "taskName": "test-cloud-starter",
+      "taskAlternativeNames": ["t,test"],
+      "availableOnOs": ["win32","darwin"],
+      "availableOnTemplate": ["all"]
+    },
+    "8. test-cloud-starter-headless": {
+      "description": "Run Test cases for your cloud starter, headless (without opening the browser)",
+      "enabled": false,
+      "internal": false,
+      "task": "testCSHeadlessWrapper",
+      "taskName": "test-cloud-starter-headless",
+      "taskAlternativeNames": ["th", "test-headless "],
+      "availableOnOs": ["win32","darwin"],
+      "availableOnTemplate": ["all"]
+    },
+    "9. deploy-cloud-starter": {
       "description": "Deploy your local cloud starter project",
       "enabled": true,
       "internal": false,
       "task": "deploy",
-      "taskName": "deploy",
-      "taskAlternativeNames": ["d"],
+      "taskName": "deploy-cloud-starter",
+      "taskAlternativeNames": ["d", "deploy"],
       "availableOnOs": ["all"]
     },
-    "9. build-deploy": {
+    "10. build-deploy-cloud-starter": {
       "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
       "task": "buildDeploy",
-      "taskName": "build-deploy",
-      "taskAlternativeNames": ["bd"],
+      "taskName": "build-deploy-cloud-starter",
+      "taskAlternativeNames": ["bd", "build-deploy"],
       "availableOnOs": ["all"]
     },
     "publish": {
@@ -99,7 +113,7 @@
       "taskName": "publish",
       "availableOnOs": ["all"]
     },
-    "10. delete-cloud-starter": {
+    "11. delete-cloud-starter": {
       "description": "Delete a LiveApps WebApp",
       "enabled": true,
       "internal": false,
@@ -107,7 +121,7 @@
       "taskName": "delete-cloud-starter",
       "availableOnOs": ["all"]
     },
-    "11. clean": {
+    "clean": {
       "description": "Clean the temporary folders",
       "enabled": true,
       "internal": true,
@@ -115,7 +129,7 @@
       "taskName": "clean",
       "availableOnOs": ["all"]
     },
-    "12. get-cloud-libs-from-git": {
+    "get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
       "enabled": true,
       "internal": true,
@@ -123,7 +137,7 @@
       "taskName": "get-cloud-libs-from-git",
       "availableOnOs": ["darwin"]
     },
-    "13. inject-lib-sources": {
+    "12. inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
@@ -131,7 +145,7 @@
       "taskName": "inject-lib-sources",
       "availableOnOs": ["darwin"]
     },
-    "14. undo-lib-sources": {
+    "13. undo-lib-sources": {
       "description": "Undo's the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
@@ -139,7 +153,7 @@
       "taskName": "undo-lib-sources",
       "availableOnOs": ["darwin"]
     },
-    "15. schematic-add": {
+    "14. schematic-add": {
       "description": "Add a schematic into your project",
       "enabled": true,
       "internal": false,
@@ -147,7 +161,7 @@
       "taskName": "schematic-add",
       "availableOnOs": ["all"]
     },
-    "16. view-global-config": {
+    "15. view-global-config": {
       "description": "View the global cloud connection configuration",
       "enabled": true,
       "internal": false,
@@ -155,7 +169,7 @@
       "taskName": "view-global-config",
       "availableOnOs": ["all"]
     },
-    "17. update-global-config": {
+    "16. update-global-config": {
       "description": "Update the global cloud connection configuration",
       "enabled": true,
       "internal": false,
@@ -163,16 +177,7 @@
       "taskName": "update-global-config",
       "availableOnOs": ["all"]
     },
-    "create-shared-state-entry": {
-      "description": "Create a new shared state entry",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "createSharedStateWrapper",
-      "taskName": "create-shared-state-entry",
-      "availableOnOs": ["all"]
-    },
-    "18. show-shared-state": {
+    "17. show-shared-state": {
       "description": "Show the shared state contents",
       "enabled": true,
       "internal": false,
@@ -181,13 +186,22 @@
       "taskName": "show-shared-state",
       "availableOnOs": ["all"]
     },
-    "19. show-shared-state-details": {
+    "18. show-shared-state-details": {
       "description": "Shows the details of one Shared State entry.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showSharedStateDetailsWrapper",
       "taskName": "show-shared-state-details",
+      "availableOnOs": ["all"]
+    },
+    "19. create-shared-state-entry": {
+      "description": "Create a new shared state entry",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "createSharedStateWrapper",
+      "taskName": "create-shared-state-entry",
       "availableOnOs": ["all"]
     },
     "20. clear-shared-state-entry": {
@@ -371,6 +385,7 @@
       "multipleInteraction": true,
       "task": "showOauthTokenWrapper",
       "taskName": "show-oauth-tokens",
+      "taskAlternativeNames": ["so"],
       "availableOnOs": ["all"]
     },
     "38. generate-oauth-token": {
@@ -380,6 +395,7 @@
       "multipleInteraction": true,
       "task": "generateOauthTokenWrapper",
       "taskName": "generate-oauth-token",
+      "taskAlternativeNames": ["go"],
       "availableOnOs": ["all"]
     },
     "39. revoke-oauth-token": {
@@ -388,6 +404,7 @@
       "internal": false,
       "task": "revokeOauthTokenWrapper",
       "taskName": "revoke-oauth-token",
+      "taskAlternativeNames": ["reo"],
       "availableOnOs": ["all"]
     },
     "40. rotate-oauth-token": {
@@ -397,6 +414,7 @@
       "multipleInteraction": true,
       "task": "rotateOauthTokenWrapper",
       "taskName": "rotate-oauth-token",
+      "taskAlternativeNames": ["ro"],
       "availableOnOs": ["all"]
     },
     "41. validate-and-rotate-oauth-token": {
@@ -406,6 +424,7 @@
       "multipleInteraction": true,
       "task": "validateAndRotateOauthTokenWrapper",
       "taskName": "validate-and-rotate-oauth-token",
+      "taskAlternativeNames": ["vo"],
       "availableOnOs": ["all"]
     },
     "42. generate-cloud-property-files": {
@@ -524,6 +543,24 @@
       "task": "browseSpotfireLibraryWrapper",
       "taskName": "browse-spotfire-library",
       "availableOnOs": ["all"]
+    },
+    "change-region": {
+      "description": "Change the Region in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "task": "changeRegion",
+      "taskName": "change-region",
+      "taskAlternativeNames": ["cr"],
+      "availableOnOs": ["darwin"]
+    },
+    "obfuscate-password": {
+      "description": "Obfuscate a password and put it in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "task": "obfuscate",
+      "taskName": "obfuscate-password",
+      "taskAlternativeNames": ["obfuscate", "ob"],
+      "availableOnOs": ["darwin"]
     },
     "update-tcli": {
       "description": "Update the Cloud CLI",

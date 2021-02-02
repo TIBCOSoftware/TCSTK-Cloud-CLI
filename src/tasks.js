@@ -44,7 +44,7 @@ export async function mainT() {
     await promptTask(__dirname, appRoot);
 }
 
-export async function test() {
+export async function testTask() {
     console.log('Test...');
     // displayMDFile('docs/use-cases/UC1_Get_Started.md');
     const PROPM = require('./build/property-file-management');
@@ -62,11 +62,22 @@ export async function showCloud() {
     await CCOM.showCloudInfo();
 }
 
-// Required to be valid for more than a week (default generation 2 weeks)
-// Start Cloudstarter Locally
+// Start Cloud Starter Locally
 export async function startWrapper() {
     const CS = require('./build/cloud-starters');
     await CS.start();
+}
+
+// Test Cloud Starter Locally
+export async function testCSWrapper() {
+    const CS = require('./build/cloud-starters');
+    await CS.testCS();
+}
+
+// Test Cloud Starter Locally Headless
+export async function testCSHeadlessWrapper() {
+    const CS = require('./build/cloud-starters');
+    await CS.testCSHeadless();
 }
 
 // Function to publish the cloud starter
@@ -344,6 +355,12 @@ export async function validateAndRotateOauthTokenWrapper() {
 export async function showOrgFoldersWrapper() {
     const CFILES = require('./build/cloud-files');
     await CFILES.showOrgFolders();
+}
+
+
+export async function showPropertiesWrapper() {
+    const PROPM = require('./build/property-file-management');
+    await PROPM.showPropertiesTable();
 }
 
 export async function generateCloudPropertyFilesWrapper() {

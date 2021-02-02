@@ -273,3 +273,58 @@ export function disableProperty(location, property, comment) {
         console.error(err)
     }
 }
+
+// display current properties in a table
+export function showPropertiesTable() {
+    // TODO: Print the OAUTH Details
+    // Get the properties object
+    let props = {};
+    if (doesFileExist(getPropFileName())) {
+        const propLoad = require('properties-reader')(getPropFileName());
+        props = propLoad.path();
+        log(INFO, ' LOCAL Property File Name: ' + colors.blue(getPropFileName()));
+        if(getGLOBALPropertyFileName() && getGLOBALPropertyFileName() != '') {
+            log(INFO, 'GLOBAL Property File Name: ' + colors.blue(getGLOBALPropertyFileName()));
+        }
+        let nvs = [];
+        for (const [key, value] of Object.entries(props)) {
+            if(key == 'CloudLogin'){
+                for (const [key, value] of Object.entries(props.CloudLogin)) {
+                    if(value == 'USE-GLOBAL'){
+                        let displayValue = getProp('CloudLogin.' + key);
+                        if(key == 'pass'){
+                            if(displayValue != ''){
+                                var passT = displayValue;
+                                displayValue = 'PLAIN TEXT';
+                                if(passT.startsWith('#') || passT.startsWith('@')){
+                                    displayValue = 'OBFUSCATED';
+                                }
+                            }
+                        }
+                        nvs = createTableValue('CloudLogin.' + key,  displayValue + ' [FROM GLOBAL]', nvs);
+                    } else {
+                        nvs = createTableValue('CloudLogin.' + key, value, nvs);
+                    }
+                    if(key == 'OAUTH_Token' && getOAUTHDetails() != null){
+                        // console.log(getOAUTHDetails())
+                        for (const [key, value] of Object.entries(getOAUTHDetails())) {
+                            if(key != 'Expiry_Date'){
+                                nvs = createTableValue('OAUTH ' + key, value, nvs);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if(value == 'USE-GLOBAL'){
+                    nvs = createTableValue(key, getProp(key) + ' [FROM GLOBAL]', nvs);
+                } else {
+                    nvs = createTableValue(key, value, nvs);
+                }
+            }
+        }
+        // Print table
+        pexTable(nvs, 'tibco-cloud-properties', getPEXConfig(), true);
+    }
+
+
+}

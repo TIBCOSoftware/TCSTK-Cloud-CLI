@@ -313,9 +313,12 @@ export function getAppLinks(showTable) {
     const appLinkTable = {};
     const apps = showAvailableApps(false);
     let i = 1;
+    let nvs = [];
     for (let app of apps) {
         const appTemp = {};
         appTemp['APP NAME'] = app.name;
+        nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
+        nvs = createTableValue('NAME', app.name, nvs);
         const appN = i++;
         const tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
         logLine("Processing App: (" + appN + '/' + apps.length + ')...');
@@ -327,12 +330,15 @@ export function getAppLinks(showTable) {
                     // const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
                     if (csInfo && csInfo.cloudstarter) {
                         appTemp['CS VERSION'] = csInfo.cloudstarter.version;
+                        nvs = createTableValue('VERSION', csInfo.cloudstarter.version, nvs);
                         appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
+                        nvs = createTableValue('BUILD DATE', csInfo.cloudstarter.build_date, nvs);
                     }
                 }
                 if (appD.name.includes("index.html")) {
                     const tempLink = 'https://' + CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name;
                     appTemp['LINK'] = tempLink;
+                    nvs = createTableValue('LINK', tempLink, nvs);
                 }
             }
         } else {
@@ -345,7 +351,10 @@ export function getAppLinks(showTable) {
         appLinkTable[appN] = appTemp;
     }
     process.stdout.write('\n');
-    pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), showTable);
+    pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), false);
+    if(showTable){
+        console.table(nvs);
+    }
     return appLinkTable;
 }
 
@@ -456,12 +465,19 @@ export function undoLibSources() {
     run('npm install ' + getProp('TCSTDebugPackages'));
 }
 
-// Function to test features
-export async function testFunction (propFile){
-    const re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
-    return re;
+// Function to test
+export function testCS (){
+    log(INFO, 'Running Testcases...');
+    // TODO: See if we can call Jasmine directly and generate a nicer testreport
+    run('npm run test');
 }
 
+// Function to test headless
+export function testCSHeadless (){
+    log(INFO, 'Running Headless Testcases...');
+    // TODO: See if we can call Jasmine directly and generate a nicer testreport
+    run('ng test --code-coverage --watch=false --browsers=ChromeHeadless');
+}
 
 
 
