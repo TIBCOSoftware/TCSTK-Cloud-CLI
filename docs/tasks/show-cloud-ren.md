@@ -2,15 +2,15 @@
 
 ---
 ### Description
-Shows Cloud Details
+> Shows Cloud Details
 
 ---
 ### Example Usage
-tcli show-cloud
+> tcli show-cloud
 
 ---
 ### Alternatives
-tcli sc
+> tcli sc
 
 ---
 ### Example Result:
@@ -23,7 +23,7 @@ tcli sc
 |    1    | 'ORGANIZATION' |     'TIBCO ORG'     |
 |    2    |  'FIRST NAME'  |       'John'        |
 |    3    |  'LAST NAME'   |        'Doe'        |
-|    4    |    'EMAIL'     |    'test@tibco.com' |
+|    4    |    'EMAIL'     |   'test@tibco.com'  |
 |    5    |  'SANDBOX 0'   |    'Production'     |
 |    6    | 'SANDBOX 0 ID' |       '1234'        |
 |    7    |  'SANDBOX 1'   |     'Developer'     |
