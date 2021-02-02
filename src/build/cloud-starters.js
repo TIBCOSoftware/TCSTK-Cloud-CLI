@@ -192,8 +192,10 @@ export function showAvailableApps(showTable) {
         // console.log('USERS: ', users);
         // TODO: Apparently apps can have tags, look into this...
         let apps = {};
+        let appsDisplay = {};
         for (const app in response) {
             const appTemp = {};
+            // const appTempDisplay = {};
             const appN = parseInt(app) + 1;
             //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
             appTemp['APP NAME'] = response[app].name;
@@ -215,7 +217,6 @@ export function showAvailableApps(showTable) {
                 latestDeployed = true;
             }
             appTemp['LATEST DEPLOYED'] = latestDeployed;
-            apps[appN] = appTemp;
             const created = new Date(response[app].creationDate);
             const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
             const optionsT = {hour: 'numeric'};
@@ -227,8 +228,17 @@ export function showAvailableApps(showTable) {
             const now = new Date();
             appTemp['AGE(DAYS)'] = Math.round((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
             appTemp['LAST MODIFIED(DAYS)'] = Math.round((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24));
+            apps[appN] = appTemp;
+            let appTempDisplay = {...appTemp};
+            delete appTempDisplay['LATEST VERSION'];
+            delete appTempDisplay['LATEST DEPLOYED'];
+            appsDisplay[appN] = appTempDisplay;
         }
-        pexTable(apps, 'cloud-starters', getPEXConfig(), doShowTable);
+        pexTable(apps, 'cloud-starters', getPEXConfig(), false);
+        if(doShowTable){
+            log(INFO, colors.blue('TABLE] cloud-starters'));
+            console.table(appsDisplay)
+        }
         return response;
     }
 }

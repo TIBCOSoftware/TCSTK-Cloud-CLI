@@ -87,6 +87,7 @@ export function getSharedState(showTable) {
         return a > b ? 1 : a < b ? -1 : 0;
     });
     const states = {};
+    const statesDisplay = {};
     for (const state in sState) {
         const sTemp = {};
         const appN = parseInt(state) + 1;
@@ -98,10 +99,18 @@ export function getSharedState(showTable) {
         sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
         sTemp['MODIFIED BY'] = sState[state].modifiedByName;
         const modified = new Date(sState[state].modifiedDate);
-        sTemp['LAST MODIFIED'] = modified.toLocaleDateString("en-US", options);
+        sTemp['MODIFIED ON'] = modified.toLocaleDateString("en-US", options);
         states[appN] = sTemp;
+        let sTempDisplay = {...sTemp};
+        delete sTempDisplay['CREATED BY'];
+        delete sTempDisplay['CREATED ON'];
+        statesDisplay[appN] = sTempDisplay;
     }
-    pexTable(states, 'shared-states', getPEXConfig(), showTable);
+    pexTable(states, 'shared-states', getPEXConfig(), false);
+    if(showTable){
+        log(INFO, colors.blue('TABLE] shared-states'));
+        console.table(statesDisplay)
+    }
     return sState;
 }
 
