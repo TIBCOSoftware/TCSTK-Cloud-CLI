@@ -59,6 +59,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
     });
@@ -80,6 +81,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Replace_PATTERN:none:./tibco-cloud.properties')).toBe(true);
         expect(run(CLI_EXECUTOR + 'replace-string-in-file')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
     });
 
     // jasmine --config=test/support/jasmine.json --filter=OAUTH
