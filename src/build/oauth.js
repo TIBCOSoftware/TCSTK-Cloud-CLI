@@ -10,16 +10,17 @@ export function displayCurrentOauthDetails() {
 }
 
 // Function to display all OAUTH Tokens...
-export function showOauthToken() {
+export async function showOauthToken() {
     log(INFO, 'Displaying OAUTH Tokens...');
-    const response = CCOM.callTC(CCOM.clURI.get_oauth,false  , {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+    const response =  await CCOM.callTCA(CCOM.clURI.get_oauth,false  , {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
     // console.log(response);
     for (let rep in response) {
         if (response[rep]['lastAccessed']) {
-            response[rep]['used'] = 'IN USE';
+            // response[rep]['used'] = 'IN USE';
             response[rep]['lastAccessed'] = response[rep]['lastAccessed'] * 1000;
         } else {
-            response[rep]['used'] = 'NEVER USED';
+            response[rep]['lastAccessed'] = 'NEVER USED';
+            // response[rep]['used'] = 'NEVER USED';
         }
         // Times need to be multiplied by 1000 (probalby UNIX Time)
         response[rep]['generatedTime'] = response[rep]['generatedTime'] * 1000;
@@ -34,7 +35,7 @@ export function showOauthToken() {
 export async function revokeOauthToken(tokenName) {
     if (!tokenName) {
         //No token name provided so choose on from list
-        const possibleTokensArrObj = showOauthToken();
+        const possibleTokensArrObj = await showOauthToken();
         let possibleTokens = ['NO TOKEN'];
         for (let tok of iterateTable(possibleTokensArrObj)) {
             possibleTokens = possibleTokens.filter(f => f != tok.Name).concat([tok.Name])
@@ -45,7 +46,7 @@ export async function revokeOauthToken(tokenName) {
     if (tokenName != 'NO TOKEN') {
         log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
         const postRequest = 'name=' + tokenName;
-        const response = CCOM.callTC(CCOM.clURI.revoke_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+        const response =  await CCOM.callTCA(CCOM.clURI.revoke_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
         log(INFO, 'Result: ', colors.blue(response.message));
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
@@ -53,7 +54,7 @@ export async function revokeOauthToken(tokenName) {
 }
 
 // Function to rotate an OAUTH Token
-export function rotateOauthToken() {
+export async function rotateOauthToken() {
     if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
         const tokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
         const tokenNumber = Number(tokenName.split('_').pop().trim());
@@ -74,11 +75,11 @@ export function rotateOauthToken() {
             log(INFO, 'Rotating OAUTH Token:  ' + tokenName);
             log(INFO, '     New OAUTH Token:  ' + newTokenName);
             // Generate new Token
-            generateOauthToken(newTokenName, true);
+            await generateOauthToken(newTokenName, true);
             // Update token name
             addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
             // Revoke old token
-            revokeOauthToken(tokenName);
+            await revokeOauthToken(tokenName);
             log(INFO, 'Successfully Rotated Token: ' + tokenName + ' --> ' + newTokenName);
 
         }
@@ -189,9 +190,8 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp)
     if (!skipCall) {
         // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
         // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
-        const responseClaims = CCOM.callTC(CCOM.clURI.claims);
-        const response = CCOM.callTC(CCOM.clURI.generate_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
-        log(INFO, response);
+        const responseClaims =  await CCOM.callTCA(CCOM.clURI.claims);
+        const response =  await CCOM.callTCA(CCOM.clURI.generate_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
         if (response) {
             if (response.error) {
                 log(ERROR, response.error_description);

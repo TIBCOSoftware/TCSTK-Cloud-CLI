@@ -3,9 +3,9 @@ const CCOM = require('./cloud-communications');
 const VAL = require('./validation');
 
 let globalProductionSandbox = null;
-export function getProductionSandbox() {
+export async function getProductionSandbox() {
     if (!globalProductionSandbox) {
-        const claims = CCOM.callTC(CCOM.clURI.claims);
+        const claims =  await CCOM.callTCA(CCOM.clURI.claims);
         for (let sb of claims.sandboxes) {
             if (sb.type === 'Production') {
                 globalProductionSandbox = sb.id;
@@ -27,9 +27,9 @@ function checkCaseFolder() {
 }
 
 // Get a LiveApps Case by Reference
-export function getLaCaseByReference(caseRef) {
-    // const caseData = callURL(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + getProductionSandbox(), 'GET', null, null, false, null, null, null, null, null, true);
-    const caseData = CCOM.callTC(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + getProductionSandbox(), false, {handleErrorOutside: true});
+export async function getLaCaseByReference(caseRef) {
+    // const caseData = callURL(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), 'GET', null, null, false, null, null, null, null, null, true);
+    const caseData =  await CCOM.callTCA(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), false, {handleErrorOutside: true});
     if (!caseData) {
         log(ERROR, 'Error Retrieving Case Data for ref: ', caseRef);
     }
@@ -37,9 +37,9 @@ export function getLaCaseByReference(caseRef) {
 }
 
 // Function to show LiveApps cases
-export function showLiveApps(doShowTable, doCountCases) {
+export async function showLiveApps(doShowTable, doCountCases) {
     //TODO: Call can be optimized by only requesting the basics
-    const caseTypes = CCOM.callTC(CCOM.clURI.types + '?$sandbox=' + getProductionSandbox() + '&$top=1000');
+    const caseTypes =  await CCOM.callTCA(CCOM.clURI.types + '?$sandbox=' + await getProductionSandbox() + '&$top=1000');
     log(DEBUG, 'Case Types: ', caseTypes)
     // TODO: (maybe) get case owner
     const cases = {};
@@ -53,7 +53,7 @@ export function showLiveApps(doShowTable, doCountCases) {
         caseTemp['IS CASE'] = caseTypes[curCase].isCase;
         if (doCountCases) {
             logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
-            caseTemp['NUMBER OF CASES'] = CCOM.callTC(CCOM.clURI.la_cases + '?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true');
+            caseTemp['NUMBER OF CASES'] =  await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true');
         }
         cases[appN] = caseTemp;
     }
@@ -102,12 +102,12 @@ export async function exportLiveAppsData() {
     for (let curCase in cTypeArray) {
         if (cTypeArray[curCase] == typeForExport) {
             // count cases
-            const numberOfCasesForExport = CCOM.callTC(CCOM.clURI.la_cases + '?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
+            const numberOfCasesForExport =  await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
             log(INFO, 'Number of cases for export: ' + numberOfCasesForExport);
             const typeIdString = ' and typeId eq 1';
             // get cases in batch sizes
             for (let i = 0; i <= numberOfCasesForExport; i = i + exportCaseStepSize) {
-                let exportBatch = CCOM.callTC(CCOM.clURI.la_cases + '?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
+                let exportBatch =  await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
                 // console.log('Export Batch', exportBatch);
                 logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
                 allCases = allCases.concat(exportBatch);
@@ -226,7 +226,7 @@ export async function importLiveAppsData() {
         }
         numberOfImports = dataForImport.length;
     }
-    const sBid = getProductionSandbox();
+    const sBid = await getProductionSandbox();
     let importAppName = '';
     let importAppId = '';
     let numberOfImportSteps = 0;
@@ -332,7 +332,7 @@ export async function importLiveAppsData() {
                         applicationId: stepConf.applicationId,
                         data: JSON.stringify(dataToImport)
                     }
-                    const response = CCOM.callTC(CCOM.clURI.la_process, false, {
+                    const response =  await CCOM.callTCA(CCOM.clURI.la_process, false, {
                         method: 'POST',
                         postRequest: postRequest
                     });
@@ -368,7 +368,7 @@ export async function importLiveAppsData() {
                         data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
                         caseReference: caseRef
                     }
-                    const response = CCOM.callTC(CCOM.clURI.la_process, true, {
+                    const response =  await CCOM.callTCA(CCOM.clURI.la_process, true, {
                         method: 'POST',
                         postRequest: postRequest
                     });

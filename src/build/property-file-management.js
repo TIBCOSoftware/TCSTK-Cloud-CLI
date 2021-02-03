@@ -5,7 +5,7 @@ const colors = require('colors');
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {
     log(INFO, 'Generating Cloud Property Files');
-    const response = CCOM.callTC(CCOM.clURI.account_info, false, {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+    const response =  await CCOM.callTCA(CCOM.clURI.account_info, false, {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
     // console.log(JSON.stringify(response));
     let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
     if (projectName.trim() !== '') {
@@ -145,10 +145,10 @@ export async function updateProperty() {
         const vTChoices = ['SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID'];
         const vType = await askMultipleChoiceQuestion('What type of answer would you like to add to the property ?', vTChoices);
         if (vType === 'SandboxID') {
-            pValue = LA.getProductionSandbox();
+            pValue = await LA.getProductionSandbox();
         }
         if (vType === 'LiveApps_AppID' || vType === 'LiveApps_ActionID') {
-            const apps = LA.showLiveApps(true, false);
+            const apps = await LA.showLiveApps(true, false);
             let laAppNameA = ['NONE'].concat(apps.map(v => v.name));
             let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA);
             if (laAppD === 'NONE') {
@@ -216,9 +216,9 @@ export async function updateProperty() {
 }
 
 // Function to get the Client ID
-export function getClientID(){
+export async function getClientID(){
     console.log('Getting Client ID...');
-    const ClientID = CCOM.callTC( CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
+    const ClientID =  await CCOM.callTCA( CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
     console.log('Client ID: ', ClientID);
 }
 // TODO: how to get a client ID for another ORG

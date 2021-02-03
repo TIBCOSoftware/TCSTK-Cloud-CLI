@@ -12,7 +12,48 @@ let isOAUTHValid;
 let toldClientID = false;
 let isOrgChecked = false;
 
-export function cLogin(tenant, customLoginURL, forceClientID) {
+
+function doRequest(url, options, data) {
+    const https = require('https');
+    return new Promise((resolve, reject) => {
+        const req = https.request(url, options, (res) => {
+            res.setEncoding('utf8');
+            // console.log(res);
+            let responseTXT = '';
+            let response = {};
+            response.body = '';
+            response.statusCode = res.statusCode;
+            response.headers = res.headers;
+            res.on('data', (chunk) => {
+                responseTXT += chunk;
+            });
+            res.on('end', () => {
+                // console.log('GOT: ' ,  response)
+                try {
+                    response.body = JSON.parse(responseTXT);
+                } catch (e) {
+                    response.body = responseTXT;
+                }
+                /*
+                if(response.statusCode === 200 && responseTXT !== ''){
+                    response.body = JSON.parse(responseTXT);
+                } else {
+                    response.body = responseTXT;
+                }*/
+                resolve(response);
+            });
+        });
+        req.on('error', (err) => {
+            reject(err);
+        });
+        if (data) {
+            req.write(data);
+        }
+        req.end();
+    });
+}
+
+export async function cLogin(tenant, customLoginURL, forceClientID) {
     const fClientID = forceClientID || false;
     if (isOauthUsed() && !fClientID) {
         log(DEBUG, 'Using OAUTH for Authentication...');
@@ -24,21 +65,16 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
         if (!isOrgChecked) {
             // Setting this to temp so it breaks the call stack
             // setOrganization('TEMP');
-            const response = callURL('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true);
+            const response = await callURLA('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true, false, true);
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
                 log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
                 isOAUTHValid = false;
-                /* TODO: When no pass is set, ask for it. (break the chain of await functions)
-                if(getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == ''){
-                    const tempPass = async () => {
-                        return await askQuestion('Provide your password to Continue: ', 'password');
-                    };
-                    console.log('SETTING PASS');
+                if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
+                    const tempPass = await askQuestion('Provide your password to Continue: ', 'password');
+                    // console.log('SETTING PASS');
                     setProperty('CloudLogin.pass', obfuscatePW(tempPass));
-                } */
-
-                // process.exit();
+                }
             }
             if (response.selectedAccount) {
                 if (doOAuthNotify) {
@@ -58,8 +94,12 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
             log(INFO, 'Using CLIENT-ID Authentication (consider using OAUTH)...');
             toldClientID = true;
         }
+        if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
+            const tempPass = await askQuestion('Provide your password to Continue: ', 'password');
+            // console.log('SETTING PASS');
+            setProperty('CloudLogin.pass', obfuscatePW(tempPass));
+        }
         let setLoginURL = 'https://' + getCurrentRegion() + clURI.login;
-        ;
         if (customLoginURL) {
             setLoginURL = customLoginURL;
             // Delete the previous cookie on a custom login
@@ -82,12 +122,12 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
             pass = Buffer.from(pass, 'base64').toString();
         }
         if (pass && pass.startsWith('@#')) {
-             const fus = require('./fuzzy-search.js');
+            const fus = require('./fuzzy-search.js');
             pass = fus.find(pass);
         }
 
         if (loginC == null) {
-            loginC = cloudLoginV3(tenantID, clientID, email, pass, setLoginURL);
+            loginC = await cloudLoginV3(tenantID, clientID, email, pass, setLoginURL);
         }
         if (loginC == 'ERROR') {
             // TODO: exit the task properly
@@ -99,18 +139,19 @@ export function cLogin(tenant, customLoginURL, forceClientID) {
     return loginC;
 }
 
-
 // Function that logs into the cloud and returns a cookie
-function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
+async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
     log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
     log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
     // log(INFO, 'With Form: ' + postForm);
-    const syncClient = require('sync-rest-client');
-    const response = syncClient.post(encodeURI(TCbaseURL), {
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        payload: postForm
-    });
+    const header = {};
+    header['Content-Type'] = 'application/x-www-form-urlencoded';
+    header['Content-Length'] = postForm.length;
+    const response = await doRequest(encodeURI(TCbaseURL), {
+        headers: header,
+        method: 'POST'
+    }, postForm);
     let re = '';
     //console.log(response.body);
     if (response.body.errorMsg != null) {
@@ -133,20 +174,19 @@ function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     return re;
 }
 
-
 // Function to call the Tibco Cloud
 // TODO: Accept, URL, doLog and possible config
-function callURL(url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside, customHeaders) {
+async function callURLA(url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside, customHeaders) {
     const doErrorOutside = handleErrorOutside || false;
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
     const reResponse = returnResponse || false;
     let lCookie = {};
     if (!fOAUTH) {
-        lCookie = cLogin(tenant, customLoginURL);
+        lCookie = await cLogin(tenant, customLoginURL);
     }
     if (fCLIENTID) {
-        lCookie = cLogin(tenant, customLoginURL, true);
+        lCookie = await cLogin(tenant, customLoginURL, true);
     }
     const cMethod = method || 'GET';
     let cdoLog = false;
@@ -154,8 +194,8 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         cdoLog = doLog;
     }
     const cType = contentType || 'application/json';
-    let body = null;
-    if (cMethod.toLowerCase() != 'get') {
+    let body = '';
+    if (cMethod.toLowerCase() !== 'get') {
         if (cType === 'application/json') {
             body = JSON.stringify(postRequest);
         } else {
@@ -190,33 +230,40 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
         log(DEBUG, '- CONTENT: ' + cType);
         log(DEBUG, '-  HEADER: ', header);
     }
-    if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'del')) {
+    if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'delete')) {
         if (cdoLog) {
             log(INFO, '-    BODY: ' + body);
         }
     }
-
     let response = {};
-    const syncClient = require('sync-rest-client');
     if (cMethod.toLowerCase() === 'get') {
-        response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
+        response = await doRequest(encodeURI(url), {
             headers: header
-        });
+        })
     } else {
-        response = syncClient[cMethod.toLowerCase()](encodeURI(url), {
+        if (body != null) {
+            header['Content-Length'] = body.length;
+        }
+        response = await doRequest(encodeURI(url), {
             headers: header,
-            payload: body
-        });
-        // console.log('Response: ', response.statusCode);
+            method: cMethod.toUpperCase()
+        }, body)
     }
-    // console.log('Response: ', response.body);
+    if (response.statusCode != 200 && !doErrorOutside) {
+        if (response.body != null) {
+            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode + ' \n Message: ', response.body);
+        } else {
+            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode);
+        }
+        process.exit(1);
+    }
     if (response.body != null) {
         if (response.body.errorMsg != null) {
             if (doErrorOutside) {
                 return response.body;
             } else {
                 log(ERROR, response.body.errorMsg);
-                log(ERROR, response.body);
+                // log(ERROR, response.body);
             }
             return null;
         } else {
@@ -236,31 +283,28 @@ function callURL(url, method, postRequest, contentType, doLog, tenant, customLog
 }
 
 // Wrapper around the callURL function that takes a config object
-export function callTC(url, doLog, conf) {
+export async function callTCA(url, doLog, conf) {
     if (conf == null) {
         conf = {};
     }
-
     // Check for another Cloud Location
-    if(getProp('CloudLogin.Cloud_Location') != null && getProp('CloudLogin.Cloud_Location') != 'cloud.tibco.com'){
-        url = url.replace('cloud.tibco.com' , getProp('CloudLogin.Cloud_Location'));
-        log(WARNING, 'Using another BASE URL: ' , getProp('CloudLogin.Cloud_Location'))
+    if (getProp('CloudLogin.Cloud_Location') != null && getProp('CloudLogin.Cloud_Location') != 'cloud.tibco.com') {
+        url = url.replace('cloud.tibco.com', getProp('CloudLogin.Cloud_Location'));
+        log(WARNING, 'Using another BASE URL: ', getProp('CloudLogin.Cloud_Location'))
     }
-
     const urlToCall = 'https://' + getCurrentRegion() + url;
     //url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
-    return callURL(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
+    return await callURLA(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
 }
 
-
 // Function to show claims for the configured user
-export function showCloudInfo(showTable) {
+export async function showCloudInfo(showTable) {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
     }
-    const response = callTC(clURI.claims);
+    const response = await callTCA(clURI.claims);
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
     let nvs = createTableValue('REGION', getRegion());
     nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
@@ -288,9 +332,9 @@ function checkPW() {
     }
 }
 
-export function isOAUTHLoginValid() {
+export async function isOAUTHLoginValid() {
     if (isOAUTHValid == null) {
-        cLogin();
+        await cLogin();
     }
     return isOAUTHValid;
 }

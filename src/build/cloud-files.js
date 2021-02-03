@@ -15,17 +15,17 @@ function checkOrgFolderLocation() {
     }
 }
 
-export function getOrgFolders(showFolders, countItems) {
+export async function getOrgFolders(showFolders, countItems) {
     const folderStepSize = 200;
     let hasMoreFolders = true;
     let allFolders = [];
     for (let i = 0; hasMoreFolders; i = i + folderStepSize) {
-        // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+        // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
         let skip = '';
         if (i != 0) {
             skip = '&$skip=' + i
         }
-        const folderDet = CCOM.callTC(CCOM.clURI.la_org_folders + '?$top=' + folderStepSize + skip);
+        const folderDet =  await CCOM.callTCA(CCOM.clURI.la_org_folders + '?$top=' + folderStepSize + skip);
         if (folderDet) {
             if (folderDet.length < folderStepSize) {
                 hasMoreFolders = false;
@@ -38,7 +38,7 @@ export function getOrgFolders(showFolders, countItems) {
     const folderTable = createTable(allFolders, CCOM.mappings.la_org_folders, false);
     if (countItems) {
         for (let fNr in folderTable) {
-            const noItems = CCOM.callTC(CCOM.clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
+            const noItems =  await CCOM.callTCA(CCOM.clURI.la_org_folders + '/' + folderTable[fNr].Name + '/artifacts?$count=TRUE');
             logLine('Processing folder (' + fNr + '/' + iterateTable(folderTable).length + ')');
             folderTable[fNr]['Number of Items'] = noItems;
         }
@@ -48,8 +48,8 @@ export function getOrgFolders(showFolders, countItems) {
 }
 
 // Function to get org folders
-export function getOrgFolderFiles(folderTable, folder, showFiles) {
-    const folderResp = CCOM.callTC(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/');
+export async function getOrgFolderFiles(folderTable, folder, showFiles) {
+    const folderResp =  await CCOM.callTCA(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/');
     const folderContentTable = createTable(folderResp, CCOM.mappings.la_org_folder_content, false);
     const users = USERGROUPS.showLiveAppsUsers(false, false);
     for (let cont in folderContentTable) {
@@ -66,12 +66,12 @@ export function getOrgFolderFiles(folderTable, folder, showFiles) {
     return folderContentTable;
 }
 
-// Funtion to download an org folder file
-function downLoadOrgFolderFile(folder, file) {
+// Function to download an org folder file
+async function downLoadOrgFolderFile(folder, file) {
     checkOrgFolderLocation();
     mkdirIfNotExist(OrgFolderLocation);
     mkdirIfNotExist(OrgFolderLocation + '/' + folder);
-    const dataForFile = CCOM.callTC(CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', true);
+    const dataForFile =  await CCOM.callTCA(CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', true);
     const fs = require('fs');
     const fileName = OrgFolderLocation + '/' + folder + '/' + file;
     fs.writeFileSync(fileName, dataForFile, 'utf8');
@@ -97,7 +97,7 @@ export async function showOrgFolders() {
         }
         const fileDecision = await askMultipleChoiceQuestionSearch('Which file would you like to download ?', chContent);
         if (fileDecision != 'NONE') {
-            downLoadOrgFolderFile(folderDecision, fileDecision);
+            await downLoadOrgFolderFile(folderDecision, fileDecision);
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
         }

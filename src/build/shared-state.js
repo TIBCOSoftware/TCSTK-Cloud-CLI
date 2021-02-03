@@ -35,7 +35,7 @@ function prepSharedStateProps() {
 }
 
 // Function to return a JSON with the shared state entries from a set filter
-export function getSharedState(showTable) {
+export async function getSharedState(showTable) {
     prepSharedStateProps();
     // const lCookie = cLogin();
     // log(DEBUG, 'Login Cookie: ', lCookie);
@@ -54,7 +54,7 @@ export function getSharedState(showTable) {
         //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         let filter = '&$filter=type=' + filterType;
-        let sStateTemp = CCOM.callTC(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
+        let sStateTemp =  await CCOM.callTCA(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -133,9 +133,9 @@ async function selectSharedState(sharedStateEntries, question) {
     return re;
 }
 
-
-function deleteSharedState(sharedStateID) {
-    const response = CCOM.callTC(CCOM.clURI.shared_state + '/' + sharedStateID, false, {method: 'DEL'});
+// Function to delete a shared state based on it's ID
+async function deleteSharedState(sharedStateID) {
+    const response =  await CCOM.callTCA(CCOM.clURI.shared_state + '/' + sharedStateID, false, {method: 'DELETE'});
     let ok = true;
     if (response != null) {
         if (response.errorMsg != null) {
@@ -151,7 +151,7 @@ function deleteSharedState(sharedStateID) {
 // Display the details of a shared state
 export async function showSharedStateDetails() {
     // Show Shared State list
-    const sStateList = getSharedState(true);
+    const sStateList = await getSharedState(true);
     if (sStateList.length > 0) {
         // Pick Item from the list
         let selectedState = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
@@ -189,19 +189,18 @@ export async function createSharedState() {
             "json": "{}"
         },
         "type": ssType,
-        "sandboxId": LA.getProductionSandbox()
+        "sandboxId": await LA.getProductionSandbox()
     }
-    const result = CCOM.callTC(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
-    console.log(result);
+    const result = await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
     if(result != null){
-        log(INFO, 'Successfully created ' + colors.yellow('EMPTY') + ' shared state entry: ' + colors.green(ssName) + ' ('+colors.blue(ssType)+')...')
+        log(INFO, 'Successfully created ' + colors.yellow('EMPTY') + ' shared state entry, with ID: ' + colors.green(result) + ' and Name: ' + colors.green(ssName) + ' ('+colors.blue(ssType)+')...')
     }
 }
 
 // Removes a Shared State Entry
 export async function removeSharedStateEntry() {
     // Show Shared State list
-    const sStateList = getSharedState(true);
+    const sStateList = await getSharedState(true);
     if (sStateList.length > 0) {
         // Pick Item from the list
         let selectedState = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
@@ -225,7 +224,7 @@ export async function removeSharedStateEntry() {
 // Removes a Shared State Filter
 export async function clearSharedState() {
     // Show Shared State list
-    const sStateList = getSharedState(true);
+    const sStateList = await getSharedState(true);
     if (sStateList.length > 0) {
         // Ask if you really want to delete this shared state filter
         let decision = 'YES';
@@ -262,7 +261,7 @@ export async function exportSharedState(verbose) {
     let reNumberOfStates = 0;
     let doVerbose = verbose || false;
     // Show Shared State List
-    let sharedStateEntries = getSharedState(true);
+    let sharedStateEntries = await getSharedState(true);
     let decision = 'YES';
     if (DO_SHARED_STATE_DOUBLE_CHECK && !doVerbose) {
         decision = await askMultipleChoiceQuestion('Are you sure you want to export all the states above ?', ['YES', 'NO']);
@@ -344,11 +343,11 @@ function importSharedStateFile(ssFile) {
     return ssObject;
 }
 
-function putSharedState(sharedStateObject) {
+async function putSharedState(sharedStateObject) {
     prepSharedStateProps();
     if (sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
-        CCOM.callTC(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
+         await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
         // const re = response;
         // TODO: Check for errors, and if the state does not exist use post..

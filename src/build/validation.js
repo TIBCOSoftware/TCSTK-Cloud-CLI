@@ -50,38 +50,38 @@ export async function validate() {
 
     // Validate if a liveApps App exist
     if (valD == 'liveapps_app_exist') {
-        const apps = LA.showLiveApps(false, false);
+        const apps = await LA.showLiveApps(false, false);
         await validationItemHelper(apps, 'LiveApps App', 'name')
     }
 
     // Validate if a liveApps Group exist
     // Live_Apps_group_exist
     if (valD == 'live_apps_group_exist') {
-        const groups = USERGROUPS.getGroupsTable(false);
+        const groups = await USERGROUPS.getGroupsTable(false);
         // console.log(iterateTable(groups));
         await validationItemHelper(iterateTable(groups), 'LiveApps Group', 'Name');
     }
 
     // Validate if a Flogo App exist
     if (valD == 'tci_app_exist') {
-        const apps = TCI.showTCI(false);
+        const apps = await TCI.showTCI(false);
         await validationItemHelper(iterateTable(apps), 'TCI App', 'Name');
     }
 
     // Validate if a Cloud Starter exist
     if (valD == 'cloud_starter_exist') {
-        const apps = CS.showAvailableApps(true);
+        const apps = await CS.showAvailableApps(true);
         // console.log(apps);
         await validationItemHelper(apps, 'Cloudstarter', 'name');
     }
 
     // Validate if an org folder exist (and possibly contains file)
     if (valD == 'org_folder_exist' || valD == 'org_folder_and_file_exist') {
-        const folders = CFILES.getOrgFolders(false, false);
+        const folders = await CFILES.getOrgFolders(false, false);
         // console.log(folders);
         const chosenFolder = await validationItemHelper(iterateTable(folders), 'Org Folder', 'Name');
         if (valD == 'org_folder_and_file_exist') {
-            const files = CFILES.getOrgFolderFiles(folders, chosenFolder, false);
+            const files = await CFILES.getOrgFolderFiles(folders, chosenFolder, false);
             await validationItemHelper(iterateTable(files), 'Org File', 'Name');
         }
     }
@@ -89,21 +89,21 @@ export async function validate() {
     // Validate if a LiveApps Case exist or not
     if (valD == 'case_exist' || valD == 'case_not_exist') {
         const casesToValidate = await askQuestion('Which case reference would you like to validate (Use plus character to validate multiple case\'s, for example: caseRef1+caseRef2) ?');
-        validateLACase(casesToValidate, valD);
+        await validateLACase(casesToValidate, valD);
     }
 
     // Validate if a LiveApps Case is in a specific state
     if (valD == 'case_in_state') {
         const caseRef = await askQuestion('For which case reference would you like to validate the state ?');
         const caseState = await askQuestion('For state would you like to validate ?');
-        validateLACaseState(caseRef, caseState)
+        await validateLACaseState(caseRef, caseState)
     }
 }
 
 // Validate the state of a case
-export function validateLACaseState(caseRefToValidate, stateToValidate) {
+export async function validateLACaseState(caseRefToValidate, stateToValidate) {
     // First check if case exists
-    validateLACase(caseRefToValidate, 'case_exist');
+    await validateLACase(caseRefToValidate, 'case_exist');
     const caseData = JSON.parse(LA.getLaCaseByReference(caseRefToValidate).untaggedCasedata);
     if (caseData.state == stateToValidate) {
         validationOk('Case with Reference ' + colors.blue(caseRefToValidate) + '\x1b[0m is in the expected state ' + colors.blue(stateToValidate) + '\x1b[0m on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
@@ -113,11 +113,11 @@ export function validateLACaseState(caseRefToValidate, stateToValidate) {
 }
 
 // Validate if case exists or not
-export function validateLACase(casesToValidate, valType) {
+export async function validateLACase(casesToValidate, valType) {
     const caseRefArray = casesToValidate.split('+');
     for (let casRef of caseRefArray) {
         let validCase = false;
-        const caseData = LA.getLaCaseByReference(casRef);
+        const caseData = await LA.getLaCaseByReference(casRef);
         if (caseData.casedata) {
             validCase = true;
         } else {

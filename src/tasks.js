@@ -14,7 +14,7 @@ export async function helptcli() {
         if (cTsks[cliTask].availableOnOs != null) {
             for (let allowedOS of cTsks[cliTask].availableOnOs) {
                 // console.log('OS:' + allowedOS);
-                if (allowedOS == process.platform || allowedOS == 'all') {
+                if (allowedOS === process.platform || allowedOS === 'all') {
                     allowed = true;
                 }
             }
@@ -31,9 +31,9 @@ export async function helptcli() {
     }
     // Ask for which task to show details and then display the MD
     let hDec = '';
-    while(hDec != 'NONE'){
+    while(hDec !== 'NONE'){
         hDec = await askMultipleChoiceQuestionSearch('For which task would you like more details ? ', hTasks);
-        if(hDec != 'NONE') {
+        if(hDec !== 'NONE') {
             const hFile = 'docs/tasks/'+hDec+'.md';
             if(doesFileExist(global.PROJECT_ROOT + hFile)){
                 displayMDFile(hFile);
@@ -50,7 +50,7 @@ export async function mainT() {
     displayOpeningMessage();
     console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
     const appRoot = process.cwd();
-    if (getProp('CloudLogin.pass') == '' && !isOauthUsed()) {
+    if (getProp('CloudLogin.pass') === '' && !isOauthUsed()) {
         // When password is empty ask it manually for the session.
         const pass = await askQuestion('Please provide your password: ', 'password');
         setProperty('CloudLogin.pass', obfuscatePW(pass));
@@ -107,9 +107,9 @@ export async function publish() {
 }
 
 // Show all the cloud starters
-export function showApps() {
+export async function showApps() {
     const CS = require('./build/cloud-starters');
-    CS.showAvailableApps(true);
+    await CS.showAvailableApps(true);
 }
 
 // Show all the cloud starters
@@ -120,9 +120,9 @@ export async function deleteAppWrapper() {
 
 
 //Show all the cloud starter links
-export function showLinks() {
+export async function showLinks() {
     const CS = require('./build/cloud-starters');
-    CS.getAppLinks(true);
+    await CS.getAppLinks(true);
 }
 
 // Function to build the cloud starter
@@ -138,10 +138,10 @@ export async function deploy() {
     const CCOM = require('./build/cloud-communications');
     const CS = require('./build/cloud-starters');
     log(INFO, 'Deploying ' + getProp('App_Name') + ' to)');
-    CCOM.showCloudInfo();
+    await CCOM.showCloudInfo();
     await CS.uploadApp(getProp('App_Name'));
     log('INFO', "DONE DEPLOYING: " + getProp('App_Name'));
-    CS.showAppLinkInfo();
+    await CS.showAppLinkInfo();
 }
 
 export async function buildDeploy() {
@@ -241,19 +241,19 @@ export async function createMultiplePropertyFileWrapper() {
 export async function createSharedStateWrapper() {
     const SHST = require('./build/shared-state');
     await SHST.createSharedState();
-};
+}
 
 // Display the shared state entries to a user
-export function showSharedState() {
+export async function showSharedState() {
     const SHST = require('./build/shared-state');
-    SHST.getSharedState(true);
-};
+    await SHST.getSharedState(true);
+}
 
 // Display the details of a shared state
 export async function showSharedStateDetailsWrapper() {
     const SHST = require('./build/shared-state');
     await SHST.showSharedStateDetails();
-};
+}
 
 export async function removeSharedStateEntryWrapper() {
     const SHST = require('./build/shared-state');
@@ -286,9 +286,9 @@ export async function watchSharedStateWrapper() {
 }
 
 // Function to show liveApps
-export function showLiveAppsWrapper() {
+export async function showLiveAppsWrapper() {
     const LA = require('./build/live-apps');
-    LA.showLiveApps(true, true);
+    await LA.showLiveApps(true, true);
 }
 
 // Function to export liveApps cases
@@ -330,9 +330,9 @@ export function updateCloudPackagesWrapper() {
     updateCloudPackages();
 }
 
-export function showTCIWrapper() {
+export async function showTCIWrapper() {
     const TCI = require('./build/tci');
-    TCI.showTCI();
+    await TCI.showTCI();
 }
 
 export async function monitorTCIWrapper() {
@@ -350,9 +350,9 @@ export async function generateOauthTokenWrapper() {
     await OAUTH.generateOauthToken();
 }
 
-export function showOauthTokenWrapper() {
+export async function showOauthTokenWrapper() {
     const OAUTH = require('./build/oauth');
-    OAUTH.showOauthToken();
+    await OAUTH.showOauthToken();
 }
 
 export async function revokeOauthTokenWrapper() {
@@ -360,9 +360,9 @@ export async function revokeOauthTokenWrapper() {
     await OAUTH.revokeOauthToken();
 }
 
-export function rotateOauthTokenWrapper() {
+export async function rotateOauthTokenWrapper() {
     const OAUTH = require('./build/oauth');
-    OAUTH.rotateOauthToken();
+    await OAUTH.rotateOauthToken();
 }
 
 export async function validateAndRotateOauthTokenWrapper() {
@@ -411,9 +411,9 @@ export async function createLiveAppsGroupWrapper() {
     await USERGROUPS.createLiveAppsGroup();
 }
 
-export function showLiveAppsUsersWrapper() {
+export async function showLiveAppsUsersWrapper() {
     const USERGROUPS = require('./build/user-groups');
-    USERGROUPS.showLiveAppsUsers(true, false);
+    await USERGROUPS.showLiveAppsUsers(true, false);
 }
 
 export async function addUserToGroupWrapper() {
@@ -462,7 +462,7 @@ export function loadTaskDesc() {
         if (cTsks[cliTask].availableOnOs != null) {
             for (let allowedOS of cTsks[cliTask].availableOnOs) {
                 // console.log('OS:' + allowedOS);
-                if (allowedOS == process.platform || allowedOS == 'all') {
+                if (allowedOS === process.platform || allowedOS === 'all') {
                     allowed = true;
                     // console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
                 }
@@ -488,7 +488,7 @@ export async function promptTask(stDir, cwdDir) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - ' + colors.blue(getRegion(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         // TODO: Look at getting org
-        if (getOrganization() != '') {
+        if (getOrganization() !== '') {
             pMes = '[TCLI - ' + colors.blue(getRegion(true) + ' - ' + getOrganization(true))+' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         }
         inquirer.prompt([{
@@ -502,19 +502,19 @@ export async function promptTask(stDir, cwdDir) {
             let selectedTask = '';
             let selectedTaskConfig = {};
             for (let cliTask in cTsks) {
-                if (answers.command.substr(0, answers.command.indexOf('(') - 1) == cliTask) {
+                if (answers.command.substr(0, answers.command.indexOf('(') - 1) === cliTask) {
                     selectedTask = cliTask;
                     selectedTaskConfig = cTsks[cliTask];
                 }
             }
             let com = selectedTask;
-            if (com == 'q' || com == 'quit' || com == 'exit') {
+            if (com === 'q' || com === 'quit' || com === 'exit') {
                 console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
             } else {
                 // Check if we need to repeat the last task
                 let comToInject = selectedTaskConfig.taskName;
-                if (com == 'repeat-last-task') {
+                if (com === 'repeat-last-task') {
                     log('INFO', 'Repeating Last Task: ' + globalLastCommand);
                     comToInject = globalLastCommand;
                 } else {
@@ -523,7 +523,7 @@ export async function promptTask(stDir, cwdDir) {
                 let additionalArugments = '';
                 for (let arg in process.argv) {
                     // TODO: Should not all arguments be propagated >?
-                    if (process.argv[arg] == '--debug' || process.argv[arg] == '-d') {
+                    if (process.argv[arg] === '--debug' || process.argv[arg] === '-d') {
                         additionalArugments += ' -d ';
                     }
                 }

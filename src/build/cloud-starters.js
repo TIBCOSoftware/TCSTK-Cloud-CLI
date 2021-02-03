@@ -172,11 +172,11 @@ export function buildCloudStarterZip(cloudStarter) {
 }
 
 // function that shows all the availible applications in the cloud
-export function showAvailableApps(showTable) {
+export async function showAvailableApps(showTable) {
     //TODO: Use table config
     const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     // TODO: loop over if there are more than 200
-    const response = CCOM.callTC(CCOM.clURI.app_info + '?$top=200', false, {handleErrorOutside: true});
+    const response =  await CCOM.callTCA(CCOM.clURI.app_info + '?$top=200', false, {handleErrorOutside: true});
     // console.log(response)
     if (response.errorMsg) {
         if (response.errorMsg === 'Application does not exist') {
@@ -188,7 +188,7 @@ export function showAvailableApps(showTable) {
         }
     } else {
         // console.log('APPS: ' , response);
-        const users = iterateTable(USERGROUPS.showLiveAppsUsers(false, true));
+        const users = iterateTable(await USERGROUPS.showLiveAppsUsers(false, true));
         // console.log('USERS: ', users);
         // TODO: Apparently apps can have tags, look into this...
         let apps = {};
@@ -250,7 +250,7 @@ export async function deleteApp() {
     const appArray = new Array();
     appArray.push('NONE');
     let deleteApp = false;
-    const apps = showAvailableApps(true);
+    const apps = await showAvailableApps(true);
     for (let app of apps) {
         appArray.push(app.name);
     }
@@ -263,7 +263,7 @@ export async function deleteApp() {
     }
     if (deleteApp) {
         log(INFO, 'Deleting ' + appToDelete + '...');
-        const da = CCOM.callTC(CCOM.clURI.app_info + appToDelete + '/', false ,{method: 'DEL'});
+        const da =  await CCOM.callTCA(CCOM.clURI.app_info + appToDelete + '/', false ,{method: 'DELETE'});
         if (da) {
             if (da.message) {
                 log(INFO, da.message);
@@ -280,7 +280,7 @@ export async function deleteApp() {
 }
 
 // Get details of a cloud starter
-function getApplicationDetails(application, version, showTable) {
+async function getApplicationDetails(application, version, showTable) {
     const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     const details = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
@@ -288,12 +288,12 @@ function getApplicationDetails(application, version, showTable) {
     let hasMoreArtefacts = true;
     let allArteFacts = [];
     for (let i = 0; hasMoreArtefacts; i = i + artefactStepSize) {
-        // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+        // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
         let skip = '';
         if (i !== 0) {
             skip = '&$skip=' + i
         }
-        const appDet = CCOM.callTC(CCOM.clURI.app_info + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip);
+        const appDet =  await CCOM.callTCA(CCOM.clURI.app_info + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip);
         if (appDet) {
             if (appDet.length < artefactStepSize) {
                 hasMoreArtefacts = false;
@@ -318,10 +318,10 @@ function getApplicationDetails(application, version, showTable) {
 
 
 //Get Links to all the applications
-export function getAppLinks(showTable) {
+export async function getAppLinks(showTable) {
     log(INFO, 'Getting Cloud Starter Links...');
     const appLinkTable = {};
-    const apps = showAvailableApps(false);
+    const apps = await showAvailableApps(false);
     let i = 1;
     let nvs = [];
     for (let app of apps) {
@@ -330,13 +330,13 @@ export function getAppLinks(showTable) {
         nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
         nvs = createTableValue('NAME', app.name, nvs);
         const appN = i++;
-        const tempDet = getApplicationDetails(app.name, app.publishedVersion, false);
+        const tempDet = await getApplicationDetails(app.name, app.publishedVersion, false);
         logLine("Processing App: (" + appN + '/' + apps.length + ')...');
         if (isIterable(tempDet)) {
             for (let appD of tempDet) {
                 // Get file after last slash in Descriptor file name; expected cloudstarter.json
                 if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
-                    const csInfo = CCOM.callTC(CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name, false);
+                    const csInfo =  await CCOM.callTCA(CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name, false);
                     // const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
                     if (csInfo && csInfo.cloudstarter) {
                         appTemp['CS VERSION'] = csInfo.cloudstarter.version;
@@ -368,8 +368,6 @@ export function getAppLinks(showTable) {
     return appLinkTable;
 }
 
-
-
 // Function to upload a zip to the LiveApps ContentManagment API
 export function uploadApp(application) {
     return new Promise(async function (resolve, reject) {
@@ -380,7 +378,7 @@ export function uploadApp(application) {
         const header = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         // Possibly add OAUTH Header...
-        if (isOauthUsed() && CCOM.isOAUTHLoginValid()) {
+        if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
             header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         } else {
             const lCookie = await CCOM.cLogin();
@@ -420,10 +418,10 @@ export function uploadApp(application) {
 }
 
 // Function to publish the application to the cloud
-export function publishApp(application) {
-    return new Promise(function (resolve, reject) {
+export async function publishApp(application) {
+    return new Promise(async function (resolve, reject) {
         // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
-        const response = CCOM.callTC(CCOM.clURI.app_info , false, {method: 'PUT'});
+        const response =  await CCOM.callTCA(CCOM.clURI.app_info , false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);
         resolve();
     });

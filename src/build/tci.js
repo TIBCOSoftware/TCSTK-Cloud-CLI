@@ -4,7 +4,7 @@ const colors = require('colors');
 //const art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
-export function showTCI(showTable) {
+export async function showTCI(showTable) {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -13,7 +13,7 @@ export function showTCI(showTable) {
     const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
     // const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
     // const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
-    const response = CCOM.callTC(CCOM.clURI.tci_apps, false, {tenant: 'TCI', customLoginURL: loginEndpoint, forceCLIENTID: true});
+    const response =  await CCOM.callTCA(CCOM.clURI.tci_apps, false, {tenant: 'TCI', customLoginURL: loginEndpoint, forceCLIENTID: true});
     let tObject = createTable(response, CCOM.mappings.tci_apps, false);
     pexTable(tObject, 'tci-apps', getPEXConfig(), doShowTable);
     log(DEBUG, 'TCI Object: ', tObject);

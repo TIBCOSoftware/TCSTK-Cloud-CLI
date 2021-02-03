@@ -2,12 +2,12 @@ const CCOM = require('./cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');
 
-export function getGroupsTable(showTable) {
+export async function getGroupsTable(showTable) {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
     }
-    const oResponse =CCOM.callTC(CCOM.clURI.la_groups);
+    const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups);
     const groupTable = createTable(oResponse, CCOM.mappings.la_groups, false);
     pexTable(groupTable, 'live-apps-groups', getPEXConfig(), doShowTable);
     return groupTable;
@@ -24,7 +24,7 @@ export async function showLiveAppsGroups() {
     if (decision != 'NONE') {
         for (let gr of iterateTable(groupT)) {
             if (decision == gr.Name || decision == 'ALL') {
-                const oResponse =CCOM.callTC(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + LA.getProductionSandbox());
+                const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await LA.getProductionSandbox());
                 const userGroupTable = createTable(oResponse, CCOM.mappings.la_groups_users, false)
                 for (let uGr in userGroupTable) {
                     //userGroupTable[uGr].assign({Group: gr.Name}, userGroupTable[uGr]);
@@ -50,7 +50,7 @@ export async function createLiveAppsGroup() {
             "description": gDescription,
             "type": "SubscriptionDefined"
         }
-        const oResponse =CCOM.callTC(CCOM.clURI.la_groups, false ,{method: 'POST',  postRequest: postGroup} );
+        const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups, false ,{method: 'POST',  postRequest: postGroup} );
         if (oResponse != null) {
             log(INFO, 'Successfully create group with ID: ', oResponse);
         }
@@ -60,8 +60,8 @@ export async function createLiveAppsGroup() {
 }
 
 // Function that shows the LiveApps Users
-export function showLiveAppsUsers(showTable, hideTestUsers) {
-    const oResponse =CCOM.callTC(CCOM.clURI.la_users);
+export async function showLiveAppsUsers(showTable, hideTestUsers) {
+    const oResponse = await CCOM.callTCA(CCOM.clURI.la_users);
     const usersTable = createTable(oResponse, CCOM.mappings.la_users, false);
     if (hideTestUsers) {
         for (let usr in usersTable) {
@@ -92,7 +92,7 @@ export async function addUserToGroup() {
         for (let gr of iterateTable(groupT)) {
             if (groupDecision == gr.Name) {
                 groupIdToAdd = gr.Id;
-                const oResponse = CCOM.callTC(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + getProductionSandbox());
+                const oResponse =  await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await getProductionSandbox());
                 log(INFO, 'CURRENT USERS IN GROUP: ' + groupDecision);
                 currentUsersInGroupT = createTable(oResponse, CCOM.mappings.la_groups_users, true)
             }
@@ -132,11 +132,11 @@ export async function addUserToGroup() {
             }
             log(INFO, 'Adding user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + ']');
             const postGroupMapping = {
-                sandboxId: getProductionSandbox(),
+                sandboxId: await getProductionSandbox(),
                 groupId: groupIdToAdd,
                 userId: userIdToAdd
             }
-            const oResponse = CCOM.callTC( CCOM.clURI.la_user_group_mapping, false, {method: 'POST',  postRequest: postGroupMapping});
+            const oResponse =  await CCOM.callTCA( CCOM.clURI.la_user_group_mapping, false, {method: 'POST',  postRequest: postGroupMapping});
             if (oResponse != null) {
                 log(INFO, 'Successfully added user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
 

@@ -52,10 +52,6 @@
           "format": "DATE"
         },
         {
-          "header": "Used",
-          "field": "used"
-        },
-        {
           "header": "Last Accessed On",
           "field": "lastAccessed",
           "format": "DATE"

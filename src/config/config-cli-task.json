@@ -123,7 +123,7 @@
     },
     "clean": {
       "description": "Clean the temporary folders",
-      "enabled": true,
+      "enabled": false,
       "internal": true,
       "task": "cleanTemp",
       "taskName": "clean",
@@ -131,7 +131,7 @@
     },
     "get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
-      "enabled": true,
+      "enabled": false,
       "internal": true,
       "task": "getCLgit",
       "taskName": "get-cloud-libs-from-git",

@@ -102,8 +102,10 @@ replaceInFile = function (from, to, filePattern) {
 
 // function to set the global connection configuration
 updateGlobalConnectionConfig = async function () {
-    log(INFO, 'Update Connection Config: ');
     // update the config.
+    log(INFO, 'Update Connection Config: ');
+    // Create the global common package if it does not exist.
+    mkdirIfNotExist(globalTCpropFolder);
     // Check if the global propfile exists, if not create one
     if (!doesFileExist(GLOBALPropertyFileName)) {
         // Create Global config from template

@@ -4,17 +4,18 @@ const colors = require('colors');
 let jSession;
 let xSRF;
 
-function callSpotfire(url, doLog, conf) {
+async function callSpotfire(url, doLog, conf) {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
-    if(isOauthUsed() && CCOM.isOAUTHLoginValid()) {
+    if(isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
         if (!jSession || !xSRF) {
             const originalConf = conf;
             if (conf) {
                 conf['returnResponse'] = true;
+                conf['handleErrorOutside'] = true;
             } else {
-                conf = {returnResponse: true};
+                conf = {returnResponse: true, handleErrorOutside: true };
             }
-            const response = CCOM.callTC(url, doLog, conf);
+            const response =  await CCOM.callTCA(url, doLog, conf);
             const loginCookie = response.headers['set-cookie'];
             //  logO(DEBUG, loginCookie);
             jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)[1];
@@ -33,7 +34,7 @@ function callSpotfire(url, doLog, conf) {
             } else {
                 conf = {customHeaders: header};
             }
-            return CCOM.callTC(url, doLog, conf);
+            return  await CCOM.callTCA(url, doLog, conf);
         }
     } else {
         log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.');
@@ -43,7 +44,7 @@ function callSpotfire(url, doLog, conf) {
 
 // Function to browse spotfire reports
 export async function browseSpotfire() {
-    const SFSettings = callSpotfire(CCOM.clURI.sf_settings);
+    const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     let currentFolderID = SFSettings.HomeFolderId;
     // console.log('Initial Folder ID: ' , SFSettings.HomeFolderId);
     let doBrowse = true;
@@ -52,7 +53,7 @@ export async function browseSpotfire() {
             "folderId": currentFolderID,
             "types": ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"]
         }
-        const sfReports = callSpotfire(CCOM.clURI.sf_reports, false,{ method: 'POST', postRequest: request});
+        const sfReports = await callSpotfire(CCOM.clURI.sf_reports, false,{ method: 'POST', postRequest: request});
         // console.log('sfReports ', sfReports);
         let currentFolder = sfReports.CurrentFolder.Title;
         if(sfReports.CurrentFolder.DisplayPath){
