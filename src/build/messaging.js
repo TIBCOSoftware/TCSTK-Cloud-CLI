@@ -3,7 +3,7 @@ const colors = require('colors');
 
 function connectMes(url){
     if(isOauthUsed() && CCOM.isOAUTHLoginValid()) {
-       return CCOM.callTC(url, true);
+       return CCOM.callTC(url, false);
     } else {
         log(ERROR, 'OAUTH Needs to be enabled for communication with MESSAGING, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as TCM.');
         process.exit(1);

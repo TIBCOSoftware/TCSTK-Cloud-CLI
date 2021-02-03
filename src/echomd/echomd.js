@@ -165,6 +165,7 @@ function slice() {'use strict';
     return a;
 }
 
+/*
 function demo() {
     var output = echomd([
         '',
@@ -186,13 +187,14 @@ function demo() {
     output += '- - -' + echomd('- - -');
     output += '\n./echomd #green(' + echomd('#green(v0.1.2)') + ')';
     console.log(output + '\n');
-}
+}*/
 
 if (module.parent == null) {
     if (some.call(process.argv, function (value) {
         return /^-h|--help$/.test(value);
     })) {
-        demo();
+        //HUGO: Switched off since it was running in build mode...
+        // demo();
     } else if(2 < process.argv.length) {
         console.log(
             echomd.apply(null, process.argv.slice(2))

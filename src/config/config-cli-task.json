@@ -74,7 +74,7 @@
       "task": "testCSWrapper",
       "taskName": "test-cloud-starter",
       "taskAlternativeNames": ["t,test"],
-      "availableOnOs": ["win32","darwin"],
+      "availableOnOs": ["all"],
       "availableOnTemplate": ["all"]
     },
     "8. test-cloud-starter-headless": {
@@ -84,7 +84,7 @@
       "task": "testCSHeadlessWrapper",
       "taskName": "test-cloud-starter-headless",
       "taskAlternativeNames": ["th", "test-headless "],
-      "availableOnOs": ["win32","darwin"],
+      "availableOnOs": ["all"],
       "availableOnTemplate": ["all"]
     },
     "9. deploy-cloud-starter": {
@@ -560,7 +560,7 @@
       "task": "changeRegion",
       "taskName": "change-region",
       "taskAlternativeNames": ["cr"],
-      "availableOnOs": ["darwin"]
+      "availableOnOs": ["all"]
     },
     "obfuscate-password": {
       "description": "Obfuscate a password and put it in the cloud-properties file",
@@ -569,7 +569,7 @@
       "task": "obfuscate",
       "taskName": "obfuscate-password",
       "taskAlternativeNames": ["obfuscate", "ob"],
-      "availableOnOs": ["darwin"]
+      "availableOnOs": ["all"]
     },
     "update-tcli": {
       "description": "Update the Cloud CLI",
