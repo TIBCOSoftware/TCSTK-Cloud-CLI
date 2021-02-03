@@ -24,6 +24,7 @@ describe("tcli testsuite", function () {
         deleteFolder(TEMP_TEST_FOLDER);
         mkdirIfNotExist(TEMP_TEST_FOLDER);
         run('node -v');
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     });
     afterEach(function () {
 
@@ -351,7 +352,7 @@ describe("tcli testsuite", function () {
 
     // Spotfire Testcases
     // jasmine --config=test/support/jasmine.json --filter='Messaging'
-    it("Messaging", function () {
+    it("Messaging", async function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:NOT-GLOBAL:LOCAL')).toBe(true);
         expect(run(CLI_EXECUTOR + 'messaging-show-summary')).toBe(false);
@@ -362,8 +363,11 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'generate-oauth-token -a YES:YES:YES')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true);
         expect(run(CLI_EXECUTOR + 'messaging-show-summary')).toBe(true);
+        // await sleep(5000);
+        // little hack to gain some time, sleep function doesn't seem to work here...
+        expect(run(CLI_EXECUTOR + 'rotate-oauth-token')).toBe(true);
         expect(run(CLI_EXECUTOR + 'messaging-show-clients')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineTcmTest_1')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineTcmTest_2')).toBe(true);
         // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
     });
 

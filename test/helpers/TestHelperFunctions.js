@@ -58,4 +58,13 @@ generateRandomString = function (length) {
     return generator(base, length);
     // console.log('OUTPUT: ', generator(base, 28));
 }
+
+sleep = function (ms) {
+    console.log('Sleeping for ' + ms + ' ms...');
+    //TODO: Add moving dots..
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
 console.log('Test Helper Functions Loaded...');
