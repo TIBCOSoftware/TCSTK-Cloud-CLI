@@ -233,7 +233,7 @@ export async function importLiveAppsData() {
     if (impConf['la-application-name'] != null) {
         importAppName = impConf['la-application-name'];
         log(INFO, 'Getting App Id for LA Application ' + importAppName);
-        const apps = showLiveApps(false, false);
+        const apps = await showLiveApps(false, false);
         //console.log(apps);
         let appData = {};
         for (let app of apps) {
