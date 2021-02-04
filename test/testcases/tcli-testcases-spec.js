@@ -138,7 +138,7 @@ describe("tcli testsuite", function () {
     // Basic Cloud Starter Template - LATEST Angular 10
 
     //TODO: Testcase fails on windows (on ./backup folder)
-    it("Case Manager and Schematics", function () {
+    xit("Case Manager and Schematics", function () {
         const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
