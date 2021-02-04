@@ -143,15 +143,15 @@
       "internal": false,
       "task": "injectLibSourcesWrapper",
       "taskName": "inject-lib-sources",
-      "availableOnOs": ["darwin"]
+      "availableOnOs": ["all"]
     },
     "13. undo-lib-sources": {
-      "description": "Undo's the enabling for Cloud Library Debugging",
+      "description": "Undoes the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
       "task": "undoLibSourcesWrapper",
       "taskName": "undo-lib-sources",
-      "availableOnOs": ["darwin"]
+      "availableOnOs": ["all"]
     },
     "14. schematic-add": {
       "description": "Add a schematic into your project",

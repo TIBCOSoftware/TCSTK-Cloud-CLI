@@ -167,10 +167,10 @@ export async function getCLgit() {
 export async function injectLibSourcesWrapper() {
     //'clean', 'get-cloud-libs-from-git', 'format-project-for-lib-sources', 'clean'
     const CS = require('./build/cloud-starters');
-    await cleanDist();
+    await CS.cleanDist();
     await getCLgit();
     CS.injectLibSources();
-    await cleanDist();
+    await CS.cleanDist();
 }
 
 // Inject the sources from the libs into a cloud starter project
@@ -178,9 +178,6 @@ export async function undoLibSourcesWrapper() {
     const CS = require('./build/cloud-starters');
     CS.undoLibSources();
 }
-
-
-
 
 // Function to generate the cloud descriptor
 export function generateCloudDescriptorWrapper() {

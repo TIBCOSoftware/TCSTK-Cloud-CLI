@@ -431,6 +431,7 @@ export async function publishApp(application) {
 export function injectLibSources() {
     log('INFO', 'Injecting Lib Sources');
     //run('mkdir tmp');
+    mkdirIfNotExist('./projects');
     mkdirIfNotExist('./projects/tibco-tcstk');
     copyDir('./tmp/TCSDK-Angular/projects/tibco-tcstk', './projects/tibco-tcstk');
     //use debug versions
@@ -470,7 +471,7 @@ export function undoLibSources() {
     deleteFolder('./projects/tibco-tcstk/tc-liveapps-lib');
     deleteFolder('./projects/tibco-tcstk/tc-spotfire-lib');
     //FIX: just install those npm packages (instead of removing the entire package.json file...)
-    run('npm install ' + getProp('TCSTDebugPackages'));
+    run('npm install ' + getProp('TCSTDebugPackages') + ' --legacy-peer-deps');
 }
 
 // Function to test
