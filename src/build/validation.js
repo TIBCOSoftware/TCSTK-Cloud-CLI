@@ -104,7 +104,7 @@ export async function validate() {
 export async function validateLACaseState(caseRefToValidate, stateToValidate) {
     // First check if case exists
     await validateLACase(caseRefToValidate, 'case_exist');
-    const caseData = JSON.parse(LA.getLaCaseByReference(caseRefToValidate).untaggedCasedata);
+    const caseData = JSON.parse((await LA.getLaCaseByReference(caseRefToValidate)).untaggedCasedata);
     if (caseData.state == stateToValidate) {
         validationOk('Case with Reference ' + colors.blue(caseRefToValidate) + '\x1b[0m is in the expected state ' + colors.blue(stateToValidate) + '\x1b[0m on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
     } else {

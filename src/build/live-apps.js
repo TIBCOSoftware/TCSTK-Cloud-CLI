@@ -28,7 +28,6 @@ function checkCaseFolder() {
 
 // Get a LiveApps Case by Reference
 export async function getLaCaseByReference(caseRef) {
-    // const caseData = callURL(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), 'GET', null, null, false, null, null, null, null, null, true);
     const caseData =  await CCOM.callTCA(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), false, {handleErrorOutside: true});
     if (!caseData) {
         log(ERROR, 'Error Retrieving Case Data for ref: ', caseRef);
