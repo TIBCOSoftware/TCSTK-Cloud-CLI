@@ -1008,6 +1008,7 @@ displayMDFile = function (mdFile) {
     const mdFileContent = fs.readFileSync(global.PROJECT_ROOT + mdFile, 'utf8');
     const ECHOMD = require('./../echomd/echomd').echomd;
     console.log(ECHOMD(mdFileContent));
+    console.log(colors.yellow ('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
 }
 
 //Common log function

@@ -321,7 +321,7 @@ export async function cli(args) {
 // Display commandline usage
 function helptcli() {
     // TODO: Display the version from generic config
-    console.log('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]');
+    console.log(colors.blue('Cloud CLI) Usage: tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)]'));
     console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
     console.log('new: Create new Cloud starter. Usage] tcli new <name> [--template(-t)] <template-to-use>');
     console.log('        --debug: Display debug information.');
@@ -332,7 +332,7 @@ function helptcli() {
     console.log('     --propfile: when specified tcli will use a different property file then the default tibco-cloud.properties');
     console.log('     --multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud starters and many different configured environments at the same time.');
     console.log(' --multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties');
-    console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.');
+    console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.\n');
     console.log('These are the available TIBCO CLOUD CLI Tasks:');
     const cliTaskConfigCLI = require('./config/config-cli-task.json');
     const cTsks = cliTaskConfigCLI.cliTasks;
@@ -349,7 +349,7 @@ function helptcli() {
         }
         if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
             let str = cliTask;
-            const x = 30 - cliTask.length;
+            const x = 45 - cliTask.length;
             for (let i = 0; i < x; i++) {
                 str = ' ' + str;
             }
@@ -357,4 +357,5 @@ function helptcli() {
         }
         // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
     }
+    console.log(colors.yellow ('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
 }
