@@ -38,12 +38,12 @@ export async function revokeOauthToken(tokenName) {
         const possibleTokensArrObj = await showOauthToken();
         let possibleTokens = ['NO TOKEN'];
         for (let tok of iterateTable(possibleTokensArrObj)) {
-            possibleTokens = possibleTokens.filter(f => f != tok.Name).concat([tok.Name])
+            possibleTokens = possibleTokens.filter(f => f !== tok.Name).concat([tok.Name])
         }
         // console.log(possibleTokens);
         tokenName = await askMultipleChoiceQuestion('Which token would you like to revoke ?', possibleTokens);
     }
-    if (tokenName != 'NO TOKEN') {
+    if (tokenName !== 'NO TOKEN') {
         log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
         const postRequest = 'name=' + tokenName;
         const response =  await CCOM.callTCA(CCOM.clURI.revoke_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
@@ -105,7 +105,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
     }
     log(INFO, 'Validating and Rotating OAUTH Token...');
     // Ask for prop to force the parsing
-    const oKey = getProp('CloudLogin.OAUTH_Token');
+    getProp('CloudLogin.OAUTH_Token');
     let oauth_required_hours_valid = 168;
     if (getProp('CloudLogin.OAUTH_Required_Hours_Valid') != null) {
         oauth_required_hours_valid = getProp('CloudLogin.OAUTH_Required_Hours_Valid');
@@ -123,7 +123,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
             if (doInteraction) {
                 decision = await askMultipleChoiceQuestion('Would you like to rotate your OAUTH key ?', ['YES', 'NO']);
             }
-            if (decision == 'YES') {
+            if (decision === 'YES') {
                 rotateOauthToken();
             } else {
                 log(INFO, 'Ok I won\'t do anything...');
@@ -148,7 +148,7 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp)
     } else {
         log(INFO, 'No OAUTH_Generate_Token_Name found; This is needed to specify the name of your OAUTH Token.');
         let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
-        if (decision == 'YES') {
+        if (decision === 'YES') {
             addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', 'MyCLIToken_1', 'Name of the OAUTH token to be generated.');
         } else {
             skipCall = true;
@@ -166,7 +166,7 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp)
     } else {
         log(INFO, 'No OAUTH_Generate_For_Tenants Property found; This is needed to specify for which tenants you would like to generate an OAUTH Token');
         let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
-        if (decision == 'YES') {
+        if (decision === 'YES') {
             addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_For_Tenants', 'TSC,BPM', 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
         } else {
             skipCall = true;
@@ -179,7 +179,7 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp)
     } else {
         log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
         let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);
-        if (decision == 'YES') {
+        if (decision === 'YES') {
             addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Generate_Valid_Hours', '336', 'Number of Hours the generated OAUTH token should be valid.');
         } else {
             skipCall = true;
@@ -206,13 +206,13 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp)
                 nvs = createTableValue('EXPIRY (DAYS)', (((response.expires_in) / 3600) / 24), nvs);
                 console.table(nvs);
                 // Ask to update
-                let decision = '';
+                let decision;
                 if (verbose) {
                     decision = 'YES';
                 } else {
                     decision = await askMultipleChoiceQuestion('Do you want to update ' + getPropFileName() + ' with the new token ?', ['YES', 'NO']);
                 }
-                if (decision == 'YES') {
+                if (decision === 'YES') {
                     //console.log('Response: ', response);
                     const expiryDate = new Date((new Date()).getTime() + (response.expires_in * 1000));
                     // ADD Get Claims Call here...

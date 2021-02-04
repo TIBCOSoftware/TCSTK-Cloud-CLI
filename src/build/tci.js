@@ -33,19 +33,19 @@ export async function monitorTCI() {
         }
     }
     let appToMonitor = await askMultipleChoiceQuestionSearch('Which TCI App would you like to monitor ?', tAppsToChoose);
-    if (appToMonitor != 'Nothing') {
+    if (appToMonitor !== 'Nothing') {
         // console.log(appToMonitor);
         // run(tibCli + ' logout');
         // TODO: move this logic to common lib
         let email = getProp('CloudLogin.email');
         let pass = getProp('CloudLogin.pass');
-        if (pass == 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-        if (email == 'USE-GLOBAL') email = propsG.CloudLogin.email;
-        if (pass == '') {
+        if (pass === 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+        if (email === 'USE-GLOBAL') email = propsG.CloudLogin.email;
+        if (pass === '') {
             pass = require('yargs').argv.pass;
             // console.log('Pass from args: ' + pass);
         }
-        if (pass.charAt(0) == '#') {
+        if (pass.charAt(0) === '#') {
             pass = Buffer.from(pass, 'base64').toString()
         }
         pass = pass.replace('$', '\\$')
@@ -72,7 +72,7 @@ function getTIBCli() {
 
 // Use WSU to generate TCI code
 function wsuAddTci() {
-    return new Promise(async function (resolve, reject) {
+    return new Promise(async function (resolve) {
         // TODO: Implement
         console.log('TODO: Implement');
         resolve();
@@ -80,7 +80,7 @@ function wsuAddTci() {
 }
 
 function wsuListTci() {
-    return new Promise(async function (resolve, reject) {
+    return new Promise(async function (resolve) {
         // TODO: Remove web scaffolding utility ?
         /*const wsu = require('@tibco-tcstk/web-scaffolding-utility');
         console.log(wsu.API.getVersion());

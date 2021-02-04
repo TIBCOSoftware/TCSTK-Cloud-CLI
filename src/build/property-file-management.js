@@ -204,10 +204,10 @@ export async function updateProperty() {
         if (doesFileExist(getGLOBALPropertyFileName())){
             // We are updating the local prop file
             const localProps = require('properties-reader')(getPropFileName()).path();
-            if(indexObj(localProps, pName) == 'USE-GLOBAL'){
+            if(indexObj(localProps, pName) === 'USE-GLOBAL'){
                 // location = GLOBALPropertyFileName;
                 const propToUse = await askMultipleChoiceQuestion('Found USE-GLOBAL for property: ' + pName + '. Do you want to update the GLOBAL or the LOCAL property file ?', ['GLOBAL', 'LOCAL']);
-                checkForGlobal = 'global' == propToUse.toLowerCase();
+                checkForGlobal = 'global' === propToUse.toLowerCase();
                 // log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
             }
         }
@@ -242,7 +242,7 @@ export function disableProperty(location, property, comment) {
                 if (dataLines[lineNumber].startsWith(property)) {
                     propFound = true;
                     log(DEBUG, `Property found: ${property} We are disabeling it...`);
-                    if(comment && comment != ''){
+                    if(comment && comment !== ''){
                         dataLines[lineNumber] = '#' + comment + '\n#' + dataLines[lineNumber];
                     } else {
                         dataLines[lineNumber] = '#' + dataLines[lineNumber];
@@ -252,7 +252,7 @@ export function disableProperty(location, property, comment) {
             }
             let dataForFile = '';
             for (let line in dataLines) {
-                if(line != (dataLines.length - 1)){
+                if(line !== (dataLines.length - 1)){
                     dataForFile += dataLines[line] + '\n';
                 } else {
                     // The last one:
@@ -283,17 +283,17 @@ export function showPropertiesTable() {
         const propLoad = require('properties-reader')(getPropFileName());
         props = propLoad.path();
         log(INFO, ' LOCAL Property File Name: ' + colors.blue(getPropFileName()));
-        if(getGLOBALPropertyFileName() && getGLOBALPropertyFileName() != '') {
+        if(getGLOBALPropertyFileName() && getGLOBALPropertyFileName() !== '') {
             log(INFO, 'GLOBAL Property File Name: ' + colors.blue(getGLOBALPropertyFileName()));
         }
         let nvs = [];
         for (const [key, value] of Object.entries(props)) {
-            if(key == 'CloudLogin'){
+            if(key === 'CloudLogin'){
                 for (const [key, value] of Object.entries(props.CloudLogin)) {
-                    if(value == 'USE-GLOBAL'){
+                    if(value === 'USE-GLOBAL'){
                         let displayValue = getProp('CloudLogin.' + key);
-                        if(key == 'pass'){
-                            if(displayValue != ''){
+                        if(key === 'pass'){
+                            if(displayValue !== ''){
                                 var passT = displayValue;
                                 displayValue = 'PLAIN TEXT';
                                 if(passT.startsWith('#') || passT.startsWith('@')){
@@ -305,17 +305,17 @@ export function showPropertiesTable() {
                     } else {
                         nvs = createTableValue('CloudLogin.' + key, value, nvs);
                     }
-                    if(key == 'OAUTH_Token' && getOAUTHDetails() != null){
+                    if(key === 'OAUTH_Token' && getOAUTHDetails() != null){
                         // console.log(getOAUTHDetails())
                         for (const [key, value] of Object.entries(getOAUTHDetails())) {
-                            if(key != 'Expiry_Date'){
+                            if(key !== 'Expiry_Date'){
                                 nvs = createTableValue('OAUTH ' + key, value, nvs);
                             }
                         }
                     }
                 }
             } else {
-                if(value == 'USE-GLOBAL'){
+                if(value === 'USE-GLOBAL'){
                     nvs = createTableValue(key, getProp(key) + ' [FROM GLOBAL]', nvs);
                 } else {
                     nvs = createTableValue(key, value, nvs);

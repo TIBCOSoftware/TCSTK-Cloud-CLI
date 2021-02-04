@@ -62,7 +62,7 @@ export async function browseSpotfire() {
         log(INFO, 'Current folder: ', colors.blue(currentFolder));
         let items = [];
         for(let parent of sfReports.Ancestors) {
-            if (parent.ItemType == 'spotfire.folder'){
+            if (parent.ItemType === 'spotfire.folder'){
                 let name = parent.Title;
                 if(parent.DisplayName){
                     name = parent.DisplayName;
@@ -79,14 +79,14 @@ export async function browseSpotfire() {
             if(child.DisplayName){
                 name = child.DisplayName;
             }
-            if (child.ItemType == 'spotfire.folder') {
+            if (child.ItemType === 'spotfire.folder') {
                 items.push({
                     type: 'Child',
                     id: child.Id,
                     name: 'Child) ' + name
                 });
             } else {
-                if (child.ItemType == 'spotfire.dxp') {
+                if (child.ItemType === 'spotfire.dxp') {
                     items.push({
                         type: 'DXP',
                         id: child.Id,
@@ -94,7 +94,7 @@ export async function browseSpotfire() {
                         item: child
                     });
                 }
-                if (child.ItemType == 'spotfire.mod') {
+                if (child.ItemType === 'spotfire.mod') {
                     items.push({
                         type: 'MOD',
                         id: child.Id,
@@ -111,12 +111,12 @@ export async function browseSpotfire() {
             itemArray.push(item.name);
         }
         const answer = await askMultipleChoiceQuestionSearch('On which Item would you like more details ?', itemArray);
-        if(answer == 'NONE'){
+        if(answer === 'NONE'){
             doBrowse = false;
         } else {
             for (const item of items) {
-                if(item.name == answer){
-                    if(item.type == 'DXP' || item.type == 'MOD'){
+                if(item.name === answer){
+                    if(item.type === 'DXP' || item.type === 'MOD'){
                         // show more info on DXP
                         console.table(item.item);
                         await askQuestion('Press [enter] to continue...');

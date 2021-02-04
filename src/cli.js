@@ -71,8 +71,8 @@ function parseArgumentsIntoOptions(rawArgs) {
     };
 }
 
-const isWindows = process.platform == 'win32';
-const dirDelimiter = isWindows ? '\\' : '/';
+const isWindows = process.platform === 'win32';
+// const dirDelimiter = isWindows ? '\\' : '/';
 
 // Main function
 export async function cli(args) {
@@ -101,26 +101,26 @@ export async function cli(args) {
         console.log('org: ' + options.org);
         console.log('answers: ' + options.answers);
     }
-    if (options.pass != '') {
+    if (options.pass !== '') {
         // This call sets the properties object, to be able to add a property to it.
         getProp('CloudLogin.pass');
-        if (options.pass.charAt(0) == '#' || options.pass.startsWith('@#')) {
+        if (options.pass.charAt(0) === '#' || options.pass.startsWith('@#')) {
             setProperty('CloudLogin.pass', options.pass);
         } else {
             setProperty('CloudLogin.pass', obfuscatePW(options.pass));
         }
     }
-    if (options.org != '') {
+    if (options.org !== '') {
         setOrganization(options.org);
     }
 
-    if (options.answers != '') {
+    if (options.answers !== '') {
         setGlobalAnswers(options.answers);
     }
 
     // Show help
-    if (options.help || options.task == 'help') {
-        if(options.task != '' && options.task != 'help'){
+    if (options.help || options.task === 'help') {
+        if(options.task !== '' && options.task !== 'help'){
             const hFile = 'docs/tasks/'+options.task+'.md';
             if(doesFileExist(global.PROJECT_ROOT + hFile)){
                 displayMDFile(hFile);
@@ -158,7 +158,7 @@ export async function cli(args) {
     }
     const projectManagementMode = true;
     if (!(options.doMultiple || options.doMultipleInteraction)) {
-        if (options.task == 'new' || options.task == 'new-starter') {
+        if (options.task === 'new' || options.task === 'new-starter') {
             // options.task = 'new-starter';
             await require('./manage-application').newStarter();
             process.exit();
@@ -254,10 +254,10 @@ export async function cli(args) {
         }
         // TODO: Maybe call run here to prevent two times asking of PW on new file
 
-        if (options.task == '') {
+        if (options.task === '') {
             await require('./tasks').mainT();
         } else {
-            if (options.task == 'help') {
+            if (options.task === 'help') {
                 options.task = 'help-tcli';
                 // TODO: Get specific help
             }
@@ -269,14 +269,14 @@ export async function cli(args) {
             let directTask = false;
             let directTaskMethod = '';
             for (const cliTask of taskArray) {
-                if (cliTask == options.task) {
+                if (cliTask === options.task) {
                     taskExist = true;
                 }
             }
             for (const cliTask in cTsks) {
                 if(cTsks[cliTask].taskAlternativeNames){
                     for (const altName of cTsks[cliTask].taskAlternativeNames) {
-                        if(altName == options.task) {
+                        if(altName === options.task) {
                             taskExist = true;
                             if (cTsks[cliTask].task) {
                                 directTask = true;
@@ -286,7 +286,7 @@ export async function cli(args) {
                         }
                     }
                 }
-                if (cTsks[cliTask].taskName == options.task) {
+                if (cTsks[cliTask].taskName === options.task) {
                     taskExist = true;
                     if (cTsks[cliTask].task) {
                         directTask = true;
@@ -342,7 +342,7 @@ function helptcli() {
             //console.log('cTsks[cliTask].availableOnOs:' + cTsks[cliTask].availableOnOs);
             for (const allowedOS of cTsks[cliTask].availableOnOs) {
                 //console.log('OS:' + allowedOS);
-                if (allowedOS == process.platform || allowedOS == 'all') {
+                if (allowedOS === process.platform || allowedOS === 'all') {
                     allowed = true;
                 }
             }

@@ -173,6 +173,15 @@ export async function injectLibSourcesWrapper() {
     await cleanDist();
 }
 
+// Inject the sources from the libs into a cloud starter project
+export async function undoLibSourcesWrapper() {
+    const CS = require('./build/cloud-starters');
+    CS.undoLibSources();
+}
+
+
+
+
 // Function to generate the cloud descriptor
 export function generateCloudDescriptorWrapper() {
     const CS = require('./build/cloud-starters');
@@ -183,7 +192,7 @@ export function generateCloudDescriptorWrapper() {
 export async function changeRegion() {
     // Getting this from common
     await updateRegion(getPropFileName());
-};
+}
 
 
 export async function obfuscate() {
@@ -484,7 +493,7 @@ export async function promptTask(stDir, cwdDir) {
     const inquirer = require('inquirer');
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - ' + colors.blue(getRegion(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         // TODO: Look at getting org

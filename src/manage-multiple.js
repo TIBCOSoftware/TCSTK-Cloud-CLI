@@ -13,11 +13,11 @@ processMultipleFile = function () {
     // log(INFO, '- Managing Multiple, Using file: ' + mFile);
     // Go Over All Cloud Starter Jobs
     let csJobs = getMProp('Cloud_Starter_JOBS');
-    if (mOpts.job && mOpts.job.trim() != '') {
+    if (mOpts.job && mOpts.job.trim() !== '') {
         csJobs = mOpts.job;
     }
     let environmentOverride = '';
-    if (mOpts.environment && mOpts.environment.trim() != '') {
+    if (mOpts.environment && mOpts.environment.trim() !== '') {
         environmentOverride = mOpts.environment;
     }
     if (csJobs == null) {
@@ -33,11 +33,11 @@ processMultipleFile = function () {
         addOrUpdateProperty(mFile, 'Fail_On_Error', 'YES', 'Indicator if script needs to fail when an error occurs (Options: YES | NO)');
         failOnError = 'YES';
     }
-    const doFailOnError = !(failOnError.toLowerCase() == 'no');
+    const doFailOnError = !(failOnError.toLowerCase() === 'no');
 
     // log(INFO, '- Looping over Configured Starter JOBS: ' + csJobs);
     let nvs = createTableValue('File', mFile);
-    if (fileExtension.trim() != '') {
+    if (fileExtension.trim() !== '') {
         nvs = createTableValue('File Extension', fileExtension, nvs);
     }
     const csJobsA = csJobs.split(',');
@@ -46,7 +46,7 @@ processMultipleFile = function () {
         const currentJob = csJobsA[k].trim();
         let environments = getMProp(currentJob + '_Environments');
 
-        if (environmentOverride != '') {
+        if (environmentOverride !== '') {
             environments = environmentOverride;
         }
         const environmentsA = environments.split(',');
@@ -66,7 +66,7 @@ processMultipleFile = function () {
         const currLoc = getMProp(currentJob + '_Location');
         log(INFO, logS + ' Location: ' + currLoc);
         let environments = getMProp(currentJob + '_Environments');
-        if (environmentOverride != '') {
+        if (environmentOverride !== '') {
             environments = environmentOverride;
         }
         log(INFO, logS + ' Environments: ' + environments);
@@ -171,7 +171,7 @@ multipleInteraction = async function () {
     if (failOnError == null) {
         failOnError = 'YES';
     }
-    const doFailOnError = !(failOnError.toLowerCase() == 'no');
+    const doFailOnError = !(failOnError.toLowerCase() === 'no');
     log(INFO, 'Multiple Cloud Interactions');
     log(INFO, '- Managing Multiple, Using file: ' + mFile + ' (Fail on error:', doFailOnError, ')');
     let taskOverRide = false;
@@ -186,7 +186,7 @@ multipleInteraction = async function () {
             miTask = getMProp('Multiple_Interaction_CLITask');
         }
         let displayTask = miTask;
-        if (miTask == '') {
+        if (miTask === '') {
             displayTask = TCLI_INTERACTVIE;
         }
 
@@ -210,13 +210,13 @@ multipleInteraction = async function () {
             eRow['AUTHENTICATION TYPE'] = '';
             if (curProps && curProps.CloudLogin) {
                 if (curProps.CloudLogin.clientID) {
-                    if (curProps.CloudLogin.clientID.trim() != '') {
+                    if (curProps.CloudLogin.clientID.trim() !== '') {
                         eRow['AUTHENTICATION TYPE'] = 'CLIENT ID';
                     }
                 }
                 //TODO: Pick up OAUTH
                 if (curProps.CloudLogin.OAUTH_Token) {
-                    if (curProps.CloudLogin.OAUTH_Token.trim() != '') {
+                    if (curProps.CloudLogin.OAUTH_Token.trim() !== '') {
                         eRow['AUTHENTICATION TYPE'] = 'OAUTH';
                         const oauthO = parseOAUTHToken(curProps.CloudLogin.OAUTH_Token, false);
                         if (oauthO) {
@@ -250,18 +250,18 @@ multipleInteraction = async function () {
         let userOptions = ['ALL ENVIRONMENTS', ...environmentOptions]
         userOptions.push('QUIT', 'EXIT', 'CHANGE TASK', 'CHANGE TO INTERACTIVE CLI TASK');
         let chosenEnv = await askMultipleChoiceQuestionSearch('On which environment would you like to run ' + colors.blue(displayTask) + ' ?', userOptions);
-        if (chosenEnv == 'QUIT' || chosenEnv == 'EXIT') {
+        if (chosenEnv === 'QUIT' || chosenEnv === 'EXIT') {
             console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
             process.exit(0);
         }
         //
-        if (chosenEnv == 'CHANGE TO INTERACTIVE CLI TASK') {
+        if (chosenEnv === 'CHANGE TO INTERACTIVE CLI TASK') {
             log(INFO, 'Setting task to: ' + TCLI_INTERACTVIE);
             miTask = '';
             taskOverRide = true;
             displayTask = TCLI_INTERACTVIE;
         } else {
-            if (chosenEnv == 'CHANGE TASK') {
+            if (chosenEnv === 'CHANGE TASK') {
                 const cliTaskConfigCLI = require('./config/config-cli-task.json');
                 let cTsks = cliTaskConfigCLI.cliTasks;
 
@@ -276,7 +276,7 @@ multipleInteraction = async function () {
                 }
                 let chosenTask = await askMultipleChoiceQuestionSearch('Which cli task would you like to switch to ?', taskDescription);
                 for (let taskN in taskDescription) {
-                    if (taskDescription[taskN] == chosenTask) {
+                    if (taskDescription[taskN] === chosenTask) {
                         taskOverRide = true;
                         miTask = taskTarget[taskN];
                     }
@@ -288,12 +288,12 @@ multipleInteraction = async function () {
                 for (let envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber];
                     let command = 'tcli -p ' + miPropFolder + propFileToUse + ' ' + miTask;
-                    if (chosenEnv == 'ALL ENVIRONMENTS') {
+                    if (chosenEnv === 'ALL ENVIRONMENTS') {
                         console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                         run(command, doFailOnError);
                         // await askQuestion('Press [enter] to continue...');
                     } else {
-                        if (environmentOptions[envNumber] == chosenEnv) {
+                        if (environmentOptions[envNumber] === chosenEnv) {
                             console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                             // console.log('Propfile to use: ', miPropFilesA[envNumber]);
                             run(command, doFailOnError);
@@ -301,7 +301,7 @@ multipleInteraction = async function () {
                         }
                     }
                 }
-                if (miTask != '') {
+                if (miTask !== '') {
                     await askQuestion('Press [enter] to continue...');
                 }
             }
@@ -321,7 +321,7 @@ getMProp = function (property, propFileName) {
     if (propsM == null) {
         const PropertiesReader = require('properties-reader');
         propsM = PropertiesReader(propFileToUse).path();
-        if (propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() != '') {
+        if (propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() !== '') {
             log(INFO, 'Adding extension to propfile(' + propFileToUse + ') : ' + propsM.PROPERTY_EXTENSION_FILE)
             let propsTwo = PropertiesReader(propsM.PROPERTY_EXTENSION_FILE).path();
             fileExtension = propsM.PROPERTY_EXTENSION_FILE;

@@ -69,7 +69,7 @@
     },
     "7. test-cloud-starter": {
       "description": "Run Test cases for your cloud starter",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "task": "testCSWrapper",
       "taskName": "test-cloud-starter",
@@ -79,7 +79,7 @@
     },
     "8. test-cloud-starter-headless": {
       "description": "Run Test cases for your cloud starter, headless (without opening the browser)",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "task": "testCSHeadlessWrapper",
       "taskName": "test-cloud-starter-headless",
@@ -149,7 +149,7 @@
       "description": "Undo's the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
-      "task": "undoLibSources",
+      "task": "undoLibSourcesWrapper",
       "taskName": "undo-lib-sources",
       "availableOnOs": ["darwin"]
     },

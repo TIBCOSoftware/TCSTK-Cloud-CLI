@@ -314,7 +314,7 @@ async function getApplicationDetails(application, version, showTable) {
     }
     pexTable(details, 'cloud-starter-details', getPEXConfig(), doShowTable);
     return allArteFacts;
-};
+}
 
 
 //Get Links to all the applications
@@ -419,7 +419,7 @@ export function uploadApp(application) {
 
 // Function to publish the application to the cloud
 export async function publishApp(application) {
-    return new Promise(async function (resolve, reject) {
+    return new Promise(async function (resolve) {
         // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
         const response =  await CCOM.callTCA(CCOM.clURI.app_info , false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);

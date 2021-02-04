@@ -21,9 +21,9 @@ export async function showLiveAppsGroups() {
         selectGroup.push(gr.Name);
     }
     const decision = await askMultipleChoiceQuestionSearch('For which group would you like to see the users ?', selectGroup);
-    if (decision != 'NONE') {
+    if (decision !== 'NONE') {
         for (let gr of iterateTable(groupT)) {
-            if (decision == gr.Name || decision == 'ALL') {
+            if (decision === gr.Name || decision === 'ALL') {
                 const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await LA.getProductionSandbox());
                 const userGroupTable = createTable(oResponse, CCOM.mappings.la_groups_users, false)
                 for (let uGr in userGroupTable) {
@@ -43,7 +43,7 @@ export async function showLiveAppsGroups() {
 export async function createLiveAppsGroup() {
     log(INFO, 'Creating LiveApps Group...');
     const gName = await askQuestion('What file name of the group you would like to create ? (press enter to not create a group)');
-    if (gName != '') {
+    if (gName !== '') {
         const gDescription = await askQuestion('What is the description of the group  ? (press enter to leave blank)');
         let postGroup = {
             "name": gName,
@@ -65,7 +65,7 @@ export async function showLiveAppsUsers(showTable, hideTestUsers) {
     const usersTable = createTable(oResponse, CCOM.mappings.la_users, false);
     if (hideTestUsers) {
         for (let usr in usersTable) {
-            if (usersTable[usr] && usersTable[usr].Type == 'Test') {
+            if (usersTable[usr] && usersTable[usr].Type === 'Test') {
                 delete usersTable[usr];
             }
         }
@@ -87,10 +87,10 @@ export async function addUserToGroup() {
         selectGroup.push(gr.Name);
     }
     const groupDecision = await askMultipleChoiceQuestionSearch('For which group would you like to ADD a user ?', selectGroup);
-    if (groupDecision != 'NONE') {
+    if (groupDecision !== 'NONE') {
         let currentUsersInGroupT = [];
         for (let gr of iterateTable(groupT)) {
-            if (groupDecision == gr.Name) {
+            if (groupDecision === gr.Name) {
                 groupIdToAdd = gr.Id;
                 const oResponse =  await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await getProductionSandbox());
                 log(INFO, 'CURRENT USERS IN GROUP: ' + groupDecision);
@@ -106,7 +106,7 @@ export async function addUserToGroup() {
             let add = true;
             for (let cUsrGrp of iterateTable(currentUsersInGroupT)) {
                 // console.log(cUsrGrp.Email + ' == ' + usr['Email'])
-                if (cUsrGrp.Email == usr['Email']) {
+                if (cUsrGrp.Email === usr['Email']) {
                     add = false;
                 }
             }
@@ -118,7 +118,7 @@ export async function addUserToGroup() {
         log(INFO, 'Users that can be added to ' + groupDecision);
         console.table(allowedUsersTable);
         const userDecision = await askMultipleChoiceQuestionSearch('Which user would you like to add to the group (' + groupDecision + ')', selectedUser);
-        if (userDecision != 'NONE') {
+        if (userDecision !== 'NONE') {
             if (userDecision.startsWith('ID-')) {
                 userIdToAdd = userDecision.substr(3);
             }
@@ -126,7 +126,7 @@ export async function addUserToGroup() {
                 groupIdToAdd = userDecision.substr(3);
             }
             for (let usr of iterateTable(userT)) {
-                if (userDecision == usr['First Name'] + ' ' + usr['Last Name']) {
+                if (userDecision === usr['First Name'] + ' ' + usr['Last Name']) {
                     userIdToAdd = usr.Id;
                 }
             }

@@ -1,10 +1,10 @@
 // This file manages the applications
 require('./build/common-functions');
 const configApp = require('./config/config-template.json');
-var templatesToUse = [];
-const isWindows = process.platform == 'win32';
+const templatesToUse = [];
+const isWindows = process.platform === 'win32';
 
-// Funcation called from the cli to pick up info and call the create starter
+// Function called from the cli to pick up info and call the create starter
 export async function newStarter() {
     log(INFO, 'Creating New Starter...');
     for (let key in configApp.templates) {
@@ -18,41 +18,41 @@ export async function newStarter() {
     let starterTemplate = '';
     let doStart = true;
     for (let arg in process.argv) {
-        if (process.argv[arg] == 'new') {
+        if (process.argv[arg] === 'new') {
             if (process.argv.length - 1 > arg) {
                 const temp = parseInt(arg) + 1;
                 starterName = process.argv[temp];
             }
         }
-        if (process.argv[arg] == '--template' || process.argv[arg] == '-t') {
+        if (process.argv[arg] === '--template' || process.argv[arg] === '-t') {
             if (process.argv.length - 1 > arg) {
                 const temp = parseInt(arg) + 1;
                 starterTemplate = process.argv[temp];
                 for (let key in configApp.templates) {
                     if (configApp.templates.hasOwnProperty(key)) {
-                        if (starterTemplate == key) {
+                        if (starterTemplate === key) {
                             starterTemplate = configApp.templates[key].displayName;
                         }
                     }
                 }
             }
         }
-        if (process.argv[arg] == '--surpressStart' || process.argv[arg] == '-s') {
+        if (process.argv[arg] === '--surpressStart' || process.argv[arg] === '-s') {
             doStart = false;
         }
     }
     // console.log('doStart: ' + doStart);
-    if (starterName == '') {
+    if (starterName === '') {
         starterName = await askQuestion('What is the name of your cloud starter ?');
     }
-    if (starterTemplate == '') {
+    if (starterTemplate === '') {
         starterTemplate = await askMultipleChoiceQuestion('Which Template would you like to use for your cloud starter ?', templatesToUse);
     }
     log(INFO, '    Cloud Starter Name: ' + starterName);
     let stTempJson = {};
     for (let key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
-            if (starterTemplate == configApp.templates[key].displayName) {
+            if (starterTemplate === configApp.templates[key].displayName) {
                 stTempJson = configApp.templates[key];
             }
 
@@ -93,13 +93,13 @@ function createNewStarter(name, template, doStart) {
         copyDir(fromDir, toDir);
     }
     try {
-        //var results = {};
-        //var doReplace = false;
-        for (var rep of template.replacements) {
+        //const results = {};
+        //const doReplace = false;
+        for (const rep of template.replacements) {
             // doReplace = true;
             log(DEBUG, 'Replacing from: ' + rep.from + " to: " + rep.to);
-            var repTo = rep.to;
-            if (rep.to == "@name") {
+            let repTo = rep.to;
+            if (rep.to === "@name") {
                 repTo = name;
             }
             replaceInFile(rep.from, repTo, toDir + '/**');
@@ -109,11 +109,11 @@ function createNewStarter(name, template, doStart) {
         run('cd ' + name + ' && tcli -c -t "' + template.displayName + '"');
         // create a new tibco-cloud.properties file
         if (isWindows) {
-            for (var postCom of template.PostCommandsWin) {
+            for (const postCom of template.PostCommandsWin) {
                 run('cd ' + toDir + ' && ' + postCom);
             }
         } else {
-            for (var postCom of template.PostCommands) {
+            for (const postCom of template.PostCommands) {
                 run('cd ' + toDir + ' && ' + postCom);
             }
         }
@@ -131,7 +131,7 @@ function createNewStarter(name, template, doStart) {
 // function to get git repo
 function getGit(source, target, tag) {
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
-    if (tag == null || tag == 'LATEST' || tag == '') {
+    if (tag == null || tag === 'LATEST' || tag === '') {
         run('git clone "' + source + '" "' + target + '" ');
     } else {
         run('git clone "' + source + '" "' + target + '" -b ' + tag);
@@ -155,7 +155,7 @@ export async function manageGlobalConfig() {
     if (displayGlobalConnectionConfig()) {
         // There is a global config
         let updateGC = await askMultipleChoiceQuestion('Would you like to update the Global Connection Configuration ?', ['YES', 'NO']);
-        if (updateGC == 'YES') {
+        if (updateGC === 'YES') {
             await updateGlobalConnectionConfig();
         }
     } else {

@@ -25,7 +25,7 @@ function prepSharedStateProps() {
         log(INFO, 'No Shared State Filter Double Check Property found; Adding YES to ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'Shared_State_Double_Check', 'YES');
     }
-    DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() == 'no'));
+    DO_SHARED_STATE_DOUBLE_CHECK = (!(SHARED_STATE_DOUBLE_CHECK.toLowerCase() === 'no'));
     // Shared state folder (picked up from configuration if exists)
     if (getProp('Shared_State_Folder') != null) {
         SHARED_STATE_FOLDER = getProp('Shared_State_Folder');
@@ -50,9 +50,9 @@ export async function getSharedState(showTable) {
     log(INFO, 'Type of Shared State: ' + colors.blue(filterType));
     while (moreStates && i < SHARED_STATE_MAX_CALLS) {
         let start = i * SHARED_STATE_STEP_SIZE;
-        let end = (i + 1) * SHARED_STATE_STEP_SIZE;
-        //log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
-        //TODO: Also get Shared shared states (+ '&filter=type = SHARED')
+        // let end = (i + 1) * SHARED_STATE_STEP_SIZE;
+        // log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
+        // TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         let filter = '&$filter=type=' + filterType;
         let sStateTemp =  await CCOM.callTCA(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
         if (sStateTemp.length < 1) {
@@ -65,12 +65,12 @@ export async function getSharedState(showTable) {
     }
     console.log('');
     log(INFO, 'Total Number of Shared State Entries: ' + ALLsState.length);
-    if (SHARED_STATE_FILTER == 'APPLICATION') {
+    if (SHARED_STATE_FILTER === 'APPLICATION') {
         SHARED_STATE_FILTER = getProp('App_Name');
     }
     let sState = [];
     log(INFO, 'Applying Shared State Filter: ' + SHARED_STATE_FILTER);
-    if (SHARED_STATE_FILTER != '*') {
+    if (SHARED_STATE_FILTER !== '*') {
         for (const state in ALLsState) {
             if (ALLsState[state] && ALLsState[state].name && ALLsState[state].name.startsWith(SHARED_STATE_FILTER)) {
                 sState.push(ALLsState[state]);
@@ -126,7 +126,7 @@ async function selectSharedState(sharedStateEntries, question) {
     let answer = await askMultipleChoiceQuestionSearch(question, stateNames);
     let re = {};
     for (const state of sharedStateEntries) {
-        if (state.name == answer) {
+        if (state.name === answer) {
             re = state;
         }
     }
@@ -211,7 +211,7 @@ export async function removeSharedStateEntry() {
             decision = await askMultipleChoiceQuestion('Are you sure ?', ['YES', 'NO']);
         }
         // Remove shared state entry
-        if (decision == 'YES') {
+        if (decision === 'YES') {
             deleteSharedState(selectedState.id);
         } else {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
@@ -233,15 +233,15 @@ export async function clearSharedState() {
             decision = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (Filter: ' + getProp('Shared_State_Filter') + ') ?', ['YES', 'NO']);
         }
         // If the filter is set to * then really double check...
-        if (getProp('Shared_State_Filter') == '*') {
+        if (getProp('Shared_State_Filter') === '*') {
             decision = 'NO';
             const secondDecision = await askMultipleChoiceQuestion('YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ? ', ['YES', 'NO']);
-            if (secondDecision == 'YES') {
+            if (secondDecision === 'YES') {
                 decision = 'YES';
             }
         }
         // Remove shared state entries
-        if (decision == 'YES') {
+        if (decision === 'YES') {
             for (sStateToDelete of sStateList) {
                 // Remove entries one by one
                 log(INFO, 'REMOVING SHARED STATE - NAME: ' + sStateToDelete.name + ' ID: ' + sStateToDelete.id);
@@ -266,7 +266,7 @@ export async function exportSharedState(verbose) {
     if (DO_SHARED_STATE_DOUBLE_CHECK && !doVerbose) {
         decision = await askMultipleChoiceQuestion('Are you sure you want to export all the states above ?', ['YES', 'NO']);
     }
-    if (decision == 'YES') {
+    if (decision === 'YES') {
         // Check if folder exist
         let ssExportFolder = SHARED_STATE_FOLDER;
         // TODO: think about setting up a structure with the organization (so that import get it directly from the right org)
@@ -335,7 +335,7 @@ function importSharedStateFile(ssFile) {
                     log(ERROR, e);
                     process.exit();
                 }
-                ssObject.content.json = ssObject.content.json;
+                // ssObject.content.json = ssObject.content.json;
             }
         }
     }
@@ -345,7 +345,7 @@ function importSharedStateFile(ssFile) {
 
 async function putSharedState(sharedStateObject) {
     prepSharedStateProps();
-    if (sharedStateObject != null || sharedStateObject != '' || sharedStateObject != {}) {
+    if (sharedStateObject != null || sharedStateObject !== '' || sharedStateObject !== {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
          await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
@@ -366,7 +366,7 @@ export async function importSharedState() {
     let it = 1;
     const fs = require('fs');
     fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
-        if (file != 'CONTENT') {
+        if (file !== 'CONTENT') {
             importOptions.push(file);
             const sTemp = {};
             const appN = it;
@@ -381,10 +381,10 @@ export async function importSharedState() {
         importOptions.unshift('ALL SHARED STATES');
         // Provide the option to select one or upload all
         let answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions);
-        if (answer == 'ALL SHARED STATES') {
+        if (answer === 'ALL SHARED STATES') {
             // Import all shared states
             for (curState of importOptions) {
-                if (curState != 'ALL SHARED STATES') {
+                if (curState !== 'ALL SHARED STATES') {
                     // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
                     putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
                 }
@@ -399,14 +399,14 @@ export async function importSharedState() {
     // Provide a summary to the user
     // Ask if you are sure to import the shared state ?
     // Upload the shared states one by one
-};
+}
 
 //wrapper function around the watcher on shared state
 export async function watchSharedStateMain() {
     prepSharedStateProps();
     const commandSTDO = 'tcli watch-shared-state-do -p "' + getPropFileName() + '"';
     const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state (filtered) ?', ['YES', 'NO']);
-    if (decision == 'YES') {
+    if (decision === 'YES') {
         await exportSharedState();
         run(commandSTDO);
     } else {
@@ -418,16 +418,16 @@ let ignoreChanges = 0;
 //A shared state watcher (every time the file changes, the shared state is updated)
 export function watchSharedState() {
     const chokidar = require('chokidar');
-    return new Promise(async function (resolve, reject) {
+    return new Promise(async function (resolve) {
         //Do the login now, so it does not have to be done later
         prepSharedStateProps();
         await CCOM.cLogin();
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
-            if (event == 'change') {
+            if (event === 'change') {
                 if(ignoreChanges <= 0) {
                     let pS = '/';
-                    if (process.platform == 'win32') {
+                    if (process.platform === 'win32') {
                         pS = '\\';
                     }
                     if (path.includes(pS + 'CONTENT' + pS)) {
@@ -454,13 +454,13 @@ export function watchSharedState() {
             if (key.ctrl && key.name === 'c') {
                 process.exit();
             }
-            if (key.name == 'r') {
+            if (key.name === 'r') {
                 // Reload Shared State
                 log(INFO, 'Reloading Shared State from Cloud...');
                 // Two files per update..
                 ignoreChanges = (await exportSharedState(true)) * 2;
             }
-            if (key.name == 'escape' || key.name === 'q') {
+            if (key.name === 'escape' || key.name === 'q') {
                 // console.log('ESCAPE...');
                 resolve();
                 watcher.close().then(() => {
@@ -471,4 +471,4 @@ export function watchSharedState() {
         });
         console.log('Press Escape key or the \'q\'-key to stop listening for file changes, or the \'r\'-key to reload from cloud...');
     });
-};
+}

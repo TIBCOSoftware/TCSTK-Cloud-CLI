@@ -3,9 +3,10 @@ const CCOM = require('./cloud-communications');
 const VAL = require('./validation');
 
 let globalProductionSandbox = null;
+
 export async function getProductionSandbox() {
     if (!globalProductionSandbox) {
-        const claims =  await CCOM.callTCA(CCOM.clURI.claims);
+        const claims = await CCOM.callTCA(CCOM.clURI.claims);
         for (let sb of claims.sandboxes) {
             if (sb.type === 'Production') {
                 globalProductionSandbox = sb.id;
@@ -18,6 +19,7 @@ export async function getProductionSandbox() {
 
 // Shared state folder (picked up from configuration if exists)
 let CASE_FOLDER = './Cases/';
+
 function checkCaseFolder() {
     if (getProp('Case_Folder') != null) {
         CASE_FOLDER = getProp('Case_Folder');
@@ -28,7 +30,7 @@ function checkCaseFolder() {
 
 // Get a LiveApps Case by Reference
 export async function getLaCaseByReference(caseRef) {
-    const caseData =  await CCOM.callTCA(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), false, {handleErrorOutside: true});
+    const caseData = await CCOM.callTCA(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), false, {handleErrorOutside: true});
     if (!caseData) {
         log(ERROR, 'Error Retrieving Case Data for ref: ', caseRef);
     }
@@ -38,7 +40,7 @@ export async function getLaCaseByReference(caseRef) {
 // Function to show LiveApps cases
 export async function showLiveApps(doShowTable, doCountCases) {
     //TODO: Call can be optimized by only requesting the basics
-    const caseTypes =  await CCOM.callTCA(CCOM.clURI.types + '?$sandbox=' + await getProductionSandbox() + '&$top=1000');
+    const caseTypes = await CCOM.callTCA(CCOM.clURI.types + '?$sandbox=' + await getProductionSandbox() + '&$top=1000');
     log(DEBUG, 'Case Types: ', caseTypes)
     // TODO: (maybe) get case owner
     const cases = {};
@@ -52,7 +54,7 @@ export async function showLiveApps(doShowTable, doCountCases) {
         caseTemp['IS CASE'] = caseTypes[curCase].isCase;
         if (doCountCases) {
             logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
-            caseTemp['NUMBER OF CASES'] =  await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true');
+            caseTemp['NUMBER OF CASES'] = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true');
         }
         cases[appN] = caseTemp;
     }
@@ -62,21 +64,22 @@ export async function showLiveApps(doShowTable, doCountCases) {
 }
 
 const storeOptions = {spaces: 2, EOL: '\r\n'};
+
 export async function exportLiveAppsCaseType() {
     checkCaseFolder();
     const cTypes = showLiveApps(true, false);
-    let cTypeArray = new Array();
+    let cTypeArray = [];
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
     let fName = await askQuestion('What file name would you like to export to ? (press enter for default)');
     for (const curCase in cTypes) {
-        if (typeForExport == cTypes[curCase].name) {
+        if (typeForExport === cTypes[curCase].name) {
 
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
-            if (fName == '') {
+            if (fName === '') {
                 fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion + '.type.json';
             }
             require('jsonfile').writeFileSync(fileName, cTypes[curCase], storeOptions);
@@ -86,27 +89,28 @@ export async function exportLiveAppsCaseType() {
 }
 
 const exportCaseStepSize = 30;
+
 // Function to export case data
 export async function exportLiveAppsData() {
     checkCaseFolder();
     const cTypes = showLiveApps(true, true);
-    let cTypeArray = new Array();
+    let cTypeArray = [];
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
     let fName = await askQuestion('What Folder like to export to ? (press enter for default, date get\'s added...)');
     // let oneFileStore = await askMultipleChoiceQuestion('Do you also want to store all contents in one file ? (this is used for import)', ['YES', 'NO']);
-    let allCases = new Array();
+    let allCases = [];
     for (let curCase in cTypeArray) {
-        if (cTypeArray[curCase] == typeForExport) {
+        if (cTypeArray[curCase] === typeForExport) {
             // count cases
-            const numberOfCasesForExport =  await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
+            const numberOfCasesForExport = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
             log(INFO, 'Number of cases for export: ' + numberOfCasesForExport);
             const typeIdString = ' and typeId eq 1';
             // get cases in batch sizes
             for (let i = 0; i <= numberOfCasesForExport; i = i + exportCaseStepSize) {
-                let exportBatch =  await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
+                let exportBatch = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
                 // console.log('Export Batch', exportBatch);
                 logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
                 allCases = allCases.concat(exportBatch);
@@ -114,7 +118,7 @@ export async function exportLiveAppsData() {
             log(INFO, 'Number of Exported Cases: ' + allCases.length);
             // Write Cases
             let cfName = CASE_FOLDER + fName;
-            if (fName == '') {
+            if (fName === '') {
                 //Add date to the end of this
                 const today = new Date();
                 const dayAddition = '(' + today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '_h' + today.getHours() + 'm' + today.getMinutes() + ')';
@@ -173,14 +177,14 @@ export async function createLAImportFile() {
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
     let impConfFileName = 'import-live-apps-data-configuration.json';
     let nameAnsw = await askQuestion('Please specify a name for the Live Apps Import Config file (\x1b[34mDefault: import-live-apps-data-configuration\x1b[0m) ?');
-    if (nameAnsw != null && nameAnsw != '') {
+    if (nameAnsw != null && nameAnsw !== '') {
         impConfFileName = nameAnsw + '.properties';
     }
     const targetFile = importFolder + impConfFileName;
     let doWrite = true;
     if (doesFileExist(targetFile)) {
         const doOverWrite = await askMultipleChoiceQuestion('The property file: \x1b[34m' + impConfFileName + '\x1b[0m already exists, do you want to Overwrite it ?', ['YES', 'NO']);
-        if (doOverWrite == 'NO') {
+        if (doOverWrite === 'NO') {
             doWrite = false;
             log(INFO, 'OK, I won\'t do anything :-)');
         }
@@ -236,7 +240,7 @@ export async function importLiveAppsData() {
         //console.log(apps);
         let appData = {};
         for (let app of apps) {
-            if (app.name == importAppName) {
+            if (app.name === importAppName) {
                 importAppId = app.applicationId;
                 appData = app;
             }
@@ -246,21 +250,21 @@ export async function importLiveAppsData() {
             const stepConf = impConf[step];
             //console.log(stepConf)
             impConf[step].applicationId = importAppId;
-            if (stepConf.type == 'CREATOR') {
+            if (stepConf.type === 'CREATOR') {
                 // Look in the creators
                 if (appData.creators != null) {
                     for (let creator of appData.creators) {
-                        if (creator.name == stepConf.name) {
+                        if (creator.name === stepConf.name) {
                             impConf[step]['process-id'] = creator.id;
                         }
                     }
                 }
             }
-            if (stepConf.type == 'ACTION') {
+            if (stepConf.type === 'ACTION') {
                 // Look in the creators
                 if (appData.actions != null) {
                     for (let action of appData.actions) {
-                        if (action.name == stepConf.name) {
+                        if (action.name === stepConf.name) {
                             impConf[step]['process-id'] = action.id;
                         }
                     }
@@ -284,11 +288,11 @@ export async function importLiveAppsData() {
         log(INFO, '\x1b[33m -                    STEP: ' + stepN);
         log(INFO, '\x1b[34m -                    NAME: ' + stepConf.name);
         log(INFO, '\x1b[34m -                    TYPE: ' + stepConf.type);
-        if (stepConf.type.toString().toLowerCase() != 'validate') {
+        if (stepConf.type.toString().toLowerCase() !== 'validate') {
             log(INFO, '\x1b[34m -              PROCESS ID: ' + stepConf['process-id']);
         } else {
             log(INFO, '\x1b[34m -       VALIDATION ACTION: ' + stepConf['validation-action']);
-            if (stepConf['validation-action'].toLowerCase() == 'case_in_state') {
+            if (stepConf['validation-action'].toLowerCase() === 'case_in_state') {
                 log(INFO, '\x1b[34m -          EXPECTED STATE: ' + stepConf['expected-state']);
             }
         }
@@ -301,7 +305,7 @@ export async function importLiveAppsData() {
 
     log(INFO, '\x1b[0m');
     const doImport = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO START THE IMPORT ?', ['YES', 'NO']);
-    if (doImport.toLowerCase() == 'yes') {
+    if (doImport.toLowerCase() === 'yes') {
         for (let i = 0; i < numberOfImports; i++) {
             //Loop over all cases
             let caseRef = '';
@@ -312,7 +316,7 @@ export async function importLiveAppsData() {
                 //Option to point to file for importing data
                 let dataForImport = [];
                 let dataToImport;
-                if (stepConf.type.toString().toLowerCase() != 'validate') {
+                if (stepConf.type.toString().toLowerCase() !== 'validate') {
                     log(INFO, '     Process ID: ' + stepConf['process-id']);
                     log(INFO, ' Application ID: ' + stepConf.applicationId);
                     //TODO: put this in seperate function
@@ -323,7 +327,7 @@ export async function importLiveAppsData() {
                     }
                     dataToImport = dataForImport[i];
                 }
-                if (stepConf.type.toString().toLowerCase() == 'creator') {
+                if (stepConf.type.toString().toLowerCase() === 'creator') {
                     log(INFO, 'Creating LiveApps Case (' + i + ')');
                     let postRequest = {
                         id: stepConf['process-id'],
@@ -331,7 +335,7 @@ export async function importLiveAppsData() {
                         applicationId: stepConf.applicationId,
                         data: JSON.stringify(dataToImport)
                     }
-                    const response =  await CCOM.callTCA(CCOM.clURI.la_process, false, {
+                    const response = await CCOM.callTCA(CCOM.clURI.la_process, false, {
                         method: 'POST',
                         postRequest: postRequest
                     });
@@ -339,20 +343,20 @@ export async function importLiveAppsData() {
                     //Get Case ID
                     caseRef = response.caseReference;
                 }
-                if (stepConf.type.toString().toLowerCase() == 'action') {
+                if (stepConf.type.toString().toLowerCase() === 'action') {
                     if (stepConf.caseref) { // TODO: Duplicate code, move to one function
                         if (Number.isInteger(stepConf.caseref)) {
                             caseRef = stepConf.caseref;
                         } else {
-                            if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
-                                if (caseRef == '') {
+                            if (stepConf.caseref.toString().toLowerCase() === 'from-creator') {
+                                if (caseRef === '') {
                                     log(ERROR, 'Caseref to be configured from creator but no caseref is set...');
                                 }
                             } else {
                                 const _F = require('lodash');
                                 caseRef = _F.get(dataToImport, stepConf.caseref);
                                 log(INFO, 'Using CaseRef: ' + caseRef);
-                                if (stepConf['delete-caseref'].toLowerCase() == 'true') {
+                                if (stepConf['delete-caseref'].toLowerCase() === 'true') {
                                     _F.unset(dataToImport, stepConf.caseref);
                                 }
                             }
@@ -367,20 +371,20 @@ export async function importLiveAppsData() {
                         data: JSON.stringify(dataToImport).replace('@@CASEREF@@', caseRef),
                         caseReference: caseRef
                     }
-                    const response =  await CCOM.callTCA(CCOM.clURI.la_process, true, {
+                    const response = await CCOM.callTCA(CCOM.clURI.la_process, true, {
                         method: 'POST',
                         postRequest: postRequest
                     });
-                // log(INFO, 'Response: ' , response);
+                    // log(INFO, 'Response: ' , response);
                 }
-                if (stepConf.type.toString().toLowerCase() == 'validate') {
-                // TODO: Add this to config: "fail-on-validation-error": true,
+                if (stepConf.type.toString().toLowerCase() === 'validate') {
+                    // TODO: Add this to config: "fail-on-validation-error": true,
                     if (stepConf.caseref) {
                         if (Number.isInteger(stepConf.caseref)) {
                             caseRef = stepConf.caseref;
                         } else {
-                            if (stepConf.caseref.toString().toLowerCase() == 'from-creator') {
-                                if (caseRef == '') {
+                            if (stepConf.caseref.toString().toLowerCase() === 'from-creator') {
+                                if (caseRef === '') {
                                     log(ERROR, 'Caseref to be configured from creator but no caseref is set...');
                                     process.exit(1);
                                 }
@@ -388,7 +392,7 @@ export async function importLiveAppsData() {
                                 const _F = require('lodash');
                                 caseRef = _F.get(dataToImport, stepConf.caseref);
                                 log(INFO, 'Using CaseRef for Validation: ' + caseRef);
-                                if (stepConf['delete-caseref'].toLowerCase() == 'true') {
+                                if (stepConf['delete-caseref'].toLowerCase() === 'true') {
                                     _F.unset(dataToImport, stepConf.caseref);
                                 }
                             }
@@ -400,11 +404,11 @@ export async function importLiveAppsData() {
                     if (stepConf['validation-action']) {
                         const vAction = stepConf['validation-action'].toLowerCase().trim();
                         let actFound = false;
-                        if (vAction == 'case_exist' || vAction == 'case_not_exist') {
+                        if (vAction === 'case_exist' || vAction === 'case_not_exist') {
                             await VAL.validateLACase(caseRef.toString(), vAction);
                             actFound = true;
                         }
-                        if (vAction == 'case_in_state') {
+                        if (vAction === 'case_in_state') {
                             if (stepConf['expected-state'] != null) {
                                 await VAL.validateLACaseState(caseRef.toString(), stepConf['expected-state']);
                             } else {
