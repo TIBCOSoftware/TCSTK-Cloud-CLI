@@ -65,11 +65,15 @@ displayGlobalConnectionConfig = function () {
 }
 
 isGlobalOauthDefined = function() {
-    const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
-    if(indexObj(propsG, 'CloudLogin.OAUTH_Token') === undefined ){
-       return false;
+    if(doesFileExist(GLOBALPropertyFileName)){
+        const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
+        if(indexObj(propsG, 'CloudLogin.OAUTH_Token') === undefined ){
+            return false;
+        } else {
+            return Object.keys(parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), false)).length !== 0;
+        }
     } else {
-        return Object.keys(parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), false)).length !== 0;
+        return false;
     }
 }
 
@@ -162,7 +166,7 @@ getProp = function (propName, forceRefresh, forceGlobalRefresh) {
             propsGl = propLoad.path();
         }
     }
-    let re;
+    let re = null;
     if (propsGl != null) {
         try {
             re = indexObj(propsGl, propName);
@@ -964,7 +968,7 @@ getPEXConfig = function () {
 
 isOauthUsed = function () {
     let re = false;
-    if (getProp('CloudLogin.OAUTH_Token') !== undefined) {
+    if (getProp('CloudLogin.OAUTH_Token')) {
         if (getProp('CloudLogin.OAUTH_Token').trim() !== '') {
             re = true
         }
