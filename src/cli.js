@@ -120,17 +120,13 @@ export async function cli(args) {
 
     // Show help
     if (options.help || options.task === 'help') {
+        const HELP = require('./build/help');
         if(options.task !== '' && options.task !== 'help'){
-            const hFile = 'docs/tasks/'+options.task+'.md';
-            if(doesFileExist(global.PROJECT_ROOT + hFile)){
-                displayMDFile(hFile);
-            } else {
-                log(ERROR, 'No Help file found for: ' + options.task);
-                process.exit(1);
-            }
+            await HELP.showHelpOnTask(options.task)
         } else {
-            helptcli();
-            console.log('To get specific help on a task type: tcli -h <TASKNAME> or tcli --help <TASKNAME>');
+            // helptcli();
+            await HELP.showInlineHelp();
+            // console.log('To get specific help on a task type: tcli -h <TASKNAME> or tcli --help <TASKNAME>');
         }
         process.exit(0);
         //options.task = 'help-tcli';
@@ -318,6 +314,7 @@ export async function cli(args) {
     }
 }
 
+/*
 // Display commandline usage
 function helptcli() {
     // TODO: Display the version from generic config
@@ -358,4 +355,4 @@ function helptcli() {
         // gtasks.push(cliTask + ' (' + cTsks[cliTask].description + ')');
     }
     console.log(colors.yellow ('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
-}
+} */

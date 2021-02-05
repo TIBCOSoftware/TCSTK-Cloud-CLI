@@ -604,7 +604,7 @@
       "description": "Display's help message",
       "enabled": true,
       "internal": false,
-      "task": "helptcli",
+      "task": "helptcliWrapper",
       "taskName": "help-tcli",
       "availableOnOs": ["all"]
     },

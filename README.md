@@ -50,14 +50,17 @@ These are the available TIBCO Cloud™ CLI Tasks:
 | TASK | Description |
 |------|:------------|
 |                    show-cloud  | Show Cloud Details |
- |                     show-apps |  Show Applications of LiveApps WebApps |
- |        show-application-links |  Show Links to Applications of LiveApps WebApps |
+ |                     show-cloud-starters |  Show Applications of LiveApps WebApps |
+ |        show-cloud-starter-links |  Show Links to Applications of LiveApps WebApps |
+|show-properties|  Show the properties in your properties file (and possibly the global values)|
  |                 change-region |  Change the Region in the tibco-cloud properties file |
- |                     obfuscate |  Obfuscate a password and put it in the tibco-cloud properties file |
- |                         start |  Start your local cloud starter project |
- |                         build |  Build your local cloud starter project |
- |                        deploy |  Deploy your local cloud starter project |
- |                  build-deploy |  Builds and Deploys your local project to the cloud |
+ |                     obfuscate-password |  Obfuscate a password and put it in the tibco-cloud properties file |
+ |                         start-cloud-starter |  Start your local cloud starter project |
+ |                         build-cloud-starter |  Build your local cloud starter project |
+|test-cloud-starter|  Run Test cases for your cloud starter|
+|test-cloud-starter-headless|  Run Test cases for your cloud starter, headless (without opening the browser)|
+ |                        deploy-cloud-starter |  Deploy your local cloud starter project |
+ |                   build-deploy-cloud-starter |  Builds and Deploys your local project to the cloud |
  |           delete-cloud-starter|  Delete a cloud starter from the cloud |
  |            inject-lib-sources |  Enables your project for Cloud Library Debugging |
  |              undo-lib-sources |  Undo enabling your project for Cloud Library Debugging |
@@ -66,6 +69,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |           update-global-config|  Update the global cloud connection configuration |
  |              show-shared-state|  Show the shared state contents |
  |      show-shared-state-details|  Shows the details of one Shared State entry |
+|create-shared-state-entry|  Create a new shared state entry|
  |       clear-shared-state-entry|  Removes one Shared State entry |
  |      clear-shared-state-filter|  Removes all shared state entries in the configured filter |
  |            export-shared-state|  Downloads all shared state entries from the configured filter to the local file system |
@@ -95,6 +99,10 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |add-user-to-group|  Adds a user to a LiveApps group. |
  |validate|  Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.|
  |add-or-update-property|  Adds or Updates a property in a file.|
+|messaging-show-summary|  Show summary of cloud messaging|
+|messaging-show-clients|  Show clients of cloud messaging|
+|browse-spotfire-library|  List Spotfire Analytical Reports and browse through folders on the Spotfire Library|
+
  |                    update-tcli|  Update the Cloud CLI |
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
@@ -111,5 +119,5 @@ This file is subject to the license terms contained
 in the license file that is distributed with this file.
 
 Please see tpc.txt for details of license and dependent third party components referenced by this library, or it can be found here:
-                                                                                                                                                                        
-https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/master/license.txt
+
+https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/master/tpc.txt

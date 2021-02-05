@@ -12,8 +12,7 @@ let isOAUTHValid;
 let toldClientID = false;
 let isOrgChecked = false;
 
-
-function doRequest(url, options, data) {
+export function doRequest(url, options, data) {
     const https = require('https');
     return new Promise((resolve, reject) => {
         const req = https.request(url, options, (res) => {
@@ -28,18 +27,11 @@ function doRequest(url, options, data) {
                 responseTXT += chunk;
             });
             res.on('end', () => {
-                // console.log('GOT: ' ,  response)
                 try {
                     response.body = JSON.parse(responseTXT);
                 } catch (e) {
                     response.body = responseTXT;
                 }
-                /*
-                if(response.statusCode === 200 && responseTXT !== ''){
-                    response.body = JSON.parse(responseTXT);
-                } else {
-                    response.body = responseTXT;
-                }*/
                 resolve(response);
             });
         });
@@ -227,7 +219,7 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '- URL(' + cMethod + '): ' + url);
         log(DEBUG, '-  METHOD: ' + cMethod);
-        log(DEBUG, '- CONTENT: ' + cType);
+        log(INFO, '- CONTENT: ' + cType);
         log(DEBUG, '-  HEADER: ', header);
     }
     if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'delete')) {

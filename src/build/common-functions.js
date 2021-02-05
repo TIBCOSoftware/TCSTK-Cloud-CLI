@@ -1002,15 +1002,6 @@ npmInstall = function (location, packageToUse) {
     });
 }
 
-// Function to display an MD File in the Console
-displayMDFile = function (mdFile) {
-    const fs = require('fs');
-    const mdFileContent = fs.readFileSync(global.PROJECT_ROOT + mdFile, 'utf8');
-    const ECHOMD = require('./../echomd/echomd').echomd;
-    console.log(ECHOMD(mdFileContent));
-    console.log(colors.yellow ('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
-}
-
 //Common log function
 global.INFO = 'INFO';
 global.WARNING = 'WARNING';
