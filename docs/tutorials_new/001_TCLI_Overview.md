@@ -1,5 +1,7 @@
 # TCLI: Overview
 
+![](001_Toolkit.png | width=100)
+
 <img src="001_Toolkit.png" alt="drawing" style="margin: 40px auto; display: block;width: 60%;"/>
 
 ---
