@@ -346,7 +346,7 @@ export async function getAppLinks(showTable) {
                     }
                 }
                 if (appD.name.includes("index.html")) {
-                    const tempLink = 'https://' + CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name;
+                    const tempLink = 'https://' + getCurrentRegion() + CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name;
                     appTemp['LINK'] = tempLink;
                     nvs = createTableValue('LINK', tempLink, nvs);
                 }

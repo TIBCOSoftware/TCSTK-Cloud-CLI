@@ -92,7 +92,7 @@ tcli
 
 > To get started just choose to create a new property file. The tcli will ask you for your Client ID and login details to the TIBCO Cloud to create an OAUTH Token. Get your client ID from https://cloud.tibco.com/ -> Settings -> Advanced Settings -> Display Client ID. If you have a global configuration already setup the tcli will use that configuration for the connection details. Read more about Global Configuration here: [Global Configuration](./002_Global_Configuration.md)
 
-> Note: you can also run to use or create a tibco cloud property file with a different name:
+> ***Note:*** You can also run to use or create a tibco cloud property file with a different name:
 
 ```console
 tcli -p <PROPERTY-FILE-NAME>
