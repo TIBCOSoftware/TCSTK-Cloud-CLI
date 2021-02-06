@@ -1,6 +1,8 @@
 # TCLI: Overview
 
+<p align="center">
 <img src="001_Toolkit.png" alt="drawing" width="50%" style="margin: 40px auto; display: block;"/>
+</p>
 
 ---
 ## Description
