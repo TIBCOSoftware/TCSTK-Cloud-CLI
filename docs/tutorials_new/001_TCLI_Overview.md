@@ -1,5 +1,7 @@
 # TCLI: Overview
 
+<img src="001_Toolkit.png" alt="drawing" width="1000" style="margin: 40px auto; display: block;width: 50%;"/>
+
 ---
 ## Description
 > The **TIBCO Command Line Interface (TCLI)** is a tool that can be run from the command line to **manage** your **Cloud Starters** and interact with the **TIBCO Cloud**. The tool can be used on Windows, Linux or a MAC. By entering commands on a terminal you work **interactively** (Questions & Answers) or **directly** by providing the answers inline or from a (property) file. It serves the following use cases: 
@@ -59,7 +61,7 @@ tcli
 
 ![](001_New_Folder.png)
 
-> To get started just choose to create a new property file. The tcli will ask you for your Client ID and login details to the TIBCO Cloud to create an OAUTH Token. Get your client ID from https://cloud.tibco.com/ -> Settings -> Advanced Settings -> Display Client ID. If you have a global configuration already setup the tcli will use that configuration for the connection details. Read more about Global Configuration here: [Global Configuration](#global-configuration)
+> To get started just choose to create a new property file. The tcli will ask you for your Client ID and login details to the TIBCO Cloud to create an OAUTH Token. Get your client ID from https://cloud.tibco.com/ -> Settings -> Advanced Settings -> Display Client ID. If you have a global configuration already setup the tcli will use that configuration for the connection details. Read more about Global Configuration here: [Global Configuration](./002_Global_Configuration.md)
 
 > Note: you can also run to use or create a tibco cloud property file with a different name:
 ```console
@@ -101,17 +103,5 @@ tcli sl
 ```console
 tcli -h show-cloud-starter-links
 ```
+> Now you are ready to [setup your own Cloud Starter](./003_Get_Started_With_Cloud_Starters.md)
 
----
-## Global Configuration
-> When you run the tcli in a folder without the tibco-cloud property file you have an option to manage the global configuration:
-
-![](001_Manage_Global.png)
-
-> Note you can also manage this global configuration from a folder that has a tibco-cloud property file, with the following two tasks:
-
-```console
-tcli view-global-config
-tcli update-global-config
-```
-> Or you can get to these tasks in the interactive menu.
