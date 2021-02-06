@@ -25,7 +25,7 @@ Which Template would you like to use for your cloud starter ?
 
 > For example: 
 
-<img src="003_Use_Template.png" alt="drawing" style="margin: 40px auto; display: block;width: 700px;"/>
+<img src="003_Use_Template.png" alt="drawing" style="margin: 40px auto; display: block;width: 50%;"/>
 
 > The tcli will fetch the Cloud Starter based on the template that you choose (from Git). The tcli will create the following folder structure:
 
