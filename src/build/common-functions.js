@@ -472,7 +472,7 @@ updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh, d
         useCID = defaultClientID;
         cidQuestion += ' (Press enter to use: ' + useCID + ')';
     }
-    log('INFO', 'Get yout client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
+    log('INFO', 'Get your client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
     let cid = await askQuestion(cidQuestion);
     if(useCID !== '' && cid === ''){
         cid = useCID;

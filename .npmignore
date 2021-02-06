@@ -29,6 +29,8 @@
 
 # documentation tutorials (with pictures)
 /docs/tutorials/**
+/docs/tutorials_new/**
+/docs/tutorials_old/**
 
 # White source stuff
 .whitesource
