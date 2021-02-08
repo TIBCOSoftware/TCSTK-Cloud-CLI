@@ -139,9 +139,15 @@ Make sure that the ***Multiple_Interaction_Property_File_Folder*** property is s
 
 > The ***Multiple_Interaction_Property_Files*** property decides which environments you can interact with. Make sure this points to all the files you want to use from the ./Env/ folder. You don't need to use the .properties extension.
 
-> The ***Multiple_Interaction_CLITask*** contains the ***initial*** task that will be shown. If you leave it blank the interactive tcli menu will come up for an organization.
+> The ***Multiple_Interaction_CLITask*** contains the ***initial*** task that will be shown. If you leave it blank the interactive tcli menu will come up for an organization. Change this for example to ***show-cloud***.
 
-Now we can start the interactive menu by running:
+> Now we can start the interactive menu.
+
+<p align="center">
+    <img src="004_TCLI_I.png" width="1000" />
+</p>
+
+> You can do this by running:
 
 ```console
 tcli --multipleInteraction
@@ -167,7 +173,44 @@ Or simply:
 tcli -i -f MyCUTSOM-multiple-cloud-starters.properties
 ```
 
+This will bring you in an interactive menu that shows your Organizations:
 
+<p align="center">
+    <img src="004_MI_ClientID.png" width="800" />
+</p>
 
- 
+> ***Note:*** In order to check if our configurations are all correct you can run the ***show-cloud*** on all the environments. This should print out the connection details of all the environments (***Check if all the environment names are correct!***).
 
+Since we have setup the OAUTH Token Name in the various Organizational property files we can now generate OAUTH for all the environments, by changing the interactive cli task:
+
+<p align="center">
+    <img src="004_Change_Task.png" width="600" />
+</p>
+
+And change the task to ***generate-oauth-token***:
+
+<p align="center">
+    <img src="004_Generate_Oauth.png" width="700" />
+</p>
+
+When you run this task on all environments:
+
+<p align="center">
+    <img src="004_Run_GO.png" width="700" />
+</p>
+
+And answer YES to update the property files, you will see the authentication mechanism changing and more information being displayed:
+
+<p align="center">
+    <img src="004_Oauth_Orgs.png" width="700" />
+</p>
+
+---
+## Run tasks on Multiple Organizations
+Now you are ready to run any task on any environment and run specific tasks on many environments. For example showing Live Apps and the number of cases. By applying ***show-live-apps-cases***:
+
+<p align="center">
+    <img src="004_Show_LA_Cases.png" width="700" />
+</p>
+
+> You can automate this as well in Jobs, which are managed in the remaining part of the multiple cloud starter file. We will discuss this in [Setting up Build Pipelines](./005_Setting_Up_A_Buildpipeline.md)
