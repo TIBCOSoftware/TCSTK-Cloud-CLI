@@ -1,7 +1,7 @@
 # TCLI: Setting up a Build Pipeline
 
 <p align="center">
-    <img src="004_Multiple_Overview.png" width="1000" />
+    <img src="005_Multiple_Overview.png" width="1000" />
 </p>
 
 ---
