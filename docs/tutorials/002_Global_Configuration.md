@@ -13,6 +13,7 @@
 tcli view-global-config
 tcli update-global-config
 ```
+
 > Or you can get to these tasks in the interactive menu.
 
 > The global configuration is a property file that lives within the global NPM folder and can contain values that can apply to various cloud property files on your drive. When a property in a file is specified as ***USE-GLOBAL*** the global file is used:

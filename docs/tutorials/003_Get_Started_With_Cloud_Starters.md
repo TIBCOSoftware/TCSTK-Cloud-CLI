@@ -7,10 +7,13 @@
 ---
 ## Set up your own Cloud Starter
 > When you run the tcli in a folder without the tibco-cloud property file:
+
 ```console
 tcli 
 ```
+
 > or
+
 ```console
 tcli new
 ```
@@ -53,6 +56,7 @@ tcli new <name> [--template(-t)] <template-to-use>
 </p>
 
 > ***Note:*** If you ***exit*** the interactive menu now you will be ***back in the main folder*** from where you created the cloud starter, and ***not*** in the cloud starter folder. So if you type tcli again you would get the menu again that asks you to create a cloud starter. To go back to your cloud starter run:
+
  ```console
 cd <Cloud Starter FOLDER>
 ```
@@ -76,11 +80,15 @@ tcli new <name> [--template(-t)] <template-to-use> --surpressStart(-s)
 ```console
 tcli start-cloud-starter
 ```
+
 > or
+
 ```console
 tcli start
 ```
+
 > or simply:
+
 ```console
 tcli s
 ```
@@ -92,7 +100,9 @@ tcli s
 ```console
 tcli validate-and-rotate-oauth-token
 ```
+
 > or simply:
+
 ```console
 tcli vo
 ```
@@ -102,7 +112,6 @@ tcli vo
 <p align="center">
     <img src="003_CS_Local.png" width="800px" />
 </p>
-
 
 ---
 ## Make a change to the Cloud Starter
@@ -179,11 +188,15 @@ tcli schematic-add
 ```console
 tcli build-cloud-starter
 ```
+
 > or
+
 ```console
 tcli build
 ```
+
 > or simply:
+
 ```console
 tcli b
 ```
@@ -203,11 +216,15 @@ tcli b
 ```console
 tcli deploy-cloud-starter
 ```
+
 > or
+
 ```console
 tcli deploy
 ```
+
 > or simply:
+
 ```console
 tcli d
 ```
@@ -218,17 +235,20 @@ tcli d
     <img src="003_Deploy.png" width="1000px" />
 </p>
 
-
 > You can also run the build and deploy step at once, as follows:
 
 ```console
 tcli build-deploy-cloud-starter
 ```
+
 > or
+
 ```console
 tcli build-deploy
 ```
+
 > or simply:
+
 ```console
 tcli bd
 ```
@@ -239,11 +259,15 @@ tcli bd
 ```console
 tcli show-cloud-starters
 ```
+
 > or simply:
+
 ```console
 tcli scs
 ```
+
 > For example:
+
 <p align="center">
     <img src="003_Show_CloudStareters.png" width="1200px" />
 </p>
@@ -253,10 +277,13 @@ tcli scs
 ```console
 tcli show-cloud-starter-links
 ```
+
 > or simply:
+
 ```console
 tcli sl
 ```
+
 > For example:
 
 <p align="center">
@@ -267,9 +294,11 @@ tcli sl
 ## Build and Deploy Interactively
 
 > In your cloud starter folder run:
+
 ```console
 tcli
 ```
+
 > And choose build-deploy, which will deploy your cloud starters. 
 
 <p align="center">

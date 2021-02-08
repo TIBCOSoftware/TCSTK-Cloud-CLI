@@ -179,7 +179,6 @@ multipleInteraction = async function () {
 
     //Start a loop till the user end's it (interactive), do reload prop files every time
     while (true) {
-        console.log(miTask);
         let miPropFolder = getMProp('Multiple_Interaction_Property_File_Folder');
         let miPropFiles = getMProp('Multiple_Interaction_Property_Files');
         if (!taskOverRide) {
