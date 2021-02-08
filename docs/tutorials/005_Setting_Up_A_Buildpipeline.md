@@ -18,7 +18,7 @@ The initial multiple property file looks like this for example:
 
 To understand this configuration let's look at the following (simple) example:
 
-```.javascript
+```properties
 # JOB DEFINITIONS  (WHAT TO DO ?)
 Cloud_Starter_JOBS=Say_Hello_Job
 # Location: Where to run the Job (locally)
