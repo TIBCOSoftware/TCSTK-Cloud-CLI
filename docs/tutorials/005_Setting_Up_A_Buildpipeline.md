@@ -18,7 +18,7 @@ The initial multiple property file looks like this for example:
 
 To understand this configuration let's look at the following (simple) example:
 
-```.properties
+```.javascript
 # JOB DEFINITIONS  (WHAT TO DO ?)
 Cloud_Starter_JOBS=Say_Hello_Job
 # Location: Where to run the Job (locally)
@@ -26,7 +26,7 @@ Say_Hello_Job_Location=./
 # Environments: Which environments in the TIBCO Cloud to run the Job on
 # --> Which cloud Property file to Use
 Say_Hello_Job_Environments=US_OOCTO
-Say_Hello_Job_Tasks={"O": "echo Hallo World"}
+Say_Hello_Job_Tasks={"O": "echo Hello World"}
 # ENVIRONMENTS
 US_OOCTO_PropertyFile=./Env/tibco-cloud-MyCloudStarter_US_OOCTO.properties
 ```
@@ -66,7 +66,7 @@ The tasks that are run can be of 3 types:
 
 An OS Task looks like this:
 ```.properties
-Say_Hello_Job_Tasks={"O": "echo Hallo World"}
+Say_Hello_Job_Tasks={"O": "echo Hello World"}
 ```
 
 A TCLI Task looks like this:
