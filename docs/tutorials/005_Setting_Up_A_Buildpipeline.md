@@ -14,11 +14,13 @@ In this section we will look at the rest of this file and how to configure it. B
     <img src="005_Mfile_Jobs.png" width="1000" />
 </p>
 
-These Jobs consist out of tasks and these tasks can be of 3 types:
+The initial multiple property file looks like this for example:
 
-- OS (Operating System Command)
-- TCLI Task
-- Script Task
+<p align="center">
+    <img src="005_MProp_File.png" width="1000" />
+</p>
+
+To understand this configuration let's look at the following (simple) example:
 
 ```.properties
 # JOB DEFINITIONS  (WHAT TO DO ?)
@@ -32,3 +34,10 @@ Say_Hello_Job_Tasks={"O": "echo Hallo World"}
 # ENVIRONMENTS
 US_OOCTO_PropertyFile=./Env/tibco-cloud-MyCloudStarter_US_OOCTO.properties
 ```
+
+
+These Jobs consist out of tasks and these tasks can be of 3 types:
+
+- OS (Operating System Command)
+- TCLI Task
+- Script Task
