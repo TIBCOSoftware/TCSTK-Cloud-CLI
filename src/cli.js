@@ -1,6 +1,7 @@
 'use strict';
 // File to manage the CLI Interaction
 import {createMultiplePropertyFileWrapper, manageGlobalConfig, newStarter} from "./manage-application";
+
 const colors = require('colors');
 
 require('./build/common-functions');
@@ -121,7 +122,7 @@ export async function cli(args) {
     // Show help
     if (options.help || options.task === 'help') {
         const HELP = require('./build/help');
-        if(options.task !== '' && options.task !== 'help'){
+        if (options.task !== '' && options.task !== 'help') {
             await HELP.showHelpOnTask(options.task)
         } else {
             // helptcli();
@@ -181,16 +182,19 @@ export async function cli(args) {
                     case tCProp:
                         // if we use a global config
                         if (getGlobalConfig()) {
-                            log(INFO, 'Using Global Connection Configuration...');
+                            log(DEBUG, 'Using Global Connection Configuration...');
                             // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
-                            if(!isGlobalOauthDefined()) {
+                            if (!isGlobalOauthDefined()) {
                                 const PROPM = require('./build/property-file-management');
                                 PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
                             }
+                            log(INFO, 'Created New TIBCO Cloud Property file ' + colors.green('(Using GLOBAL configuration)') + ': ' + colors.blue(cwdir + '/' + propFileName));
+
                         } else {
-                            log(INFO, 'Using Local Connection Configuration...');
+                            log(DEBUG, 'Using Local Connection Configuration...');
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
+                            log(INFO, 'Created New TIBCO Cloud Property file ' + colors.green('(Using LOCAL configuration)') + ': ' + colors.blue(cwdir + '/' + propFileName));
                             await updateRegion(propFileName);
                             await updateCloudLogin(propFileName, true);
                         }
@@ -203,7 +207,7 @@ export async function cli(args) {
                                 // console.log(jsonp.name);
                                 addOrUpdateProperty(propFileName, 'App_Name', jsonp.name);
                             } else {
-                                log('INFO', 'No Package.json file found...');
+                                log(WARNING, 'No Package.json file found to insert the application name. You can update: App_Name=<YOUR APP NAME>');
                             }
                         } catch (e) {
                             log(ERROR, e);
@@ -270,9 +274,9 @@ export async function cli(args) {
                 }
             }
             for (const cliTask in cTsks) {
-                if(cTsks[cliTask].taskAlternativeNames){
+                if (cTsks[cliTask].taskAlternativeNames) {
                     for (const altName of cTsks[cliTask].taskAlternativeNames) {
-                        if(altName === options.task) {
+                        if (altName === options.task) {
                             taskExist = true;
                             if (cTsks[cliTask].task) {
                                 directTask = true;

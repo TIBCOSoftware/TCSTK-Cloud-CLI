@@ -123,4 +123,33 @@ https://account.cloud.tibco.com/manage/settings/oAuthTokens
     <img src="004_Multiple_File_Structure.png" width="1400" />
 </p>
 
+> Make sure that the ***Multiple_Interaction_Property_File_Folder*** property is set to the folder where you keep all the organizational property files (for example ./Env/). Notice the slash '/' at the end.
+
+> The ***Multiple_Interaction_Property_Files*** property decides which environments you can interact with. Make sure this points to all the files you want to use from the ./Env/ folder. You don't need to use the .properties extension.
+
+> The ***Multiple_Interaction_CLITask*** contains the ***initial*** task that will be shown. If you leave it blank the interactive tcli menu will come up for an organization.
+
+> Now we can start the interactive menu by running:
+
+ ```console
+tcli --multipleInteraction
+```
+> Or simply:
+ ```console
+tcli -i
+```
+> In the folder where the manage-multiple Cloud Starter property file sits.
+
+> ***Note:*** If you use a different name for the manage-multiple Cloud Starter property file, you can also use:
+ ```console
+tcli -i --multipleFile <multiple-file-name>
+```
+> Or simply:
+ ```console
+tcli -i -f MyCUTSOM-multiple-cloud-starters.properties
+```
+
+
+
+ 
 

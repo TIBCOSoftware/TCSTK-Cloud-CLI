@@ -51,7 +51,7 @@ export async function getOrgFolders(showFolders, countItems) {
 export async function getOrgFolderFiles(folderTable, folder, showFiles) {
     const folderResp =  await CCOM.callTCA(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/');
     const folderContentTable = createTable(folderResp, CCOM.mappings.la_org_folder_content, false);
-    const users = USERGROUPS.showLiveAppsUsers(false, false);
+    const users = await USERGROUPS.showLiveAppsUsers(false, false);
     for (let cont in folderContentTable) {
         for (let usr of iterateTable(users)) {
             if (usr.Id == folderContentTable[cont]['Author']) {
@@ -80,7 +80,7 @@ async function downLoadOrgFolderFile(folder, file) {
 }
 
 export async function showOrgFolders() {
-    const folderT = getOrgFolders(true, true);
+    const folderT = await getOrgFolders(true, true);
     let chFolder = ['NONE'];
     // TODO: Use mapping
     for (let fol of iterateTable(folderT)) {
