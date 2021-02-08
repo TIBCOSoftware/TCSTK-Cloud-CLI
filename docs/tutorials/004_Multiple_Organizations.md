@@ -175,6 +175,30 @@ tcli -i -f MyCUTSOM-multiple-cloud-starters.properties
     <img src="004_MI_ClientID.png" width="800" />
 </p>
 
-> In order to check if our configurations are all correct we can run the ***show-cloud*** on all the environments
- 
+> In order to check if our configurations are all correct you can run the ***show-cloud*** on all the environments. This should print out the connection details of all the environments (***Check if all the environment names are correct!***).
 
+> Since we have setup the OAUTH Token Name in the various Organizational property files we can now generate OAUTH for all the environments, by changing the interactive cli task:
+
+<p align="center">
+    <img src="004_Change_Task.png" width="600" />
+</p>
+
+> And change the task to ***generate-oauth-token***:
+
+<p align="center">
+    <img src="004_Generate_Oauth.png" width="700" />
+</p>
+
+> When you run this task on all environments:
+
+<p align="center">
+    <img src="004_Run_GO.png" width="700" />
+</p>
+
+> And answer YES to update the property files, you will see the authentication mechanism changing and more information being displayed:
+
+<p align="center">
+    <img src="004_Oauth_Orgs.png" width="700" />
+</p>
+
+> Now you are ready to run any task on any environment and run specific tasks on many environments. You can automate this as well in Jobs, which are managed in the remaining part of the multiple cloud starter file. We will discuss this in [Setting up Build Pipelines](./005_Setting_Up_A_Buildpipeline.md)
