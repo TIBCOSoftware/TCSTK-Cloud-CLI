@@ -65,17 +65,17 @@ The tasks that are run can be of 3 types:
 - Script Task
 
 An OS Task looks like this:
-```.properties
+```properties
 Say_Hello_Job_Tasks={"O": "echo Hello World"}
 ```
 
 A TCLI Task looks like this:
-```.properties
+```properties
 Say_Hello_Job_Tasks={"T": "show-cloud"}
 ```
 
 A Script Task looks like this:
-```.properties
+```properties
 Say_Hello_Job_Tasks={"S": "script.js"}
 ```
 
