@@ -1,6 +1,8 @@
 # TCLI: Get started with Cloud Starters
 
-<img src="003_CS_Main_Menu.png" alt="drawing" style="margin: 40px auto; display: block;width: 70%;"/>
+<p align="center">
+    <img src="003_CS_Main_Menu.png" width="1000px" />
+</p>
 
 ---
 ## Set up your own Cloud Starter
@@ -295,3 +297,6 @@ tcli delete-cloud-starter
 <p align="center">
     <img src="003_Delete_App.png" width="1200px" />
 </p>
+
+
+> To manage multiple Cloud Starters simultaneously go to the section [Managing multiple TIBCO Cloud organizations](./004_Multiple_Organizations.md)
