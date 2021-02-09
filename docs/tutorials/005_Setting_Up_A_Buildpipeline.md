@@ -260,11 +260,3 @@ The output is displayed on the console:
 </p>
 
 Depending on your setup you can run these build pipelines on demand, when code is checked in or recurring (on a nightly basis for example). 
-
-
-
-
-
-
-
-

@@ -122,6 +122,9 @@ You can also run a task directly without getting into the interactive menu, by r
 tcli <TASK-NAME>
 ```
 
+> ***Note:*** You can make this direct task completely verbose (non-interactive) by providing answers inline. [Click here for more information about providing answers](./006_Passing_In_Answers.md)
+
+
 > For example:
 
 ```console
