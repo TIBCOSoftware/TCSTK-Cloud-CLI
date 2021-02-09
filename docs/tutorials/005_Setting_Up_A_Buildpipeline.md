@@ -182,6 +182,19 @@ Regardless of what you have specified in the Multiple Cloud Starters property fi
     <img src="005_RunMultiple.png" width="1000" />
 </p>
 
+For example:
+
+```console
+tcli -m -j Say_Hello_Job -e US_OOCTO
+```
+
+Which results in:
+
+<p align="center">
+    <img src="005_Run_Extension.png" width="1000" />
+</p>
+
+> ***Note:*** Also look at the fact manage multiple property file is an extension of a common file in the Table at the top.
 
 ---
 ## Setting up the Build Pipeline
@@ -190,6 +203,68 @@ Now that we understand and have setup our Jobs and Tasks in the Multiple Cloud S
 
 ### Jenkins Classic
 
+Jenkins is a tool to manage automatic builds and deployments to manage your CI/CD Pipelines. For more information see <a href="https://www.jenkins.io/" target="_blank">The Jenkins Webpage</a>
+
+Jenkins has a rich eco system of plugins fomr the Jenkins classic view we use a plugin called <a href="https://plugins.jenkins.io/build-pipeline-plugin/" target="_blank">The Build Pipeline Plugin</a>, which gives us a nice view of our pipeline, For Example:
+
+<p align="center">
+    <img src="005_JenkisBuildPipeline.png" width="1000" />
+</p>
+
+Now in Jenkins every task on the pipeline basically becomes one task in our manage-multiple Cloud Starter property file:
+
+<p align="center">
+    <img src="005_Jenkins_Pipeline_Tasks.png" width="1000" />
+</p>
+
+
 ### Jenkins Pipeline Script
+A more modern way of working with Jenkins is using <a href="https://www.jenkins.io/doc/book/pipeline/syntax/" target="_blank">Jenkins Pipeline Scripts</a>. In this way you have your actual pipeline stored as code (configuration as code), and you can see the history of your pipeline itself, it looks somewhat like this:
+
+<p align="center">
+    <img src="005_Jenkins_Pipeline_Script.png" width="800" />
+</p>
+
+Every step in the script is executed by running the ***tcli cloud starter jobs***:
+
+<p align="center">
+    <img src="005_Jenkins_Script_Pipeline_Connected.png" width="1400" />
+</p>
+
+> ***Note:*** This makes it also very easy to migrate from one build tool to another.
+
+Visually it displays like this:
+
+<p align="center">
+    <img src="005_Jenkins_Script_Visual.png" width="800" />
+</p>
 
 ### Team City
+
+<a href="https://www.jetbrains.com/teamcity/" target="_blank">Team City</a> is very similar to Jenkins and supported by Jetbrains. In Team City you define a Project and then Build Steps:
+
+<p align="center">
+    <img src="005_Team_City.png" width="1200" />
+</p>
+
+Like the Jenkins build pipeline you can connect every build step to a run of the ***tcli cloud starter job***:
+
+<p align="center">
+    <img src="005_Team_City_Connected.png" width="1200" />
+</p>
+
+The output is displayed on the console:
+
+<p align="center">
+    <img src="005_Team_City_Output.png" width="1200" />
+</p>
+
+Depending on your setup you can run these build pipelines on demand, when code is checked in or recurring (on a nightly basis for example). 
+
+
+
+
+
+
+
+
