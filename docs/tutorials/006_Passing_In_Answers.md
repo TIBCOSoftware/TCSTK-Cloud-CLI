@@ -141,6 +141,7 @@ Will result in the following error:
 </p>
 
 > ***Note:*** These are the special values that can be added:
+
 * SandboxID
 * LiveApps_AppID
 * LiveApps_ActionID 
