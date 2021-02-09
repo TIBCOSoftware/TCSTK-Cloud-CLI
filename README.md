@@ -1,7 +1,7 @@
 # TIBCO Cloud™ Starters Toolkit - Command Line Interface 
 <img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>Powered by [TIBCO Labs™](https://community.tibco.com/wiki/tibco-labs)
 
-Command Line Interface for creating TIBCO Cloud™ Starter Projects
+Command Line Interface for creating TIBCO Cloud™ Starter Projects (For more information see the [Full Documentation](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/001_TCLI_Overview/) 
 
 ### TIBCO Cloud™ CLI) Installation:
 ```

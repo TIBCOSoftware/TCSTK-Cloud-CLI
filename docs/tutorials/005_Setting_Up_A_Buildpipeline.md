@@ -124,18 +124,50 @@ So a property encapsulated within ${} is resolved in the multiple cloud starters
 
 Note that we now run 1 Job with 2 tasks on 2 environments, and that we have different values for the property ***APP_NAME*** in the environment/organization files.
 
-This is an important concept to understand when setting up the build pipelines. Now you can understand the ***${Workfolder}*** and ***${CS_Branch}*** property in the initial example. In this way it is also possible to define Tasks and Subtasks in a readable way for example:
+This is an important concept to understand when setting up the build pipelines. Now you can understand the ***${Workfolder}*** and ***${CS_Branch}*** property in the initial example. In this way it is also possible to define Tasks and Subtasks in a readable way.
+
+Lets now look at a Real World example:
 
 ```properties
+# Import LiveApps Cases
 tImportLiveApps=${tClearTmpFolder},${tCopyFilesForImport},${tMassageImportFiles},${tRunLAImportVerbose}
+# First Clear the temporary folders
 tClearTmpFolder={"O": "${os_delete} ./tmpImport && mkdir tmpImport"}
+# Copy the creator and action files
 tCopyFilesForImport=${tCopyCreator},${tCopyAction}
 tCopyCreator={"O": "${os_copy} '@{Case_Folder}/${LA_EXPORT_FOLDER}/CONTENT/All.json' ./tmpImport/createCases.json"}
 tCopyAction={"O": "${os_copy} '@{Case_Folder}/${LA_EXPORT_FOLDER}/CONTENT/All.json' ./tmpImport/actionCases.json"}
+# Run the mapping script
 tMassageImportFiles={"S": "massageData.js"}
+# Run the import and say yes to the question: Are you sure ?
 tRunLAImportVerbose={"T":"import-live-apps-cases -a ${LA_Import_Configuration}:Yes"}
 ```
 
+This is a piece of a pipeline to import data into LiveApps. There are a few things to uncover here. First of all the top task reuses the tasks below and the ***tCopyFilesForImport*** task is even divided into two more subtasks. Replacements for the ***Case_Folder*** property are made from the ***organizational/environmental property files***(by using @{}) and the tasks themselves and a value called ***LA_EXPORT_FOLDER*** is used (by using ${}).  We also see an ***os_copy*** task being replaced, and this is ***an interesting one***. TCLI provides the capability to ***extend the property files by*** setting a value called ***PROPERTY_EXTENSION_FILE*** For example:
+
+```properties
+PROPERTY_EXTENSION_FILE=manage-multiple-cloud-starters-common.properties
+```
+
+This means that the multiple property file can be extended, for example:
+
+<p align="center">
+    <img src="005_Extending_Properties.png" width="1000" />
+</p>
+
+Properties in the extension always overwrite properties from the common file, so in this case windows specific property file contains:
+
+```properties
+# WINDOWS SPECIFICS
+os_delete=rmdir /q/s
+```
+
+And the Linux one contains:
+
+```properties
+# LINUX SPECIFICS
+os_delete=rm -rf
+```
 
 ---
 ## Specifying Jobs from the Commandline
