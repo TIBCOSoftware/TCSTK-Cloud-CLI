@@ -366,8 +366,10 @@ describe("tcli testsuite", function () {
         // await sleep(5000);
         // little hack to gain some time, sleep function doesn't seem to work here...
         expect(run(CLI_EXECUTOR + 'rotate-oauth-token')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'rotate-oauth-token')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'rotate-oauth-token')).toBe(true);
         expect(run(CLI_EXECUTOR + 'messaging-show-clients')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineTcmTest_2')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineTcmTest_4')).toBe(true);
         // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
     });
 
