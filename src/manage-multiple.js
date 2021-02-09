@@ -25,6 +25,9 @@ processMultipleFile = function () {
         csJobs = getMProp('Cloud_Starters');
         if (csJobs != null) {
             log(WARNING, "Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...");
+        } else {
+            log(ERROR, "Please specify the Cloud_Starter_JOBS property in: " + mFile +' (or the common file if used...)');
+            process.exit(1);
         }
     }
     let failOnError = getMProp('Fail_On_Error');

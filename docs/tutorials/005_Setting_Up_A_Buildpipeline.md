@@ -143,7 +143,9 @@ tMassageImportFiles={"S": "massageData.js"}
 tRunLAImportVerbose={"T":"import-live-apps-cases -a ${LA_Import_Configuration}:Yes"}
 ```
 
-This is a piece of a pipeline to import data into LiveApps. There are a few things to uncover here. First of all the top task reuses the tasks below and the ***tCopyFilesForImport*** task is even divided into two more subtasks. Replacements for the ***Case_Folder*** property are made from the ***organizational/environmental property files***(by using @{}) and the tasks themselves and a value called ***LA_EXPORT_FOLDER*** is used (by using ${}).  We also see an ***os_copy*** task being replaced, and this is ***an interesting one***. TCLI provides the capability to ***extend the property files by*** setting a value called ***PROPERTY_EXTENSION_FILE*** For example:
+This is a piece of a pipeline to import data into LiveApps. There are a few things to uncover here. First of all the top task reuses the tasks below and the ***tCopyFilesForImport*** task is even divided into two more subtasks. Replacements for the ***Case_Folder*** property are made from the ***organizational/environmental property files***(by using @{}). The tasks themselves and a values called ***LA_EXPORT_FOLDER*** and ***LA_Import_Configuration*** are replaced from the multiple property file(by using ${}). The ***import-live-apps-cases*** tcli task is provided answers by the -a character. [Click here for more information on Providing Answers](./006_Passing_In_Answers.md).
+
+We also see an ***os_copy*** task being replaced, and this is ***an interesting one***. TCLI provides the capability to ***extend the property files by*** setting a value called ***PROPERTY_EXTENSION_FILE*** For example:
 
 ```properties
 PROPERTY_EXTENSION_FILE=manage-multiple-cloud-starters-common.properties
@@ -169,8 +171,12 @@ And the Linux one contains:
 os_delete=rm -rf
 ```
 
+This is useful for Operating System specifics but can also be used for other purposes, like creating a multiple cloud build pipeline files specifically for Jenkins or Team City or your own Division. Note that this extending only works once.
+
 ---
 ## Specifying Jobs from the Commandline
+
+Regardless of what you have specified in the Multiple Cloud Starters property file, you can always specify one job and one environment name from the commandline:
 
 <p align="center">
     <img src="005_RunMultiple.png" width="1000" />
@@ -179,3 +185,11 @@ os_delete=rm -rf
 
 ---
 ## Setting up the Build Pipeline
+
+Now that we understand and have setup our Jobs and Tasks in the Multiple Cloud Starters property file we can start setting up our build pipeline in a Build Pipeline tool, like for example Jenkins or Team City.
+
+### Jenkins Classic
+
+### Jenkins Pipeline Script
+
+### Team City
