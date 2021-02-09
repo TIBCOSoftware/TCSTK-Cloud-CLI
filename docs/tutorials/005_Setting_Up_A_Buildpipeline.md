@@ -130,8 +130,8 @@ This is an important concept to understand when setting up the build pipelines. 
 tImportLiveApps=${tClearTmpFolder},${tCopyFilesForImport},${tMassageImportFiles},${tRunLAImportVerbose}
 tClearTmpFolder={"O": "${os_delete} ./tmpImport && mkdir tmpImport"}
 tCopyFilesForImport=${tCopyCreator},${tCopyAction}
-tCopyCreator={"O": "${os_copy} '@{Case_Folder}/${LA_EXPORT_FOLDER}/CONTENT/Discoveranalysis-ALL.CONTENT.json' ./tmpImport/createCases-Discoveranalysis.json"}
-tCopyAction={"O": "${os_copy} '@{Case_Folder}/${LA_EXPORT_FOLDER}/CONTENT/Discoveranalysis-ALL.CONTENT.json' ./tmpImport/actionCases-Discoveranalysis.json"}
+tCopyCreator={"O": "${os_copy} '@{Case_Folder}/${LA_EXPORT_FOLDER}/CONTENT/All.json' ./tmpImport/createCases.json"}
+tCopyAction={"O": "${os_copy} '@{Case_Folder}/${LA_EXPORT_FOLDER}/CONTENT/All.json' ./tmpImport/actionCases.json"}
 tMassageImportFiles={"S": "massageData.js"}
 tRunLAImportVerbose={"T":"import-live-apps-cases -a ${LA_Import_Configuration}:Yes"}
 ```
