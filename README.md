@@ -102,7 +102,6 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |messaging-show-summary|  Show summary of cloud messaging|
 |messaging-show-clients|  Show clients of cloud messaging|
 |browse-spotfire-library|  List Spotfire Analytical Reports and browse through folders on the Spotfire Library|
-
  |                    update-tcli|  Update the Cloud CLI |
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
