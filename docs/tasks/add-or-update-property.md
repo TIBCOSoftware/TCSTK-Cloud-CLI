@@ -15,6 +15,8 @@ This can be useful to update property in your tibco-cloud.properties file or any
 * What value would you like to add ? (use SPECIAL to select from a list)
 --> If SPECIAL is used:
 * What type of answer would you like to add to the property ?
+--> If the value exist and is set to USE-GLOBAL
+* Do you want to update the GLOBAL or the LOCAL property file ?
 
 For SPECIAL you can use:
 
