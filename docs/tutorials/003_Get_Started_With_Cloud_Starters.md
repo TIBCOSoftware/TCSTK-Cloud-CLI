@@ -1,6 +1,6 @@
 # TCLI: Get started with Cloud Starters
 
-![TCLI_Show_Links](imgs/003_CS_Main_Menu.png)
+![TCLI_Show_Links](imgs/003_CS_Main_Menu.png#zoom)
 
 ---
 ## Set up your own Cloud Starter
@@ -29,7 +29,7 @@ Which Template would you like to use for your cloud starter ?
 > For example: 
 
 
-![TCLI_Show_Links](imgs/003_Use_Template.png)
+![TCLI_Show_Links](imgs/003_Use_Template.png#zoom)
 
 > ***Note:*** You can also provide the command to create a new cloud starter inline (without interactions):
 
@@ -39,14 +39,14 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 When you choose the template to use the tcli will fetch the Cloud Starter(from Git) based on that template. The tcli will create the following folder structure:
 
-![TCLI_Show_Links](imgs/003_CS_Folder.png)
+![TCLI_Show_Links](imgs/003_CS_Folder.png#zoom)
 
 
 > If you have a global configuration the tibco-cloud property file crated will contain ***USE-GLOBAL*** for your authentication values. [Click here for more information on global configuration](./002_Global_Configuration.md)
 
 > If all was successfully, you will directly get into the interactive tcli menu in your newly created cloud starter folder:
 
-![TCLI_Show_Links](imgs/003_CS_Created.png)
+![TCLI_Show_Links](imgs/003_CS_Created.png#zoom)
 
 > ***Note:*** If you ***exit*** the interactive menu now you will be ***back in the main folder*** from where you created the cloud starter, and ***not*** in the cloud starter folder. So if you type tcli again you would get the menu again that asks you to create a cloud starter. To go back to your cloud starter run:
 
@@ -64,7 +64,7 @@ tcli new <name> [--template(-t)] <template-to-use> --surpressStart(-s)
 ## Start the Cloud Starter locally
 Now we have created our cloud starter we can select start-cloud-starter from the menu:
 
-![TCLI_Show_Links](imgs/003_Start.png)
+![TCLI_Show_Links](imgs/003_Start.png#zoom)
 
 > Or use we cloud provide this command on the commandline:
 
@@ -99,21 +99,21 @@ tcli vo
 
 > We can now open the Cloud Starter locally in the browser:
 
-![TCLI_Show_Links](imgs/003_CS_Local.png)
+![TCLI_Show_Links](imgs/003_CS_Local.png#zoom)
 
 ---
 ## Make a change to the Cloud Starter
 Now you can basically start your development cycle and based on your requirements and template that use use make changes to the Cloud Starter. The nice thing about the Cloud Starter apps is that you can make changes on the fly. For example we are running a Cloud Starter like this:  
 
-![TCLI_Show_Links](imgs/003_CS_Change_Before.png)
+![TCLI_Show_Links](imgs/003_CS_Change_Before.png#zoom)
 
 > When we take the code of the Home component and we add some HTML code in:
 
-![TCLI_Show_Links](imgs/003_CS_Change_Code.png)
+![TCLI_Show_Links](imgs/003_CS_Change_Code.png#zoom)
 
 > We can see the result directly on the Screen:
 
-![TCLI_Show_Links](imgs/003_CS_Change_After.png)
+![TCLI_Show_Links](imgs/003_CS_Change_After.png#zoom)
 
 ---
 ## Apply a Schematic
@@ -121,11 +121,11 @@ Instead of doing all the changes manually we can also use a concept called <a hr
 
 > ***Note:*** Stop your Cloud Starter when applying schematics
 
-![TCLI_Show_Links](imgs/003_Schematics.png)
+![TCLI_Show_Links](imgs/003_Schematics.png#zoom)
 
 > The tcli provides a command to add these schematics in:
 
-![TCLI_Show_Links](imgs/003_Schematic_Add.png)
+![TCLI_Show_Links](imgs/003_Schematic_Add.png#zoom)
 
 > Or you could run:
 
@@ -135,19 +135,19 @@ tcli schematic-add
 
 Based on the template that you are using you get the available schematics shown:
 
-![TCLI_Show_Links](imgs/003_Choose_Schematic.png)
+![TCLI_Show_Links](imgs/003_Choose_Schematic.png#zoom)
 
 Every schematic asks a number of questions, and based on the answers it will generate all the required HTML,CSS and TS code:
 
-![TCLI_Show_Links](imgs/003_Schematic_Questions.png)
+![TCLI_Show_Links](imgs/003_Schematic_Questions.png#zoom)
 
 In this case the schematic created a component called ***MyDashboard***, which we can use on our home component:
 
-![TCLI_Show_Links](imgs/003_Code_Change.png)
+![TCLI_Show_Links](imgs/003_Code_Change.png#zoom)
 
 Now when we start our Cloud Starter we can see that we have added a Spotfire Analytical dashboard in our Cloud Starter, without hardly writing any code:
 
-![TCLI_Show_Links](imgs/003_Schematics_Dashboard.png)
+![TCLI_Show_Links](imgs/003_Schematics_Dashboard.png#zoom)
 
 ---
 ## Build and Deploy the Cloud Starter to the Cloud
@@ -173,7 +173,7 @@ tcli b
 
 When the build command is run the following section in the tibco cloud property file is used:
 
-![TCLI_Show_Links](imgs/003_Build_Properties.png)
+![TCLI_Show_Links](imgs/003_Build_Properties.png#zoom)
 
 Based on these settings your cloud starter gets build. You can leave the default settings, to deploy initially. The builder will include a cloud descriptor file, which can be used on to identify your cloud starter later by the show-cloud-starter-links command and the App Gallery for example.
 
@@ -199,7 +199,7 @@ tcli d
 
 After the deployment you get a link to your Cloud Starter and your Cloud Descriptor:
 
-![TCLI_Show_Links](imgs/003_Deploy.png)
+![TCLI_Show_Links](imgs/003_Deploy.png#zoom)
 
 You can also run the build and deploy step at once, as follows:
 
@@ -234,7 +234,7 @@ tcli scs
 
 > For example:
 
-![TCLI_Show_Links](imgs/003_Show_CloudStareters.png)
+![TCLI_Show_Links](imgs/003_Show_CloudStareters.png#zoom)
 
 To see which cloud starters are deployed and what there links are you can run 
 
@@ -250,7 +250,7 @@ tcli sl
 
 > For example:
 
-![TCLI_Show_Links](imgs/003_Cloud_Starters_Links.png)
+![TCLI_Show_Links](imgs/003_Cloud_Starters_Links.png#zoom)
 
 ## Build and Deploy Interactively
 In your cloud starter folder run:
@@ -261,13 +261,13 @@ tcli
 
 And choose build-deploy, which will deploy your cloud starters. 
 
-![TCLI_Show_Links](imgs/003_Build_Deploy.png)
+![TCLI_Show_Links](imgs/003_Build_Deploy.png#zoom)
 
 > ***Note:*** Remember you can always press up or run the repeat-last-task option to redeploy quickly.
 
 Now we have our Cloud Starter running on the TIBCO Cloud:
 
-![TCLI_Show_Links](imgs/003_Deployed_App.png)
+![TCLI_Show_Links](imgs/003_Deployed_App.png#zoom)
 
 ## Delete a Cloud Starter
 You can delete a cloud starter with the following command:
@@ -278,6 +278,6 @@ tcli delete-cloud-starter
 
 This command will first list all the Cloud Starters and then ask which one you want to delete and aks if you are sure and then delete the app:
 
-![TCLI_Show_Links](imgs/003_Delete_App.png)
+![TCLI_Show_Links](imgs/003_Delete_App.png#zoom)
 
 To manage multiple Cloud Starters simultaneously go to the section [Managing multiple TIBCO Cloud organizations](./004_Multiple_Organizations.md)

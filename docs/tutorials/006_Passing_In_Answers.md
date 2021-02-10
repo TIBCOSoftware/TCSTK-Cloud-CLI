@@ -25,7 +25,7 @@ Which property would you like to validate (Use plus character to validate multip
 
 If we answer ***CloudLogin.Region***, we will get the following result:
 
-![TCLI_Show_Links](imgs/006_Validate.png)
+![TCLI_Show_Links](imgs/006_Validate.png#zoom)
 
 > ***Note:*** There are a whole bunch of things you can validate:
 
@@ -61,7 +61,7 @@ tcli validate -a Property_exist:CloudLogin.Region
 
 Resulting in:
 
-![TCLI_Show_Links](imgs/006_Provide_Answers.png)
+![TCLI_Show_Links](imgs/006_Provide_Answers.png#zoom)
 
 Or another example:
 
@@ -71,7 +71,7 @@ tcli validate -a Property_exist:CloudLogin.Region+AnotherProperty
 
 Resulting in:
 
-![TCLI_Show_Links](imgs/006_Answers_Validation_Failed.png)
+![TCLI_Show_Links](imgs/006_Answers_Validation_Failed.png#zoom)
 
 ---
 ## Updating properties with answers
@@ -102,11 +102,11 @@ tcli add-or-update-property -a DEFAULT:SaveMe:'I want to be saved':'I am safe...
 
 This runs like this:
 
-![TCLI_Show_Links](imgs/006_Save_Me.png#zoom)
+![TCLI_Show_Links](imgs/006_Save_Me.png#zoom#zoom)
 
 And results in this being added to the tibco-cloud properties file:
 
-![TCLI_Show_Links](imgs/006_Saved.png#center)
+![TCLI_Show_Links](imgs/006_Saved.png#center#zoom)
 
 ---
 ## Too little answers is wrong but too many is ok
@@ -127,7 +127,7 @@ tcli add-or-update-property -a DEFAULT:SaveMe:none:SPECIAL
 
 Will result in the following error:
 
-![TCLI_Show_Links](imgs/006_Too_little_Answers.png)
+![TCLI_Show_Links](imgs/006_Too_little_Answers.png#zoom)
 
 > ***Note:*** These are the special values that can be added:
 
@@ -141,6 +141,6 @@ And should be, for example:
 tcli add-or-update-property -a DEFAULT,SaveMe,none,SPECIAL,SandboxID
 ```
 
-![TCLI_Show_Links](imgs/006_Right_Answer.png)
+![TCLI_Show_Links](imgs/006_Right_Answer.png#zoom)
 
 > ***Note:*** You can use comma(,) separated values or semi colon separated values. It does not really matter, only in the multiple cloud property files you ***need to use semi colon separated values*** (otherwise the task interpretation gets confused). 

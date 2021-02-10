@@ -19,12 +19,12 @@ The global configuration is a property file that lives within the global NPM fol
 
 After you have setup the TIBCO Cloud Connection details in the global file, when you create a new TIBCO Cloud Property file it will initiate with ***USE-GLOBAL*** for the connection details:
 
-![TCLI_Show_Links](imgs/001_Global_Set.png)
+![TCLI_Show_Links](imgs/001_Global_Set.png#zoom)
 
 
 This is very useful when you are managing multiple Cloud Starters and you want to share the connection details:
 
-![TCLI_Show_Links](imgs/001_CS_Global.png)
+![TCLI_Show_Links](imgs/001_CS_Global.png#zoom)
 
 It is also better to use the global configuration from a ***security perspective***, in this way when you accidentally check in the tibco-cloud property file into a source control system (like GitHub) it does not contain any secrets. Although in the cloud starer templates this file is in the .gigignore file.
 

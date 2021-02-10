@@ -1,6 +1,6 @@
 # TCLI: Managing multiple TIBCO Cloud Organizations
 
-![TCLI_Show_Links](imgs/004_Multiple_Overview.png)
+![TCLI_Show_Links](imgs/004_Multiple_Overview.png#zoom)
 
 ---
 ## Manage multiple Cloud Starters
@@ -19,7 +19,7 @@ tcli create-multiple-property-file
 
 This will ask you for the property name, but you can choose to use the default name, to get:
 
-![TCLI_Show_Links](imgs/004_Multiple_File.png)
+![TCLI_Show_Links](imgs/004_Multiple_File.png#zoom)
 
 > We will talk about the structure of this manage-multiple Cloud Starter property file in the section [Structure of the Multiple Property file ](#structure-of-the-multiple-property-file) down below.
 
@@ -32,11 +32,11 @@ cd Env
 
 Now we will run tcli in the Env folder to get a tibco-cloud property file there:
 
-![TCLI_Show_Links](imgs/004_Env_Folder.png)
+![TCLI_Show_Links](imgs/004_Env_Folder.png#zoom)
 
 It is recommended that you use a ***global configuration*** for the authentication details (and ***USE-GLOBAL*** is set) so that we get a file that looks like this: 
 
-![TCLI_Show_Links](imgs/004_Env_Global.png)
+![TCLI_Show_Links](imgs/004_Env_Global.png#zoom)
 
 For more information on [Global Configuration click here.](./002_Global_Configuration.md)
 
@@ -47,7 +47,7 @@ In the next step we will create a tibco-cloud property file for every organizati
 
 You can disable a property by using a '#' character in front of it as follows:
 
-![TCLI_Show_Links](imgs/004_File_Changes.png)
+![TCLI_Show_Links](imgs/004_File_Changes.png#zoom)
 
 And replace ***USE-GLOBAL*** of ***CloudLogin.OAUTH_Generate_Token_Name*** by a specific value. For example use ***MyCloudStarter_Cli_Token_1*** 
 
@@ -55,7 +55,7 @@ And replace ***USE-GLOBAL*** of ***CloudLogin.OAUTH_Generate_Token_Name*** by a 
 
 Now we can create the Organization specific cloud property files:
 
-![TCLI_Show_Links](imgs/004_Generate_Env_Files.png)
+![TCLI_Show_Links](imgs/004_Generate_Env_Files.png#zoom)
 
 Do this by running tcli (in the Env folder):
 
@@ -64,7 +64,7 @@ tcli
 (and select generate-cloud-property-files)
 ```
 
-![TCLI_Show_Links](imgs/004_Generate_Multiple.png)
+![TCLI_Show_Links](imgs/004_Generate_Multiple.png#zoom)
 
 Or run:
 
@@ -103,7 +103,7 @@ What is file name of multiple property file ? (press enter for: manage-multiple-
 
 For every organization we now have a file that looks somewhat like this:
 
-![TCLI_Show_Links](imgs/004_ClientID_Replace.png)
+![TCLI_Show_Links](imgs/004_ClientID_Replace.png#zoom)
 
 Now replace the ***Client ID*** (in ***CloudLogin.clientID***) with the ID from that specific environment, from here:
 
@@ -115,7 +115,7 @@ After you have done that for all the environment files, let's go back to our Mul
 ## Structure of the Multiple Property file
 The multiple property file contains the information on which organizations to interact with:
 
-![TCLI_Show_Links](imgs/004_Multiple_File_Structure.png)
+![TCLI_Show_Links](imgs/004_Multiple_File_Structure.png#zoom)
 
 Make sure that the ***Multiple_Interaction_Property_File_Folder*** property is set to the folder where you keep all the organizational property files (for example ./Env/). Notice the slash '/' at the end.
 
@@ -125,7 +125,7 @@ Make sure that the ***Multiple_Interaction_Property_File_Folder*** property is s
 
 > Now we can start the interactive menu.
 
-![TCLI_Show_Links](imgs/004_TCLI_I.png)
+![TCLI_Show_Links](imgs/004_TCLI_I.png#zoom)
 
 > You can do this by running:
 
@@ -155,30 +155,30 @@ tcli -i -f MyCUTSOM-multiple-cloud-starters.properties
 
 This will bring you in an interactive menu that shows your Organizations:
 
-![TCLI_Show_Links](imgs/004_MI_ClientID.png)
+![TCLI_Show_Links](imgs/004_MI_ClientID.png#zoom)
 
 > ***Note:*** In order to check if our configurations are all correct you can run the ***show-cloud*** on all the environments. This should print out the connection details of all the environments (***Check if all the environment names are correct!***).
 
 Since we have setup the OAUTH Token Name in the various Organizational property files we can now generate OAUTH for all the environments, by changing the interactive cli task:
 
-![TCLI_Show_Links](imgs/004_Change_Task.png)
+![TCLI_Show_Links](imgs/004_Change_Task.png#zoom)
 
 And change the task to ***generate-oauth-token***:
 
-![TCLI_Show_Links](imgs/004_Generate_Oauth.png)
+![TCLI_Show_Links](imgs/004_Generate_Oauth.png#zoom)
 
 When you run this task on all environments:
 
-![TCLI_Show_Links](imgs/004_Run_GO.png)
+![TCLI_Show_Links](imgs/004_Run_GO.png#zoom)
 
 And answer YES to update the property files, you will see the authentication mechanism changing and more information being displayed:
 
-![TCLI_Show_Links](imgs/004_Oauth_Orgs.png)
+![TCLI_Show_Links](imgs/004_Oauth_Orgs.png#zoom)
 
 ---
 ## Run tasks on Multiple Organizations
 Now you are ready to run any task on any environment and run specific tasks on many environments. For example showing Live Apps and the number of cases. By applying ***show-live-apps-cases***:
 
-![TCLI_Show_Links](imgs/004_Show_LA_Cases.png)
+![TCLI_Show_Links](imgs/004_Show_LA_Cases.png#zoom)
 
 > You can automate this as well in Jobs, which are managed in the remaining part of the multiple cloud starter file. We will discuss this in [Setting up Build Pipelines](./005_Setting_Up_A_Buildpipeline.md)
