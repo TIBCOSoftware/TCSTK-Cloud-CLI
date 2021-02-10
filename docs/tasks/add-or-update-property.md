@@ -16,6 +16,11 @@ This can be useful to update property in your tibco-cloud.properties file or any
 --> If SPECIAL is used:
 * What type of answer would you like to add to the property ?
 
+For SPECIAL you can use:
+
+* SandboxID
+* LiveApps_AppID
+* LiveApps_ActionID
 
 ---
 ### Example Usages:
