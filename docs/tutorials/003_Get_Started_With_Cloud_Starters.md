@@ -99,7 +99,7 @@ tcli vo
 
 > We can now open the Cloud Starter locally in the browser:
 
-![TCLI_Show_Links](imgs/003_CS_Local.png#zoom)
+![TCLI_Show_Links](imgs/003_CS_Local.png#shadow)
 
 ---
 ## Make a change to the Cloud Starter
