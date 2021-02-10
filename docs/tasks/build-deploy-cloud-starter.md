@@ -14,8 +14,4 @@
 
 > tcli build-deploy
 
----
-### Questions:
-
----
-### Example Result:
+For more information see the ***Get started with Cloud Starters*** section in the online documentation.

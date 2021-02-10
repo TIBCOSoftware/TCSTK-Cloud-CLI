@@ -19,4 +19,4 @@ For more information: [setup your own Cloud Starter](https://tibcosoftware.githu
 
 > tcli build
 
-
+For more information see the ***Get started with Cloud Starters*** section in the online documentation.
