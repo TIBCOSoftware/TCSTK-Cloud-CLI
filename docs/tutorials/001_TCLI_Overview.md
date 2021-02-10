@@ -1,6 +1,6 @@
 # TCLI: Overview
 
-![TCLI_Toolkit_Overview](imgs/001_Toolkit.png#zoom)
+![TCLI_Toolkit_Overview](imgs/001_Toolkit.png)
 
 ---
 
@@ -101,7 +101,7 @@ After the property file is generated you will get into an interactive menu with 
 
 All subsequent times you run tcli in this folder you will get into this menu. From here you can choose any of the tasks to run. You can ***start typing*** in this menu to ***search within the available tasks*** and their descriptions. But you can also use the ***up and down arrows*** to scroll through them. Press enter to run a task, for example the first one show-cloud. Running this task also validates that the tcli can actually connect with the TIBCO Cloud and shows the connected organization. The results looks somewhat like this:
 
-![TCLI_Show_Cloud](imgs/001_Show_Cloud.png#zoom)
+![TCLI_Show_Cloud](imgs/001_Show_Cloud.png)
 
 > Note: After running a task you can always press up and run **repeat-last-task** to re-run the task you just run. This is very handy, to quickly repeat a task.
 

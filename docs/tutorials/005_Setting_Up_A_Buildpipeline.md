@@ -6,11 +6,11 @@
 
 In this section we will look at the rest of this file and how to configure it. Basically we can define ***Cloud Starter Jobs*** in the manage multiple Cloud Starter file:
 
-![TCLI_Show_Links](imgs/005_Mfile_Jobs.png#zoom)
+![TCLI_Show_Links](imgs/005_Mfile_Jobs.png)
 
 The initial multiple property file looks like this for example, notice the ***Cloud_Starter_JOBS*** property:
 
-![TCLI_Show_Links](imgs/005_MProp_File.png#zoom)
+![TCLI_Show_Links](imgs/005_MProp_File.png)
 
 To understand this configuration let's look at the following (simple) example:
 
@@ -106,7 +106,7 @@ LABS_DEV_PropertyFile=./Env/tibco-cloud-MyCloudStarter_EU_TIBCO_LABS_DEV.propert
 
 Note the ***${Project}*** and ***@{App_Name}*** variables in our tasks, these are property replacements and they work as follows:
 
-![TCLI_Show_Links](imgs/005_Property_Replacement.png#zoom)
+![TCLI_Show_Links](imgs/005_Property_Replacement.png)
 
 So a property encapsulated within ${} is resolved in the multiple cloud starters file and a property encapsulated within @{} is resolved in the individual environment/organization files. So when we run this we get the following. 
 
@@ -143,7 +143,7 @@ PROPERTY_EXTENSION_FILE=manage-multiple-cloud-starters-common.properties
 
 This means that the multiple property file can be extended, for example:
 
-![TCLI_Show_Links](imgs/005_Extending_Properties.png#zoom)
+![TCLI_Show_Links](imgs/005_Extending_Properties.png)
 
 Properties in the extension always overwrite properties from the common file, so in this case windows specific property file contains:
 
@@ -166,7 +166,7 @@ This is useful for Operating System specifics but can also be used for other pur
 
 Regardless of what you have specified in the Multiple Cloud Starters property file, you can always specify one job and one environment name from the commandline:
 
-![TCLI_Show_Links](imgs/005_RunMultiple.png#zoom)
+![TCLI_Show_Links](imgs/005_RunMultiple.png)
 
 For example:
 
