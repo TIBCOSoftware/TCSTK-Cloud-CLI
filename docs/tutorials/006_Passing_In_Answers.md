@@ -28,6 +28,7 @@ If we answer ***CloudLogin.Region***, we will get the following result:
 ![TCLI_Show_Links](imgs/006_Validate.png)
 
 > ***Note:*** There are a whole bunch of things you can validate:
+
 * Property_exist
 * Property_is_set
 * Property_is_set_ask
