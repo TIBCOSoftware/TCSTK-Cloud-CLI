@@ -105,7 +105,7 @@ tcli vo
 ## Make a change to the Cloud Starter
 Now you can basically start your development cycle and based on your requirements and template that use use make changes to the Cloud Starter. The nice thing about the Cloud Starter apps is that you can make changes on the fly. For example we are running a Cloud Starter like this:  
 
-![TCLI_Show_Links](imgs/003_CS_Change_Before.png#zoom)
+![TCLI_Show_Links](imgs/003_CS_Change_Before.png#shadow)
 
 > When we take the code of the Home component and we add some HTML code in:
 
@@ -113,7 +113,7 @@ Now you can basically start your development cycle and based on your requirement
 
 > We can see the result directly on the Screen:
 
-![TCLI_Show_Links](imgs/003_CS_Change_After.png#zoom)
+![TCLI_Show_Links](imgs/003_CS_Change_After.png#shadow)
 
 ---
 ## Apply a Schematic
@@ -139,7 +139,7 @@ Based on the template that you are using you get the available schematics shown:
 
 Every schematic asks a number of questions, and based on the answers it will generate all the required HTML,CSS and TS code:
 
-![TCLI_Show_Links](imgs/003_Schematic_Questions.png#zoom)
+![TCLI_Show_Links](imgs/003_Schematic_Questions.png#shadow)
 
 In this case the schematic created a component called ***MyDashboard***, which we can use on our home component:
 
@@ -267,7 +267,7 @@ And choose build-deploy, which will deploy your cloud starters.
 
 Now we have our Cloud Starter running on the TIBCO Cloud:
 
-![TCLI_Show_Links](imgs/003_Deployed_App.png#zoom)
+![TCLI_Show_Links](imgs/003_Deployed_App.png#shadow)
 
 ## Delete a Cloud Starter
 You can delete a cloud starter with the following command:
