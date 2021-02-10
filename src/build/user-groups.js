@@ -79,7 +79,7 @@ export async function addUserToGroup() {
     // Show all the groups and ask to which group you would like to add a user.
     let groupIdToAdd = '';
     let userIdToAdd = '';
-    const groupT = getGroupsTable();
+    const groupT = await getGroupsTable();
     // TODO: perhaps allow to add a user to all groups
     // let selectGroup = ['NONE', 'ALL'];
     let selectGroup = ['NONE'];
@@ -92,12 +92,12 @@ export async function addUserToGroup() {
         for (let gr of iterateTable(groupT)) {
             if (groupDecision === gr.Name) {
                 groupIdToAdd = gr.Id;
-                const oResponse =  await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await getProductionSandbox());
+                const oResponse =  await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await LA.getProductionSandbox());
                 log(INFO, 'CURRENT USERS IN GROUP: ' + groupDecision);
                 currentUsersInGroupT = createTable(oResponse, CCOM.mappings.la_groups_users, true)
             }
         }
-        const userT = showLiveAppsUsers(false, true);
+        const userT = await showLiveAppsUsers(false, true);
         // TODO: perhaps allow to add a user to all groups
         //let selectedUser = ['NONE', 'ALL'];
         let selectedUser = ['NONE'];
@@ -132,7 +132,7 @@ export async function addUserToGroup() {
             }
             log(INFO, 'Adding user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + ']');
             const postGroupMapping = {
-                sandboxId: await getProductionSandbox(),
+                sandboxId: await LA.getProductionSandbox(),
                 groupId: groupIdToAdd,
                 userId: userIdToAdd
             }
