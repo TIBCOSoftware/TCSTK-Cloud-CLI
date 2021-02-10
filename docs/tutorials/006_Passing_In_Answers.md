@@ -102,11 +102,11 @@ tcli add-or-update-property -a DEFAULT:SaveMe:'I want to be saved':'I am safe...
 
 This runs like this:
 
-![TCLI_Show_Links](imgs/006_Save_Me.png#zoom#zoom)
+![TCLI_Show_Links](imgs/006_Save_Me.png#zoom)
 
 And results in this being added to the tibco-cloud properties file:
 
-![TCLI_Show_Links](imgs/006_Saved.png#center#zoom)
+![TCLI_Show_Links](imgs/006_Saved.png#center)
 
 ---
 ## Too little answers is wrong but too many is ok
