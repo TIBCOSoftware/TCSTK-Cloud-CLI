@@ -139,7 +139,7 @@ Based on the template that you are using you get the available schematics shown:
 
 Every schematic asks a number of questions, and based on the answers it will generate all the required HTML,CSS and TS code:
 
-![TCLI_Show_Links](imgs/003_Schematic_Questions.png#shadow)
+![TCLI_Show_Links](imgs/003_Schematic_Questions.png#zoom)
 
 In this case the schematic created a component called ***MyDashboard***, which we can use on our home component:
 
@@ -147,7 +147,7 @@ In this case the schematic created a component called ***MyDashboard***, which w
 
 Now when we start our Cloud Starter we can see that we have added a Spotfire Analytical dashboard in our Cloud Starter, without hardly writing any code:
 
-![TCLI_Show_Links](imgs/003_Schematics_Dashboard.png#zoom)
+![TCLI_Show_Links](imgs/003_Schematics_Dashboard.png#shadow)
 
 ---
 ## Build and Deploy the Cloud Starter to the Cloud
