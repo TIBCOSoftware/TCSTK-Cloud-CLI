@@ -6,15 +6,11 @@
 
 In this section we will look at the rest of this file and how to configure it. Basically we can define ***Cloud Starter Jobs*** in the manage multiple Cloud Starter file:
 
-<p align="center">
-    <img src="005_Mfile_Jobs.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_Mfile_Jobs.png)
 
 The initial multiple property file looks like this for example, notice the ***Cloud_Starter_JOBS*** property:
 
-<p align="center">
-    <img src="005_MProp_File.png" width="700" />
-</p>
+![TCLI_Show_Links](imgs/005_MProp_File.png)
 
 To understand this configuration let's look at the following (simple) example:
 
@@ -84,9 +80,7 @@ tcli --multipleFile(-f) <multiple-file-name>
 
 From our little example above we get the following result:
 
-<p align="center">
-    <img src="005_HW_Result.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_HW_Result.png)
 
 As you can see first the used property file is printed with a list of Jobs and Environment that they run on. Then every Job is executed sequentially.
 
@@ -112,15 +106,11 @@ LABS_DEV_PropertyFile=./Env/tibco-cloud-MyCloudStarter_EU_TIBCO_LABS_DEV.propert
 
 Note the ***${Project}*** and ***@{App_Name}*** variables in our tasks, these are property replacements and they work as follows:
 
-<p align="center">
-    <img src="005_Property_Replacement.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_Property_Replacement.png)
 
 So a property encapsulated within ${} is resolved in the multiple cloud starters file and a property encapsulated within @{} is resolved in the individual environment/organization files. So when we run this we get the following. 
 
-<p align="center">
-    <img src="005_Prop_Replacement_Execution.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_Prop_Replacement_Execution.png)
 
 Note that we now run 1 Job with 2 tasks on 2 environments, and that we have different values for the property ***APP_NAME*** in the environment/organization files.
 
@@ -153,9 +143,7 @@ PROPERTY_EXTENSION_FILE=manage-multiple-cloud-starters-common.properties
 
 This means that the multiple property file can be extended, for example:
 
-<p align="center">
-    <img src="005_Extending_Properties.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_Extending_Properties.png)
 
 Properties in the extension always overwrite properties from the common file, so in this case windows specific property file contains:
 
@@ -178,9 +166,7 @@ This is useful for Operating System specifics but can also be used for other pur
 
 Regardless of what you have specified in the Multiple Cloud Starters property file, you can always specify one job and one environment name from the commandline:
 
-<p align="center">
-    <img src="005_RunMultiple.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_RunMultiple.png)
 
 For example:
 
@@ -190,9 +176,7 @@ tcli -m -j Say_Hello_Job -e US_OOCTO
 
 Which results in:
 
-<p align="center">
-    <img src="005_Run_Extension.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_Run_Extension.png)
 
 > ***Note:*** Also look at the fact manage multiple property file is an extension of a common file in the Table at the top.
 
@@ -207,56 +191,39 @@ Jenkins is a tool to manage automatic builds and deployments to manage your CI/C
 
 Jenkins has a rich eco system of plugins fomr the Jenkins classic view we use a plugin called <a href="https://plugins.jenkins.io/build-pipeline-plugin/" target="_blank">The Build Pipeline Plugin</a>, which gives us a nice view of our pipeline, For Example:
 
-<p align="center">
-    <img src="005_JenkisBuildPipeline.png" width="1000" />
-</p>
+![TCLI_Show_Links](imgs/005_JenkisBuildPipeline.png)
 
 Now in Jenkins every task on the pipeline basically becomes one task in our manage-multiple Cloud Starter property file:
 
-<p align="center">
-    <img src="005_Jenkins_Pipeline_Tasks.png" width="1000" />
-</p>
-
+![TCLI_Show_Links](imgs/005_Jenkins_Pipeline_Tasks.png)
 
 ### Jenkins Pipeline Script
 A more modern way of working with Jenkins is using <a href="https://www.jenkins.io/doc/book/pipeline/syntax/" target="_blank">Jenkins Pipeline Scripts</a>. In this way you have your actual pipeline stored as code (configuration as code), and you can see the history of your pipeline itself, it looks somewhat like this:
 
-<p align="center">
-    <img src="005_Jenkins_Pipeline_Script.png" width="800" />
-</p>
+![TCLI_Show_Links](imgs/005_Jenkins_Pipeline_Script.png)
 
 Every step in the script is executed by running the ***tcli cloud starter jobs***:
 
-<p align="center">
-    <img src="005_Jenkins_Script_Pipeline_Connected.png" width="1400" />
-</p>
+![TCLI_Show_Links](imgs/005_Jenkins_Script_Pipeline_Connected.png)
 
 > ***Note:*** This makes it also very easy to migrate from one build tool to another.
 
 Visually it displays like this:
 
-<p align="center">
-    <img src="005_Jenkins_Script_Visual.png" width="800" />
-</p>
+![TCLI_Show_Links](imgs/005_Jenkins_Script_Visual.png)
 
 ### Team City
 
 <a href="https://www.jetbrains.com/teamcity/" target="_blank">Team City</a> is very similar to Jenkins and supported by Jetbrains. In Team City you define a Project and then Build Steps:
 
-<p align="center">
-    <img src="005_Team_City.png" width="1200" />
-</p>
+![TCLI_Show_Links](imgs/005_Team_City.png)
 
 Like the Jenkins build pipeline you can connect every build step to a run of the ***tcli cloud starter job***:
 
-<p align="center">
-    <img src="005_Team_City_Connected.png" width="1200" />
-</p>
+![TCLI_Show_Links](imgs/005_Team_City_Connected.png)
 
 The output is displayed on the console:
 
-<p align="center">
-    <img src="005_Team_City_Output.png" width="1200" />
-</p>
+![TCLI_Show_Links](imgs/005_Team_City_Output.png)
 
 Depending on your setup you can run these build pipelines on demand, when code is checked in or recurring (on a nightly basis for example). 
