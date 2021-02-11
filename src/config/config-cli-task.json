@@ -553,6 +553,15 @@
       "taskName": "browse-spotfire-library",
       "availableOnOs": ["all"]
     },
+    "55. list-spotfire-library": {
+      "description": "Make a list of all specific component in your Spotfire Library (DXP's, Mods, Folders or Data Functions)",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "listSpotfireLibraryWrapper",
+      "taskName": "list-spotfire-library",
+      "availableOnOs": ["all"]
+    },
     "change-region": {
       "description": "Change the Region in the cloud-properties file",
       "enabled": true,

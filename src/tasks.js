@@ -305,6 +305,13 @@ export async function browseSpotfireLibraryWrapper() {
     await SPOTFIRE.browseSpotfire();
 }
 
+export async function listSpotfireLibraryWrapper() {
+    const SPOTFIRE = require('./build/spotfire');
+    await SPOTFIRE.listSpotfire();
+}
+
+
+
 export async function generateOauthTokenWrapper() {
     const OAUTH = require('./build/oauth');
     await OAUTH.generateOauthToken();

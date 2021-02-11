@@ -4,6 +4,8 @@ const colors = require('colors');
 let jSession;
 let xSRF;
 
+
+
 async function callSpotfire(url, doLog, conf) {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
     if(isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
@@ -42,18 +44,37 @@ async function callSpotfire(url, doLog, conf) {
     }
 }
 
+/*
+    'spotfire.sbdf': 'Data file',
+    'spotfire.dataconnection': 'Data connection',
+    'spotfire.folder': 'Folder',
+    'spotfire.mod': 'Mod file',
+    'spotfire.query': 'Information link',
+    'spotfire.dxp': 'Analysis file'
+
+ */
+
+
+const SF_TYPES = ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"];
+async function getSFolderInfo(folderId) {
+    const request = {
+        "folderId": folderId,
+        "types": SF_TYPES
+    }
+    let re = await callSpotfire(CCOM.clURI.sf_reports, false,{ method: 'POST', postRequest: request});
+    return re;
+}
+
+
 // Function to browse spotfire reports
 export async function browseSpotfire() {
+    log(INFO, 'Browsing the Spotfire Library...');
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     let currentFolderID = SFSettings.HomeFolderId;
     // console.log('Initial Folder ID: ' , SFSettings.HomeFolderId);
     let doBrowse = true;
     while(doBrowse) {
-        const request = {
-            "folderId": currentFolderID,
-            "types": ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"]
-        }
-        const sfReports = await callSpotfire(CCOM.clURI.sf_reports, false,{ method: 'POST', postRequest: request});
+        const sfReports = await getSFolderInfo(currentFolderID);
         // console.log('sfReports ', sfReports);
         let currentFolder = sfReports.CurrentFolder.Title;
         if(sfReports.CurrentFolder.DisplayPath){
@@ -127,4 +148,82 @@ export async function browseSpotfire() {
             }
         }
     }
+}
+
+
+
+// Function to browse spotfire reports
+export async function listSpotfire() {
+    log(INFO, 'Listing the Spotfire Library...');
+/*
+    'spotfire.sbdf': 'Data file',
+        'spotfire.dataconnection': 'Data connection',
+        'spotfire.folder': 'Folder',
+        'spotfire.mod': 'Mod file',
+        'spotfire.query': 'Information link',
+        'spotfire.dxp': 'Analysis file'
+*/
+    // TODO: Ask for type
+    // const questionTypes = ['Spotfire Reports', 'Spotfire Mods','Information link' ,'Data files', 'Data connections'];
+    // const typeForSearch = await askMultipleChoiceQuestionSearch('What Spotfire Library item would you like to list ?', questionTypes);
+
+    let typeToSearch = 'spotfire.dxp';
+
+
+    const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
+    // console.log(SFSettings);
+
+    // Go from Root
+    const sfRoot = await getSFolderInfo(SFSettings.rootFolderId);
+    // console.log('sfRoot ', sfRoot);
+
+    // Look for Teams
+    let teamsInfo = null;
+    for (let folder of sfRoot.Children){
+        if(folder.IsFolder && folder.Path == '/Teams'){
+            teamsInfo = await getSFolderInfo(folder.Id);
+        }
+    }
+    if(teamsInfo !== null){
+        // console.log(teamsInfo);
+        for (let teamFolder of teamsInfo.Children) {
+            if(teamFolder.IsFolder && teamFolder.DisplayName){
+                if(teamFolder.DisplayName === getOrganization()) {
+                    log(INFO, 'Organization Folder: ' + teamFolder.DisplayName + ' found...');
+                    // console.log(teamFolder);
+                    GlCounter = 0;
+                    const items = await iterateItems(teamFolder.Id, typeToSearch);
+                    console.log('');
+                    // console.log(items);
+                    let tObject = createTable(items, CCOM.mappings.sf_reports, false);
+                    pexTable(tObject, 'list-spotfire', getPEXConfig(), true);
+                }
+            }
+        }
+    } else {
+        log(ERROR, 'Teams folder not found...');
+    }
+    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
+}
+
+let GlCounter = 0;
+async function iterateItems(baseFolderId, type) {
+    // console.log('Finding: ' , type , ' in ', baseFolderId);
+    let re = [];
+    const iterateFolder = await getSFolderInfo(baseFolderId);
+    for (let itItem of iterateFolder.Children) {
+        // console.log(itItem.ItemType);
+        if(itItem.ItemType === type){
+            // console.log('Found: ' + type);
+            GlCounter++;
+            re.push(itItem);
+        }
+        if(itItem.IsFolder) {
+            logLine('                                                                                ');
+            logLine('Drilling Down into: ' + itItem.DisplayPath);
+            re = re.concat(await iterateItems(itItem.Id, type));
+            // re.push();
+        }
+    }
+    return re;
 }

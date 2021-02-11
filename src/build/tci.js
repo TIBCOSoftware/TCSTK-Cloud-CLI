@@ -24,7 +24,7 @@ export async function monitorTCI() {
     log(INFO, 'Monitoring a TCI App');
     // showCloudInfo(false);
     const tibCli = getTIBCli();
-    const tciApps = showTCI();
+    const tciApps = await showTCI();
     let tAppsToChoose = ['Nothing'];
     for (let tApp of iterateTable(tciApps)) {
         // console.log(tApp);
@@ -45,8 +45,12 @@ export async function monitorTCI() {
             pass = require('yargs').argv.pass;
             // console.log('Pass from args: ' + pass);
         }
-        if (pass.charAt(0) === '#') {
-            pass = Buffer.from(pass, 'base64').toString()
+        if (pass && pass.charAt(0) == '#') {
+            pass = Buffer.from(pass, 'base64').toString();
+        }
+        if (pass && pass.startsWith('@#')) {
+            const fus = require('./fuzzy-search.js');
+            pass = fus.find(pass);
         }
         pass = pass.replace('$', '\\$')
         run(tibCli + ' login -u "' + email + '" -p "' + pass + '" -o "' + getOrganization() + '" -r "' + getCurrentAWSRegion() + '"');
