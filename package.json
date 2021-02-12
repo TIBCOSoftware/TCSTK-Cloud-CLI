@@ -9,6 +9,7 @@
     "testB": "jasmine --config=test/support/jasmine.json --filter='Basic Operations'",
     "build": "webpack --config webpack.config.js",
     "compile": "pkg --output executable/tcli .",
+    "generateTaskDocs": "node generateHelpFiles.js",
     "pub": "npm publish"
   },
   "dependencies": {

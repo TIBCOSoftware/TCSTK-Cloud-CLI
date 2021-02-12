@@ -554,7 +554,7 @@
       "availableOnOs": ["all"]
     },
     "55. list-spotfire-library": {
-      "description": "Make a list of all specific component in your Spotfire Library (DXP's, Mods, Folders or Data Functions)",
+      "description": "Make a list of all specific components in your Spotfire Library (DXP's, Mods, Information links, Data files or Data connections)",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
