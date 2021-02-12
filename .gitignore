@@ -21,6 +21,8 @@
 /dist
 /tmp
 /swaggerTmp
+/executable
+
 
 /tibco-cloud.properties
 /HugoNotes.txt

@@ -8,6 +8,7 @@
     "test": "jasmine --config=test/support/jasmine.json",
     "testB": "jasmine --config=test/support/jasmine.json --filter='Basic Operations'",
     "build": "webpack --config webpack.config.js",
+    "compile": "pkg --output executable/tcli .",
     "pub": "npm publish"
   },
   "dependencies": {

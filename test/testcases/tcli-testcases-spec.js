@@ -336,8 +336,17 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'browse-spotfire-library -a NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'browse-spotfire-library -a "Parent) root:Child) DemoGallery:DXP) FinanceAnalytics::NONE"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'browse-spotfire-library -a "Parent) root:Child) TIBCO Community Mods:Child) Mods Library:MOD) Area Chart::NONE"')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineSpotfireTest_1')).toBe(true);
+
         // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a NONE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a all')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a "Spotfire Reports"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a "Spotfire Mods"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a "Information links"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a "Data files"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a "Data connections"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'list-spotfire-library -a spotfire.mod')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineSpotfireTest_1')).toBe(true);
     });
 
     // FS Testcases

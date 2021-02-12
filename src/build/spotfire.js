@@ -5,19 +5,18 @@ let jSession;
 let xSRF;
 
 
-
 async function callSpotfire(url, doLog, conf) {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
-    if(isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
+    if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
         if (!jSession || !xSRF) {
             const originalConf = conf;
             if (conf) {
                 conf['returnResponse'] = true;
                 conf['handleErrorOutside'] = true;
             } else {
-                conf = {returnResponse: true, handleErrorOutside: true };
+                conf = {returnResponse: true, handleErrorOutside: true};
             }
-            const response =  await CCOM.callTCA(url, doLog, conf);
+            const response = await CCOM.callTCA(url, doLog, conf);
             const loginCookie = response.headers['set-cookie'];
             //  logO(DEBUG, loginCookie);
             jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)[1];
@@ -36,7 +35,7 @@ async function callSpotfire(url, doLog, conf) {
             } else {
                 conf = {customHeaders: header};
             }
-            return  await CCOM.callTCA(url, doLog, conf);
+            return await CCOM.callTCA(url, doLog, conf);
         }
     } else {
         log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.');
@@ -56,12 +55,13 @@ async function callSpotfire(url, doLog, conf) {
 
 
 const SF_TYPES = ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"];
+
 async function getSFolderInfo(folderId) {
     const request = {
         "folderId": folderId,
         "types": SF_TYPES
     }
-    let re = await callSpotfire(CCOM.clURI.sf_reports, false,{ method: 'POST', postRequest: request});
+    let re = await callSpotfire(CCOM.clURI.sf_reports, false, {method: 'POST', postRequest: request});
     return re;
 }
 
@@ -73,19 +73,19 @@ export async function browseSpotfire() {
     let currentFolderID = SFSettings.HomeFolderId;
     // console.log('Initial Folder ID: ' , SFSettings.HomeFolderId);
     let doBrowse = true;
-    while(doBrowse) {
+    while (doBrowse) {
         const sfReports = await getSFolderInfo(currentFolderID);
         // console.log('sfReports ', sfReports);
         let currentFolder = sfReports.CurrentFolder.Title;
-        if(sfReports.CurrentFolder.DisplayPath){
+        if (sfReports.CurrentFolder.DisplayPath) {
             currentFolder = sfReports.CurrentFolder.DisplayPath;
         }
         log(INFO, 'Current folder: ', colors.blue(currentFolder));
         let items = [];
-        for(let parent of sfReports.Ancestors) {
-            if (parent.ItemType === 'spotfire.folder'){
+        for (let parent of sfReports.Ancestors) {
+            if (parent.ItemType === 'spotfire.folder') {
                 let name = parent.Title;
-                if(parent.DisplayName){
+                if (parent.DisplayName) {
                     name = parent.DisplayName;
                 }
                 items.push({
@@ -95,9 +95,9 @@ export async function browseSpotfire() {
                 });
             }
         }
-        for(let child of sfReports.Children){
+        for (let child of sfReports.Children) {
             let name = child.Title;
-            if(child.DisplayName){
+            if (child.DisplayName) {
                 name = child.DisplayName;
             }
             if (child.ItemType === 'spotfire.folder') {
@@ -132,12 +132,12 @@ export async function browseSpotfire() {
             itemArray.push(item.name);
         }
         const answer = await askMultipleChoiceQuestionSearch('On which Item would you like more details ?', itemArray);
-        if(answer === 'NONE'){
+        if (answer === 'NONE') {
             doBrowse = false;
         } else {
             for (const item of items) {
-                if(item.name === answer){
-                    if(item.type === 'DXP' || item.type === 'MOD'){
+                if (item.name === answer) {
+                    if (item.type === 'DXP' || item.type === 'MOD') {
                         // show more info on DXP
                         console.table(item.item);
                         await askQuestion('Press [enter] to continue...');
@@ -151,24 +151,48 @@ export async function browseSpotfire() {
 }
 
 
-
 // Function to browse spotfire reports
 export async function listSpotfire() {
     log(INFO, 'Listing the Spotfire Library...');
-/*
-    'spotfire.sbdf': 'Data file',
-        'spotfire.dataconnection': 'Data connection',
-        'spotfire.folder': 'Folder',
-        'spotfire.mod': 'Mod file',
-        'spotfire.query': 'Information link',
-        'spotfire.dxp': 'Analysis file'
-*/
-    // TODO: Ask for type
-    // const questionTypes = ['Spotfire Reports', 'Spotfire Mods','Information link' ,'Data files', 'Data connections'];
-    // const typeForSearch = await askMultipleChoiceQuestionSearch('What Spotfire Library item would you like to list ?', questionTypes);
+    /*
+        'spotfire.sbdf': 'Data file',
+            'spotfire.dataconnection': 'Data connection',
+            'spotfire.folder': 'Folder',
+            'spotfire.mod': 'Mod file',
+            'spotfire.query': 'Information link',
+            'spotfire.dxp': 'Analysis file'
+    */
+    // Ask for type
+    const questionTypes = ['Spotfire Reports', 'Spotfire Mods', 'Information links', 'Data files', 'Data connections', 'NONE', 'ALL'];
+    const typeForSearch = await askMultipleChoiceQuestionSearch('What Spotfire Library item would you like to list ?', questionTypes);
+    if (typeForSearch.toLowerCase() !== 'none') {
+        const map = {
+            'Spotfire Reports': 'spotfire.dxp',
+            'Spotfire Mods': 'spotfire.mod',
+            'Information links': 'spotfire.query',
+            'Data files': 'spotfire.sbdf',
+            'Data connections': 'spotfire.dataconnection'
+        }
+        if(typeForSearch.toLowerCase() === 'all'){
+            for (const [ReadableName, SFTypeName] of Object.entries(map)) {
+                log(INFO, 'Looking for: ' + colors.blue(ReadableName)  + ' in library:');
+                await listOnType(SFTypeName, ReadableName);
+            }
+        } else {
+            let typeToSearch = typeForSearch;
+            if(map[typeForSearch] != null){
+                typeToSearch = map[typeForSearch];
+            }
+            await listOnType(typeToSearch, typeForSearch);
+        }
+        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+}
 
-    let typeToSearch = 'spotfire.dxp';
 
+async function listOnType(typeToList, typeName) {
 
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     // console.log(SFSettings);
@@ -179,46 +203,52 @@ export async function listSpotfire() {
 
     // Look for Teams
     let teamsInfo = null;
-    for (let folder of sfRoot.Children){
-        if(folder.IsFolder && folder.Path == '/Teams'){
+    for (let folder of sfRoot.Children) {
+        if (folder.IsFolder && folder.Path == '/Teams') {
             teamsInfo = await getSFolderInfo(folder.Id);
         }
     }
-    if(teamsInfo !== null){
+    if (teamsInfo !== null) {
         // console.log(teamsInfo);
         for (let teamFolder of teamsInfo.Children) {
-            if(teamFolder.IsFolder && teamFolder.DisplayName){
-                if(teamFolder.DisplayName === getOrganization()) {
+            if (teamFolder.IsFolder && teamFolder.DisplayName) {
+                if (teamFolder.DisplayName === getOrganization()) {
                     log(INFO, 'Organization Folder: ' + teamFolder.DisplayName + ' found...');
                     // console.log(teamFolder);
                     GlCounter = 0;
-                    const items = await iterateItems(teamFolder.Id, typeToSearch);
+                    const items = await iterateItems(teamFolder.Id, typeToList);
                     console.log('');
                     // console.log(items);
-                    let tObject = createTable(items, CCOM.mappings.sf_reports, false);
-                    pexTable(tObject, 'list-spotfire', getPEXConfig(), true);
+                    if(items.length > 0){
+                        let tObject = createTable(items, CCOM.mappings.sf_reports, false);
+                        pexTable(tObject, 'list-spotfire', getPEXConfig(), true);
+                    } else {
+                        log(INFO, 'No ' + colors.yellow(typeName) + ' Found in ' + colors.blue(teamFolder.DisplayName) + '...');
+                    }
+
                 }
             }
         }
     } else {
         log(ERROR, 'Teams folder not found...');
     }
-    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
 }
 
+
 let GlCounter = 0;
+
 async function iterateItems(baseFolderId, type) {
     // console.log('Finding: ' , type , ' in ', baseFolderId);
     let re = [];
     const iterateFolder = await getSFolderInfo(baseFolderId);
     for (let itItem of iterateFolder.Children) {
         // console.log(itItem.ItemType);
-        if(itItem.ItemType === type){
+        if (itItem.ItemType === type) {
             // console.log('Found: ' + type);
             GlCounter++;
             re.push(itItem);
         }
-        if(itItem.IsFolder) {
+        if (itItem.IsFolder) {
             logLine('                                                                                ');
             logLine('Drilling Down into: ' + itItem.DisplayPath);
             re = re.concat(await iterateItems(itItem.Id, type));
