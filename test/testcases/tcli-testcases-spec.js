@@ -138,7 +138,7 @@ describe("tcli testsuite", function () {
     // Basic Cloud Starter Template - LATEST Angular 10
 
     //TODO: Testcase fails on windows (on ./backup folder)
-    xit("Case Manager and Schematics", function () {
+    it("Case Manager and Schematics", function () {
         const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
@@ -151,9 +151,14 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'generate-cloud-descriptor')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'update-cloud-packages')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
-        // TODO: "9. clean":
-        // TODO: look at providing Anlytic schematic input on commandline
-
+    });
+    // TODO: "9. clean":
+    // TODO: look at providing Anlytic schematic input on commandline
+    // jasmine --config=test/support/jasmine.json --filter='Case Manager and Lib Sources'
+    xit("Case Manager and Lib Sources", function () {
+        const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime();
+        expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         // ng generate @tibco-tcstk/component-template:analytics-cockpit CustomAnalyticsCockpit
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'inject-lib-sources')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
