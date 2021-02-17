@@ -300,6 +300,12 @@ export async function monitorTCIWrapper() {
     await TCI.monitorTCI();
 }
 
+export async function exportTCIAppWrapper() {
+    const TCI = require('./build/tci');
+    await TCI.exportTCIApp();
+}
+
+
 export async function browseSpotfireLibraryWrapper() {
     const SPOTFIRE = require('./build/spotfire');
     await SPOTFIRE.browseSpotfire();
@@ -309,8 +315,6 @@ export async function listSpotfireLibraryWrapper() {
     const SPOTFIRE = require('./build/spotfire');
     await SPOTFIRE.listSpotfire();
 }
-
-
 
 export async function generateOauthTokenWrapper() {
     const OAUTH = require('./build/oauth');
@@ -341,7 +345,6 @@ export async function showOrgFoldersWrapper() {
     const CFILES = require('./build/cloud-files');
     await CFILES.showOrgFolders();
 }
-
 
 export async function showPropertiesWrapper() {
     const PROPM = require('./build/property-file-management');

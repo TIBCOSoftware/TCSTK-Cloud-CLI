@@ -4,7 +4,7 @@ const colors = require('colors');
 //const art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
-export async function showTCI(showTable) {
+export async function showTCI(showTable, returnRaw) {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -14,10 +14,15 @@ export async function showTCI(showTable) {
     // const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
     // const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
     const response =  await CCOM.callTCA(CCOM.clURI.tci_apps, false, {tenant: 'TCI', customLoginURL: loginEndpoint, forceCLIENTID: true});
+    console.log('TCI APPS: ', response);
     let tObject = createTable(response, CCOM.mappings.tci_apps, false);
     pexTable(tObject, 'tci-apps', getPEXConfig(), doShowTable);
     log(DEBUG, 'TCI Object: ', tObject);
-    return tObject;
+    let re = tObject;
+    if(returnRaw){
+        re = response;
+    }
+    return re;
 }
 
 export async function monitorTCI() {
@@ -25,7 +30,7 @@ export async function monitorTCI() {
     // showCloudInfo(false);
     const tibCli = getTIBCli();
     const tciApps = await showTCI();
-    let tAppsToChoose = ['Nothing'];
+    let tAppsToChoose = ['NONE'];
     for (let tApp of iterateTable(tciApps)) {
         // console.log(tApp);
         if (tApp && tApp.Name) {
@@ -33,7 +38,7 @@ export async function monitorTCI() {
         }
     }
     let appToMonitor = await askMultipleChoiceQuestionSearch('Which TCI App would you like to monitor ?', tAppsToChoose);
-    if (appToMonitor !== 'Nothing') {
+    if (appToMonitor !== 'NONE') {
         // console.log(appToMonitor);
         // run(tibCli + ' logout');
         // TODO: move this logic to common lib
@@ -60,6 +65,51 @@ export async function monitorTCI() {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
 }
+
+
+export async function exportTCIApp() {
+    log(INFO, 'Exporting a TCI App');
+    const tciApps = await showTCI(true, true);
+    let tAppsToChoose = ['NONE'];
+    for (let tApp of tciApps) {
+        if (tApp && tApp.name && tApp.type && tApp.type.val && tApp.type.val === 'flogo') {
+            tAppsToChoose.push(tApp.name);
+        }
+    }
+    let appToExport = await askMultipleChoiceQuestionSearch('Which FLOGO-TCI App would you like to export ?', tAppsToChoose);
+    if (appToExport !== 'NONE') {
+        for (let tApp of tciApps) {
+            if (appToExport === tApp.name) {
+                const EXCLUDE_LIST = '&excludeList=git.tibco.com/git/product/ipaas/wi-contrib.git/contributions/General/trigger/rest';
+                const loginEndpoint = 'https://' + getCurrentRegion(true) + 'integration.cloud.tibco.com/idm/v3/login-oauth';
+                // TODO: Create timeout (if you are not the right user)
+                const flogoAppExport =  await CCOM.callTCA(CCOM.clURI.tci_export_app + '/' + tApp.id + '?export=true' + EXCLUDE_LIST, false, {tenant: 'TCI', customLoginURL: loginEndpoint, forceCLIENTID: true});
+                const storeOptions = {spaces: 2, EOL: '\r\n'};
+                let manifestFileName = await askQuestion('Which filename would you like to use for the MANIFEST export ? (press enter or use DEFAULT to use manifest.json, or use NONE to not export the manifest)');
+                if(manifestFileName === '' || manifestFileName.toLowerCase() === 'default'){
+                    manifestFileName = 'manifest.json';
+                }
+                if(manifestFileName.toLowerCase() != 'none') {
+                    require('jsonfile').writeFileSync(manifestFileName, flogoAppExport.manifest, storeOptions);
+                    log(INFO, 'Stored Flogo Manifest: ' + colors.blue(manifestFileName));
+                    log(WARNING, 'Not all components of the manifest are exported in the same way as a manual export...');
+                }
+                let flogoFileName = await askQuestion('Which filename would you like to use for the Flogo JSON export ? (press enter or use DEFAULT to use flogo.json, or use NONE to not export the Flogo JSON)');
+                if(flogoFileName === '' || flogoFileName.toLowerCase() === 'default'){
+                    flogoFileName = 'flogo.json';
+                }
+                if(flogoFileName.toLowerCase() != 'none'){
+                    require('jsonfile').writeFileSync(flogoFileName, flogoAppExport.flogoJson, storeOptions);
+                    log(INFO, 'Stored Flogo json: ' + colors.blue(flogoFileName));
+                }
+            }
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+}
+
+
 
 function getTIBCli() {
     let re = '';
@@ -97,3 +147,4 @@ function wsuListTci() {
 
     });
 }
+

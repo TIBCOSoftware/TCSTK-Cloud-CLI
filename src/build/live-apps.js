@@ -76,7 +76,6 @@ export async function exportLiveAppsCaseType() {
     let fName = await askQuestion('What file name would you like to export to ? (press enter for default)');
     for (const curCase in cTypes) {
         if (typeForExport === cTypes[curCase].name) {
-
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
             if (fName === '') {

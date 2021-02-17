@@ -22,6 +22,7 @@
     "la_cases": "liveapps.cloud.tibco.com/case/v1/cases",
     "la_process": "liveapps.cloud.tibco.com/process/v1/processes",
     "tci_apps": "integration.cloud.tibco.com/api/v1/apps",
+    "tci_export_app": "integration.cloud.tibco.com/wistudio/v2/metadata",
     "sf_settings": "spotfire-next.cloud.tibco.com/spotfire/wp/settings",
     "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo",
     "mes_system": "messaging.cloud.tibco.com/tcm/v1/system",

@@ -369,7 +369,16 @@
       "taskName": "monitor-tci-app",
       "availableOnOs": ["all"]
     },
-    "36. describe-cloud": {
+    "36. export-tci-app": {
+      "description": "Exports a TCI-Flogo Application",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "exportTCIAppWrapper",
+      "taskName": "export-tci-app",
+      "availableOnOs": ["all"]
+    },
+    "describe-cloud": {
       "description": "A combination of show-cloud, show-tci-apps, show-spotfire-reports, show-live-apps-cases & show-cloud-starters.",
       "enabled": false,
       "internal": false,
