@@ -133,7 +133,7 @@ export async function cLogin(tenant, customLoginURL, forceClientID) {
 
 // Function that logs into the cloud and returns a cookie
 async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
-    const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + pass;
+    const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + encodeURIComponent(pass);
     log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
     log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
     // log(INFO, 'With Form: ' + postForm);

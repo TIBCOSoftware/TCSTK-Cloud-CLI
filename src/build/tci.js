@@ -14,7 +14,6 @@ export async function showTCI(showTable, returnRaw) {
     // const appEndpoint = 'https://' + getCurrentRegion() + 'integration.cloud.tibco.com/api/v1/apps';
     // const response = callURL(appEndpoint, 'GET', null, null, false, 'TCI', loginEndpoint, null, false, true);
     const response =  await CCOM.callTCA(CCOM.clURI.tci_apps, false, {tenant: 'TCI', customLoginURL: loginEndpoint, forceCLIENTID: true});
-    console.log('TCI APPS: ', response);
     let tObject = createTable(response, CCOM.mappings.tci_apps, false);
     pexTable(tObject, 'tci-apps', getPEXConfig(), doShowTable);
     log(DEBUG, 'TCI Object: ', tObject);
