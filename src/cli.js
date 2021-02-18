@@ -12,44 +12,49 @@ let propFileName;
 //const version = require('./package.json').version;
 
 function parseArgumentsIntoOptions(rawArgs) {
-    //TODO: Add a non interactive verbose option
-    const args = arg(
-        {
-            '--debug': Boolean,
-            '-d': '--debug',
-            '--template': String,
-            '-t': '--template',
-            '--createCP': Boolean,
-            '-c': '--createCP',
-            '--help': Boolean,
-            '-h': '--help',
-            '--version': Boolean,
-            '-v': '--version',
-            '--update': Boolean,
-            '-u': '--update',
-            '--propfile': String,
-            '-p': '--propfile',
-            '--multiple': Boolean,
-            '-m': '--multiple',
-            '--multipleInteraction': Boolean,
-            '-i': '--multipleInteraction',
-            '--multipleFile': String,
-            '-f': '--multipleFile',
-            '--surpressStart': Boolean,
-            '-s': '--surpressStart',
-            '--pass': String,
-            '--org': String,
-            '--answers': String,
-            '-a': '--answers',
-            '--job': String,
-            '-j': '--job',
-            '--environment': String,
-            '-e': '--environment',
-        },
-        {
-            argv: rawArgs.slice(2),
-        }
-    );
+    let args;
+    try {
+        args = arg(
+            {
+                '--debug': Boolean,
+                '-d': '--debug',
+                '--template': String,
+                '-t': '--template',
+                '--createCP': Boolean,
+                '-c': '--createCP',
+                '--help': Boolean,
+                '-h': '--help',
+                '--version': Boolean,
+                '-v': '--version',
+                '--update': Boolean,
+                '-u': '--update',
+                '--propfile': String,
+                '-p': '--propfile',
+                '--multiple': Boolean,
+                '-m': '--multiple',
+                '--multipleInteraction': Boolean,
+                '-i': '--multipleInteraction',
+                '--multipleFile': String,
+                '-f': '--multipleFile',
+                '--surpressStart': Boolean,
+                '-s': '--surpressStart',
+                '--pass': String,
+                '--org': String,
+                '--answers': String,
+                '-a': '--answers',
+                '--job': String,
+                '-j': '--job',
+                '--environment': String,
+                '-e': '--environment',
+            },
+            {
+                argv: rawArgs.slice(2),
+            }
+        );
+    } catch (e) {
+        log(ERROR, e.message);
+        process.exit(1);
+    }
     return {
         template: args['--template'] || '',
         debug: args['--debug'] || false,
