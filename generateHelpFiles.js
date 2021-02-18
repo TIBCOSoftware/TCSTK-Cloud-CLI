@@ -61,7 +61,7 @@ function generateIndex() {
     for (const [key, value] of Object.entries(tsksCAT)) {
         dataForFile += '\n\n\n## ' + key + '\n\n---\n';
         for (const [tKey, tVal] of Object.entries(value)) {
-            dataForFile += '\n' + tVal;
+            dataForFile += '\n\n' + tVal;
         }
     }
 
