@@ -29,9 +29,9 @@ Before you run the command to change the region.
 
 > tcli change-region
 
-> tcli change-region -a 'US - Oregon'
+> tcli change-region --answers 'US - Oregon'
 
-> tcli change-region --answer 'EU - Ireland'
+> tcli change-region -a 'EU - Ireland'
 
 > tcli cr -a 'AU - Sydney'
 

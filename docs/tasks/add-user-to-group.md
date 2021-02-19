@@ -8,17 +8,18 @@
 This is useful to assign users to your Cloud Starter
 
 ---
-### Example Usage
-
-> tcli add-user-to-group
-
-> tcli add-user-to-group -a Users:Me
-
----
 ### Questions:
 
 For which group would you like to ADD a user ?
 Which user would you like to add to the group ?
+
+---
+### Example Usage
+
+> tcli add-user-to-group
+
+> tcli add-user-to-group --answers Users,Me
+
 
 ---
 ### Example Result:
