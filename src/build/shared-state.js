@@ -212,7 +212,7 @@ export async function removeSharedStateEntry() {
         }
         // Remove shared state entry
         if (decision === 'YES') {
-            deleteSharedState(selectedState.id);
+            await deleteSharedState(selectedState.id);
         } else {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
         }
@@ -242,10 +242,10 @@ export async function clearSharedState() {
         }
         // Remove shared state entries
         if (decision === 'YES') {
-            for (sStateToDelete of sStateList) {
+            for (const sStateToDelete of sStateList) {
                 // Remove entries one by one
                 log(INFO, 'REMOVING SHARED STATE - NAME: ' + sStateToDelete.name + ' ID: ' + sStateToDelete.id);
-                deleteSharedState(sStateToDelete.id);
+                await deleteSharedState(sStateToDelete.id);
             }
         } else {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
