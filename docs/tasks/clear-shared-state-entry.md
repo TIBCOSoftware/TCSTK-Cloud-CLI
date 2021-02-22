@@ -39,6 +39,8 @@ Double check actions on shared state (YES | NO)
 ---
 ### Example Result:
 
+```console
 TIBCO CLOUD CLI] (INFO)  Removing Shared State: TestEntry.PUBLIC (12345)
 ? Are you sure ? YES
 TIBCO CLOUD CLI] (INFO)  Successfully removed shared state with ID: 12345
+```

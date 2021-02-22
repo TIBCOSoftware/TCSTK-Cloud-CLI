@@ -24,4 +24,6 @@ What is the description of the group  ? (press enter to leave blank)
 ---
 ### Example Result:
 
+```console
 TIBCO CLOUD CLI] (INFO)  Successfully created group with ID:  1234
+```

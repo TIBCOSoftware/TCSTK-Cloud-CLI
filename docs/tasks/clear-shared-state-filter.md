@@ -44,8 +44,10 @@ A special case is created if the filter is set to '*' (even if Shared_State_Doub
 ---
 ### Example Result:
 
+```console
 ? ARE YOU SURE YOU WANT TO REMOVE ALL STATES ABOVE (Filter: Test) ? YES
 TIBCO CLOUD CLI] (INFO)  REMOVING SHARED STATE - NAME: TestMe.PUBLIC ID: 12345
 TIBCO CLOUD CLI] (INFO)  Successfully removed shared state with ID: 12345
 TIBCO CLOUD CLI] (INFO)  REMOVING SHARED STATE - NAME: TestMe2.PUBLIC ID: 12346
 TIBCO CLOUD CLI] (INFO)  Successfully removed shared state with ID: 12346 
+```
