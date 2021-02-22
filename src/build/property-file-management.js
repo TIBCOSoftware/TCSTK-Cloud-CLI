@@ -221,9 +221,6 @@ export async function getClientID(){
     const ClientID =  await CCOM.callTCA( CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
     console.log('Client ID: ', ClientID);
 }
-// TODO: how to get a client ID for another ORG
-
-
 
 // Function comment out a property in a prop file
 export function disableProperty(location, property, comment) {
@@ -247,7 +244,6 @@ export function disableProperty(location, property, comment) {
                     } else {
                         dataLines[lineNumber] = '#' + dataLines[lineNumber];
                     }
-
                 }
             }
             let dataForFile = '';
@@ -325,6 +321,7 @@ export function showPropertiesTable() {
         // Print table
         pexTable(nvs, 'tibco-cloud-properties', getPEXConfig(), true);
     }
-
-
 }
+
+// TODO: how to get a client ID for another ORG
+// TODO: Create a function that lists all client ID's
