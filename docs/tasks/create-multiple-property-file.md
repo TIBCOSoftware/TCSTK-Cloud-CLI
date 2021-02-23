@@ -5,10 +5,21 @@
 > Creating an initial property file to manage multiple cloud starters and environments.
 
 ---
+### Questions:
+
+Please specify a name for the Multiple prop file (Use DEFAULT for: manage-multiple-cloud-starters) ?
+
+If the file exists:
+The property file: <FILE>.properties already exists, do you want to Overwrite it ?
+
+---
 ### Example Usage
 > tcli create-multiple-property-file
 
+> tcli create-multiple-property-file --answers MyMultipleFile.properties
+
+> tcli create-multiple-property-file -a default
 
 
----
-### Example Result:
+For more information see the **Managing multiple TIBCO Cloud Organizations** section in the online documentation:
+[Managing multiple TIBCO Cloud Organizations](../tutorials/004_Multiple_Organizations.md)

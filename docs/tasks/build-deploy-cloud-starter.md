@@ -40,3 +40,4 @@ Location of the descriptor file; For example: (./src/assets/cloudstarter.json)
 > tcli build-deploy
 
 For more information see the **Get started with Cloud Starters** section in the online documentation:
+[Get started with Cloud Starters](../tutorials/003_Get_Started_With_Cloud_Starters.md)
