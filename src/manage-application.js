@@ -145,7 +145,7 @@ function copyDir(fromDir, toDir) {
     fseA.copySync(fromDir, toDir, {overwrite: true});
 }
 
-// Function to create a new starter, based on a template
+// Function to manage the global configuration
 export async function manageGlobalConfig() {
     // Set the props to use global
     const itemsForGlobal = ['CloudLogin.clientID','CloudLogin.email','CloudLogin.pass','CloudLogin.OAUTH_Token','CloudLogin.Region','CloudLogin.OAUTH_Generate_Token_Name', 'CloudLogin.OAUTH_Generate_For_Tenants', 'CloudLogin.OAUTH_Generate_Valid_Hours', 'CloudLogin.OAUTH_Required_Hours_Valid'];
