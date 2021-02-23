@@ -67,23 +67,29 @@ const storeOptions = {spaces: 2, EOL: '\r\n'};
 
 export async function exportLiveAppsCaseType() {
     checkCaseFolder();
-    const cTypes = showLiveApps(true, false);
+    const cTypes = await showLiveApps(true, false);
     let cTypeArray = [];
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-    let fName = await askQuestion('What file name would you like to export to ? (press enter for default)');
+    let fName = await askQuestion('What file name would you like to export to ? (press enter or use DEFAULT for default):');
+    let appFound = false;
     for (const curCase in cTypes) {
         if (typeForExport === cTypes[curCase].name) {
+            appFound = true;
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
-            if (fName === '') {
+            if (fName === '' || fName.toLowerCase() === 'default') {
                 fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion + '.type.json';
             }
             require('jsonfile').writeFileSync(fileName, cTypes[curCase], storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
         }
+    }
+    if(!appFound){
+        log(ERROR, 'Live Apps Case-Type not found for export: ' + typeForExport);
+        process.exit(1);
     }
 }
 
@@ -92,17 +98,19 @@ const exportCaseStepSize = 30;
 // Function to export case data
 export async function exportLiveAppsData() {
     checkCaseFolder();
-    const cTypes = showLiveApps(true, true);
+    const cTypes = await showLiveApps(true, true);
     let cTypeArray = [];
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
     }
     let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-    let fName = await askQuestion('What Folder like to export to ? (press enter for default, date get\'s added...)');
+    let fName = await askQuestion('What Folder like to export to ? (press enter or use default, date get\'s added...)');
     // let oneFileStore = await askMultipleChoiceQuestion('Do you also want to store all contents in one file ? (this is used for import)', ['YES', 'NO']);
     let allCases = [];
+    let appFound = false;
     for (let curCase in cTypeArray) {
         if (cTypeArray[curCase] === typeForExport) {
+            appFound = true;
             // count cases
             const numberOfCasesForExport = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
             log(INFO, 'Number of cases for export: ' + numberOfCasesForExport);
@@ -114,10 +122,12 @@ export async function exportLiveAppsData() {
                 logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
                 allCases = allCases.concat(exportBatch);
             }
+            // Print a newline after all the log entries
+            console.log('');
             log(INFO, 'Number of Exported Cases: ' + allCases.length);
             // Write Cases
             let cfName = CASE_FOLDER + fName;
-            if (fName === '') {
+            if (fName === '' || fName.toLowerCase() === 'default') {
                 //Add date to the end of this
                 const today = new Date();
                 const dayAddition = '(' + today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '_h' + today.getHours() + 'm' + today.getMinutes() + ')';
@@ -163,6 +173,10 @@ export async function exportLiveAppsData() {
             log(INFO, '[STORED ALL CONTENT]: ' + AllCaseFileName);
             //}
         }
+    }
+    if(!appFound){
+        log(ERROR, 'Live Apps Case not found for export: ' + typeForExport);
+        process.exit(1);
     }
 }
 

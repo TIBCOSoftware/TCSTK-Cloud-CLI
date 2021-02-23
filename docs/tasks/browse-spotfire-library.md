@@ -14,11 +14,13 @@ This task let's you browse the Spotfire Library and display different items, her
 On a folder you can request the sub-folder and on a DXP and a MOD you can request the details.
 
 ---
-### Example Usage
-> tcli browse-spotfire-library
-
----
 ### Questions:
 
 On which Item would you like more details ?
+
+---
+### Example Usage
+> tcli browse-spotfire-library
+
+
 
