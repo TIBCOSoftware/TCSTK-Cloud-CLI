@@ -124,7 +124,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
                 decision = await askMultipleChoiceQuestion('Would you like to rotate your OAUTH key ?', ['YES', 'NO']);
             }
             if (decision === 'YES') {
-                rotateOauthToken();
+                await rotateOauthToken();
             } else {
                 log(INFO, 'Ok I won\'t do anything...');
             }
