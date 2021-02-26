@@ -318,8 +318,8 @@ function importSharedStateFile(ssFile) {
         ssObject = JSON.parse(contentContextFile);
     } catch (e) {
         log(ERROR, 'Parse Error on: ' + ssFile);
-        log(ERROR, e);
-        process.exit();
+        log(ERROR, e.message);
+        process.exit(1);
     }
     if (ssObject.content != null) {
         if (ssObject.content.json != null) {
@@ -329,11 +329,12 @@ function importSharedStateFile(ssFile) {
                 const contentContentFile = fs.readFileSync(contentFile, "utf8");
                 // console.log('GOT: ' , contentContentFile);
                 try {
+                    // TODO: Parse stringify and check for weird characters: Try this package: https://www.npmjs.com/package/axios
                     ssObject.content.json = contentContentFile;
                 } catch (e) {
                     log(ERROR, 'Parse Error on: ' + contentFile);
-                    log(ERROR, e);
-                    process.exit();
+                    log(ERROR, e.message);
+                    process.exit(1);
                 }
                 // ssObject.content.json = ssObject.content.json;
             }
@@ -342,6 +343,35 @@ function importSharedStateFile(ssFile) {
     // console.log(ssObject);
     return ssObject;
 }
+
+/*
+  const contentContentFile = fs.readFileSync(contentFile, 'utf-8');
+                // console.log('GOT: ' , contentContentFile);
+                try {
+                    var jsonString = contentContentFile.replace(/(\r\n|\n|\r)/g,"");
+                    console.log('shortJsonString: ' ,jsonString);
+                    var object = JSON.parse(jsonString);
+                    // console.log(object);
+                    var myJSONString = JSON.stringify(JSON.parse(jsonString));
+                    var myEscapedJSONString = myJSONString.replace(/\\n/g, "\\n")
+                        .replace(/\\'/g, "\\'")
+                        .replace(/\\"/g, '\\"')
+                        .replace(/\\&/g, "\\&")
+                        .replace(/\\r/g, "\\r")
+                        .replace(/\\t/g, "\\t")
+                        .replace(/\\b/g, "\\b")
+                        .replace(/\\f/g, "\\f");
+                    // myEscapedJSONString is now ready to be POST'ed to the server.
+                    ssObject.content.json = myEscapedJSONString;
+                    console.log('ssObject: ', ssObject.content.json);
+                } catch (e) {
+                    log(ERROR, 'Parse Error on: ' + contentFile);
+                    log(ERROR, e.message);
+                    process.exit(1);
+                }
+                // ssObject.content.json = ssObject.content.json;
+
+ */
 
 async function putSharedState(sharedStateObject) {
     prepSharedStateProps();
@@ -440,7 +470,7 @@ export function watchSharedState() {
                         }
                     } else {
                         log(INFO, 'CONTEXT File UPDATED: ' + path);
-                        log(INFO, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
+                        log(WARNING, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
                     }
                 } else {
                     ignoreChanges--;

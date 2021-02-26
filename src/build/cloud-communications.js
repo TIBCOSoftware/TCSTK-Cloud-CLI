@@ -39,6 +39,9 @@ export function doRequest(url, options, data) {
             reject(err);
         });
         if (data) {
+            // console.log('Writing:' , data);
+            // req.setEncoding('utf8');
+            // req.write(data, 'utf-8');
             req.write(data);
         }
         req.end();
@@ -198,7 +201,10 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
     if (customHeaders) {
         header = customHeaders;
     }
-    header["accept"] = 'application/json';
+    if(!header["accept"]){
+        header["accept"] = 'application/json';
+    }
+
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
     if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
