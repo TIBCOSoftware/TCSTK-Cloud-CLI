@@ -86,6 +86,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |update-cloud-packages|  Updates the NPM packges in the @tibco-tcstk scope in your project. |
  |show-tci-apps|  List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works). |
  |monitor-tci-app|  Monitor the logs of a TIBCO Cloud Integration Flogo Application |
+ |export-tci-app|  Exports a TCI-Flogo Application |
  |show-oauth-tokens|  Displays OAUTH tokens to authenticate to the TIBCO Cloud. |
  |generate-oauth-token|  Generate a new OAUTH token to authenticate to the TIBCO Cloud. |
  |revoke-oauth-token|  Revokes an existing OAUTH token. |

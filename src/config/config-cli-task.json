@@ -43,7 +43,7 @@
       "category": "cloud-starters"
     },
     "4. show-properties": {
-      "description": "Show the properties in your properties file (and possibly the global values)",
+      "description": "Shows the properties in your properties file (and possibly the global values)",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
