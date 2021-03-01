@@ -12,7 +12,32 @@ let isOAUTHValid;
 let toldClientID = false;
 let isOrgChecked = false;
 
-export function doRequest(url, options, data) {
+// An HTTP request based on Axios library
+export async function doRequest(url, options, data) {
+    const axios = require('axios').default;
+    // console.log(options);
+    if(data){
+        options['data'] = data;
+    }
+    try {
+        const responseAxios = await axios(url, options);
+        const response = {};
+        response.body = '';
+        response.statusCode = responseAxios.status;
+        response.headers = responseAxios.headers;
+        try {
+            response.body = JSON.parse(responseAxios.data);
+        } catch (e) {
+            response.body = responseAxios.data;
+        }
+        return response;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+// We have replaced this manual request by Axios, to handle weird characters
+export function doManualRequest(url, options, data) {
     const https = require('https');
     return new Promise((resolve, reject) => {
         const req = https.request(url, options, (res) => {
@@ -47,6 +72,9 @@ export function doRequest(url, options, data) {
         req.end();
     });
 }
+
+
+
 
 export async function cLogin(tenant, customLoginURL, forceClientID) {
     const fClientID = forceClientID || false;

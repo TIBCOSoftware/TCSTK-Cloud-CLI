@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "arg": "^4.1.3",
+    "axios": "^0.21.1",
     "child_process": "^1.0.2",
     "chokidar": "^3.5.0",
     "colors": "^1.4.0",
@@ -41,8 +42,8 @@
     "webpack-cli": "^4.3.1"
   },
   "bin": {
-    "tcli_prod": "dist/tcli/main.js",
-    "tcli": "src/bin/cloud-cli.js"
+    "tcli": "dist/tcli/main.js",
+    "tcli_dev": "src/bin/cloud-cli.js"
   },
   "pkg": {
     "assets": [
