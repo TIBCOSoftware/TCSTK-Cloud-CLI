@@ -81,11 +81,13 @@ export function echomd() {
     txt = txt.replace(/^(\#{1,6})[ \t]+(.+?)[ \t]*\#*([\r\n]+|$)/gm, getHeader);
     // bold dim underline blink reverse hidden strike
     txt = txt.replace(/(\*{1,2})(?=\S)(.*?)(\S)\1/g, '\x1B[1m$2$3\x1B[22m');
+    /* HUGO: Removed this so '-' characters don't disappear
     txt = txt.replace(
         /(-{1,2})(?=\S)(.*?)(\S)\1/g,
         '\x1B[' + DIM_START + 'm$2$3\x1B[' + DIM_END + 'm'
-    );
-    txt = txt.replace(/(_{1,2})(?=\S)(.*?)(\S)\1/g, '\x1B[4m$2$3\x1B[24m');
+    );*/
+    // HUGO: Removed this to make underscores look correctly
+    // txt = txt.replace(/(_{1,2})(?=\S)(.*?)(\S)\1/g, '\x1B[4m$2$3\x1B[24m');
     txt = txt.replace(
         /(\:{1,2})(?=\S)(.*?)(\S)\1/g,
         function ($0, $1, $2, $3) {
@@ -105,6 +107,12 @@ export function echomd() {
     txt = txt.replace(/(!?)#([a-zA-Z0-9]{3,8})\((.+?)\)(?!\))/g, getColor);
     txt = txt.replace(singleLineCode, restoreHidden);
     txt = txt.replace(multiLineCode, restoreHidden);
+
+    // HUGO: Added this to show the example
+    txt = txt.replace('```console', '---');
+    txt = txt.replace('```', '---');
+
+
     return txt;
 }
 

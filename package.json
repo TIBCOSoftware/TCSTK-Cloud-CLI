@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "scripts": {
     "postinstall": "node message.js",
     "testO": "node ./test/run-test-cases.js",
@@ -41,8 +41,8 @@
     "webpack-cli": "^4.3.1"
   },
   "bin": {
-    "tcli": "dist/tcli/main.js",
-    "tcli_dev": "src/bin/cloud-cli.js"
+    "tcli_prod": "dist/tcli/main.js",
+    "tcli": "src/bin/cloud-cli.js"
   },
   "pkg": {
     "assets": [
