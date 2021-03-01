@@ -329,12 +329,16 @@ function importSharedStateFile(ssFile) {
                 const contentContentFile = fs.readFileSync(contentFile, "utf8");
                 // console.log('GOT: ' , contentContentFile);
                 try {
-                    // TODO: Parse stringify and check for weird characters: Try this package: https://www.npmjs.com/package/axios
-                    ssObject.content.json = contentContentFile;
+                    // Parse JSON to make it shorter (and Axios is handling weir characters)
+                    const shortJSONString = JSON.stringify(JSON.parse(contentContentFile));
+                    console.log('shortJsonString: ', shortJSONString);
+                    ssObject.content.json = shortJSONString;
                 } catch (e) {
-                    log(ERROR, 'Parse Error on: ' + contentFile);
-                    log(ERROR, e.message);
-                    process.exit(1);
+                    log(WARNING, 'Parse Error on: ' + contentFile);
+                    log(WARNING, e.message);
+                    // process.exit(1);
+                    return null;
+                    // throw new Error('PARSE');
                 }
                 // ssObject.content.json = ssObject.content.json;
             }
@@ -344,45 +348,14 @@ function importSharedStateFile(ssFile) {
     return ssObject;
 }
 
-/*
-  const contentContentFile = fs.readFileSync(contentFile, 'utf-8');
-                // console.log('GOT: ' , contentContentFile);
-                try {
-                    var jsonString = contentContentFile.replace(/(\r\n|\n|\r)/g,"");
-                    console.log('shortJsonString: ' ,jsonString);
-                    var object = JSON.parse(jsonString);
-                    // console.log(object);
-                    var myJSONString = JSON.stringify(JSON.parse(jsonString));
-                    var myEscapedJSONString = myJSONString.replace(/\\n/g, "\\n")
-                        .replace(/\\'/g, "\\'")
-                        .replace(/\\"/g, '\\"')
-                        .replace(/\\&/g, "\\&")
-                        .replace(/\\r/g, "\\r")
-                        .replace(/\\t/g, "\\t")
-                        .replace(/\\b/g, "\\b")
-                        .replace(/\\f/g, "\\f");
-                    // myEscapedJSONString is now ready to be POST'ed to the server.
-                    ssObject.content.json = myEscapedJSONString;
-                    console.log('ssObject: ', ssObject.content.json);
-                } catch (e) {
-                    log(ERROR, 'Parse Error on: ' + contentFile);
-                    log(ERROR, e.message);
-                    process.exit(1);
-                }
-                // ssObject.content.json = ssObject.content.json;
-
- */
-
 async function putSharedState(sharedStateObject) {
     prepSharedStateProps();
-    if (sharedStateObject != null || sharedStateObject !== '' || sharedStateObject !== {}) {
+    if (sharedStateObject != null && sharedStateObject !== '' && sharedStateObject !== {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
          await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
-        // const re = response;
-        // TODO: Check for errors, and if the state does not exist use post..
     } else {
-        log(ERROR, 'NOT Posting Empty Shared State: ', sharedStateObject)
+        log(ERROR, 'NOT Posting Shared State... ');
     }
 }
 
@@ -413,9 +386,10 @@ export async function importSharedState() {
         let answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions);
         if (answer === 'ALL SHARED STATES') {
             // Import all shared states
-            for (curState of importOptions) {
+            for (const curState of importOptions) {
                 if (curState !== 'ALL SHARED STATES') {
                     // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
+
                     putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
                 }
             }
