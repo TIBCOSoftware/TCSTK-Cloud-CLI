@@ -22,4 +22,4 @@ The property file: <FILE>.properties already exists, do you want to Overwrite it
 
 
 For more information see the **Managing multiple TIBCO Cloud Organizations** section in the online documentation:
-[Managing multiple TIBCO Cloud Organizations](../tutorials/004_Multiple_Organizations.md)
+[Managing multiple TIBCO Cloud Organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/004_Multiple_Organizations/)

@@ -28,4 +28,4 @@ TIBCO CLOUD CLI] (INFO)  DESCRIPTOR LOCATION: https://eu.liveapps.cloud.tibco.co
 ```
 
 For more information see the **Get started with Cloud Starters** section in the online documentation:
-[Get started with Cloud Starters](../tutorials/003_Get_Started_With_Cloud_Starters.md)
+[Get started with Cloud Starters](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)
