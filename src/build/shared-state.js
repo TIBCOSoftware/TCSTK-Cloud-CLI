@@ -331,7 +331,7 @@ function importSharedStateFile(ssFile) {
                 try {
                     // Parse JSON to make it shorter (and Axios is handling weir characters)
                     const shortJSONString = JSON.stringify(JSON.parse(contentContentFile));
-                    console.log('shortJsonString: ', shortJSONString);
+                    // console.log('shortJsonString: ', shortJSONString);
                     ssObject.content.json = shortJSONString;
                 } catch (e) {
                     log(WARNING, 'Parse Error on: ' + contentFile);
