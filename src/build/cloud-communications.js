@@ -15,8 +15,11 @@ let isOrgChecked = false;
 // An HTTP request based on Axios library
 // TODO: Look at managing Axios error handling
 // https://stackoverflow.com/questions/43842711/can-i-throw-error-in-axios-post-based-on-response-status
-export async function doAxiosRequest(url, options, data) {
+export async function doRequest(url, options, data) {
     const axios = require('axios').default;
+    axios.defaults.validateStatus = () => {
+        return true;
+    };
     // console.log(options);
     if(data){
         options['data'] = data;
@@ -40,7 +43,7 @@ export async function doAxiosRequest(url, options, data) {
 }
 
 // We have replaced this manual request by Axios, to handle weird characters
-export function doRequest(url, options, data) {
+export function doManualRequest(url, options, data) {
     const https = require('https');
     return new Promise((resolve, reject) => {
         const req = https.request(url, options, (res) => {
