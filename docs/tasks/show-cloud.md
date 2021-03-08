@@ -14,7 +14,6 @@ This is useful to test the connection with a specific cloud organization.
 ### Alternatives
 > tcli sc
 
-
 ---
 ### Example Result:
 
@@ -31,4 +30,3 @@ TIBCO CLOUD CLI] (INFO)  Using OAUTH Authentication, ORGANIZATION: TIBCO LABS DE
 |    6    | 'SANDBOX 0 ID' |       '1234'        |
 |    7    |  'SANDBOX 1'   |     'Developer'     |
 |    8    | 'SANDBOX 1 ID' |       '4321'        |
-
