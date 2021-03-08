@@ -1,6 +1,7 @@
 const CCOM = require('./cloud-communications');
 //TODO Possibly circular dependency ???
 const VAL = require('./validation');
+const colors = require('colors');
 
 let globalProductionSandbox = null;
 
@@ -20,11 +21,19 @@ export async function getProductionSandbox() {
 // Shared state folder (picked up from configuration if exists)
 let CASE_FOLDER = './Cases/';
 
-function checkCaseFolder() {
+async function checkCaseFolder() {
     if (getProp('Case_Folder') != null) {
         CASE_FOLDER = getProp('Case_Folder');
     } else {
         addOrUpdateProperty(getPropFileName(), 'Case_Folder', CASE_FOLDER);
+    }
+    // Potentially use the organization name in the Case Folder property
+    if(CASE_FOLDER.toLowerCase().indexOf('~{organization}') > 0){
+        if(!getOrganization()){
+            await CCOM.showCloudInfo(false);
+        }
+        CASE_FOLDER = CASE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
+        log(INFO, 'Using Case Folder: ' + colors.blue(CASE_FOLDER));
     }
 }
 
@@ -66,7 +75,7 @@ export async function showLiveApps(doShowTable, doCountCases) {
 const storeOptions = {spaces: 2, EOL: '\r\n'};
 
 export async function exportLiveAppsCaseType() {
-    checkCaseFolder();
+    await checkCaseFolder();
     const cTypes = await showLiveApps(true, false);
     let cTypeArray = [];
     for (const curCase in cTypes) {
@@ -97,7 +106,7 @@ const exportCaseStepSize = 30;
 
 // Function to export case data
 export async function exportLiveAppsData() {
-    checkCaseFolder();
+    await checkCaseFolder();
     const cTypes = await showLiveApps(true, true);
     let cTypeArray = [];
     for (const curCase in cTypes) {
@@ -133,6 +142,7 @@ export async function exportLiveAppsData() {
                 const dayAddition = '(' + today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '_h' + today.getHours() + 'm' + today.getMinutes() + ')';
                 cfName = CASE_FOLDER + 'Export-' + typeForExport + dayAddition + '/';
             }
+            mkdirIfNotExist(CASE_FOLDER);
             mkdirIfNotExist(cfName);
             mkdirIfNotExist(cfName + 'CONTENT/');
             let AllCaseArray = [];
@@ -182,7 +192,7 @@ export async function exportLiveAppsData() {
 
 //DONE: Add Export Feature to one file. (Just the data and to use for import)
 export async function createLAImportFile() {
-    checkCaseFolder();
+    await checkCaseFolder();
     log(INFO, ' -- Generate Live Aps Import Configuration file --- ');
     //TODO: Create a generator for the input feature. (based on the template and ask to add steps)
     //TODO: Make sure you are not overwriting a current import file.
@@ -213,7 +223,7 @@ export async function createLAImportFile() {
 
 // Function to Import LiveApps Case Data based on Config File
 export async function importLiveAppsData() {
-    checkCaseFolder();
+    await checkCaseFolder();
     log(INFO, ' -- Gathering Import Configuration --- ');
     const importFolder = process.cwd() + '/' + CASE_FOLDER + 'Import/';
     let importFile = importFolder + 'import-live-apps-data-configuration.json';

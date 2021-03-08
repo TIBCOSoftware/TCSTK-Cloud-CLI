@@ -10,7 +10,7 @@ let SHARED_STATE_DOUBLE_CHECK = 'YES';
 let SHARED_STATE_FOLDER = './Shared_State/';
 let DO_SHARED_STATE_DOUBLE_CHECK = true;
 
-function prepSharedStateProps() {
+async function prepSharedStateProps() {
     // Shared state filter (picked up from configuration if exists)
     if (getProp('Shared_State_Filter') != null) {
         SHARED_STATE_FILTER = getProp('Shared_State_Filter');
@@ -32,11 +32,19 @@ function prepSharedStateProps() {
     } else {
         addOrUpdateProperty(getPropFileName(), 'Shared_State_Folder', SHARED_STATE_FOLDER);
     }
+    // Potentially use the organization name in the Folder property
+    if(SHARED_STATE_FOLDER.toLowerCase().indexOf('~{organization}') > 0){
+        if(!getOrganization()){
+            await CCOM.showCloudInfo(false);
+        }
+        SHARED_STATE_FOLDER = SHARED_STATE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
+        log(INFO, 'Using Shared State Folder: ' + colors.blue(SHARED_STATE_FOLDER));
+    }
 }
 
 // Function to return a JSON with the shared state entries from a set filter
 export async function getSharedState(showTable) {
-    prepSharedStateProps();
+    await prepSharedStateProps();
     // const lCookie = cLogin();
     // log(DEBUG, 'Login Cookie: ', lCookie);
     //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
@@ -308,8 +316,8 @@ export async function exportSharedState(verbose) {
 }
 
 // Load shared state contents from a file
-function importSharedStateFile(ssFile) {
-    prepSharedStateProps();
+async function importSharedStateFile(ssFile) {
+    await prepSharedStateProps();
     log(DEBUG, 'Importing: ' + ssFile);
     const fs = require('fs');
     const contentContextFile = fs.readFileSync(ssFile).toString();
@@ -349,7 +357,7 @@ function importSharedStateFile(ssFile) {
 }
 
 async function putSharedState(sharedStateObject) {
-    prepSharedStateProps();
+    await prepSharedStateProps();
     if (sharedStateObject != null && sharedStateObject !== '' && sharedStateObject !== {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
          await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
@@ -361,7 +369,7 @@ async function putSharedState(sharedStateObject) {
 
 // Import the Shared state filter from a folder
 export async function importSharedState() {
-    prepSharedStateProps();
+    await prepSharedStateProps();
     //console.log('ORG: ', getOrganization());
     let importOptions = [];
     // Go Over Shared State files
@@ -390,11 +398,11 @@ export async function importSharedState() {
                 if (curState !== 'ALL SHARED STATES') {
                     // console.log('Updating: ' + SHARED_STATE_FOLDER + curState);
 
-                    putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + curState));
+                    putSharedState((await importSharedStateFile(SHARED_STATE_FOLDER + curState)));
                 }
             }
         } else {
-            putSharedState(importSharedStateFile(SHARED_STATE_FOLDER + answer));
+            putSharedState((await importSharedStateFile(SHARED_STATE_FOLDER + answer)));
         }
     } else {
         log(ERROR, 'No Shared States found for import in: ' + SHARED_STATE_FOLDER);
@@ -407,7 +415,7 @@ export async function importSharedState() {
 
 //wrapper function around the watcher on shared state
 export async function watchSharedStateMain() {
-    prepSharedStateProps();
+    await prepSharedStateProps();
     const commandSTDO = 'tcli watch-shared-state-do -p "' + getPropFileName() + '"';
     const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state (filtered) ?', ['YES', 'NO']);
     if (decision === 'YES') {
@@ -424,10 +432,10 @@ export function watchSharedState() {
     const chokidar = require('chokidar');
     return new Promise(async function (resolve) {
         //Do the login now, so it does not have to be done later
-        prepSharedStateProps();
+        await prepSharedStateProps();
         await CCOM.cLogin();
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
-        const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', (event, path) => {
+        const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', async (event, path) => {
             if (event === 'change') {
                 if(ignoreChanges <= 0) {
                     let pS = '/';
@@ -438,7 +446,7 @@ export function watchSharedState() {
                         log(INFO, 'CONTENT File UPDATED: ' + path);
                         const contextFile = path.replace(pS + 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
                         if (doesFileExist(contextFile)) {
-                            putSharedState(importSharedStateFile(contextFile));
+                            putSharedState((await importSharedStateFile(contextFile)));
                         } else {
                             log(ERROR, 'Can\'t find context file: ' + contextFile);
                         }

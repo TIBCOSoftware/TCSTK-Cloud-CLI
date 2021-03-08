@@ -21,6 +21,12 @@ Possible values: (PUBLIC | SHARED | PRIVATE)
 
 > Shared_State_Folder
 
+Note that you can use ~{ORGANIZATION}, to use the current organization name in your folder.
+
+For example:
+
+> Shared_State_Folder=./Shared_State (~{ORGANIZATION})/
+
 Folder used for Shared State imports and exports
 
 > Shared_State_Double_Check

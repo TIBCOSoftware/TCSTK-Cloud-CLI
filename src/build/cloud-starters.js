@@ -56,7 +56,7 @@ export async function cleanDist() {
     return deleteFolder('./dist/' + getProp('App_Name'));
 }
 
-export function generateCloudDescriptor () {
+export function generateCloudDescriptor() {
     // Add Descriptor
     let ADD_DESCRIPTOR = 'YES';
     if (getProp('Add_Descriptor') !== null) {
@@ -176,11 +176,11 @@ export async function showAvailableApps(showTable) {
     //TODO: Use table config
     const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     // TODO: loop over if there are more than 200
-    const response =  await CCOM.callTCA(CCOM.clURI.app_info + '?$top=200', false, {handleErrorOutside: true});
+    const response = await CCOM.callTCA(CCOM.clURI.app_info + '?$top=200', false, {handleErrorOutside: true});
     // console.log(response)
     if (response.errorMsg) {
         if (response.errorMsg === 'Application does not exist') {
-            log(INFO, 'No Cloud Starters deployed yet...');
+            log(WARNING, 'No Cloud Starters deployed yet...');
             return null;
         } else {
             log(ERROR, response.errorMsg);
@@ -200,8 +200,8 @@ export async function showAvailableApps(showTable) {
             //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
             appTemp['APP NAME'] = response[app].name;
             let owner = 'Unknown';
-            for (const user of users){
-                if(user.Id === response[app].owner){
+            for (const user of users) {
+                if (user.Id === response[app].owner) {
                     owner = user['First Name'] + ' ' + user['Last Name'];
                 }
             }
@@ -235,7 +235,7 @@ export async function showAvailableApps(showTable) {
             appsDisplay[appN] = appTempDisplay;
         }
         pexTable(apps, 'cloud-starters', getPEXConfig(), false);
-        if(doShowTable){
+        if (doShowTable) {
             log(INFO, colors.blue('TABLE] cloud-starters'));
             console.table(appsDisplay)
         }
@@ -263,7 +263,7 @@ export async function deleteApp() {
     }
     if (deleteApp) {
         log(INFO, 'Deleting ' + appToDelete + '...');
-        const da =  await CCOM.callTCA(CCOM.clURI.app_info + appToDelete + '/', false ,{method: 'DELETE'});
+        const da = await CCOM.callTCA(CCOM.clURI.app_info + appToDelete + '/', false, {method: 'DELETE'});
         if (da) {
             if (da.message) {
                 log(INFO, da.message);
@@ -293,7 +293,7 @@ async function getApplicationDetails(application, version, showTable) {
         if (i !== 0) {
             skip = '&$skip=' + i
         }
-        const appDet =  await CCOM.callTCA(CCOM.clURI.app_info + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip);
+        const appDet = await CCOM.callTCA(CCOM.clURI.app_info + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip);
         if (appDet) {
             if (appDet.length < artefactStepSize) {
                 hasMoreArtefacts = false;
@@ -322,48 +322,50 @@ export async function getAppLinks(showTable) {
     log(INFO, 'Getting Cloud Starter Links...');
     const appLinkTable = {};
     const apps = await showAvailableApps(false);
-    let i = 1;
-    let nvs = [];
-    for (let app of apps) {
-        const appTemp = {};
-        appTemp['APP NAME'] = app.name;
-        nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
-        nvs = createTableValue('NAME', app.name, nvs);
-        const appN = i++;
-        const tempDet = await getApplicationDetails(app.name, app.publishedVersion, false);
-        logLine("Processing App: (" + appN + '/' + apps.length + ')...');
-        if (isIterable(tempDet)) {
-            for (let appD of tempDet) {
-                // Get file after last slash in Descriptor file name; expected cloudstarter.json
-                if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
-                    const csInfo =  await CCOM.callTCA(CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name, false);
-                    // const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
-                    if (csInfo && csInfo.cloudstarter) {
-                        appTemp['CS VERSION'] = csInfo.cloudstarter.version;
-                        nvs = createTableValue('VERSION', csInfo.cloudstarter.version, nvs);
-                        appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
-                        nvs = createTableValue('BUILD DATE', csInfo.cloudstarter.build_date, nvs);
+    if (apps) {
+        let i = 1;
+        let nvs = [];
+        for (let app of apps) {
+            const appTemp = {};
+            appTemp['APP NAME'] = app.name;
+            nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
+            nvs = createTableValue('NAME', app.name, nvs);
+            const appN = i++;
+            const tempDet = await getApplicationDetails(app.name, app.publishedVersion, false);
+            logLine("Processing App: (" + appN + '/' + apps.length + ')...');
+            if (isIterable(tempDet)) {
+                for (let appD of tempDet) {
+                    // Get file after last slash in Descriptor file name; expected cloudstarter.json
+                    if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
+                        const csInfo = await CCOM.callTCA(CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name, false);
+                        // const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
+                        if (csInfo && csInfo.cloudstarter) {
+                            appTemp['CS VERSION'] = csInfo.cloudstarter.version;
+                            nvs = createTableValue('VERSION', csInfo.cloudstarter.version, nvs);
+                            appTemp['BUILD DATE'] = csInfo.cloudstarter.build_date;
+                            nvs = createTableValue('BUILD DATE', csInfo.cloudstarter.build_date, nvs);
+                        }
+                    }
+                    if (appD.name.includes("index.html")) {
+                        const tempLink = 'https://' + getCurrentRegion() + CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name;
+                        appTemp['LINK'] = tempLink;
+                        nvs = createTableValue('LINK', tempLink, nvs);
                     }
                 }
-                if (appD.name.includes("index.html")) {
-                    const tempLink = 'https://' + getCurrentRegion() + CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name;
-                    appTemp['LINK'] = tempLink;
-                    nvs = createTableValue('LINK', tempLink, nvs);
+            } else {
+                if (app.name && tempDet && tempDet.errorMsg) {
+                    log(ERROR, 'App: ' + app.name + ', Error: ' + tempDet.errorMsg);
+                } else {
+                    log(ERROR, 'Something is wrong with ', app, tempDet);
                 }
             }
-        } else {
-            if (app.name && tempDet && tempDet.errorMsg) {
-                log(ERROR, 'App: ' + app.name + ', Error: ' + tempDet.errorMsg);
-            } else {
-                log(ERROR, 'Something is wrong with ', app, tempDet);
-            }
+            appLinkTable[appN] = appTemp;
         }
-        appLinkTable[appN] = appTemp;
-    }
-    process.stdout.write('\n');
-    pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), false);
-    if(showTable){
-        console.table(nvs);
+        process.stdout.write('\n');
+        pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), false);
+        if (showTable) {
+            console.table(nvs);
+        }
     }
     return appLinkTable;
 }
@@ -396,9 +398,9 @@ export function uploadApp(application) {
             });
             res.on('end', () => {
                 // console.log(data);
-                if(data){
+                if (data) {
                     const dataObj = JSON.parse(data);
-                    if(dataObj && dataObj.message) {
+                    if (dataObj && dataObj.message) {
                         log(INFO, 'UPLOAD RESULT:', colors.green(dataObj.message));
                     } else {
                         log(WARNING, 'UPLOAD RESULT:', data);
@@ -421,7 +423,7 @@ export function uploadApp(application) {
 export async function publishApp(application) {
     return new Promise(async function (resolve) {
         // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
-        const response =  await CCOM.callTCA(CCOM.clURI.app_info , false, {method: 'PUT'});
+        const response = await CCOM.callTCA(CCOM.clURI.app_info, false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);
         resolve();
     });
@@ -475,14 +477,14 @@ export function undoLibSources() {
 }
 
 // Function to test
-export function testCS (){
+export function testCS() {
     log(INFO, 'Running Testcases...');
     // TODO: See if we can call Jasmine directly and generate a nicer testreport
     run('npm run test');
 }
 
 // Function to test headless
-export function testCSHeadless (){
+export function testCSHeadless() {
     log(INFO, 'Running Headless Testcases...');
     // TODO: See if we can call Jasmine directly and generate a nicer testreport
     run('ng test --code-coverage --watch=false --browsers=ChromeHeadless');

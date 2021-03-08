@@ -10,7 +10,11 @@ The following properties in the cloud properties file are being used:
 
 > Case_Folder
 
-This determines which folder you want to export to.
+This determines which folder you want to export to. Note that you can use ~{ORGANIZATION}, to use the current organization name in your folder. 
+
+For example: 
+
+> Case_Folder=./Cases (~{ORGANIZATION})/
 
 ---
 ### Questions:

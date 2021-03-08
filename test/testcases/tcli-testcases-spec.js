@@ -216,6 +216,10 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PRIVATE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-shared-state-scope -a YES')).toBe(true);
+        // Export to Organization Folder
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:Shared_State_Folder:none:./Shared_State (~{ORGAniZAtION})/"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'export-shared-state-scope -a YES')).toBe(true);
+
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PUBLIC')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
 
@@ -243,6 +247,11 @@ describe("tcli testsuite", function () {
         // ERROR
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:FAKE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(false);
+
+
+
+
+
     });
 
 
@@ -256,8 +265,11 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'export-live-apps-case-type -a Discoveranalysis:Discoveranalysis.json')).toBe(true);
         // TODO: Allow for NONE
         // TODO: Allow for All
-        // TODO: Allow for default on folder input
-        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discoveranalysis:DiscoFOLDER')).toBe(true);
+
+        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discoveranalysis:DiscoFOLDER/')).toBe(true);
+        // Allow for default on folder input
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:Case_Folder:none:./Cases (~{ORGAniZAtION})/"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discoveranalysis:DEFAULT')).toBe(true);
     });
 
     // Validation Testcases
