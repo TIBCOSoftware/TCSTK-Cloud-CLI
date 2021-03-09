@@ -10,6 +10,7 @@ let SHARED_STATE_DOUBLE_CHECK = 'YES';
 let SHARED_STATE_FOLDER = './Shared_State/';
 let DO_SHARED_STATE_DOUBLE_CHECK = true;
 
+let ssInformed = false;
 async function prepSharedStateProps() {
     // Shared state filter (picked up from configuration if exists)
     if (getProp('Shared_State_Filter') != null) {
@@ -38,7 +39,10 @@ async function prepSharedStateProps() {
             await CCOM.showCloudInfo(false);
         }
         SHARED_STATE_FOLDER = SHARED_STATE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
-        log(INFO, 'Using Shared State Folder: ' + colors.blue(SHARED_STATE_FOLDER));
+        if(!ssInformed) {
+            log(INFO, 'Using Shared State Folder: ' + colors.blue(SHARED_STATE_FOLDER));
+            ssInformed = true;
+        }
     }
 }
 
