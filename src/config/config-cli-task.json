@@ -1,118 +1,147 @@
 {
   "cliTasks": {
-   "test-task": {
+    "test-task": {
       "description": "Run Test",
       "enabled": false,
       "internal": false,
       "task": "testTask",
-      "taskName": "test-task",
-      "availableOnOs": ["win32","darwin"],
-      "availableOnTemplate": ["all"]
+      "availableOnOs": [
+        "win32",
+        "darwin"
+      ],
+      "availableOnTemplate": [
+        "all"
+      ]
     },
-    "1. show-cloud": {
+    "show-cloud": {
       "description": "Show Cloud Details",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showCloud",
-      "taskName": "show-cloud",
-      "taskAlternativeNames": ["sc"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "sc"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tcli"
     },
-    "2. show-cloud-starters": {
-      "description": "Show Applications of LiveApps WebApps",
+    "show-cloud-starters": {
+      "description": "Show a Table of all the deployed Cloud Starters",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showApps",
-      "taskName": "show-cloud-starters",
-      "taskAlternativeNames": ["scs"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "scs", "show"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "3. show-cloud-starter-links": {
-      "description": "Show Links to Applications of LiveApps WebApps",
+    "show-cloud-starter-links": {
+      "description": "Show Links to your Cloud Starters",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showLinks",
-      "taskName": "show-cloud-starter-links",
-      "taskAlternativeNames": ["sl"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "sl", "show-links"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "4. show-properties": {
-      "description": "Shows the properties in your properties file (and possibly the global values)",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showPropertiesWrapper",
-      "taskName": "show-properties",
-      "taskAlternativeNames": ["sp"],
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "5. start-cloud-starter": {
+    "start-cloud-starter": {
       "description": "Start your local cloud starter project",
       "enabled": true,
       "internal": false,
       "task": "startWrapper",
-      "taskName": "start-cloud-starter",
-      "taskAlternativeNames": ["s", "start"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "s",
+        "start"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "6. build-cloud-starter": {
+    "build-cloud-starter": {
       "description": "Build your local cloud starter project",
       "enabled": true,
       "internal": false,
       "task": "buildCloudStarter",
-      "taskName": "build-cloud-starter",
-      "taskAlternativeNames": ["b", "build"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "b",
+        "build"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "7. test-cloud-starter": {
+    "test-cloud-starter": {
       "description": "Run Test cases for your cloud starter",
       "enabled": true,
       "internal": false,
       "task": "testCSWrapper",
-      "taskName": "test-cloud-starter",
-      "taskAlternativeNames": ["t,test"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "t,test"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters",
-      "availableOnTemplate": ["all"]
+      "availableOnTemplate": [
+        "all"
+      ]
     },
-    "8. test-cloud-starter-headless": {
+    "test-cloud-starter-headless": {
       "description": "Run Test cases for your cloud starter, headless (without opening the browser)",
       "enabled": true,
       "internal": false,
       "task": "testCSHeadlessWrapper",
-      "taskName": "test-cloud-starter-headless",
-      "taskAlternativeNames": ["th", "test-headless "],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "th",
+        "test-headless "
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters",
-      "availableOnTemplate": ["all"]
+      "availableOnTemplate": [
+        "all"
+      ]
     },
-    "9. deploy-cloud-starter": {
+    "deploy-cloud-starter": {
       "description": "Deploy your local cloud starter project",
       "enabled": true,
       "internal": false,
       "task": "deploy",
-      "taskName": "deploy-cloud-starter",
-      "taskAlternativeNames": ["d", "deploy"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "d",
+        "deploy"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "10. build-deploy-cloud-starter": {
+    "build-deploy-cloud-starter": {
       "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
       "task": "buildDeploy",
-      "taskName": "build-deploy-cloud-starter",
-      "taskAlternativeNames": ["bd", "build-deploy"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "bd",
+        "build-deploy"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
     "publish": {
@@ -120,17 +149,19 @@
       "enabled": false,
       "internal": false,
       "task": "publish",
-      "taskName": "publish",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "11. delete-cloud-starter": {
+    "delete-cloud-starter": {
       "description": "Delete a LiveApps WebApp",
       "enabled": true,
       "internal": false,
       "task": "deleteAppWrapper",
-      "taskName": "delete-cloud-starter",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
     "clean": {
@@ -138,8 +169,29 @@
       "enabled": false,
       "internal": true,
       "task": "cleanTemp",
-      "taskName": "clean",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-starters"
+    },
+    "generate-cloud-descriptor": {
+      "description": "Generates the configured Public Cloud Descriptor",
+      "enabled": true,
+      "internal": false,
+      "task": "generateCloudDescriptorWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-starters"
+    },
+    "update-cloud-packages": {
+      "description": "Updates the NPM packages in the @tibco-tcstk scope in your project.",
+      "enabled": true,
+      "internal": false,
+      "task": "updateCloudPackagesWrapper",
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
     "get-cloud-libs-from-git": {
@@ -147,135 +199,384 @@
       "enabled": false,
       "internal": true,
       "task": "getCLgit",
-      "taskName": "get-cloud-libs-from-git",
-      "availableOnOs": ["darwin"],
+      "availableOnOs": [
+        "darwin"
+      ],
       "category": "cloud-starters"
     },
-    "12. inject-lib-sources": {
+    "inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
       "task": "injectLibSourcesWrapper",
-      "taskName": "inject-lib-sources",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "13. undo-lib-sources": {
+    "undo-lib-sources": {
       "description": "Undoes the enabling for Cloud Library Debugging",
       "enabled": true,
       "internal": false,
       "task": "undoLibSourcesWrapper",
-      "taskName": "undo-lib-sources",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "14. schematic-add": {
+    "schematic-add": {
       "description": "Add a schematic into your project",
       "enabled": true,
       "internal": false,
       "task": "schematicAddWrapper",
-      "taskName": "schematic-add",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "15. view-global-config": {
+    "show-properties": {
+      "description": "Shows the properties in your properties file (and possibly the global values)",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showPropertiesWrapper",
+      "taskAlternativeNames": [
+        "sp"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "add-or-update-property": {
+      "description": "Adds or Updates a property in a file.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "updatePropertyWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "view-global-config": {
       "description": "View the global cloud connection configuration",
       "enabled": true,
       "internal": false,
       "task": "viewGlobalConfig",
-      "taskName": "view-global-config",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tcli"
     },
-    "16. update-global-config": {
+    "update-global-config": {
       "description": "Update the global cloud connection configuration",
       "enabled": true,
       "internal": false,
       "task": "updateGlobalConfig",
-      "taskName": "update-global-config",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tcli"
     },
-    "17. show-shared-state": {
+    "create-multiple-property-file": {
+      "description": "Creating an initial property file to manage multiple cloud starters and environments.",
+      "enabled": true,
+      "internal": false,
+      "task": "createMultiplePropertyFileWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "generate-cloud-property-files": {
+      "description": "Generates a list of cloud property files.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "generateCloudPropertyFilesWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "replace-string-in-file": {
+      "description": "Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties",
+      "enabled": true,
+      "internal": false,
+      "task": "replaceStringInFileWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "validate": {
+      "description": "Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "validateWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "show-live-apps-cases": {
+      "description": "Show Live Apps Cases",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "export-live-apps-case-type": {
+      "description": "Export the details of a Live Apps Case Type",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "exportLiveAppsCaseTypeWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "export-live-apps-cases": {
+      "description": "Export Data from Live Apps",
+      "enabled": true,
+      "internal": false,
+      "task": "exportLiveAppsDataWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "generate-live-apps-import-configuration": {
+      "description": "Generate the Live Apps Import configuration file",
+      "enabled": true,
+      "internal": false,
+      "task": "generateLiveAppsImportConfiguration",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "import-live-apps-cases": {
+      "description": "Import Cases to Live Apps",
+      "enabled": true,
+      "internal": false,
+      "task": "importLiveAppsDataWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "csv-to-json-live-apps-data": {
+      "description": "Convert CSV to JSON for LiveApps data",
+      "enabled": false,
+      "internal": false,
+      "task": "csvToJsonLiveAppsDataWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "json-to-csv-liveapps-data": {
+      "description": "Convert JSON to CSV for LiveApps data",
+      "enabled": false,
+      "internal": false,
+      "task": "jsonToCsvLiveAppsDataWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-org-folders": {
+      "description": "Displays the content of the LiveApps Organization Folders.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showOrgFoldersWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "export-org-folder": {
+      "description": "Exports the content of a LiveApps Organization Folder to disk.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "exportOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "import-org-folder": {
+      "description": "Imports the content of a folder on disk to a LiveApps Organization Folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "importOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "watch-org-folder": {
+      "description": "Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "watchOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-live-apps-groups": {
+      "description": "Displays the LiveApps groups and their users.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsGroupsWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "create-live-apps-group": {
+      "description": "Creates a new LiveApps group.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "createLiveAppsGroupWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-live-apps-users": {
+      "description": "Shows the users in LiveApps (which can be added to groups).",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsUsersWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "add-user-to-group": {
+      "description": "Adds a user to a LiveApps group.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "addUserToGroupWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-shared-state": {
       "description": "Show the shared state contents",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showSharedState",
-      "taskName": "show-shared-state",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "18. show-shared-state-details": {
+    "show-shared-state-details": {
       "description": "Shows the details of one Shared State entry.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showSharedStateDetailsWrapper",
-      "taskName": "show-shared-state-details",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "19. create-shared-state-entry": {
+    "create-shared-state-entry": {
       "description": "Create a new shared state entry",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "createSharedStateWrapper",
-      "taskName": "create-shared-state-entry",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "20. clear-shared-state-entry": {
+    "clear-shared-state-entry": {
       "description": "Removes one Shared State entry.",
       "enabled": true,
       "internal": false,
       "task": "removeSharedStateEntryWrapper",
-      "taskName": "clear-shared-state-entry",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "21. clear-shared-state-filter": {
+    "clear-shared-state-filter": {
       "description": "Removes all shared state entries in the configured filter.",
       "enabled": true,
       "internal": false,
       "task": "clearSharedStateWrapper",
-      "taskName": "clear-shared-state-filter",
-      "taskAlternativeNames": ["clear-shared-state-scope"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "clear-shared-state-scope"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "22. export-shared-state": {
+    "export-shared-state": {
       "description": "Downloads all shared state entries from the configured filter to the local file system.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "exportSharedStateWrapper",
-      "taskAlternativeNames": ["export-shared-state-scope"],
-      "taskName": "export-shared-state",
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "export-shared-state-scope"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "23. import-shared-state": {
+    "import-shared-state": {
       "description": "Uploads one entry or the configured filter from the local file system to the shared state.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "importSharedStateWrapper",
-      "taskAlternativeNames": ["import-shared-state-scope"],
-      "taskName": "import-shared-state",
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "import-shared-state-scope"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "24. watch-shared-state": {
+    "watch-shared-state": {
       "description": "Monitors the local shared state and when changes are detected it is uploaded to the cloud.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "watchSharedStateMainWrapper",
-      "taskName": "watch-shared-state",
-      "taskAlternativeNames": ["watch-shared-state-scope"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "watch-shared-state-scope"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
     "watch-shared-state-do": {
@@ -284,140 +585,45 @@
       "enabled": false,
       "internal": true,
       "task": "watchSharedStateWrapper",
-      "taskName": "watch-shared-state-do",
-      "taskAlternativeNames": ["watch-shared-state-scope-do"],
-      "availableOnOs": ["all"],
+      "taskAlternativeNames": [
+        "watch-shared-state-scope-do"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "shared-state"
     },
-    "25. create-multiple-property-file": {
-      "description": "Creating an initial property file to manage multiple cloud starters and environments.",
-      "enabled": true,
-      "internal": false,
-      "task": "createMultiplePropertyFileWrapper",
-      "taskName": "create-multiple-property-file",
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "26. replace-string-in-file": {
-      "description": "Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties",
-      "enabled": true,
-      "internal": false,
-      "task": "replaceStringInFileWrapper",
-      "taskName": "replace-string-in-file",
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "27. show-live-apps-cases": {
-      "description": "Show Live Apps Cases",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showLiveAppsWrapper",
-      "taskName": "show-live-apps-cases",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "28. export-live-apps-case-type": {
-      "description": "Export the details of a Live Apps Case Type",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "exportLiveAppsCaseTypeWrapper",
-      "taskName": "export-live-apps-case-type",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "29. export-live-apps-cases": {
-      "description": "Export Data from Live Apps",
-      "enabled": true,
-      "internal": false,
-      "task": "exportLiveAppsDataWrapper",
-      "taskName": "export-live-apps-cases",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "30. generate-live-apps-import-configuration": {
-      "description": "Generate the Live Apps Import configuration file",
-      "enabled": true,
-      "internal": false,
-      "task": "generateLiveAppsImportConfiguration",
-      "taskName": "generate-live-apps-import-configuration",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "31. import-live-apps-cases": {
-      "description": "Import Cases to Live Apps",
-      "enabled": true,
-      "internal": false,
-      "task": "importLiveAppsDataWrapper",
-      "taskName": "import-live-apps-cases",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "csv-to-json-live-apps-data": {
-      "description": "Convert CSV to JSON for LiveApps data",
-      "enabled": false,
-      "internal": false,
-      "task": "csvToJsonLiveAppsDataWrapper",
-      "taskName": "csv-to-json-liveapps-data",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "json-to-csv-liveapps-data": {
-      "description": "Convert JSON to CSV for LiveApps data",
-      "enabled": false,
-      "internal": false,
-      "task": "jsonToCsvLiveAppsDataWrapper",
-      "taskName": "json-to-csv-liveapps-data",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "32. generate-cloud-descriptor": {
-      "description": "Generates the configured Public Cloud Descriptor",
-      "enabled": true,
-      "internal": false,
-      "task": "generateCloudDescriptorWrapper",
-      "taskName": "generate-cloud-descriptor",
-      "availableOnOs": ["all"],
-      "category": "cloud-starters"
-    },
-    "33. update-cloud-packages": {
-      "description": "Updates the NPM packges in the @tibco-tcstk scope in your project.",
-      "enabled": true,
-      "internal": false,
-      "task": "updateCloudPackagesWrapper",
-      "taskName": "update-cloud-packages",
-      "availableOnOs": ["all"],
-      "category": "cloud-starters"
-    },
-    "34. show-tci-apps": {
+    "show-tci-apps": {
       "description": "List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showTCIWrapper",
-      "taskName": "show-tci-apps",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tci"
     },
-    "35. monitor-tci-app": {
+    "monitor-tci-app": {
       "description": "Monitor the logs of a TIBCO Cloud Integration Flogo Application",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "monitorTCIWrapper",
-      "taskName": "monitor-tci-app",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tci"
     },
-    "36. export-tci-app": {
+    "export-tci-app": {
       "description": "Exports a TCI-Flogo Application",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "exportTCIAppWrapper",
-      "taskName": "export-tci-app",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tci"
     },
     "describe-cloud": {
@@ -426,265 +632,178 @@
       "internal": false,
       "multipleInteraction": false,
       "task": "showCloud",
-      "taskName": "describe-cloud",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "cloud-starters"
     },
-    "37. show-oauth-tokens": {
-      "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showOauthTokenWrapper",
-      "taskName": "show-oauth-tokens",
-      "taskAlternativeNames": ["so"],
-      "availableOnOs": ["all"],
-      "category": "oauth"
-    },
-    "38. generate-oauth-token": {
-      "description": "Generate a new OAUTH token to authenticate to the TIBCO Cloud.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "generateOauthTokenWrapper",
-      "taskName": "generate-oauth-token",
-      "taskAlternativeNames": ["go"],
-      "availableOnOs": ["all"],
-      "category": "oauth"
-    },
-    "39. revoke-oauth-token": {
-      "description": "Revokes an existing OAUTH token.",
-      "enabled": true,
-      "internal": false,
-      "task": "revokeOauthTokenWrapper",
-      "taskName": "revoke-oauth-token",
-      "taskAlternativeNames": ["reo"],
-      "availableOnOs": ["all"],
-      "category": "oauth"
-    },
-    "40. rotate-oauth-token": {
-      "description": "Revokes your existing OAUTH token and then generates a new one.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "rotateOauthTokenWrapper",
-      "taskName": "rotate-oauth-token",
-      "taskAlternativeNames": ["ro"],
-      "availableOnOs": ["all"],
-      "category": "oauth"
-    },
-    "41. validate-and-rotate-oauth-token": {
-      "description": "Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "validateAndRotateOauthTokenWrapper",
-      "taskName": "validate-and-rotate-oauth-token",
-      "taskAlternativeNames": ["vo"],
-      "availableOnOs": ["all"],
-      "category": "oauth"
-    },
-    "42. generate-cloud-property-files": {
-      "description": "Generates a list of cloud property files.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "generateCloudPropertyFilesWrapper",
-      "taskName": "generate-cloud-property-files",
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "43. show-org-folders": {
-      "description": "Displays the content of the LiveApps Organization Folders.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showOrgFoldersWrapper",
-      "taskName": "show-org-folders",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "44. export-org-folder": {
-      "description": "Exports the content of a LiveApps Organization Folder to disk.",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "exportOrgFolderWrapper",
-      "taskName": "export-org-folder",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "45. import-org-folder": {
-      "description": "Imports the content of a folder on disk to a LiveApps Organization Folder.",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "importOrgFolderWrapper",
-      "taskName": "import-org-folder",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "46. watch-org-folder": {
-      "description": "Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "watchOrgFolderWrapper",
-      "taskName": "watch-org-folder",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "47. show-live-apps-groups": {
-      "description": "Displays the LiveApps groups and their users.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showLiveAppsGroupsWrapper",
-      "taskName": "show-live-apps-groups",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "48. create-live-apps-group": {
-      "description": "Creates a new LiveApps group.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "createLiveAppsGroupWrapper",
-      "taskName": "create-live-apps-group",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "49. show-live-apps-users": {
-      "description": "Shows the users in LiveApps (which can be added to groups).",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showLiveAppsUsersWrapper",
-      "taskName": "show-live-apps-users",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "50. add-user-to-group": {
-      "description": "Adds a user to a LiveApps group.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "addUserToGroupWrapper",
-      "taskName": "add-user-to-group",
-      "availableOnOs": ["all"],
-      "category": "live-apps"
-    },
-    "51. validate": {
-      "description": "Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "validateWrapper",
-      "taskName": "validate",
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "52. add-or-update-property": {
-      "description": "Adds or Updates a property in a file.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "updatePropertyWrapper",
-      "taskName": "add-or-update-property",
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "53. messaging-show-summary": {
+    "messaging-show-summary": {
       "description": "Show summary of cloud messaging",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showMessagingSummaryWrapper",
-      "taskName": "messaging-show-summary",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "messaging"
     },
-    "54. messaging-show-clients": {
+    "messaging-show-clients": {
       "description": "Show clients of cloud messaging",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showMessagingClientsWrapper",
-      "taskName": "messaging-show-clients",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "messaging"
     },
-    "55. browse-spotfire-library": {
+    "browse-spotfire-library": {
       "description": "List Spotfire Analytical Reports and browse through folders on the Spotfire Library.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "browseSpotfireLibraryWrapper",
-      "taskName": "browse-spotfire-library",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "spotfire"
     },
-    "55. list-spotfire-library": {
+    "list-spotfire-library": {
       "description": "Make a list of all specific components in your Spotfire Library (DXP's, Mods, Information links, Data files or Data connections)",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "listSpotfireLibraryWrapper",
-      "taskName": "list-spotfire-library",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "spotfire"
     },
-    "change-region": {
-      "description": "Change the Region in the cloud-properties file",
+    "show-oauth-tokens": {
+      "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
       "enabled": true,
       "internal": false,
-      "task": "changeRegion",
-      "taskName": "change-region",
-      "taskAlternativeNames": ["cr"],
-      "availableOnOs": ["all"],
-      "category": "cloud-starters"
+      "multipleInteraction": true,
+      "task": "showOauthTokenWrapper",
+      "taskAlternativeNames": [
+        "so"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "oauth"
     },
-    "obfuscate-password": {
-      "description": "Obfuscate a password and put it in the cloud-properties file",
+    "generate-oauth-token": {
+      "description": "Generate a new OAUTH token to authenticate to the TIBCO Cloud.",
       "enabled": true,
       "internal": false,
-      "task": "obfuscate",
-      "taskName": "obfuscate-password",
-      "taskAlternativeNames": ["obfuscate", "ob"],
-      "availableOnOs": ["all"],
-      "category": "tcli"
+      "multipleInteraction": true,
+      "task": "generateOauthTokenWrapper",
+      "taskAlternativeNames": [
+        "go"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "oauth"
     },
-    "update-tcli": {
-      "description": "Update the Cloud CLI",
+    "revoke-oauth-token": {
+      "description": "Revokes an existing OAUTH token.",
       "enabled": true,
       "internal": false,
-      "task": "updateTCLIwrapper",
-      "taskName": "update-tcli",
-      "availableOnOs": ["all"],
-      "category": "tcli"
+      "task": "revokeOauthTokenWrapper",
+      "taskAlternativeNames": [
+        "reo"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "oauth"
     },
-    "q": {
-      "description": "Quit the console",
-      "enabled": true,
-      "internal": true,
-      "taskName": "",
-      "availableOnOs": ["all"],
-      "category": "tcli"
-    },
-    "exit": {
-      "description": "Quit the console",
+    "rotate-oauth-token": {
+      "description": "Revokes your existing OAUTH token and then generates a new one.",
       "enabled": true,
       "internal": false,
-      "taskName": "",
-      "availableOnOs": ["all"],
-      "category": "tcli"
+      "multipleInteraction": true,
+      "task": "rotateOauthTokenWrapper",
+      "taskAlternativeNames": [
+        "ro"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "oauth"
+    },
+    "validate-and-rotate-oauth-token": {
+      "description": "Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "validateAndRotateOauthTokenWrapper",
+      "taskAlternativeNames": [
+        "vo"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "oauth"
     },
     "quit": {
       "description": "Quit the console",
       "enabled": true,
       "internal": true,
-      "taskName": "",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "change-region": {
+      "description": "Change the Region in the cloud-properties file",
+      "enabled": true,
+      "internal": true,
+      "task": "changeRegion",
+      "taskAlternativeNames": [
+        "cr"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "obfuscate-password": {
+      "description": "Obfuscate a password and put it in the cloud-properties file",
+      "enabled": true,
+      "internal": true,
+      "task": "obfuscate",
+      "taskAlternativeNames": [
+        "obfuscate",
+        "ob"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "update-tcli": {
+      "description": "Update the Cloud CLI",
+      "enabled": true,
+      "internal": true,
+      "task": "updateTCLIwrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "browse-tasks": {
+      "description": "Browses the TCLI tasks by category",
+      "enabled": false,
+      "internal": true,
+      "task": "browse-tasks",
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tcli"
     },
     "help": {
@@ -692,17 +811,19 @@
       "enabled": true,
       "internal": false,
       "task": "helptcliWrapper",
-      "taskName": "help-tcli",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tcli"
     },
     "repeat-last-task": {
-      "NOTE" : "MAKE SURE THIS TASK IS LAST IN THE LIST !!!",
+      "NOTE": "MAKE SURE THIS TASK IS LAST IN THE LIST !!!",
       "description": "Repeats the last executed task",
       "enabled": true,
       "internal": true,
-      "taskName": "repeat-last-task",
-      "availableOnOs": ["all"],
+      "availableOnOs": [
+        "all"
+      ],
       "category": "tcli"
     }
   }

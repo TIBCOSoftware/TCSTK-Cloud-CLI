@@ -10,7 +10,7 @@
 
 [show-cloud](./show-cloud.md) - Show Cloud Details
 
-[show-properties](./show-properties.md) - Show the properties in your properties file (and possibly the global values)
+[show-properties](./show-properties.md) - Shows the properties in your properties file (and possibly the global values)
 
 [view-global-config](./view-global-config.md) - View the global cloud connection configuration
 
@@ -30,7 +30,7 @@
 
 [update-tcli](./update-tcli.md) - Update the Cloud CLI
 
-[help-tcli](./help-tcli.md) - Display's help message
+[exit](./exit.md) - Quit the console
 
 
 ## cloud-starters

@@ -92,7 +92,7 @@ function getAndListTasks() {
             }
         }
         if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
-            hTasks.push(cTsks[cliTask].taskName);
+            hTasks.push(cliTask);
             let str = cliTask;
             const x = 45 - cliTask.length;
             for (let i = 0; i < x; i++) {

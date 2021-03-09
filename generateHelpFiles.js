@@ -10,12 +10,12 @@ function main(OnlyGenerateNew) {
     const tasks = require('./src/config/config-cli-task.json').cliTasks;
     for (let tn in tasks) {
         if (tasks[tn].enabled == true && tasks[tn].internal == false) {
-            if (tasks[tn].taskName != '') {
-                console.log(tasks[tn].taskName);
-                const fName = 'docs/tasks/' + tasks[tn].taskName + '.md';
+            if (tn != '') {
+                console.log(tn);
+                const fName = 'docsTemp/tasks/' + tn + '.md';
                 if (!OnlyGenerateNew || !doesFileExist(fName)) {
-                    copyFile('docs/tasks/template.md', fName);
-                    replaceInFile('@@TASK@@', tasks[tn].taskName, fName);
+                    copyFile('docsTemp/tasks/template.md', fName);
+                    replaceInFile('@@TASK@@', tn, fName);
                     // @@DESCRIPTION@@
                     replaceInFile('@@DESCRIPTION@@', tasks[tn].description, fName);
                     if (tasks[tn].taskAlternativeNames != null && tasks[tn].taskAlternativeNames.length > 0) {
@@ -45,14 +45,14 @@ function generateIndex() {
 
     for (let tn in tasks) {
         if (tasks[tn].enabled == true && tasks[tn].internal == false) {
-            if (tasks[tn].taskName != '') {
+            if (tn != '') {
 
                 let cat = tasks[tn].category;
-                console.log(cat + ' : ' + tasks[tn].taskName );
+                console.log(cat + ' : ' + tn);
                 if(!tsksCAT[cat]){
                     tsksCAT[cat] = {};
                 }
-                tsksCAT[cat][tasks[tn].taskName] = '['+tasks[tn].taskName+'](./'+tasks[tn].taskName+'.md) - ' + tasks[tn].description;
+                tsksCAT[cat][tn] = '['+tn+'](./'+tn+'.md) - ' + tasks[tn].description;
             }
         }
     }
@@ -70,6 +70,20 @@ function generateIndex() {
 
 }
 
-console.log('Generating Help Files...');
-// main(ONLY_GENERATE_NEW_FILES);
+function adjustTasks() {
+    const tasks = require('./src/config/config-cli-task.json').cliTasks;
+    for (let tn in tasks) {
+        console.log(tn);
+        delete tasks[tn].taskName
+    }
+    const fs = require('fs');
+    const dataForFile = JSON.stringify({
+        cliTasks: tasks
+    });
+    fs.writeFileSync('./src/config/config-cli-task.json', dataForFile, 'utf8');
+}
+
+// console.log('Generating Help Files...');
+main(ONLY_GENERATE_NEW_FILES);
 generateIndex();
+// adjustTasks();

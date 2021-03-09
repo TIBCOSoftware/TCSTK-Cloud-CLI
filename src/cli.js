@@ -286,12 +286,12 @@ export async function cli(args) {
                             if (cTsks[cliTask].task) {
                                 directTask = true;
                                 directTaskMethod = cTsks[cliTask].task;
-                                log(INFO, 'Task: ' + options.task + ' --> ' + colors.blue(cTsks[cliTask].taskName));
+                                log(INFO, 'Task: ' + options.task + ' --> ' + colors.blue(cliTask));
                             }
                         }
                     }
                 }
-                if (cTsks[cliTask].taskName === options.task) {
+                if (cliTask === options.task) {
                     taskExist = true;
                     if (cTsks[cliTask].task) {
                         directTask = true;
@@ -299,7 +299,7 @@ export async function cli(args) {
                         directTaskMethod = cTsks[cliTask].task;
                     }
                 }
-                taskArray.push(cTsks[cliTask].taskName);
+                taskArray.push(cliTask);
             }
             if (!taskExist) {
                 log(ERROR, 'TASK: ' + options.task + ' does not exist...');
