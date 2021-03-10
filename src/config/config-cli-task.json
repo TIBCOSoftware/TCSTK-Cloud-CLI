@@ -89,7 +89,7 @@
       "internal": false,
       "task": "testCSWrapper",
       "taskAlternativeNames": [
-        "t,test"
+        "t","test"
       ],
       "availableOnOs": [
         "all"
@@ -106,7 +106,7 @@
       "task": "testCSHeadlessWrapper",
       "taskAlternativeNames": [
         "th",
-        "test-headless "
+        "test-headless"
       ],
       "availableOnOs": [
         "all"
@@ -162,7 +162,10 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-starters",
+      "taskAlternativeNames": [
+        "delete"
+      ]
     },
     "clean": {
       "description": "Clean the temporary folders",
@@ -360,6 +363,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showLiveAppsWrapper",
+      "taskAlternativeNames": [
+        "show-cases"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -371,6 +377,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "exportLiveAppsCaseTypeWrapper",
+      "taskAlternativeNames": [
+        "export-case-type"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -381,6 +390,9 @@
       "enabled": true,
       "internal": false,
       "task": "exportLiveAppsDataWrapper",
+      "taskAlternativeNames": [
+        "export-cases"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -391,6 +403,9 @@
       "enabled": true,
       "internal": false,
       "task": "generateLiveAppsImportConfiguration",
+      "taskAlternativeNames": [
+        "generate-import-configuration"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -401,6 +416,9 @@
       "enabled": true,
       "internal": false,
       "task": "importLiveAppsDataWrapper",
+      "taskAlternativeNames": [
+        "import-cases"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -476,6 +494,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showLiveAppsGroupsWrapper",
+      "taskAlternativeNames": [
+        "show-groups"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -487,6 +508,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "createLiveAppsGroupWrapper",
+      "taskAlternativeNames": [
+        "create-group"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -498,6 +522,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showLiveAppsUsersWrapper",
+      "taskAlternativeNames": [
+        "show-users"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -520,6 +547,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showSharedState",
+      "taskAlternativeNames": [
+        "show-ss"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -531,6 +561,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showSharedStateDetailsWrapper",
+      "taskAlternativeNames": [
+        "show-ss-details"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -542,6 +575,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "createSharedStateWrapper",
+      "taskAlternativeNames": [
+        "create-ss", "create-ss-entry"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -552,6 +588,9 @@
       "enabled": true,
       "internal": false,
       "task": "removeSharedStateEntryWrapper",
+      "taskAlternativeNames": [
+        "clear-ss-entry"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -577,7 +616,8 @@
       "multipleInteraction": true,
       "task": "exportSharedStateWrapper",
       "taskAlternativeNames": [
-        "export-shared-state-scope"
+        "export-shared-state-scope",
+        "export-ss"
       ],
       "availableOnOs": [
         "all"
@@ -591,7 +631,8 @@
       "multipleInteraction": true,
       "task": "importSharedStateWrapper",
       "taskAlternativeNames": [
-        "import-shared-state-scope"
+        "import-shared-state-scope",
+        "import-ss"
       ],
       "availableOnOs": [
         "all"
@@ -605,7 +646,8 @@
       "multipleInteraction": true,
       "task": "watchSharedStateMainWrapper",
       "taskAlternativeNames": [
-        "watch-shared-state-scope"
+        "watch-shared-state-scope",
+        "watch-ss"
       ],
       "availableOnOs": [
         "all"
@@ -676,6 +718,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showMessagingSummaryWrapper",
+      "taskAlternativeNames": [
+        "show-summary"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -687,6 +732,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showMessagingClientsWrapper",
+      "taskAlternativeNames": [
+        "show-clients"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -698,6 +746,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "browseSpotfireLibraryWrapper",
+      "taskAlternativeNames": [
+        "browse-sf"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -709,6 +760,9 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "listSpotfireLibraryWrapper",
+      "taskAlternativeNames": [
+        "list-sf"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -721,7 +775,7 @@
       "multipleInteraction": true,
       "task": "showOauthTokenWrapper",
       "taskAlternativeNames": [
-        "so"
+        "so", "show-tokens"
       ],
       "availableOnOs": [
         "all"
@@ -735,7 +789,7 @@
       "multipleInteraction": true,
       "task": "generateOauthTokenWrapper",
       "taskAlternativeNames": [
-        "go"
+        "go", "generate-token"
       ],
       "availableOnOs": [
         "all"
@@ -748,7 +802,7 @@
       "internal": false,
       "task": "revokeOauthTokenWrapper",
       "taskAlternativeNames": [
-        "reo"
+        "reo", "revoke-token"
       ],
       "availableOnOs": [
         "all"
@@ -762,7 +816,7 @@
       "multipleInteraction": true,
       "task": "rotateOauthTokenWrapper",
       "taskAlternativeNames": [
-        "ro"
+        "ro", "rotate-token"
       ],
       "availableOnOs": [
         "all"
@@ -776,7 +830,7 @@
       "multipleInteraction": true,
       "task": "validateAndRotateOauthTokenWrapper",
       "taskAlternativeNames": [
-        "vo"
+        "vo", "validate-and-rotate-token"
       ],
       "availableOnOs": [
         "all"
