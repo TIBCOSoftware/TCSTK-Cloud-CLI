@@ -28,7 +28,6 @@ export async function showInlineHelp() {
     getAndListTasks();
     console.log(colors.yellow('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
     console.log('To get specific help on a task type: tcli -h <TASKNAME> or tcli --help <TASKNAME>');
-
 }
 
 // Help function that asks user what he wants help on

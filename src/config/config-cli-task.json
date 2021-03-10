@@ -174,7 +174,7 @@
       ],
       "category": "cloud-starters"
     },
-    "generate-cloud-descriptor": {
+    "generate-descriptor": {
       "description": "Generates the configured Public Cloud Descriptor",
       "enabled": true,
       "internal": false,
@@ -182,15 +182,21 @@
       "availableOnOs": [
         "all"
       ],
+      "taskAlternativeNames": [
+        "generate-cloud-descriptor"
+      ],
       "category": "cloud-starters"
     },
-    "update-cloud-packages": {
+    "update-packages": {
       "description": "Updates the NPM packages in the @tibco-tcstk scope in your project.",
       "enabled": true,
       "internal": false,
       "task": "updateCloudPackagesWrapper",
       "availableOnOs": [
         "all"
+      ],
+      "taskAlternativeNames": [
+        "update-cloud-packages"
       ],
       "category": "cloud-starters"
     },
@@ -254,6 +260,33 @@
       "internal": false,
       "multipleInteraction": false,
       "task": "updatePropertyWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "change-region": {
+      "description": "Change the Region in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "task": "changeRegion",
+      "taskAlternativeNames": [
+        "cr"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "obfuscate-password": {
+      "description": "Obfuscate a password and put it in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "task": "obfuscate",
+      "taskAlternativeNames": [
+        "obfuscate",
+        "ob"
+      ],
       "availableOnOs": [
         "all"
       ],
@@ -759,33 +792,6 @@
       ],
       "category": "tcli"
     },
-    "change-region": {
-      "description": "Change the Region in the cloud-properties file",
-      "enabled": true,
-      "internal": true,
-      "task": "changeRegion",
-      "taskAlternativeNames": [
-        "cr"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "tcli"
-    },
-    "obfuscate-password": {
-      "description": "Obfuscate a password and put it in the cloud-properties file",
-      "enabled": true,
-      "internal": true,
-      "task": "obfuscate",
-      "taskAlternativeNames": [
-        "obfuscate",
-        "ob"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "tcli"
-    },
     "update-tcli": {
       "description": "Update the Cloud CLI",
       "enabled": true,
@@ -796,21 +802,23 @@
       ],
       "category": "tcli"
     },
-    "browse-tasks": {
-      "description": "Browses the TCLI tasks by category",
-      "enabled": false,
-      "internal": true,
-      "task": "browse-tasks",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "tcli"
-    },
     "help": {
       "description": "Display's help message",
       "enabled": true,
-      "internal": false,
-      "task": "helptcliWrapper",
+      "internal": true,
+      "availableOnOs": [
+        "all"
+      ],
+      "taskAlternativeNames": [
+        "help-tcli"
+      ],
+      "category": "tcli"
+    },
+    "browse-tasks": {
+      "description": "Browses the TCLI tasks by category",
+      "enabled": true,
+      "internal": true,
+      "task": "browse-tasks",
       "availableOnOs": [
         "all"
       ],

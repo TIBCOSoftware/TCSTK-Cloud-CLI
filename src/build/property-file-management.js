@@ -5,7 +5,10 @@ const colors = require('colors');
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {
     log(INFO, 'Generating Cloud Property Files');
-    const response =  await CCOM.callTCA(CCOM.clURI.account_info, false, {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+    const response = await CCOM.callTCA(CCOM.clURI.account_info, false, {
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+    });
     // console.log(JSON.stringify(response));
     let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
     if (projectName.trim() !== '') {
@@ -116,6 +119,7 @@ function configurePropFile(fileName, region) {
 }
 
 const SPECIAL = 'SPECIAL';
+
 // A Function to update a property (possibly in a custom file)
 export async function updateProperty() {
     let doUpdate = true;
@@ -201,10 +205,10 @@ export async function updateProperty() {
     }
     if (doUpdate) {
         let checkForGlobal = false;
-        if (doesFileExist(getGLOBALPropertyFileName())){
+        if (doesFileExist(getGLOBALPropertyFileName())) {
             // We are updating the local prop file
             const localProps = require('properties-reader')(getPropFileName()).path();
-            if(indexObj(localProps, pName) === 'USE-GLOBAL'){
+            if (indexObj(localProps, pName) === 'USE-GLOBAL') {
                 // location = GLOBALPropertyFileName;
                 const propToUse = await askMultipleChoiceQuestion('Found USE-GLOBAL for property: ' + pName + '. Do you want to update the GLOBAL or the LOCAL property file ?', ['GLOBAL', 'LOCAL']);
                 checkForGlobal = 'global' === propToUse.toLowerCase();
@@ -216,9 +220,9 @@ export async function updateProperty() {
 }
 
 // Function to get the Client ID
-export async function getClientID(){
+export async function getClientID() {
     console.log('Getting Client ID...');
-    const ClientID =  await CCOM.callTCA( CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
+    const ClientID = await CCOM.callTCA(CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
     console.log('Client ID: ', ClientID);
 }
 
@@ -239,7 +243,7 @@ export function disableProperty(location, property, comment) {
                 if (dataLines[lineNumber].startsWith(property)) {
                     propFound = true;
                     log(DEBUG, `Property found: ${property} We are disabeling it...`);
-                    if(comment && comment !== ''){
+                    if (comment && comment !== '') {
                         dataLines[lineNumber] = '#' + comment + '\n#' + dataLines[lineNumber];
                     } else {
                         dataLines[lineNumber] = '#' + dataLines[lineNumber];
@@ -248,7 +252,7 @@ export function disableProperty(location, property, comment) {
             }
             let dataForFile = '';
             for (let line in dataLines) {
-                if(line !== (dataLines.length - 1)){
+                if (line !== (dataLines.length - 1)) {
                     dataForFile += dataLines[line] + '\n';
                 } else {
                     // The last one:
@@ -272,46 +276,54 @@ export function disableProperty(location, property, comment) {
 
 // display current properties in a table
 export function showPropertiesTable() {
-    // TODO: Print the OAUTH Details
     // Get the properties object
     let props = {};
     if (doesFileExist(getPropFileName())) {
         const propLoad = require('properties-reader')(getPropFileName());
         props = propLoad.path();
         log(INFO, ' LOCAL Property File Name: ' + colors.blue(getPropFileName()));
-        if(getGLOBALPropertyFileName() && getGLOBALPropertyFileName() !== '') {
+        if (getGLOBALPropertyFileName() && getGLOBALPropertyFileName() !== '') {
             log(INFO, 'GLOBAL Property File Name: ' + colors.blue(getGLOBALPropertyFileName()));
         }
         let nvs = [];
         for (const [key, value] of Object.entries(props)) {
-            if(key === 'CloudLogin'){
+            if (key === 'CloudLogin') {
                 for (const [key, value] of Object.entries(props.CloudLogin)) {
-                    if(value === 'USE-GLOBAL'){
+                    if (value === 'USE-GLOBAL') {
                         let displayValue = getProp('CloudLogin.' + key);
-                        if(key === 'pass'){
-                            if(displayValue !== ''){
+                        if (key === 'pass') {
+                            if (displayValue !== '') {
                                 var passT = displayValue;
                                 displayValue = 'PLAIN TEXT';
-                                if(passT.startsWith('#') || passT.startsWith('@')){
+                                if (passT.startsWith('#') || passT.startsWith('@')) {
                                     displayValue = 'OBFUSCATED';
                                 }
                             }
                         }
-                        nvs = createTableValue('CloudLogin.' + key,  displayValue + ' [FROM GLOBAL]', nvs);
+                        nvs = createTableValue('CloudLogin.' + key, displayValue + ' [FROM GLOBAL]', nvs);
                     } else {
-                        nvs = createTableValue('CloudLogin.' + key, value, nvs);
-                    }
-                    if(key === 'OAUTH_Token' && getOAUTHDetails() != null){
-                        // console.log(getOAUTHDetails())
-                        for (const [key, value] of Object.entries(getOAUTHDetails())) {
-                            if(key !== 'Expiry_Date'){
-                                nvs = createTableValue('OAUTH ' + key, value, nvs);
+                        if (key !== 'OAUTH_Token') {
+                            nvs = createTableValue('CloudLogin.' + key, value, nvs);
+                        } else {
+                            // This is to check if there is a manual token
+                            if (value.length < 40) {
+                                nvs = createTableValue('CloudLogin.' + key, value, nvs);
                             }
                         }
                     }
+                    // Force OAUTH Refresh; isOauthUsed()
+                    if (key === 'OAUTH_Token' && isOauthUsed() && getOAUTHDetails() != null) {
+                        // console.log(getOAUTHDetails())
+                        for (const [key, value] of Object.entries(getOAUTHDetails())) {
+                            if (key !== 'Expiry_Date') {
+                                nvs = createTableValue('OAUTH ' + key, value, nvs);
+                            }
+                        }
+                        // Do not add the
+                    }
                 }
             } else {
-                if(value === 'USE-GLOBAL'){
+                if (value === 'USE-GLOBAL') {
                     nvs = createTableValue(key, getProp(key) + ' [FROM GLOBAL]', nvs);
                 } else {
                     nvs = createTableValue(key, value, nvs);
@@ -325,3 +337,34 @@ export function showPropertiesTable() {
 
 // TODO: how to get a client ID for another ORG
 // TODO: Create a function that lists all client ID's
+
+/*
+
+STEP 0: Get tennant info
+GET https://eu.account.cloud.tibco.com/tsc-ws/v1/my-accounts/info?access-check-tenantid=TSC
+
+STEP 1: Internal Logout:
+POST https://eu.account.cloud.tibco.com/idm/v1/internal-logout
+DATA: resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fswitch-account%3Faction%3Dswitch%26resumeURL%3Dhttps%253A%252F%252Feu.account.cloud.tibco.com%252Fmanage%252Fhome%26ordinal%3D2%26baseTscDomain%3Dhttps%253A%252F%252Faccount.cloud.tibco.com%26tenantId%3DTSC%26tenantDomain%3Dhttps%253A%252F%252Feu.account.cloud.tibco.com
+
+STEP 2: Switch Account:
+
+https://eu.account.cloud.tibco.com/switch-account?action=switch&resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fmanage%2Fhome&ordinal=2&baseTscDomain=https%3A%2F%2Faccount.cloud.tibco.com&tenantId=TSC&tenantDomain=https%3A%2F%2Feu.account.cloud.tibco.com
+
+
+https://eu.account.cloud.tibco.com/switch-account?ordinal=2&tenantId=TSC&resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fmanage%2Fhome&tenantDomain=https%3A%2F%2Feu.account.cloud.tibco.com&baseTscDomain=https%3A%2F%2Faccount.cloud.tibco.com&fromSource=recents&v=1.5.11
+
+
+STEP 3: Reauthorize:
+POST: https://eu.account.cloud.tibco.com/idm/v1/reauthorize
+resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fmanage%2Fhome&account-id=01DXJP1RMD9HKNYHDW34Z04M20&opaque-for-tenant=TSC
+
+STEP 4: Get Client ID:
+
+POST https://eu.account.cloud.tibco.com/idm/v1/clientID
+
+
+
+
+
+ */

@@ -6,7 +6,7 @@ const colors = require('colors');
 
 // Wrapper to main task
 export async function mainT() {
-    loadTaskDesc();
+    loadTaskDesc('ALL');
     displayOpeningMessage();
     console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
     const appRoot = process.cwd();
@@ -21,13 +21,22 @@ export async function mainT() {
 // Comes from prop file
 let gTasksDescr = [];
 let gTasksNames = [];
+let gCategory = ['ALL'];
+const BACK = 'BACK';
+const BACK_TO_ALL = 'BACK TO ALL TASKS';
 
-// TODO: Hier verder; add another array that has the task names so you can lookup the task
 const cliTaskConfig = require('./config/config-cli-task.json');
 const cTsks = cliTaskConfig.cliTasks;
 
-export function loadTaskDesc() {
-    let taskCounter = 1;
+export function loadTaskDesc(category) {
+    gTasksDescr = [];
+    gTasksNames = [];
+    const catToUse = category || 'ALL';
+    if (catToUse !== 'ALL') {
+        gTasksDescr.push(BACK, BACK_TO_ALL);
+        gTasksNames.push(BACK, BACK_TO_ALL);
+    }
+    let taskCounter = 0;
     for (let cliTask in cTsks) {
         // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
         let allowed = false;
@@ -41,46 +50,37 @@ export function loadTaskDesc() {
             }
         }
         if (cTsks[cliTask].enabled && allowed) {
+            // Add to global category (if not exits)
+            if (gCategory.indexOf(cTsks[cliTask].category) === -1) {
+                gCategory.push(cTsks[cliTask].category);
+            }
             // console.log('Adding: ' + cliTask);
             // console.log('Adding: ' + cliTask + ' : ' + cliTask.length);
-            let tCounterStr = '';
-            if(!cTsks[cliTask].internal && !(cliTask === 'help' || cliTask === 'exit')) {
-                if(taskCounter > 9){
-                    tCounterStr = taskCounter + ') ';
-                } else {
-                    tCounterStr = ' ' + taskCounter + ') ';
+            if (!cTsks[cliTask].internal && !(cliTask === 'help' || cliTask === 'exit')) {
+                if (cTsks[cliTask].category === catToUse || catToUse === 'ALL') {
+                    taskCounter++;
+                    const tCounterStr = taskCounter + ') ';
+                    const catStr = '[' + cTsks[cliTask].category + '] ';
+                    // Remove the category from the name
+                    let taskName = cliTask.replace(cTsks[cliTask].category, '');
+                    // Special case for cloud starter since the category is called cloud starters
+                    taskName = taskName.replace('cloud-starter', '');
+                    // Replace double --
+                    taskName = taskName.replace('--', '-');
+                    // Remove -'s at the end or beginning
+                    if (taskName.endsWith('-')) {
+                        taskName = taskName.substring(0, taskName.length - 1);
+                    }
+                    if (taskName.startsWith('-')) {
+                        taskName = taskName.substring(1, taskName.length);
+                    }
+                    gTasksDescr.push(tCounterStr.padStart(4) + catStr.padStart(17) + taskName.padEnd(30) + ' - ' + cTsks[cliTask].description);
+                    gTasksNames.push(cliTask);
                 }
-                taskCounter++;
-                const catStr = '[' + cTsks[cliTask].category + '] ';
-                // Remove the category from the name
-                let taskName = cliTask.replace(cTsks[cliTask].category,'');
-                // Special case for cloud starter since the category is called cloud starters
-                taskName = taskName.replace('cloud-starter','');
-                // Replace double --
-                taskName = taskName.replace('--','-');
-                if(taskName.endsWith('-')){
-                    taskName = taskName.substring(0, taskName.length - 1);
-                }
-                if(taskName.startsWith('-')){
-                    taskName = taskName.substring(1, taskName.length);
-                }
-                // Add spaces till 40 before task name
-                const spacesNeeded = 15 - taskName.length;
-                let space = '';
-                for (let i = 0 ; i < spacesNeeded; i++){
-                    space += ' ';
-                }
-                const secondSpacesNeeded = 17 - catStr.length; /*+ addS;*/
-                // (cloud-starters) - 16
-                let secondSpace = '';
-                for (let i = 0 ; i < secondSpacesNeeded; i++){
-                    secondSpace += ' ';
-                }
-                gTasksDescr.push(tCounterStr + secondSpace + catStr + taskName + space + ' - ' + cTsks[cliTask].description);
             } else {
                 gTasksDescr.push(cliTask);
+                gTasksNames.push(cliTask);
             }
-            gTasksNames.push(cliTask)
         }
     }
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
@@ -97,9 +97,9 @@ export async function promptTask(stDir, cwdDir) {
     return new Promise(function (resolve) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - ' + colors.blue(getRegion(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
-        // TODO: Look at getting org
+        // If there is an org, show it
         if (getOrganization() !== '') {
-            pMes = '[TCLI - ' + colors.blue(getRegion(true) + ' - ' + getOrganization(true))+' - ' + colors.yellow(getProp('App_Name')) + ']: ';
+            pMes = '[TCLI - ' + colors.blue(getRegion(true) + ' - ' + getOrganization(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         }
         inquirer.prompt([{
             type: 'autocomplete',
@@ -107,43 +107,54 @@ export async function promptTask(stDir, cwdDir) {
             suggestOnly: false,
             message: pMes,
             source: searchAnswer,
-            pageSize: 4
-        }]).then(function (answers) {
+            pageSize: 6
+        }]).then(async function (answers) {
             let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => answers.command === el)];
             log(INFO, 'Selected task] ' + colors.blue(selectedTask));
             let com = selectedTask;
-            // TODO: Add logic to browse by task
-
-
-            if (com === 'q' || com === 'quit' || com === 'exit') {
-                console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
-                return resolve();
-            } else {
-                // Check if we need to repeat the last task
-                let comToInject = selectedTask;
-                if (com === 'repeat-last-task') {
-                    log('INFO', 'Repeating Last Task: ' + globalLastCommand);
-                    comToInject = globalLastCommand;
-                } else {
-                    globalLastCommand = comToInject;
-                }
-                let additionalArugments = '';
-                for (let arg in process.argv) {
-                    // TODO: Should not all arguments be propagated >?
-                    if (process.argv[arg] === '--debug' || process.argv[arg] === '-d') {
-                        additionalArugments += ' -d ';
-                    }
-                }
-                if (getProp('CloudLogin.pass').toString() !== '') {
-                    additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
-                }
-                if (getOrganization() !== '') {
-                    additionalArugments += ' --org "' + getOrganization() + '"';
-                }
-                let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
-                run(commandTcli);
+            // Special case for help, call the inline help directly
+            if (com === 'help') {
+                await helptcliWrapper();
                 return promptTask(stDir, cwdDir);
             }
+            // Logic to browse by task
+            if (com === BACK_TO_ALL) {
+                loadTaskDesc('ALL');
+                return promptTask(stDir, cwdDir);
+            }
+            if (com === 'browse-tasks' || com === BACK) {
+                const chosenCat = await askMultipleChoiceQuestion('From which category would you like to select a task ?', gCategory);
+                loadTaskDesc(chosenCat);
+                return promptTask(stDir, cwdDir);
+            }
+            if (com === 'quit') {
+                console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
+                return resolve();
+            }
+            // Check if we need to repeat the last task
+            let comToInject = selectedTask;
+            if (com === 'repeat-last-task') {
+                log('INFO', 'Repeating Last Task: ' + globalLastCommand);
+                comToInject = globalLastCommand;
+            } else {
+                globalLastCommand = comToInject;
+            }
+            let additionalArugments = '';
+            for (let arg in process.argv) {
+                // TODO: Should not all arguments be propagated >?
+                if (process.argv[arg] === '--debug' || process.argv[arg] === '-d') {
+                    additionalArugments += ' -d ';
+                }
+            }
+            if (getProp('CloudLogin.pass').toString() !== '') {
+                additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
+            }
+            if (getOrganization() !== '') {
+                additionalArugments += ' --org "' + getOrganization() + '"';
+            }
+            let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
+            run(commandTcli);
+            return promptTask(stDir, cwdDir);
         });
     });
 }
@@ -164,11 +175,6 @@ export async function searchAnswer(answers, input) {
         }, _.random(30, 60));
     });
 }
-
-
-
-
-
 
 
 export async function testTask() {
@@ -573,7 +579,7 @@ export async function showMessagingClientsWrapper() {
 setLogDebug(getProp('Use_Debug'));
 
 // Function to upgrade the prop file to V2
-if(getProp('Cloud_Properties_Version') == null){
+if (getProp('Cloud_Properties_Version') == null) {
     upgradeToV2(false, getPropFileName());
 }
 
