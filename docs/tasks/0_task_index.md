@@ -62,7 +62,7 @@
 
 [schematic-add](./schematic-add.md) - Add a schematic into your project
 
-[generate-cloud-descriptor](./generate-cloud-descriptor.md) - Generates the configured Public Cloud Descriptor
+[generate-descriptor](generate-descriptor.md) - Generates the configured Public Cloud Descriptor
 
 [update-cloud-packages](./update-cloud-packages.md) - Updates the NPM packges in the @tibco-tcstk scope in your project.
 
