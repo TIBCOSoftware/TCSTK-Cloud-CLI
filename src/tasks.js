@@ -3,10 +3,22 @@ require('./build/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;
 const colors = require('colors');
+// Constants
+const BACK = 'BACK';
+const BACK_TO_ALL = 'BACK TO ALL TASKS';
+const CAT_QUESTION = 'From which category would you like to select a task ?';
+const cliTaskConfig = require('./config/config-cli-task.json');
+const cTsks = cliTaskConfig.cliTasks;
+// Comes from prop file
+let gTasksDescr = [];
+let gTasksNames = [];
+let gCategory = ['ALL'];
+let globalLastCommand = 'help-tcli';
 
 // Wrapper to main task
-export async function mainT() {
-    loadTaskDesc('ALL');
+export async function mainT(cat) {
+    const catToUse = cat || 'ALL';
+    loadTaskDesc(catToUse);
     displayOpeningMessage();
     console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
     const appRoot = process.cwd();
@@ -17,16 +29,6 @@ export async function mainT() {
     }
     await promptTask(__dirname, appRoot);
 }
-
-// Comes from prop file
-let gTasksDescr = [];
-let gTasksNames = [];
-let gCategory = ['ALL'];
-const BACK = 'BACK';
-const BACK_TO_ALL = 'BACK TO ALL TASKS';
-
-const cliTaskConfig = require('./config/config-cli-task.json');
-const cTsks = cliTaskConfig.cliTasks;
 
 export function loadTaskDesc(category) {
     gTasksDescr = [];
@@ -86,10 +88,7 @@ export function loadTaskDesc(category) {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
 }
 
-let globalLastCommand = 'help-tcli';
-
 //Main Cloud CLI Questions
-// TODO: look at double answers
 export async function promptTask(stDir, cwdDir) {
     const inquirer = require('inquirer');
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
@@ -123,11 +122,15 @@ export async function promptTask(stDir, cwdDir) {
                 return promptTask(stDir, cwdDir);
             }
             if (com === 'browse-tasks' || com === BACK) {
-                const chosenCat = await askMultipleChoiceQuestion('From which category would you like to select a task ?', gCategory);
+                const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory);
                 loadTaskDesc(chosenCat);
                 return promptTask(stDir, cwdDir);
             }
             if (com === 'quit') {
+                if(Math.random() < 0.1){
+                    //Quit with a quote
+                    console.log(colors.bgWhite(QUOTES[Math.floor(Math.random() * QUOTES.length)]));
+                }
                 console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
             }
@@ -159,6 +162,7 @@ export async function promptTask(stDir, cwdDir) {
     });
 }
 
+//TODO: Use function from common, and test with test
 //User interaction
 export async function searchAnswer(answers, input) {
     const _ = require('lodash');
@@ -167,6 +171,7 @@ export async function searchAnswer(answers, input) {
     return new Promise(function (resolve) {
         setTimeout(function () {
             const fuzzyResult = fuzzy.filter(input, gTasksDescr);
+            // TODO: Check for more exact match
             resolve(
                 fuzzyResult.map(function (el) {
                     return el.original;
@@ -176,6 +181,13 @@ export async function searchAnswer(answers, input) {
     });
 }
 
+// A function to get directly into the browse mode
+export async function browseTasks() {
+    // Load categories
+    loadTaskDesc('ALL');
+    const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory);
+    mainT(chosenCat);
+}
 
 export async function testTask() {
     console.log('Test...');
@@ -588,4 +600,15 @@ setLogDebug(getProp('Use_Debug'));
 if (getProp('Cloud_Properties_Version') == null) {
     upgradeToV2(false, getPropFileName());
 }
+
+const QUOTES = [
+    "Everyone's a nerd inside. I don't care how cool you are. - Channing Tatum",
+    "Never argue with the data. - Sheen",
+    "Be nice to nerds. Chances are you'll end up working for one. - Bill Gates",
+    "Geeks are people who love something so much that all the details matter. - Marissa Mayer",
+    "Q. How does a computer get drunk? A. It takes screenshots....",
+    "Q. Why did the PowerPoint Presentation cross the road? A. To get to the other slide....",
+    "Q: Why did the computer show up at work late? A: It had a hard drive....",
+    "Autocorrect has become my worst enema...."
+]
 

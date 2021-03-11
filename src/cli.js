@@ -46,6 +46,8 @@ function parseArgumentsIntoOptions(rawArgs) {
                 '-j': '--job',
                 '--environment': String,
                 '-e': '--environment',
+                '--browse': Boolean,
+                '-b': '--browse',
             },
             {
                 argv: rawArgs.slice(2),
@@ -74,6 +76,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         answers: args['--answers'] || '',
         job: args['--job'] || '',
         environment: args['--environment'] || '',
+        browse: args['--browse'] || false
     };
 }
 
@@ -106,6 +109,9 @@ export async function cli(args) {
         console.log('pass: ' + options.pass);
         console.log('org: ' + options.org);
         console.log('answers: ' + options.answers);
+        console.log('job: ' + options.job);
+        console.log('environment: ' + options.environment);
+        console.log('browse: ' + options.browse);
     }
     if (options.pass !== '') {
         // This call sets the properties object, to be able to add a property to it.
@@ -123,6 +129,8 @@ export async function cli(args) {
     if (options.answers !== '') {
         setGlobalAnswers(options.answers);
     }
+
+    if (options.browse) options.task = 'browse-tasks';
 
     // Show help
     if (options.help || options.task === 'help') {

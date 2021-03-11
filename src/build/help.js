@@ -10,7 +10,7 @@ const GIT_HUB_LINK_DOC = 'https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/
 export async function showInlineHelp() {
     // TODO: show a more.. (by pressing enter to go down...)
     console.log('TIBCO Cloud CLI Version: ' + require('../../package.json').version);
-    console.log(colors.blue('tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]'));
+    console.log(colors.blue('tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]'));
     console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
     console.log('new: Create new Cloud starter. Usage] tcli new <name> [--template(-t)] <template-to-use>');
     console.log('        --debug: Display debug information.');
@@ -18,6 +18,7 @@ export async function showInlineHelp() {
     console.log('         --help: display this help ');
     console.log('      --version: display the version number');
     console.log('       --update: update the tcli');
+    console.log('       --browse: browse tcli tasks (with an existing tibco-cloud.properties file)');
     console.log('     --propfile: when specified tcli will use a different property file then the default tibco-cloud.properties');
     console.log('     --multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud starters and many different configured environments at the same time.');
     console.log(' --multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties');

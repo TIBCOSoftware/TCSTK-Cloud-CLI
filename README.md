@@ -10,7 +10,7 @@ npm install -g @tibco-tcstk/cloud-cli
 
 ###TIBCO Cloud™ CLI) Usage: 
 ```
-tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]
+tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]
 ```
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
@@ -32,6 +32,8 @@ tcli new <name> [--template(-t)] <template-to-use>
 * version: display the version number
 
 * update: update the tcli
+
+* browse: browse tcli tasks (Note; a tibco-cloud.properties file need to exist otherwise one can be created automatically)
 
 * propfile: when specified tcli will use a different property file then the default tibco-cloud.properties
 

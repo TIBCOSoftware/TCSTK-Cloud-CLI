@@ -886,9 +886,12 @@
       "description": "Browses the TCLI tasks by category",
       "enabled": true,
       "internal": true,
-      "task": "browse-tasks",
+      "task": "browseTasks",
       "availableOnOs": [
         "all"
+      ],
+      "taskAlternativeNames": [
+        "browse"
       ],
       "category": "tcli"
     },
