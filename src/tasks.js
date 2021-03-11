@@ -410,6 +410,12 @@ export async function showLiveAppsWrapper() {
     await LA.showLiveApps(true, true);
 }
 
+// Function to show liveApps Actions
+export async function showLiveAppsActionsWrapper() {
+    const LA = require('./build/live-apps');
+    await LA.showLiveAppsActions();
+}
+
 // Function to export liveApps cases
 export async function exportLiveAppsDataWrapper() {
     const LA = require('./build/live-apps');

@@ -168,23 +168,9 @@ export async function updateProperty() {
                     pValue = laApp.applicationId
                 }
                 if (doUpdate && vType === 'LiveApps_ActionID') {
-                    let laActions = [{name: 'NONE'}];
-                    if (laApp.creators) {
-                        laActions = laActions.concat(laApp.creators.map(v => ({
-                            type: 'CREATOR',
-                            id: v.id,
-                            name: v.name
-                        })));
-                    }
-                    if (laApp.actions) {
-                        laActions = laActions.concat(laApp.actions.map(v => ({
-                            type: 'ACTION',
-                            id: v.id,
-                            name: v.name
-                        })));
-                    }
+                    let laActions = [{name: 'NONE'}].concat(LA.stripLiveAppsActions(laApp));
                     // console.log(laActions);
-                    log(INFO, 'Liva Apps Actions: ');
+                    log(INFO, 'Live Apps Actions: ');
                     console.table(laActions);
                     let laActD = await askMultipleChoiceQuestionSearch('For which ACTION would you like to store an Action ID ?', laActions.map(v => v.name));
                     if (laActD === 'NONE') {
@@ -192,7 +178,7 @@ export async function updateProperty() {
                         doUpdate = false;
                     } else {
                         let laAction = laActions.find(e => e.name === laActD);
-                        if (laAction != null) {
+                        if (laAction) {
                             pValue = laAction.id
                         } else {
                             log(ERROR, 'LA Action not found: ' + laActD);

@@ -371,6 +371,84 @@
       ],
       "category": "live-apps"
     },
+    "show-live-apps-users": {
+      "description": "Shows the users in LiveApps (which can be added to groups).",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsUsersWrapper",
+      "taskAlternativeNames": [
+        "show-users"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-live-apps-groups": {
+      "description": "Displays the LiveApps groups and their users.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsGroupsWrapper",
+      "taskAlternativeNames": [
+        "show-groups"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-org-folders": {
+      "description": "Displays the content of the LiveApps Organization Folders.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showOrgFoldersWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-live-apps-actions": {
+      "description": "Displays the LiveApps actions (Creators & Actions) for a CaseType",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsActionsWrapper",
+      "taskAlternativeNames": [
+        "show-actions"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "create-live-apps-group": {
+      "description": "Creates a new LiveApps group.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "createLiveAppsGroupWrapper",
+      "taskAlternativeNames": [
+        "create-group"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "add-user-to-group": {
+      "description": "Adds a user to a LiveApps group.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "addUserToGroupWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
     "export-live-apps-case-type": {
       "description": "Export the details of a Live Apps Case Type",
       "enabled": true,
@@ -444,17 +522,6 @@
       ],
       "category": "live-apps"
     },
-    "show-org-folders": {
-      "description": "Displays the content of the LiveApps Organization Folders.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showOrgFoldersWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
     "export-org-folder": {
       "description": "Exports the content of a LiveApps Organization Folder to disk.",
       "enabled": false,
@@ -483,59 +550,6 @@
       "internal": false,
       "multipleInteraction": false,
       "task": "watchOrgFolderWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "show-live-apps-groups": {
-      "description": "Displays the LiveApps groups and their users.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showLiveAppsGroupsWrapper",
-      "taskAlternativeNames": [
-        "show-groups"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "create-live-apps-group": {
-      "description": "Creates a new LiveApps group.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "createLiveAppsGroupWrapper",
-      "taskAlternativeNames": [
-        "create-group"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "show-live-apps-users": {
-      "description": "Shows the users in LiveApps (which can be added to groups).",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showLiveAppsUsersWrapper",
-      "taskAlternativeNames": [
-        "show-users"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "add-user-to-group": {
-      "description": "Adds a user to a LiveApps group.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "addUserToGroupWrapper",
       "availableOnOs": [
         "all"
       ],

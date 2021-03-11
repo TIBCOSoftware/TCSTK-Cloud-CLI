@@ -117,6 +117,19 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(false);
     });
 
+    // jasmine --config=test/support/jasmine.json --filter=LIVEAPPS
+    // Generate an OAUTH Token
+    it("LIVEAPPS", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cases')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-actions -a none')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-live-apps-actions -a all')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-actions -a Discoveranalysis')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-actions -a NOT_Exists')).toBe(false);
+
+    });
+
+
     // jasmine --config=test/support/jasmine.json --filter='Build and Deploy Basic Cloud Starter'
     // Basic Cloud Starter Template - LATEST Angular 10
     it("Build and Deploy Basic Cloud Starter", function () {
@@ -341,8 +354,14 @@ describe("tcli testsuite", function () {
     it("Add Properties", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:SandboxID')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
-        // TODO: Think about a testcase for the action ID
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Test:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:AppID:none:SPECIAL:LiveApps_AppID:Discoveranalysis')).toBe(true);
+        // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:ActionID1:none:SPECIAL:LiveApps_ActionID:none')).toBe(true);
+        // expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:none"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:New analysis"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:Abort"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:NOT_EXITS:Abort"')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:NOT_EXISTS"')).toBe(false);
     });
 
     // Spotfire Testcases

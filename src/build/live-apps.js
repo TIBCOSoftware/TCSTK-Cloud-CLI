@@ -28,8 +28,8 @@ async function checkCaseFolder() {
         addOrUpdateProperty(getPropFileName(), 'Case_Folder', CASE_FOLDER);
     }
     // Potentially use the organization name in the Case Folder property
-    if(CASE_FOLDER.toLowerCase().indexOf('~{organization}') > 0){
-        if(!getOrganization()){
+    if (CASE_FOLDER.toLowerCase().indexOf('~{organization}') > 0) {
+        if (!getOrganization()) {
             await CCOM.showCloudInfo(false);
         }
         CASE_FOLDER = CASE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
@@ -72,6 +72,62 @@ export async function showLiveApps(doShowTable, doCountCases) {
     return caseTypes;
 }
 
+export function stripLiveAppsActions(liveApp){
+    let re;
+    if (liveApp) {
+        re = [];
+        if (liveApp.creators) {
+            re = re.concat(liveApp.creators.map(v => ({
+                type: 'CREATOR',
+                id: v.id,
+                name: v.name
+            })));
+        }
+        if (liveApp.actions) {
+            re = re.concat(liveApp.actions.map(v => ({
+                type: 'ACTION',
+                id: v.id,
+                name: v.name
+            })));
+        }
+    }
+    return re;
+}
+
+function showActions(laApp, appName){
+    const laActions = stripLiveAppsActions(laApp);
+    if(laActions){
+        log(INFO, 'Live Apps Actions For ' + colors.bgBlue(laApp.name));
+        pexTable(laActions, 'live-apps-actions', getPEXConfig(), true);
+    } else {
+        log(ERROR, 'App not found: ' + appName);
+        process.exit(1);
+    }
+}
+
+export async function showLiveAppsActions() {
+    const apps = await showLiveApps(true, false);
+    const laAppNameA = ['NONE', 'ALL'].concat(apps.map(v => v.name));
+    let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to see the actions ?', laAppNameA);
+    if (laAppD.toLowerCase() !== 'none') {
+        if(laAppD.toLowerCase() === 'all'){
+            apps.forEach((app) => {
+                showActions(app, laAppD);
+            })
+        } else {
+            showActions(apps.find(e => e.name === laAppD.trim()), laAppD);
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+}
+
+/*
+let laAppNameA = ['NONE'].concat(apps.map(v => v.name));
+            let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA);
+ */
+
+
 const storeOptions = {spaces: 2, EOL: '\r\n'};
 
 export async function exportLiveAppsCaseType() {
@@ -96,7 +152,7 @@ export async function exportLiveAppsCaseType() {
             log(INFO, 'Case Type File Stored: ' + fileName)
         }
     }
-    if(!appFound){
+    if (!appFound) {
         log(ERROR, 'Live Apps Case-Type not found for export: ' + typeForExport);
         process.exit(1);
     }
@@ -184,7 +240,7 @@ export async function exportLiveAppsData() {
             //}
         }
     }
-    if(!appFound){
+    if (!appFound) {
         log(ERROR, 'Live Apps Case not found for export: ' + typeForExport);
         process.exit(1);
     }
