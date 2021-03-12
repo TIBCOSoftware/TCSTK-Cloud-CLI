@@ -76,7 +76,7 @@ export function loadTaskDesc(category) {
                     if (taskName.startsWith('-')) {
                         taskName = taskName.substring(1, taskName.length);
                     }
-                    gTasksDescr.push(tCounterStr.padStart(4) + catStr.padStart(17) + taskName.padEnd(30) + ' - ' + cTsks[cliTask].description);
+                    gTasksDescr.push(tCounterStr.padStart(4) + taskName.padEnd(30) + catStr.padStart(17) +' - ' + cTsks[cliTask].description);
                     gTasksNames.push(cliTask);
                 }
             } else {
@@ -106,7 +106,7 @@ export async function promptTask(stDir, cwdDir) {
             suggestOnly: false,
             message: pMes,
             source: searchAnswer,
-            pageSize: 6
+            pageSize: 5
         }]).then(async function (answers) {
             let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => answers.command === el)];
             log(INFO, 'Selected task] ' + colors.blue(selectedTask));
