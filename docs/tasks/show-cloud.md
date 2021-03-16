@@ -26,7 +26,4 @@ TIBCO CLOUD CLI] (INFO)  Using OAUTH Authentication, ORGANIZATION: TIBCO LABS DE
 |    2    |  'FIRST NAME'  |       'John'        |
 |    3    |  'LAST NAME'   |        'Doe'        |
 |    4    |    'EMAIL'     |   'test@tibco.com'  |
-|    5    |  'SANDBOX 0'   |    'Production'     |
-|    6    | 'SANDBOX 0 ID' |       '1234'        |
-|    7    |  'SANDBOX 1'   |     'Developer'     |
-|    8    | 'SANDBOX 1 ID' |       '4321'        |
+

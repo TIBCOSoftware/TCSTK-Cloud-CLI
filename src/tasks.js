@@ -191,6 +191,9 @@ export async function browseTasks() {
 
 export async function testTask() {
     console.log('Test...');
+    const PROPM = require('./build/property-file-management');
+    await PROPM.getClientIDforOrg();
+
 }
 
 // Function to display help
@@ -316,6 +319,17 @@ export async function changeRegion() {
     await updateRegion(getPropFileName());
 }
 
+// Function to change the organization in the properties file
+export async function changeOrganizationWrapper() {
+    const PROPM = require('./build/property-file-management');
+    await PROPM.changeOrganization();
+}
+
+// Function to change the organization in the properties file
+export async function showOrganizationWrapper() {
+    const PROPM = require('./build/property-file-management');
+    await PROPM.showOrganization();
+}
 
 export async function obfuscate() {
     const password = await askQuestion('Please provide the password...', 'password');
@@ -426,6 +440,12 @@ export async function showLiveAppsWrapper() {
 export async function showLiveAppsActionsWrapper() {
     const LA = require('./build/live-apps');
     await LA.showLiveAppsActions();
+}
+
+// Function to show liveApps Actions
+export async function showLiveAppsSandboxWrapper() {
+    const CCOM = require('./build/cloud-communications');
+    await CCOM.showCloudInfo(true,true);
 }
 
 // Function to export liveApps cases

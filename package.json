@@ -38,7 +38,7 @@
     "jasmine": "^3.6.3",
     "jasmine-reporters": "^2.3.2",
     "jasmine-ts-console-reporter": "^3.1.1",
-    "webpack": "^5.11.1",
+    "webpack": "^5.26.1",
     "webpack-cli": "^4.3.1"
   },
   "bin": {

@@ -268,13 +268,39 @@
       ],
       "category": "tcli"
     },
-    "change-region": {
+    "change-cloud-region": {
       "description": "Change the Region in the cloud-properties file",
       "enabled": true,
       "internal": false,
       "task": "changeRegion",
       "taskAlternativeNames": [
-        "cr"
+        "change-region","cr"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "show-cloud-organizations": {
+      "description": "Shows the Cloud Organization and potentially more details",
+      "enabled": true,
+      "internal": false,
+      "task": "showOrganizationWrapper",
+      "taskAlternativeNames": [
+        "show-organizations","show-orgs"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
+    "change-cloud-organization": {
+      "description": "Changes the Organization in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "task": "changeOrganizationWrapper",
+      "taskAlternativeNames": [
+        "change-organization","co"
       ],
       "availableOnOs": [
         "all"
@@ -405,6 +431,20 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "showOrgFoldersWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "show-live-apps-sandbox": {
+      "description": "Displays the LiveApps Sandbox ID's for Production and Development",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsSandboxWrapper",
+      "taskAlternativeNames": [
+        "show-sandbox"
+      ],
       "availableOnOs": [
         "all"
       ],

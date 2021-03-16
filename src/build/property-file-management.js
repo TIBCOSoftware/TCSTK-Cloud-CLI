@@ -1,15 +1,23 @@
+import {isOAUTHLoginValid} from "./cloud-communications";
+
 const CCOM = require('./cloud-communications');
+const OAUTH = require('./oauth');
 const LA = require('./live-apps');
 const colors = require('colors');
+
+// Get a list of all the organizations
+async function getOrganizations() {
+    return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+    })).accountsInfo;
+}
 
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {
     log(INFO, 'Generating Cloud Property Files');
-    const response = await CCOM.callTCA(CCOM.clURI.account_info, false, {
-        tenant: 'TSC',
-        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
-    });
-    // console.log(JSON.stringify(response));
+    const organizations = await getOrganizations();
+    // console.log(JSON.stringify(organizations));
     let projectName = await askQuestion('What is the name of your Project ? (press enter to leave it blank)');
     if (projectName.trim() !== '') {
         projectName = projectName + '_';
@@ -19,7 +27,7 @@ export async function generateCloudPropertyFiles() {
     const propFilesUS = [];
     const propFilesAU = [];
     const propOption = ['NONE', 'ALL', 'ALL EU', 'ALL US', 'ALL AU'];
-    for (let org of response.accountsInfo) {
+    for (let org of organizations) {
         extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU);
         // Check for Children
         if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
@@ -205,13 +213,6 @@ export async function updateProperty() {
     }
 }
 
-// Function to get the Client ID
-export async function getClientID() {
-    console.log('Getting Client ID...');
-    const ClientID = await CCOM.callTCA(CCOM.clURI.get_clientID, false, {method: 'POST'}).ClientID;
-    console.log('Client ID: ', ClientID);
-}
-
 // Function comment out a property in a prop file
 export function disableProperty(location, property, comment) {
     log(DEBUG, 'Disabling: ' + property + ' in:' + location);
@@ -321,8 +322,175 @@ export function showPropertiesTable() {
     }
 }
 
-// TODO: how to get a client ID for another ORG
+
 // TODO: Create a function that lists all client ID's
+
+
+// Function to get the Client ID
+export async function getClientID(headers) {
+    log(INFO, 'Getting Client ID...');
+    let clientID;
+    clientID = (await CCOM.callTCA(CCOM.clURI.get_clientID, true, {
+        method: 'POST',
+        forceCLIENTID: true,
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login,
+        headers
+    })).ClientID;
+    log(INFO, 'Client ID: ', clientID);
+    return clientID;
+}
+
+export async function showOrganization() {
+    log(INFO, 'Showing Organizations:');
+    // List all the organizations
+    const orgDetails = await displayOrganizations(true, true, 'For which organization would you like more details ?');
+    if (orgDetails) {
+        delete orgDetails.ownersInfo;
+        delete orgDetails.regions;
+        delete orgDetails.childAccountsInfo
+        console.table(orgDetails);
+    }
+}
+
+export async function changeOrganization() {
+    log(INFO, 'Changing Organization...');
+    // List all the organizations
+    // Ask to which organization you would like to switch
+    const orgDetails = await displayOrganizations(true, true, 'Which organization would you like to change to ?');
+    if (orgDetails) {
+        // Get the clientID for that organization
+        const clientID = await getClientIDforOrg(orgDetails.accountId)
+        // console.log('Client ID: ' + clientID);
+        let doOauth = false;
+        // If Oauth is being used: revoke the Key on the Old Organization
+        if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
+            doOauth = true;
+            const oDetails = getOAUTHDetails();
+            log(INFO, 'Revoking your OAUTH Token on previous environment(' + colors.blue(oDetails.Org) + '), Token Name: ' + colors.blue(oDetails.Token_Name))
+            await OAUTH.revokeOauthToken(oDetails.Token_Name);
+            addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', '');
+        }
+        // Update the Cloud property file with that new Client ID
+        addOrUpdateProperty(getPropFileName(), 'CloudLogin.clientID', clientID);
+        // Invalidate login to login to new environment
+        CCOM.invalidateLogin();
+        // Property file needs to be reloaded; forcing a refresh
+        getProp('CloudLogin.clientID', true, true);
+        // If Oauth is being used: Generate a Key on the new Org
+        if (doOauth) {
+            // Generate a new OAUTH Token
+            await OAUTH.generateOauthToken(null, true, false);
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+}
+
+function mapOrg(org) {
+    org.name = org.accountDisplayName;
+    if (org.ownersInfo) {
+        let i = 1;
+        for (const owner of org.ownersInfo) {
+            org['Owner ' + i] = owner.firstName + ' ' + owner.lastName + ' (' + owner.email + ')';
+            i++;
+        }
+    }
+    if (org.regions) {
+        org.regions = org.regions.map(reg => translateAWSRegion(reg));
+        let i = 1;
+        for (const reg of org.regions) {
+            org['Region ' + i] = reg;
+            i++;
+        }
+    } else {
+        org.regions = ['NONE'];
+    }
+    return org;
+}
+
+
+// Options; doShow, doChoose, question
+async function displayOrganizations(doShow, doChoose, question) {
+    const organizations = await getOrganizations();
+    const myOrgs = [];
+    for (let org of organizations) {
+        org.type = 'Main';
+        org = mapOrg(org);
+        myOrgs.push(org);
+        const main = org.accountDisplayName;
+        if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
+            for (let child of org.childAccountsInfo) {
+                child.type = 'Child of ' + main;
+                child = mapOrg(child);
+                myOrgs.push(child);
+            }
+        }
+    }
+    const tObject = createTable(myOrgs, CCOM.mappings.account_info, false);
+    pexTable(tObject, 'organizations', getPEXConfig(), doShow);
+    if (doChoose) {
+        const orgA = await askMultipleChoiceQuestionSearch(question, ['NONE', ...iterateTable(tObject).map(v => v['Organization Name'])]);
+        const selectedOrg = iterateTable(tObject).filter(v => v['Organization Name'] === orgA)[0];
+        let orgDetails;
+        if (selectedOrg) {
+            orgDetails = getSpecificOrganization(organizations, selectedOrg['Organization Name']);
+        }
+        return orgDetails;
+    }
+}
+
+function getSpecificOrganization(organizations, name) {
+    for (let org of organizations) {
+        if (name === org.accountDisplayName) {
+            return org;
+        }
+        if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
+            for (let child of org.childAccountsInfo) {
+                if (name === child.accountDisplayName) {
+                    return child;
+                }
+            }
+        }
+    }
+}
+
+
+// display current properties in a table
+async function getClientIDforOrg(accountId) {
+    log(INFO, 'Getting client ID for organization, with account ID: ' + colors.blue(accountId));
+    const postRequest = 'account-id=' + accountId + '&opaque-for-tenant=TSC';
+    const response = await CCOM.callTCA(CCOM.clURI.reauthorize, false, {
+        method: 'POST',
+        postRequest: postRequest,
+        contentType: 'application/x-www-form-urlencoded',
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login,
+        forceCLIENTID: true,
+        returnResponse: true
+    });
+
+    const loginCookie = response.headers['set-cookie'];
+    const rxd = /domain=(.*?);/g;
+    const rxt = /tsc=(.*?);/g;
+    const cookies = {"domain": rxd.exec(loginCookie)[1], "tsc": rxt.exec(loginCookie)[1]};
+
+    const axios = require('axios').default;
+    axios.defaults.validateStatus = () => {
+        return true;
+    };
+    const options = {
+        method: "POST",
+        headers: {
+            cookie: "tsc=" + cookies.tsc + "; domain=" + cookies.domain
+        }
+    }
+    // Get the ClientID
+    const clientIDResponse = (await axios('https://' + getCurrentRegion() + CCOM.clURI.get_clientID, options)).data;
+    // Invalidate the login after using Re-Authorize
+    CCOM.invalidateLogin();
+    return clientIDResponse.ClientID;
+}
 
 /*
 

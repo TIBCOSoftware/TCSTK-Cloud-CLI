@@ -12,9 +12,9 @@ function main(OnlyGenerateNew) {
         if (tasks[tn].enabled == true && tasks[tn].internal == false) {
             if (tn != '') {
                 console.log(tn);
-                const fName = 'docsTemp/tasks/' + tn + '.md';
+                const fName = 'docs/tasks/' + tn + '.md';
                 if (!OnlyGenerateNew || !doesFileExist(fName)) {
-                    copyFile('docsTemp/tasks/template.md', fName);
+                    copyFile('docs/tasks/template.md', fName);
                     replaceInFile('@@TASK@@', tn, fName);
                     // @@DESCRIPTION@@
                     replaceInFile('@@DESCRIPTION@@', tasks[tn].description, fName);
@@ -84,6 +84,6 @@ function adjustTasks() {
 }
 
 // console.log('Generating Help Files...');
-main(ONLY_GENERATE_NEW_FILES);
+// main(ONLY_GENERATE_NEW_FILES);
 generateIndex();
 // adjustTasks();

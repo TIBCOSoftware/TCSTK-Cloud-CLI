@@ -46,10 +46,10 @@ displayGlobalConnectionConfig = function () {
             "EMAIL": indexObj(propsG, 'CloudLogin.email'),
             "CLIENT ID": indexObj(propsG, 'CloudLogin.clientID'),
             "PASSWORD": passType,
-            "OAUTH TOKEN NAME" : indexObj(propsG, 'CloudLogin.OAUTH_Generate_Token_Name')
+            "OAUTH TOKEN NAME": indexObj(propsG, 'CloudLogin.OAUTH_Generate_Token_Name')
         };
         console.table(globalConfig);
-        if(isGlobalOauthDefined()){
+        if (isGlobalOauthDefined()) {
             log(INFO, 'Global OAUTH Configuration:');
             parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), true);
         } else {
@@ -64,10 +64,10 @@ displayGlobalConnectionConfig = function () {
     return re;
 }
 
-isGlobalOauthDefined = function() {
-    if(doesFileExist(GLOBALPropertyFileName)){
+isGlobalOauthDefined = function () {
+    if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
-        if(indexObj(propsG, 'CloudLogin.OAUTH_Token') === undefined ){
+        if (indexObj(propsG, 'CloudLogin.OAUTH_Token') === undefined) {
             return false;
         } else {
             return Object.keys(parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), false)).length !== 0;
@@ -124,7 +124,7 @@ updateGlobalConnectionConfig = async function () {
         const newTokenNumber = tokenNumber + 1;
         const newTokenName = OTokenName.replace(tokenNumber, newTokenNumber);
         addOrUpdateProperty(GLOBALPropertyFileName, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
-        log(INFO, 'Updating Global Token Name: ' , newTokenName);
+        log(INFO, 'Updating Global Token Name: ', newTokenName);
     }
     const defEmail = getProp('CloudLogin.email');
     const defClientID = getProp('CloudLogin.clientID');
@@ -156,8 +156,8 @@ getOAUTHDetails = function () {
 }
 
 getProp = function (propName, forceRefresh, forceGlobalRefresh) {
-    log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh,  'Forcing a Global Refresh: ', forceGlobalRefresh);
-    if(forceRefresh){
+    log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh, 'Forcing a Global Refresh: ', forceGlobalRefresh);
+    if (forceRefresh) {
         propsGl = null;
     }
     if (propsGl == null) {
@@ -242,15 +242,15 @@ parseOAUTHToken = function (stringToken, doLog) {
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
 getOrganization = function (forceRefresh) {
-    if(forceRefresh){
+    if (forceRefresh) {
         OrganizationGl = '';
     }
-    if(OrganizationGl === '' && isOauthUsed()) {
+    if (OrganizationGl === '' && isOauthUsed()) {
         if (globalOAUTH == null) {
             getProp('CloudLogin.OAUTH_Token');
             // It could be that there is just the OAUTH token
         }
-        if(globalOAUTH != null && globalOAUTH.Org) {
+        if (globalOAUTH != null && globalOAUTH.Org) {
             OrganizationGl = globalOAUTH.Org
         }
     }
@@ -265,7 +265,7 @@ setOrganization = function (org) {
 setProperty = function (name, value) {
     //console.log('BEFORE propsGl: ' , propsGl);
     log(DEBUG, 'Setting Property) Name: ', name, ' Value: ', value);
-    if(propsGl == null){
+    if (propsGl == null) {
         propsGl = {};
     }
     set(name, value, propsGl);
@@ -469,25 +469,25 @@ updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh, d
     // Client ID
     let cidQuestion = 'What is your Client ID ?';
     let useCID = '';
-    if(defaultClientID != null){
+    if (defaultClientID != null) {
         useCID = defaultClientID;
         cidQuestion += ' (Press enter to use: ' + useCID + ')';
     }
     log('INFO', 'Get your client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
     let cid = await askQuestion(cidQuestion);
-    if(useCID !== '' && cid === ''){
+    if (useCID !== '' && cid === '') {
         cid = useCID;
     }
     addOrUpdateProperty(propFile, 'CloudLogin.clientID', cid);
     let emailQuestion = 'What is your User Name (Email) ?'
     let useEMAIL = '';
-    if(defaultEmail != null){
+    if (defaultEmail != null) {
         useEMAIL = defaultEmail;
         emailQuestion += ' (Press enter to use: ' + useEMAIL + ')';
     }
     // Username & Password (obfuscate)
     let email = await askQuestion(emailQuestion);
-    if(useEMAIL !== '' && email === ''){
+    if (useEMAIL !== '' && email === '') {
         email = useEMAIL;
     }
     addOrUpdateProperty(propFile, 'CloudLogin.email', email);
@@ -573,6 +573,21 @@ getCurrentAWSRegion = function () {
     return re
 }
 
+// Translates an AWS region into normal region description.
+translateAWSRegion = function (awsRegion) {
+    switch (awsRegion) {
+        case 'us-west-2':
+            return 'US - Oregon';
+            break;
+        case 'eu-west-1':
+            return 'EU - Ireland';
+            break;
+        case 'ap-southeast-2':
+            return 'AU - Sydney';
+            break;
+    }
+}
+
 // Gets region (in Capitals)
 getRegion = function (forceRefresh, forceGlobalRefresh) {
     return getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh).toString().toUpperCase();
@@ -605,17 +620,17 @@ updateTCLIwrapper = function () {
 // TODO: Implement Check for global (see if the old value is USE-GLOBAL, and then update the global file)
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
 addOrUpdateProperty = function (location, property, value, comment, checkForGlobal) {
-    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ') Use Global: ' ,checkForGlobal);
+    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ') Use Global: ', checkForGlobal);
     // Check for global is true by default
     let doCheckForGlobal = true;
-    if(checkForGlobal != null){
+    if (checkForGlobal != null) {
         doCheckForGlobal = checkForGlobal
     }
     // If we check for global and if the global file exist, see if we need to update the global file instead.
-    if (doCheckForGlobal && location === LOCALPropertyFileName && doesFileExist(GLOBALPropertyFileName)){
+    if (doCheckForGlobal && location === LOCALPropertyFileName && doesFileExist(GLOBALPropertyFileName)) {
         // We are updating the local prop file
         const localProps = require('properties-reader')(LOCALPropertyFileName).path();
-        if(indexObj(localProps, property) === 'USE-GLOBAL'){
+        if (indexObj(localProps, property) === 'USE-GLOBAL') {
             location = GLOBALPropertyFileName;
             log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
         }
@@ -646,7 +661,7 @@ addOrUpdateProperty = function (location, property, value, comment, checkForGlob
             }
             let dataForFile = '';
             for (let line in dataLines) {
-                if(line !== (dataLines.length - 1)){
+                if (line !== (dataLines.length - 1)) {
                     dataForFile += dataLines[line] + '\n';
                 } else {
                     // The last one:
@@ -683,7 +698,7 @@ getGlobalConfig = function () {
 }
 
 // Getter
-getGLOBALPropertyFileName = function() {
+getGLOBALPropertyFileName = function () {
     return GLOBALPropertyFileName;
 }
 
@@ -1027,9 +1042,9 @@ log = function (level, ...message) {
         // const timeStamp = new Date();
         // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
         if (level === global.ERROR) {
-            for (let mN in message){
+            for (let mN in message) {
                 // Removes password in console
-                if(typeof message[mN] == 'string' && message[mN].indexOf('--pass') > 0){
+                if (typeof message[mN] == 'string' && message[mN].indexOf('--pass') > 0) {
                     message[mN] = message[mN].replace(/--pass \".*\"/, '')
                 }
             }
@@ -1060,19 +1075,18 @@ logLine = function (message) {
 }
 
 
-
 // For future versions: if(getProp('Cloud_Properties_Version') != 'V3'){
 const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 
-upgradeToV2 = function(isGlobal, propFile){
+upgradeToV2 = function (isGlobal, propFile) {
     let host = '';
     let curl = '';
     let newORG = 'US';
     let newPW = '';
     let propsTemp;
-    let defaultSharedStateFilter='APPLICATION'
-    if(isGlobal){
+    let defaultSharedStateFilter = 'APPLICATION'
+    if (isGlobal) {
         propsTemp = require('properties-reader')(GLOBALPropertyFileName).path();
         host = propsTemp.cloudHost || '';
         curl = propsTemp.Cloud_URL || '';
@@ -1081,18 +1095,18 @@ upgradeToV2 = function(isGlobal, propFile){
         curl = getProp('Cloud_URL') || '';
         // Old Local Props
         propsTemp = require('properties-reader')(LOCALPropertyFileName).path();
-        if(propsTemp.Shared_State_Scope != null){
+        if (propsTemp.Shared_State_Scope != null) {
             defaultSharedStateFilter = propsTemp.Shared_State_Scope;
         }
 
-        if(propsTemp.cloudHost === 'USE-GLOBAL' || propsTemp.Cloud_URL === 'USE-GLOBAL'){
+        if (propsTemp.cloudHost === 'USE-GLOBAL' || propsTemp.Cloud_URL === 'USE-GLOBAL') {
             newORG = 'USE-GLOBAL';
         }
     }
     let pass = indexObj(propsTemp, 'CloudLogin.pass');
-    if(pass && pass !== '' && pass !== 'USE-GLOBAL' && !pass.startsWith('@#'))  {
+    if (pass && pass !== '' && pass !== 'USE-GLOBAL' && !pass.startsWith('@#')) {
         const fus = require('./fuzzy-search.js');
-        if(pass.startsWith('#')) {
+        if (pass.startsWith('#')) {
             newPW = fus.search(Buffer.from(pass, 'base64').toString());
         } else {
             newPW = fus.search(pass);
@@ -1107,7 +1121,7 @@ upgradeToV2 = function(isGlobal, propFile){
     // console.log('newORG: ', newORG, 'host',host, 'curl',curl);
     let initialTokenName = 'MyCLIToken_1'
     log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
-    if(isGlobal){
+    if (isGlobal) {
         initialTokenName = 'MyGlobalCLIToken_1'
         log(INFO, colors.rainbow('* AUTOMATICALLY Updating GLOBAL property file to V2.*'));
     } else {
@@ -1127,51 +1141,51 @@ upgradeToV2 = function(isGlobal, propFile){
     addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version', false);
     addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Oregon) - US\n#  EU Cloud (Ireland) - EU\n# AUS Cloud (Sydney) - AU\n# Options: US | EU | AU', false);
     // addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com', false);
-    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Token_Name',initialTokenName , 'Name of the OAUTH token to be generated.');
-    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_For_Tenants','TSC,BPM' , 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
-    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Generate_Valid_Hours','336', 'Number of Hours the generated OAUTH token should be valid.');
-    createPropINE(isGlobal, propFile,'CloudLogin.OAUTH_Required_Hours_Valid','168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
-    if(newPW !== ''){
-        addOrUpdateProperty(propFile, 'CloudLogin.pass', newPW, '',false);
+    createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Generate_Token_Name', initialTokenName, 'Name of the OAUTH token to be generated.');
+    createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Generate_For_Tenants', 'TSC,BPM', 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.');
+    createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Generate_Valid_Hours', '336', 'Number of Hours the generated OAUTH token should be valid.');
+    createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Required_Hours_Valid', '168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
+    if (newPW !== '') {
+        addOrUpdateProperty(propFile, 'CloudLogin.pass', newPW, '', false);
     }
-    if(!isGlobal) {
+    if (!isGlobal) {
         // Translate Shared_State_Scope to Shared_State_Filter
         PROPM.disableProperty(propFile, 'Shared_State_Scope', DisableMessage);
-        createPropINE(isGlobal, propFile,'Shared_State_Filter',defaultSharedStateFilter , 'Shared_State_Scope was renamed to Shared_State_Filter\n# Filter for the shared state to manage (all shared states starting with this value will be managed)\n' +
+        createPropINE(isGlobal, propFile, 'Shared_State_Filter', defaultSharedStateFilter, 'Shared_State_Scope was renamed to Shared_State_Filter\n# Filter for the shared state to manage (all shared states starting with this value will be managed)\n' +
             '#  Use \'\'(empty) or APPLICATION for the current application. Use * for all values, or use a specific value to apply a filter.\n' +
             '#  ( <Filter> | APPLICATION | * )');
         createPropINE(isGlobal, propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)');
         // Force a Refresh (not needed for global)
-        getProp('CloudLogin.Region',true, true);
+        getProp('CloudLogin.Region', true, true);
     }
 }
 
 
 // Upgrade Helper: Create Propety If Not Exists
-function createPropINE (isGlobal, propFile, propName, value ,comment) {
+function createPropINE(isGlobal, propFile, propName, value, comment) {
     let doUpdate;
-    if(isGlobal){
+    if (isGlobal) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         doUpdate = propsG[propName] === undefined;
     } else {
         doUpdate = getProp(propName) === undefined;
     }
-    if(doUpdate){
-        addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment,false);
+    if (doUpdate) {
+        addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment, false);
     } else {
         log(INFO, 'Not changed the value of ' + colors.green(propName) + '...')
     }
 }
 
-if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
-checkGlobalForUpgrade = function() {
+if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
+checkGlobalForUpgrade = function () {
     if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
-        if(propsG.Cloud_Properties_Version == null) {
+        if (propsG.Cloud_Properties_Version == null) {
             log(WARNING, 'Global file need to be upgraded...');
             upgradeToV2(true, GLOBALPropertyFileName);
         }
     }
-    if(global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'AFTER Check for Global Upgrade');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'AFTER Check for Global Upgrade');
 }
 checkGlobalForUpgrade();

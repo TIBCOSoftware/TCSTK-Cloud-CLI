@@ -272,7 +272,6 @@ export async function cli(args) {
         } else {
             if (options.task === 'help') {
                 options.task = 'help-tcli';
-                // TODO: Get specific help
             }
             // Check if the task exists...
             const cliTaskConfigCLI = require('./config/config-cli-task.json');

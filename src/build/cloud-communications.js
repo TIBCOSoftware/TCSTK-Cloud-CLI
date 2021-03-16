@@ -79,8 +79,12 @@ export function doManualRequest(url, options, data) {
     });
 }
 
-
-
+// When called this will force a new login (when switching orgs for example)
+export function invalidateLogin(){
+    loginC = null;
+    isOrgChecked = false;
+    isOAUTHValid = null;
+}
 
 export async function cLogin(tenant, customLoginURL, forceClientID) {
     const fClientID = forceClientID || false;
@@ -330,7 +334,8 @@ export async function callTCA(url, doLog, conf) {
 }
 
 // Function to show claims for the configured user
-export async function showCloudInfo(showTable) {
+export async function showCloudInfo(showTable, showSandbox) {
+    const doShowSandbox = showSandbox || false;
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;
     if (showTable != null) {
@@ -343,7 +348,7 @@ export async function showCloudInfo(showTable) {
     nvs = createTableValue('FIRST NAME', response.firstName, nvs);
     nvs = createTableValue('LAST NAME', response.lastName, nvs);
     nvs = createTableValue('EMAIL', response.email, nvs);
-    if (response.sandboxes) {
+    if (response.sandboxes && doShowSandbox) {
         for (let i = 0; i < response.sandboxes.length; i++) {
             nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs);
             nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs);

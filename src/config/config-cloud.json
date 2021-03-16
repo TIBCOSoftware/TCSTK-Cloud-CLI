@@ -13,6 +13,7 @@
     "generate_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/generate",
     "get_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens",
     "get_clientID": "account.cloud.tibco.com/idm/v1/clientID",
+    "reauthorize": "account.cloud.tibco.com/idm/v1/reauthorize",
     "revoke_oauth": "account.cloud.tibco.com/idm/v1/oauth2/tokens/operations/revoke",
     "la_org_folders": "liveapps.cloud.tibco.com/webresource/v1/orgFolders",
     "la_org_folder_download": "liveapps.cloud.tibco.com/webresource/orgFolders",
@@ -306,6 +307,26 @@
         {
           "header": "Subscriptions",
           "field": "NOFSubscriptions"
+        }
+      ]
+    },
+    "account_info": {
+      "entries": [
+        {
+          "header": "Organization Name",
+          "field": "name"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "Your Role",
+          "field": "loggedInUserRole"
+        },
+        {
+          "header": "Available Regions",
+          "field": "regions"
         }
       ]
     }
