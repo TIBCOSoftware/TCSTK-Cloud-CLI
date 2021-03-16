@@ -491,34 +491,3 @@ async function getClientIDforOrg(accountId) {
     CCOM.invalidateLogin();
     return clientIDResponse.ClientID;
 }
-
-/*
-
-STEP 0: Get tennant info
-GET https://eu.account.cloud.tibco.com/tsc-ws/v1/my-accounts/info?access-check-tenantid=TSC
-
-STEP 1: Internal Logout:
-POST https://eu.account.cloud.tibco.com/idm/v1/internal-logout
-DATA: resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fswitch-account%3Faction%3Dswitch%26resumeURL%3Dhttps%253A%252F%252Feu.account.cloud.tibco.com%252Fmanage%252Fhome%26ordinal%3D2%26baseTscDomain%3Dhttps%253A%252F%252Faccount.cloud.tibco.com%26tenantId%3DTSC%26tenantDomain%3Dhttps%253A%252F%252Feu.account.cloud.tibco.com
-
-STEP 2: Switch Account:
-
-https://eu.account.cloud.tibco.com/switch-account?action=switch&resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fmanage%2Fhome&ordinal=2&baseTscDomain=https%3A%2F%2Faccount.cloud.tibco.com&tenantId=TSC&tenantDomain=https%3A%2F%2Feu.account.cloud.tibco.com
-
-
-https://eu.account.cloud.tibco.com/switch-account?ordinal=2&tenantId=TSC&resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fmanage%2Fhome&tenantDomain=https%3A%2F%2Feu.account.cloud.tibco.com&baseTscDomain=https%3A%2F%2Faccount.cloud.tibco.com&fromSource=recents&v=1.5.11
-
-
-STEP 3: Reauthorize:
-POST: https://eu.account.cloud.tibco.com/idm/v1/reauthorize
-resumeURL=https%3A%2F%2Feu.account.cloud.tibco.com%2Fmanage%2Fhome&account-id=01DXJP1RMD9HKNYHDW34Z04M20&opaque-for-tenant=TSC
-
-STEP 4: Get Client ID:
-
-POST https://eu.account.cloud.tibco.com/idm/v1/clientID
-
-
-
-
-
- */
