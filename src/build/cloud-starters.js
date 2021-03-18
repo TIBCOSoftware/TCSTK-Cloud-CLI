@@ -316,8 +316,7 @@ async function getApplicationDetails(application, version, showTable) {
     return allArteFacts;
 }
 
-
-//Get Links to all the applications
+// Get Links to all the applications
 export async function getAppLinks(showTable) {
     log(INFO, 'Getting Cloud Starter Links...');
     const appLinkTable = {};
@@ -371,52 +370,10 @@ export async function getAppLinks(showTable) {
 }
 
 // Function to upload a zip to the LiveApps ContentManagment API
-export function uploadApp(application) {
-    return new Promise(async function (resolve, reject) {
-        let formData = new require('form-data')();
-        log(INFO, 'UPLOADING APP: ' + application);
-        const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
-        formData.append('appContents', require("fs").createReadStream('./dist/' + application + '.zip'));
-        const header = {};
-        header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
-        // Possibly add OAUTH Header...
-        if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
-            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
-        } else {
-            const lCookie = await CCOM.cLogin();
-            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-        }
-        let query = require('https').request({
-            hostname: getCurrentRegion() + CCOM.clURI.la_host,   //cloudHost,*/
-            path: uploadAppLocation,
-            method: 'POST',
-            headers: header
-        }, (res) => {
-            let data = '';
-            res.on("data", (chunk) => {
-                data += chunk.toString('utf8');
-            });
-            res.on('end', () => {
-                // console.log(data);
-                if (data) {
-                    const dataObj = JSON.parse(data);
-                    if (dataObj && dataObj.message) {
-                        log(INFO, 'UPLOAD RESULT:', colors.green(dataObj.message));
-                    } else {
-                        log(WARNING, 'UPLOAD RESULT:', data);
-                    }
-                } else {
-                    log(WARNING, 'UPLOAD RESULT:', data);
-                }
-                resolve();
-            })
-        });
-        query.on("error", (e) => {
-            console.error(e);
-            resolve();
-        });
-        formData.pipe(query);
-    });
+export async function uploadApp(application) {
+    const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
+    const appLocation = './dist/' + application + '.zip'
+    await CCOM.uploadToCloud('appContents', appLocation, uploadAppLocation);
 }
 
 // Function to publish the application to the cloud

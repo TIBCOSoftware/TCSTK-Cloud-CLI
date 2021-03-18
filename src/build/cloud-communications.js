@@ -333,6 +333,57 @@ export async function callTCA(url, doLog, conf) {
     return await callURLA(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
 }
 
+// Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
+export async function uploadToCloud(formDataType, localFileLocation, uploadFileURI) {
+    return new Promise( async function (resolve, reject) {
+        let formData = new require('form-data')();
+        log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')');
+        formData.append(formDataType, require("fs").createReadStream(localFileLocation));
+        const header = {};
+        header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
+        // Possibly add OAUTH Header...
+        if (isOauthUsed() && await isOAUTHLoginValid()) {
+            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
+        } else {
+            const lCookie = await cLogin();
+            // console.log(lCookie);
+            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        }
+        let query = require('https').request({
+            hostname: getCurrentRegion() + clURI.la_host,   //cloudHost,*/
+            path: uploadFileURI,
+            method: 'POST',
+            headers: header
+        }, (res) => {
+            let data = '';
+            res.on("data", (chunk) => {
+                data += chunk.toString('utf8');
+            });
+            res.on('end', () => {
+                // console.log(data);
+                if (data) {
+                    const dataObj = JSON.parse(data);
+                    if (dataObj && dataObj.message) {
+                        log(INFO, ' UPLOAD RESULT:', colors.green(dataObj.message));
+                    } else {
+                        log(WARNING, ' UPLOAD RESULT:', data);
+                        reject();
+                    }
+                } else {
+                    log(WARNING, ' UPLOAD RESULT:', data);
+                    reject();
+                }
+                resolve();
+            })
+        });
+        query.on("error", (e) => {
+            console.error(e);
+            resolve();
+        });
+        formData.pipe(query);
+    });
+}
+
 // Function to show claims for the configured user
 export async function showCloudInfo(showTable, showSandbox) {
     const doShowSandbox = showSandbox || false;

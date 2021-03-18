@@ -3,6 +3,8 @@ const USERGROUPS = require('./user-groups');
 const colors = require('colors');
 
 let OrgFolderLocation;
+const isWindows = process.platform === 'win32';
+const dirDelimiter = isWindows ? '\\' : '/';
 
 // Function to get org folders
 function checkOrgFolderLocation() {
@@ -140,7 +142,14 @@ export async function uploadFileToOrgFolder() {
     const folderDecision = await askMultipleChoiceQuestionSearch('To which folder would you like to upload a file ?', chFolder);
     if (folderDecision != 'NONE') {
         const localFileLocation = await askQuestion('Specify to location of the local file you want to upload ?');
-        const cloudFileName = await askQuestion('Specify the fileName as which you would like to upload it ?');
+        let cloudFileName = await askQuestion('Specify the fileName as which you would like to upload it (Or press enter or use "SAME" to use the same name)?');
+        if (cloudFileName === '' || cloudFileName.toLowerCase() === 'same') {
+            if (localFileLocation.indexOf(dirDelimiter) > 0) {
+                cloudFileName = localFileLocation.substring(localFileLocation.lastIndexOf(dirDelimiter) + 1, localFileLocation.length);
+            } else {
+                cloudFileName = localFileLocation;
+            }
+        }
         await uploadFile(localFileLocation, folderDecision, cloudFileName);
 
     } else {
@@ -149,55 +158,9 @@ export async function uploadFileToOrgFolder() {
 }
 
 // Function to upload a zip to the LiveApps ContentManagment API
-export function uploadFile(fileLocation, cloudFolder, cloudFileName) {
-    return new Promise(async function (resolve, reject) {
-        let formData = new require('form-data')();
-        log(INFO, 'UPLOADING File: ' + fileLocation);
-        // /orgFolders/{folderName}/artifacts/{artifactName}/upload/
-        //
-        const uploadFileURI = '/webresource/v1/orgFolders/' + cloudFolder  + '/artifacts/'+ cloudFileName+'/upload/';
-        formData.append('artifactContents', require("fs").createReadStream(fileLocation));
-        const header = {};
-        header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
-        // Possibly add OAUTH Header...
-        if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
-            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
-        } else {
-            const lCookie = await CCOM.cLogin();
-            // console.log(lCookie);
-            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-        }
-        let query = require('https').request({
-            hostname: getCurrentRegion() + CCOM.clURI.la_host,   //cloudHost,*/
-            path: uploadFileURI,
-            method: 'POST',
-            headers: header
-        }, (res) => {
-            let data = '';
-            res.on("data", (chunk) => {
-                data += chunk.toString('utf8');
-            });
-            res.on('end', () => {
-                console.log(data);
-                if (data) {
-                    const dataObj = JSON.parse(data);
-                    if (dataObj && dataObj.message) {
-                        log(INFO, 'UPLOAD RESULT:', colors.green(dataObj.message));
-                    } else {
-                        log(WARNING, 'UPLOAD RESULT:', data);
-                    }
-                } else {
-                    log(WARNING, 'UPLOAD RESULT:', data);
-                }
-                resolve();
-            })
-        });
-        query.on("error", (e) => {
-            console.error(e);
-            resolve();
-        });
-        formData.pipe(query);
-    });
+export async function uploadFile(fileLocation, cloudFolder, cloudFileName) {
+    const uploadFileURI = '/webresource/v1/orgFolders/' + cloudFolder + '/artifacts/' + cloudFileName + '/upload/';
+    await CCOM.uploadToCloud('artifactContents', fileLocation, uploadFileURI);
 }
 
 

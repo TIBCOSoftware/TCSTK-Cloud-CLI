@@ -289,7 +289,7 @@ multipleInteraction = async function () {
 
                 for (let envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber];
-                    let command = 'tcli -p ' + miPropFolder + propFileToUse + ' ' + miTask;
+                    let command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask;
                     if (chosenEnv === 'ALL ENVIRONMENTS') {
                         console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                         run(command, doFailOnError);

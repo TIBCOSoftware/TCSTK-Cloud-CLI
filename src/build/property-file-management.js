@@ -45,33 +45,35 @@ export async function generateCloudPropertyFiles() {
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL EU') {
             genOne = false;
             for (let pFile of propFilesEU) {
-                configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL US') {
             genOne = false;
             for (let pFile of propFilesUS) {
-                configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL AU') {
             genOne = false;
             for (let pFile of propFilesAU) {
-                configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (genOne) {
             let reg = '';
+            let accId = '';
             for (let pFile of propFilesALL) {
                 if (pFile.PROPERTY_FILE_NAME === propFilesToGenerate) {
                     reg = pFile.REGION;
                     propForMFile += pFile.PROP + ',';
+                    accId = pFile.ACCOUNT_ID;
                 }
             }
-            configurePropFile('./' + propFilesToGenerate, reg);
+            await configurePropFile('./' + propFilesToGenerate, reg, accId);
         }
         const tcliIprop = propForMFile.substr(0, propForMFile.length - 1);
         log(INFO, 'Property for tcli interaction: ' + tcliIprop);
@@ -92,22 +94,27 @@ export async function generateCloudPropertyFiles() {
 
 // Extract Helper
 function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU) {
-    let orgName = '' + org.accountDisplayName;
+    console.log(org.accountId);
+    const orgName = '' + org.accountDisplayName;
+    const accId = org.accountId;
     let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
     let tOrgNameEU = {
         REGION: 'EU',
         PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties',
-        PROP: 'tibco-cloud-' + projectName + 'EU_' + tOrgName
+        PROP: 'tibco-cloud-' + projectName + 'EU_' + tOrgName,
+        ACCOUNT_ID: accId
     };
     let tOrgNameUS = {
         REGION: 'US',
         PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties',
-        PROP: 'tibco-cloud-' + projectName + 'US_' + tOrgName
+        PROP: 'tibco-cloud-' + projectName + 'US_' + tOrgName,
+        ACCOUNT_ID: accId
     };
     let tOrgNameAU = {
         REGION: 'AU',
         PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties',
-        PROP: 'tibco-cloud-' + projectName + 'AU_' + tOrgName
+        PROP: 'tibco-cloud-' + projectName + 'AU_' + tOrgName,
+        ACCOUNT_ID: accId
     };
     propOption.push(tOrgNameEU.PROPERTY_FILE_NAME, tOrgNameUS.PROPERTY_FILE_NAME, tOrgNameAU.PROPERTY_FILE_NAME);
     propFilesALL.push(tOrgNameEU, tOrgNameUS, tOrgNameAU);
@@ -117,13 +124,17 @@ function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesE
 }
 
 // Config property helper
-function configurePropFile(fileName, region) {
+async function configurePropFile(fileName, region, accountId) {
     log(INFO, '[' + region + ']: Generating: ' + fileName);
     let regToAdd = '';
     copyFile(getPropFileName(), fileName);
-    addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://" + regToAdd + "account.cloud.tibco.com/manage/settings/oAuthTokens>");
+    const ClientID = await getClientIDforOrg(accountId);
+    // TODO: Possibly generate an OAUTH Token, on the new file
+    // console.log('Account ID: ' , accountId + ' ClientID: ' + ClientID);
+    //addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://" + regToAdd + "account.cloud.tibco.com/manage/settings/oAuthTokens>");
+    addOrUpdateProperty(fileName, 'CloudLogin.clientID', ClientID);
     addOrUpdateProperty(fileName, 'CloudLogin.Region', region);
-    log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
+    // log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
 }
 
 const SPECIAL = 'SPECIAL';
