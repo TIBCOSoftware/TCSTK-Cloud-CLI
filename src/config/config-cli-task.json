@@ -425,17 +425,6 @@
       ],
       "category": "live-apps"
     },
-    "show-org-folders": {
-      "description": "Displays the content of the LiveApps Organization Folders.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showOrgFoldersWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
     "show-live-apps-sandbox": {
       "description": "Displays the LiveApps Sandbox ID's for Production and Development",
       "enabled": true,
@@ -557,39 +546,6 @@
       "enabled": false,
       "internal": false,
       "task": "jsonToCsvLiveAppsDataWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "export-org-folder": {
-      "description": "Exports the content of a LiveApps Organization Folder to disk.",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "exportOrgFolderWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "import-org-folder": {
-      "description": "Imports the content of a folder on disk to a LiveApps Organization Folder.",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "importOrgFolderWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "live-apps"
-    },
-    "watch-org-folder": {
-      "description": "Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "watchOrgFolderWrapper",
       "availableOnOs": [
         "all"
       ],
@@ -721,6 +677,72 @@
         "all"
       ],
       "category": "shared-state"
+    },
+    "show-org-folders": {
+      "description": "Displays the content of the LiveApps Organization Folders.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showOrgFoldersWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
+    },
+    "create-org-folder": {
+      "description": "Creates a new Organizational Folder.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "createOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
+    },
+    "upload-file-to-org-folder": {
+      "description": "Uploads a file to an org folder",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "uploadFileWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
+    },
+    "export-org-folder": {
+      "description": "Exports the content of a LiveApps Organization Folder to disk.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "exportOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
+    },
+    "import-org-folder": {
+      "description": "Imports the content of a folder on disk to a LiveApps Organization Folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "importOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
+    "watch-org-folder": {
+      "description": "Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "watchOrgFolderWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
     },
     "show-tci-apps": {
       "description": "List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).",

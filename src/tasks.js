@@ -543,6 +543,17 @@ export async function showOrgFoldersWrapper() {
     await CFILES.showOrgFolders();
 }
 
+export async function createOrgFolderWrapper() {
+    const CFILES = require('./build/cloud-files');
+    await CFILES.createOrgFolder();
+}
+
+export async function uploadFileWrapper() {
+    const CFILES = require('./build/cloud-files');
+    await CFILES.uploadFileToOrgFolder();
+}
+
+
 export async function showPropertiesWrapper() {
     const PROPM = require('./build/property-file-management');
     await PROPM.showPropertiesTable();

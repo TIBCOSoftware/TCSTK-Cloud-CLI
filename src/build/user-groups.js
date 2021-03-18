@@ -42,14 +42,14 @@ export async function showLiveAppsGroups() {
 // Function to create LiveApps Group
 export async function createLiveAppsGroup() {
     log(INFO, 'Creating LiveApps Group...');
-    const gName = await askQuestion('What is the name of the group you would like to create ? (press enter to not create a group)');
-    if (gName !== '') {
+    const gName = await askQuestion('What is the name of the group you would like to create ? (use "NONE" or press enter to not create a group)');
+    if (gName !== '' || gName.toLowerCase() !== 'none') {
         const gDescription = await askQuestion('What is the description of the group  ? (press enter to leave blank)');
-        let postGroup = {
+        const postGroup = {
             "name": gName,
             "description": gDescription,
             "type": "SubscriptionDefined"
-        }
+        };
         const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups, false ,{method: 'POST',  postRequest: postGroup} );
         if (oResponse != null) {
             log(INFO, 'Successfully created group with ID: ', oResponse);
