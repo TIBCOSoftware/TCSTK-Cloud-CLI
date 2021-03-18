@@ -373,7 +373,7 @@
       "category": "tcli"
     },
     "validate": {
-      "description": "Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.",
+      "description": "Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": false,
@@ -809,7 +809,7 @@
       "category": "spotfire"
     },
     "list-spotfire-library": {
-      "description": "Make a list of all specific components in your Spotfire Library (DXP's, Mods, Information links, Data files or Data connections)",
+      "description": "Lists all components(DXP's, Mods, Information links, Data files or Data connections) in your SF Library.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,

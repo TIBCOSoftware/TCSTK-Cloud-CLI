@@ -37,8 +37,8 @@ describe("tcli testsuite", function () {
     });
 
     // Show cloud with Basic Authentication
-    // jasmine --config=test/support/jasmine.json --filter='tcli basic interactions'
-    it("tcli basic interactions", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: basic interactions'
+    it("TCLI: basic interactions", function () {
         //expect(run(CLI_EXECUTOR + ' -a q')).toBe(true);
         //expect(run(CLI_EXECUTOR + ' -a exit')).toBe(true);
         //expect(run(CLI_EXECUTOR + ' -a quit')).toBe(true);
@@ -54,9 +54,9 @@ describe("tcli testsuite", function () {
 
     });
 
-    // jasmine --config=test/support/jasmine.json --filter='Basic Operations'
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Basic Operations'
     // Show cloud with Basic Authentication
-    it("Basic Operations", function () {
+    it("TCLI: Basic Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
@@ -65,8 +65,8 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter='Help'
-    it("Help", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Help'
+    it("TCLI: Help", function () {
         expect(run(CLI_EXECUTOR + '--help')).toBe(true);
         expect(run(CLI_EXECUTOR + '-h')).toBe(true);
         expect(run(CLI_EXECUTOR + '-h show-cloud')).toBe(true);
@@ -74,9 +74,9 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + '-h show-crap')).toBe(false);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter='More Operations'
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: More Operations'
     // Show cloud with Basic Authentication
-    it("More Operations", function () {
+    it("TCLI: More Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
@@ -94,9 +94,38 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter=OAUTH
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Organizations'
+    // Show cloud with Basic Authentication
+    it("TCLI: Organizations", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'change-region -a "US - Oregon"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'change-region -a "AU - Sydney"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'change-region -a "EU - Ireland"')).toBe(true);
+
+        // Test switching org Just Client ID
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:USE-LOCAL:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud-organizations -a NONE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud-organizations -a "TIBCO LABS DEV"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'change-cloud-organization -a "OOCTO"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
+
+        // Test switching org with OAUTH
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_Token_Name:none:JasmineOrgTest_1:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'generate-oauth-token -a YES:YES:YES')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud-organizations -a NONE')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud-organizations -a "OOCTO"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'change-cloud-organization -a "TIBCO LABS DEV"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineOrgTest_1')).toBe(true);
+
+    });
+
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: OAUTH'
     // Generate an OAUTH Token
-    it("OAUTH", function () {
+    it("TCLI: OAUTH", function () {
         //"37. show-oauth-tokens":
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true);
@@ -117,9 +146,9 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(false);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter=LIVEAPPS
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: LIVEAPPS'
     // Generate an OAUTH Token
-    it("LIVEAPPS", function () {
+    it("TCLI: LIVEAPPS", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cases')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-actions -a none')).toBe(true);
@@ -130,9 +159,9 @@ describe("tcli testsuite", function () {
     });
 
 
-    // jasmine --config=test/support/jasmine.json --filter='Build and Deploy Basic Cloud Starter'
+    // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Build and Deploy Basic Cloud Starter'
     // Basic Cloud Starter Template - LATEST Angular 10
-    it("Build and Deploy Basic Cloud Starter", function () {
+    it("TEMPLATE: Build and Deploy Basic Cloud Starter", function () {
         const CSName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Basic Cloud Starter Template - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
@@ -147,11 +176,11 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud-starters')).toBe(true);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter='Case Manager and Schematics'
+    // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Case Manager and Schematics'
     // Basic Cloud Starter Template - LATEST Angular 10
 
     //TODO: Testcase fails on windows (on ./backup folder)
-    it("Case Manager and Schematics", function () {
+    it("TEMPLATE: Case Manager and Schematics", function () {
         const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
@@ -181,10 +210,10 @@ describe("tcli testsuite", function () {
         // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter='Form Template and Schematics'
+    // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Form and Schematics'
     // Form Template - LATEST Angular 10
     // TODO: Testcase fails on: Cannot read property 'length' of undefined
-    xit("Form Template and Schematics", function () {
+    xit("TEMPLATE: Form and Schematics", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Form Template - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
@@ -195,9 +224,9 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ng generate @tibco-tcstk/component-template:custom-form-casedata CustomFormCaseData --defaults=true --interactive=false')).toBe(true);
     });
 
-    // jasmine --config=test/support/jasmine.json --filter='Analytics Template and Schematics'
+    // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Analytics Template and Schematics'
     // Analytics Application Template - LATEST Angular 10
-    it("Analytics Template and Schematics", function () {
+    it("TEMPLATE: Analytics Template and Schematics", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-deploy')).toBe(true);
@@ -206,8 +235,8 @@ describe("tcli testsuite", function () {
     });
 
 
-    // jasmine --config=test/support/jasmine.json --filter='Generate files'
-    it("Generate files", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Generate files'
+    it("TCLI: Generate files", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         let mFile = 'myMultiple';
         expect(run(CLI_EXECUTOR + 'create-multiple-property-file -a ' + mFile)).toBe(true);
@@ -219,8 +248,8 @@ describe("tcli testsuite", function () {
     });
 
     // Shared State Testcases
-    // jasmine --config=test/support/jasmine.json --filter='Shared State Testcases'
-    it("Shared State Testcases", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Shared State Testcases'
+    it("TCLI: Shared State Testcases", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Filter:none:*')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state')).toBe(true);
@@ -269,8 +298,8 @@ describe("tcli testsuite", function () {
 
 
     // Live Apps Cases
-    // jasmine --config=test/support/jasmine.json --filter='Live Apps Cases'
-    it("Live Apps Cases", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Live Apps Cases'
+    it("TCLI: Live Apps Cases", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         // TODO: Allow for NONE
         // TODO: Allow for All
@@ -286,8 +315,8 @@ describe("tcli testsuite", function () {
     });
 
     // Validation Testcases
-    // jasmine --config=test/support/jasmine.json --filter='Validation Testcases'
-    it("Validation Testcases", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Validation Testcases'
+    it("TCLI: Validation Testcases", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'validate -a Property_exist,CloudLogin.Region+CloudLogin.clientID')).toBe(true);
         expect(run(CLI_EXECUTOR + 'validate -a Property_exist,crap')).toBe(false);
@@ -313,8 +342,8 @@ describe("tcli testsuite", function () {
 
 
     // Groups and Users
-    // jasmine --config=test/support/jasmine.json --filter='Groups and Users'
-    it("Groups and Users", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Groups and Users'
+    it("TCLI: Groups and Users", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-live-apps-groups -a NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-live-apps-groups -a ALL')).toBe(true);
@@ -325,8 +354,8 @@ describe("tcli testsuite", function () {
     });
 
     // Org Folders
-    // jasmine --config=test/support/jasmine.json --filter='Org Folders'
-    it("Org Folders", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Org Folders'
+    it("TCLI: Org Folders", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         // TODO: Get more than 200 folders
         expect(run(CLI_EXECUTOR + 'show-org-folders -a NONE')).toBe(true);
@@ -336,7 +365,7 @@ describe("tcli testsuite", function () {
     });
 
     // TCI Apps
-    // jasmine --config=test/support/jasmine.json --filter='TCI Apps'
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: TCI Apps'
     it("TCI Apps", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-tci-apps')).toBe(true);
@@ -350,8 +379,8 @@ describe("tcli testsuite", function () {
     });
 
     // Shared State Testcases
-    // jasmine --config=test/support/jasmine.json --filter='Add Properties'
-    it("Add Properties", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Add Properties'
+    it("TCLI: Add Properties", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:SandboxID')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Test:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
@@ -365,8 +394,8 @@ describe("tcli testsuite", function () {
     });
 
     // Spotfire Testcases
-    // jasmine --config=test/support/jasmine.json --filter='Spotfire'
-    it("Spotfire", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Spotfire'
+    it("TCLI: Spotfire", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:NOT-GLOBAL:LOCAL')).toBe(true);
         expect(run(CLI_EXECUTOR + 'browse-spotfire-library -a NONE')).toBe(false);
@@ -392,8 +421,8 @@ describe("tcli testsuite", function () {
     });
 
     // FS Testcases
-    // jasmine --config=test/support/jasmine.json --filter='Fuzzy Search'
-    it("Fuzzy Search", function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Fuzzy Search'
+    it("TCLI: Fuzzy Search", function () {
         const fus = require('./../../src/build/fuzzy-search.js');
         for (let i = 0 ; i < 1000 ; i++) {
             let randomString = generateRandomString(Math.floor(Math.random() * 100));
@@ -402,8 +431,8 @@ describe("tcli testsuite", function () {
     });
 
     // Spotfire Testcases
-    // jasmine --config=test/support/jasmine.json --filter='Messaging'
-    it("Messaging", async function () {
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: Messaging'
+    it("TCLI: Messaging", async function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:NOT-GLOBAL:LOCAL')).toBe(true);
         expect(run(CLI_EXECUTOR + 'messaging-show-summary')).toBe(false);
