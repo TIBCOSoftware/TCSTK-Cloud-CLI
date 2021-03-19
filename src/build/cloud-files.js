@@ -113,8 +113,6 @@ export async function showOrgFolders() {
 
 // Function to create an org folder
 export async function createOrgFolder() {
-    const folderT = await getOrgFolders(true, false);
-    log(INFO, 'Above are the existing Organizational folders.')
     const fName = await askQuestion('What is the name of the organization folder you would like to create (use "NONE" or press enter to not create a folder) ?');
     if (fName !== '' || fName.toLowerCase() !== 'none') {
         const postFolder = {

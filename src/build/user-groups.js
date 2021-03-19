@@ -15,7 +15,7 @@ export async function getGroupsTable(showTable) {
 
 // Function that shows live apps group and who is in it.
 export async function showLiveAppsGroups() {
-    const groupT = getGroupsTable();
+    const groupT = await getGroupsTable();
     let selectGroup = ['NONE', 'ALL'];
     for (let gr of iterateTable(groupT)) {
         selectGroup.push(gr.Name);
