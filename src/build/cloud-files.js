@@ -150,6 +150,7 @@ export async function uploadFileToOrgFolder() {
                 cloudFileName = localFileLocation;
             }
         }
+        log(INFO, 'Creating ' + colors.blue(cloudFileName) + ' in folder: ' +  colors.blue(folderDecision));
         await uploadFile(localFileLocation, folderDecision, cloudFileName);
 
     } else {

@@ -243,7 +243,7 @@ describe("tcli testsuite", function () {
         let mFile = 'myMultiple';
         expect(run(CLI_EXECUTOR + 'create-multiple-property-file -a ' + mFile)).toBe(true);
         // TODO: allow for default as input for multiple
-        expect(run(CLI_EXECUTOR + 'generate-cloud-property-files -a MyProject:ALL:YES:' + mFile + '.properties')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'generate-cloud-property-files -a MyProject:ALL_EU:NO:YES:' + mFile + '.properties')).toBe(true);
         // TODO: allow for default as input for multiple
         // TODO: output should be json NOT properties
         expect(run(CLI_EXECUTOR + 'generate-live-apps-import-configuration -a import-live-apps-data-configuration.json')).toBe(true);
