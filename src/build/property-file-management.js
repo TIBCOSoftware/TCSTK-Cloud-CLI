@@ -38,28 +38,36 @@ export async function generateCloudPropertyFiles() {
     }
     log(INFO, 'Files that can be created');
     console.table(propFilesALL);
-    let propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption);
+    const propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption);
+    let doOauth = false;
+    if(isOauthUsed()){
+        const decision = await askMultipleChoiceQuestion('Do you want to generate OAUTH tokens for the new files ?', ['YES', 'NO']);
+        if(decision.toLowerCase() === 'yes') {
+            doOauth = true;
+        }
+    }
+
     let propForMFile = '';
     if (propFilesToGenerate !== 'NONE') {
         let genOne = true;
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL EU') {
             genOne = false;
             for (let pFile of propFilesEU) {
-                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID,doOauth);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL US') {
             genOne = false;
             for (let pFile of propFilesUS) {
-                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID,doOauth);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL AU') {
             genOne = false;
             for (let pFile of propFilesAU) {
-                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID,doOauth);
                 propForMFile += pFile.PROP + ',';
             }
         }
@@ -73,7 +81,7 @@ export async function generateCloudPropertyFiles() {
                     accId = pFile.ACCOUNT_ID;
                 }
             }
-            await configurePropFile('./' + propFilesToGenerate, reg, accId);
+            await configurePropFile('./' + propFilesToGenerate, reg, accId,doOauth);
         }
         const tcliIprop = propForMFile.substr(0, propForMFile.length - 1);
         log(INFO, 'Property for tcli interaction: ' + tcliIprop);
@@ -94,7 +102,6 @@ export async function generateCloudPropertyFiles() {
 
 // Extract Helper
 function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU) {
-    console.log(org.accountId);
     const orgName = '' + org.accountDisplayName;
     const accId = org.accountId;
     let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
@@ -124,17 +131,21 @@ function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesE
 }
 
 // Config property helper
-async function configurePropFile(fileName, region, accountId) {
+async function configurePropFile(fileName, region, accountId,doOauth) {
     log(INFO, '[' + region + ']: Generating: ' + fileName);
     let regToAdd = '';
     copyFile(getPropFileName(), fileName);
     const ClientID = await getClientIDforOrg(accountId);
-    // TODO: Possibly generate an OAUTH Token, on the new file
-    // console.log('Account ID: ' , accountId + ' ClientID: ' + ClientID);
-    //addOrUpdateProperty(fileName, 'CloudLogin.clientID', "<PLEASE GET THE API access key(CLIENT ID) FROM: https://" + regToAdd + "account.cloud.tibco.com/manage/settings/oAuthTokens>");
     addOrUpdateProperty(fileName, 'CloudLogin.clientID', ClientID);
     addOrUpdateProperty(fileName, 'CloudLogin.Region', region);
-    // log(WARNING, 'Remember to Update The Client ID in: ' + fileName);
+    // Possibly generate an OAUTH Token, on the new file
+    if(doOauth){
+        // Remove the OAUTH Token so it does not use that as the authentication
+        addOrUpdateProperty(fileName, 'CloudLogin.OAUTH_Token', '');
+        log(INFO, 'Generating OAUTH Token for: ' + fileName);
+        run('tcli -p "' + fileName + '" generate-oauth-token -a YES'  , false);
+    }
+
 }
 
 const SPECIAL = 'SPECIAL';

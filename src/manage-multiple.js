@@ -267,13 +267,13 @@ multipleInteraction = async function () {
                 const cliTaskConfigCLI = require('./config/config-cli-task.json');
                 let cTsks = cliTaskConfigCLI.cliTasks;
 
-                const taskDescription = ['0) ' + TCLI_INTERACTVIE];
+                const taskDescription = [TCLI_INTERACTVIE];
                 const taskTarget = [''];
                 for (let cliTask in cTsks) {
                     if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && cTsks[cliTask].multipleInteraction) {
                         // console.log('\x1b[36m%s\x1b[0m',':', ' ' + cTsks[cliTask].description);
                         taskDescription.push(cliTask + ') ' + cTsks[cliTask].description);
-                        taskTarget.push(cTsks[cliTask].taskName);
+                        taskTarget.push(cliTask);
                     }
                 }
                 let chosenTask = await askMultipleChoiceQuestionSearch('Which cli task would you like to switch to ?', taskDescription);
