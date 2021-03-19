@@ -84,6 +84,6 @@ function adjustTasks() {
 }
 
 // console.log('Generating Help Files...');
-// main(ONLY_GENERATE_NEW_FILES);
+main(ONLY_GENERATE_NEW_FILES);
 generateIndex();
 // adjustTasks();

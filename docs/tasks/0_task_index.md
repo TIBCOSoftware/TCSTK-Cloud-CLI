@@ -32,7 +32,7 @@
 
 [replace-string-in-file](./replace-string-in-file.md) - Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties
 
-[validate](./validate.md) - Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.
+[validate](./validate.md) - Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.
 
 
 ## cloud-starters
@@ -80,8 +80,6 @@
 
 [show-live-apps-groups](./show-live-apps-groups.md) - Displays the LiveApps groups and their users.
 
-[show-org-folders](./show-org-folders.md) - Displays the content of the LiveApps Organization Folders.
-
 [show-live-apps-sandbox](./show-live-apps-sandbox.md) - Displays the LiveApps Sandbox ID's for Production and Development
 
 [show-live-apps-actions](./show-live-apps-actions.md) - Displays the LiveApps actions (Creators & Actions) for a CaseType
@@ -121,6 +119,18 @@
 [watch-shared-state](./watch-shared-state.md) - Monitors the local shared state and when changes are detected it is uploaded to the cloud.
 
 
+## cloud-files
+
+---
+
+
+[show-org-folders](./show-org-folders.md) - Displays the content of the LiveApps Organization Folders.
+
+[create-org-folder](./create-org-folder.md) - Creates a new Organizational Folder.
+
+[upload-file-to-org-folder](./upload-file-to-org-folder.md) - Uploads a file to an org folder
+
+
 ## tci
 
 ---
@@ -150,7 +160,7 @@
 
 [browse-spotfire-library](./browse-spotfire-library.md) - List Spotfire Analytical Reports and browse through folders on the Spotfire Library.
 
-[list-spotfire-library](./list-spotfire-library.md) - Make a list of all specific components in your Spotfire Library (DXP's, Mods, Information links, Data files or Data connections)
+[list-spotfire-library](./list-spotfire-library.md) - Lists all components(DXP's, Mods, Information links, Data files or Data connections) in your SF Library.
 
 
 ## oauth

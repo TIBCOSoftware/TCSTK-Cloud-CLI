@@ -81,6 +81,8 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-live-apps-sandbox')).toBe(true);
+
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
         // TODO: add test user to US
         // expect(run(CLI_EXECUTOR + 'change-region -a "US - Oregon"')).toBe(true);
