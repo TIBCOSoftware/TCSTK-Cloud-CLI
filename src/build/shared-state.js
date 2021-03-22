@@ -11,6 +11,7 @@ let SHARED_STATE_FOLDER = './Shared_State/';
 let DO_SHARED_STATE_DOUBLE_CHECK = true;
 
 let ssInformed = false;
+
 async function prepSharedStateProps() {
     // Shared state filter (picked up from configuration if exists)
     if (getProp('Shared_State_Filter') != null) {
@@ -34,12 +35,12 @@ async function prepSharedStateProps() {
         addOrUpdateProperty(getPropFileName(), 'Shared_State_Folder', SHARED_STATE_FOLDER);
     }
     // Potentially use the organization name in the Folder property
-    if(SHARED_STATE_FOLDER.toLowerCase().indexOf('~{organization}') > 0){
-        if(!getOrganization()){
+    if (SHARED_STATE_FOLDER.toLowerCase().indexOf('~{organization}') > 0) {
+        if (!getOrganization()) {
             await CCOM.showCloudInfo(false);
         }
         SHARED_STATE_FOLDER = SHARED_STATE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
-        if(!ssInformed) {
+        if (!ssInformed) {
             log(INFO, 'Using Shared State Folder: ' + colors.blue(SHARED_STATE_FOLDER));
             ssInformed = true;
         }
@@ -66,7 +67,7 @@ export async function getSharedState(showTable) {
         // log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
         // TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         let filter = '&$filter=type=' + filterType;
-        let sStateTemp =  await CCOM.callTCA(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
+        let sStateTemp = await CCOM.callTCA(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -105,6 +106,7 @@ export async function getSharedState(showTable) {
         const appN = parseInt(state) + 1;
         sTemp['ID'] = sState[state].id;
         sTemp['NAME'] = sState[state].name;
+        sTemp['SCOPE'] = sState[state].scope;
         sTemp['CREATED BY'] = sState[state].createdByName;
         const created = new Date(sState[state].createdDate);
         const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
@@ -119,7 +121,7 @@ export async function getSharedState(showTable) {
         statesDisplay[appN] = sTempDisplay;
     }
     pexTable(states, 'shared-states', getPEXConfig(), false);
-    if(showTable){
+    if (showTable) {
         log(INFO, colors.blue('TABLE] shared-states'));
         console.table(statesDisplay)
     }
@@ -147,7 +149,7 @@ async function selectSharedState(sharedStateEntries, question) {
 
 // Function to delete a shared state based on it's ID
 async function deleteSharedState(sharedStateID) {
-    const response =  await CCOM.callTCA(CCOM.clURI.shared_state + '/' + sharedStateID, false, {method: 'DELETE'});
+    const response = await CCOM.callTCA(CCOM.clURI.shared_state + '/' + sharedStateID, false, {method: 'DELETE'});
     let ok = true;
     if (response != null) {
         if (response.errorMsg != null) {
@@ -204,8 +206,8 @@ export async function createSharedState() {
         "sandboxId": await LA.getProductionSandbox()
     }
     const result = await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
-    if(result != null){
-        log(INFO, 'Successfully created ' + colors.yellow('EMPTY') + ' shared state entry, with ID: ' + colors.green(result) + ' and Name: ' + colors.green(ssName) + ' ('+colors.blue(ssType)+')...')
+    if (result != null) {
+        log(INFO, 'Successfully created ' + colors.yellow('EMPTY') + ' shared state entry, with ID: ' + colors.green(result) + ' and Name: ' + colors.green(ssName) + ' (' + colors.blue(ssType) + ')...')
     }
 }
 
@@ -281,7 +283,6 @@ export async function exportSharedState(verbose) {
     if (decision === 'YES') {
         // Check if folder exist
         let ssExportFolder = SHARED_STATE_FOLDER;
-        // TODO: think about setting up a structure with the organization (so that import get it directly from the right org)
         mkdirIfNotExist(ssExportFolder);
         mkdirIfNotExist(ssExportFolder + 'CONTENT/');
         // Create 2 files per shared state: description (name of the state.json) and content ( name.CONTENT.json)
@@ -289,8 +290,14 @@ export async function exportSharedState(verbose) {
         for (let sSEntry of sharedStateEntries) {
             let writeContentSeparate = false;
             let contentObject = {};
-            let contextFileName = ssExportFolder + sSEntry.name + '.json';
-            let contentFileName = ssExportFolder + 'CONTENT/' + sSEntry.name + '.CONTENT.json';
+            let scopeAdd = '';
+            if (sSEntry.scope) {
+                log(INFO, 'Scope Found: ' + colors.blue(sSEntry.scope) + ' For Shared State: ' + colors.blue(sSEntry.name));
+                scopeAdd = '.[SCOPE ' + sSEntry.scope + ']'
+
+            }
+            let contextFileName = ssExportFolder + sSEntry.name + scopeAdd + '.json';
+            let contentFileName = ssExportFolder + 'CONTENT/' + sSEntry.name + '.CONTENT' + scopeAdd + '.json';
             if (sSEntry.content != null) {
                 if (sSEntry.content.json != null) {
                     try {
@@ -307,7 +314,7 @@ export async function exportSharedState(verbose) {
                     }
                 }
             }
-            require('jsonfile').writeFileSync(ssExportFolder + sSEntry.name + '.json', sSEntry, storeOptions);
+            require('jsonfile').writeFileSync(contextFileName, sSEntry, storeOptions);
             log(INFO, '[STORED CONTEXT]: ' + contextFileName);
             if (!writeContentSeparate) {
                 log(ERROR, 'Stored all in: ' + contextFileName)
@@ -364,7 +371,7 @@ async function putSharedState(sharedStateObject) {
     await prepSharedStateProps();
     if (sharedStateObject != null && sharedStateObject !== '' && sharedStateObject !== {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
-         await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
+        await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'PUT', postRequest: [sharedStateObject]});
         log(INFO, '\x1b[32m', 'Updated: ' + sharedStateObject.name)
     } else {
         log(ERROR, 'NOT Posting Shared State... ');
@@ -431,6 +438,7 @@ export async function watchSharedStateMain() {
 }
 
 let ignoreChanges = 0;
+
 //A shared state watcher (every time the file changes, the shared state is updated)
 export function watchSharedState() {
     const chokidar = require('chokidar');
@@ -441,22 +449,22 @@ export function watchSharedState() {
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
         const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', async (event, path) => {
             if (event === 'change') {
-                if(ignoreChanges <= 0) {
+                if (ignoreChanges <= 0) {
                     let pS = '/';
                     if (process.platform === 'win32') {
                         pS = '\\';
                     }
                     if (path.includes(pS + 'CONTENT' + pS)) {
                         log(INFO, 'CONTENT File UPDATED: ' + path);
-                        const contextFile = path.replace(pS + 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
-                        if (doesFileExist(contextFile)) {
-                            putSharedState((await importSharedStateFile(contextFile)));
-                        } else {
-                            log(ERROR, 'Can\'t find context file: ' + contextFile);
-                        }
+
                     } else {
                         log(INFO, 'CONTEXT File UPDATED: ' + path);
-                        log(WARNING, 'NOTHING CHANGED; WE ARE NOT POSTING CONTEXT FILES CURRENTLY...');
+                    }
+                    const contextFile = path.replace(pS + 'CONTENT' + pS, pS).replace('.CONTENT.', '.');
+                    if (doesFileExist(contextFile)) {
+                        putSharedState((await importSharedStateFile(contextFile)));
+                    } else {
+                        log(ERROR, 'Can\'t find context file: ' + contextFile);
                     }
                 } else {
                     ignoreChanges--;
