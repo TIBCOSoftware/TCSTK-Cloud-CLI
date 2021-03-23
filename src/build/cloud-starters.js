@@ -371,6 +371,7 @@ export async function getAppLinks(showTable) {
 
 // Function to upload a zip to the LiveApps ContentManagment API
 export async function uploadApp(application) {
+    // We use the location here because the way the call is setup (with the host)
     const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
     const appLocation = './dist/' + application + '.zip'
     await CCOM.uploadToCloud('appContents', appLocation, uploadAppLocation);

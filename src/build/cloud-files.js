@@ -2,22 +2,34 @@ const CCOM = require('./cloud-communications');
 const USERGROUPS = require('./user-groups');
 const colors = require('colors');
 
-let OrgFolderLocation;
 const isWindows = process.platform === 'win32';
 const dirDelimiter = isWindows ? '\\' : '/';
 
-// Function to get org folders
-function checkOrgFolderLocation() {
-    if (getProp('LA_Organization_Folder') == null) {
-        const OrgFolderLocationDef = './LA_Organization_Folder/'
-        log(INFO, 'No LA_Organization_Folder property found; We are adding it to: ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'LA_Organization_Folder', OrgFolderLocationDef, 'The location for exports and imports of the LiveApps organization folders');
-        OrgFolderLocation = OrgFolderLocationDef;
+let CLOUD_FILES_FOLDER = './Cloud_Files/';
+let cfInformed = false;
+
+async function prepCloudFileProps() {
+    // Shared state folder (picked up from configuration if exists)
+    if (getProp('Cloud_File_Folder') != null) {
+        CLOUD_FILES_FOLDER = getProp('Cloud_File_Folder');
     } else {
-        OrgFolderLocation = getProp('LA_Organization_Folder');
+        addOrUpdateProperty(getPropFileName(), 'Cloud_File_Folder', CLOUD_FILES_FOLDER, 'Local folder used to download and upload Cloud Files to\n' +
+            '# NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder.');
+    }
+    // Potentially use the organization name in the Folder property
+    if (CLOUD_FILES_FOLDER.toLowerCase().indexOf('~{organization}') > 0) {
+        if (!getOrganization()) {
+            await CCOM.showCloudInfo(false);
+        }
+        CLOUD_FILES_FOLDER = CLOUD_FILES_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
+        if (!cfInformed) {
+            log(INFO, 'Using Local Folder (for cloud files): ' + colors.blue(CLOUD_FILES_FOLDER));
+            cfInformed = true;
+        }
     }
 }
 
+// Get a list of Cloud folders
 export async function getOrgFolders(showFolders, countItems) {
     const folderStepSize = 200;
     let hasMoreFolders = true;
@@ -46,7 +58,7 @@ export async function getOrgFolders(showFolders, countItems) {
             folderTable[fNr]['Number of Items'] = noItems;
         }
     }
-    pexTable(folderTable, 'live-apps-org-folders', getPEXConfig(), showFolders);
+    pexTable(folderTable, 'cloud-folders', getPEXConfig(), showFolders);
     return folderTable;
 }
 
@@ -65,26 +77,27 @@ export async function getOrgFolderFiles(folderTable, folder, showFiles) {
             }
         }
     }
-    pexTable(folderContentTable, 'live-apps-folder-folder-content', getPEXConfig(), showFiles);
+    pexTable(folderContentTable, 'cloud-folder-content', getPEXConfig(), showFiles);
     return folderContentTable;
 }
 
 // Function to download an org folder file
 async function downLoadOrgFolderFile(folder, file) {
-    checkOrgFolderLocation();
-    mkdirIfNotExist(OrgFolderLocation);
-    mkdirIfNotExist(OrgFolderLocation + '/' + folder);
-    const dataForFile = await CCOM.callTCA(CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', true);
-    const fs = require('fs');
-    // console.log('Data for file: ' , dataForFile);
-    // TODO: Download the DATA correctly (jpeg etc.)
-    const fileName = OrgFolderLocation + '/' + folder + '/' + file;
-    fs.writeFileSync(fileName, dataForFile, 'utf8');
-    log(INFO, 'LA Orgfolder data exported: ' + fileName);
-
+    log(INFO, '    Cloud Folder: ' + colors.blue(folder) + ' File: ' + colors.blue(file));
+    // checkOrgFolderLocation();
+    await prepCloudFileProps();
+    mkdirIfNotExist(CLOUD_FILES_FOLDER);
+    mkdirIfNotExist(CLOUD_FILES_FOLDER + '/' + folder);
+    // const dataForFile = await CCOM.callTCA(CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true', true);
+    let fileName = CLOUD_FILES_FOLDER + '/' + folder + '/' + file;
+    if (CLOUD_FILES_FOLDER.endsWith('/')) {
+        fileName = CLOUD_FILES_FOLDER + folder + '/' + file;
+    }
+    await CCOM.downloadFromCloud(fileName, CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true');
 }
 
 export async function showOrgFolders() {
+    await prepCloudFileProps();
     const folderT = await getOrgFolders(true, true);
     let chFolder = ['NONE'];
     // TODO: Use mapping
@@ -95,17 +108,7 @@ export async function showOrgFolders() {
     }
     const folderDecision = await askMultipleChoiceQuestionSearch('For which folder would you like to see the contents ?', chFolder);
     if (folderDecision != 'NONE') {
-        const orgFFiles = await getOrgFolderFiles(folderT, folderDecision, true);
-        const chContent = ['NONE'];
-        for (let fil of iterateTable(orgFFiles)) {
-            chContent.push(fil.Name);
-        }
-        const fileDecision = await askMultipleChoiceQuestionSearch('Which file would you like to download ?', chContent);
-        if (fileDecision != 'NONE') {
-            await downLoadOrgFolderFile(folderDecision, fileDecision);
-        } else {
-            log(INFO, 'OK, I won\'t do anything :-)');
-        }
+        await getOrgFolderFiles(folderT, folderDecision, true);
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
@@ -113,6 +116,7 @@ export async function showOrgFolders() {
 
 // Function to create an org folder
 export async function createOrgFolder() {
+    await prepCloudFileProps();
     const fName = await askQuestion('What is the name of the organization folder you would like to create (use "NONE" or press enter to not create a folder) ?');
     if (fName !== '' || fName.toLowerCase() !== 'none') {
         const postFolder = {
@@ -132,6 +136,7 @@ export async function createOrgFolder() {
 
 // Function to upload a file to an org folder
 export async function uploadFileToOrgFolder() {
+    await prepCloudFileProps();
     const folderT = await getOrgFolders(true, false);
     let chFolder = ['NONE'];
     for (let fol of iterateTable(folderT)) {
@@ -148,7 +153,7 @@ export async function uploadFileToOrgFolder() {
                 cloudFileName = localFileLocation;
             }
         }
-        log(INFO, 'Creating ' + colors.blue(cloudFileName) + ' in folder: ' +  colors.blue(folderDecision));
+        log(INFO, 'Creating ' + colors.blue(cloudFileName) + ' in folder: ' + colors.blue(folderDecision));
         await uploadFile(localFileLocation, folderDecision, cloudFileName);
 
     } else {
@@ -160,6 +165,39 @@ export async function uploadFileToOrgFolder() {
 export async function uploadFile(fileLocation, cloudFolder, cloudFileName) {
     const uploadFileURI = '/webresource/v1/orgFolders/' + cloudFolder + '/artifacts/' + cloudFileName + '/upload/';
     await CCOM.uploadToCloud('artifactContents', fileLocation, uploadFileURI);
+}
+
+// Download a file from an organization flder
+export async function downloadFileFromOrgFolder() {
+    await prepCloudFileProps();
+    const folderT = await getOrgFolders(true, false);
+    let chFolder = ['NONE'];
+    for (let fol of iterateTable(folderT)) {
+        chFolder.push(fol.Name);
+    }
+    const folderDecision = await askMultipleChoiceQuestionSearch('From which folder would you like to download a file ?', chFolder);
+    if (folderDecision.toLowerCase() !== 'none') {
+        const orgFFiles = await getOrgFolderFiles(folderT, folderDecision, true);
+        const chContent = ['NONE', 'ALL'];
+        for (let fil of iterateTable(orgFFiles)) {
+            chContent.push(fil.Name);
+        }
+        const fileDecision = await askMultipleChoiceQuestionSearch('Which file would you like to download ?', chContent);
+        if (fileDecision.toLowerCase() === 'all') {
+            const fArray = chContent.slice(2, chContent.length);
+            log(INFO, 'Files to Download: ' + fArray.length);
+            for (let fN in fArray) {
+                log(INFO, 'Downloading file: ' + (Number(fN) + 1));
+                await downLoadOrgFolderFile(folderDecision, fArray[fN]);
+            }
+        } else if (fileDecision.toLowerCase() !== 'none') {
+            await downLoadOrgFolderFile(folderDecision, fileDecision);
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
 }
 
 

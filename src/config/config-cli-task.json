@@ -711,6 +711,17 @@
       ],
       "category": "cloud-files"
     },
+    "download-file-from-org-folder": {
+      "description": "Downloads a file from an org folder",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "downloadFileWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
+    },
     "export-org-folder": {
       "description": "Exports the content of a LiveApps Organization Folder to disk.",
       "enabled": false,
@@ -731,7 +742,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "live-apps"
+      "category": "cloud-files"
     },
     "watch-org-folder": {
       "description": "Watches a folder on disk for changes and updates those changes to a LiveApps Organization Folder.",

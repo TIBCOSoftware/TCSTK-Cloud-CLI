@@ -21,7 +21,7 @@ export async function doRequest(url, options, data) {
         return true;
     };
     // console.log(options);
-    if(data){
+    if (data) {
         options['data'] = data;
     }
     try {
@@ -80,7 +80,7 @@ export function doManualRequest(url, options, data) {
 }
 
 // When called this will force a new login (when switching orgs for example)
-export function invalidateLogin(){
+export function invalidateLogin() {
     loginC = null;
     isOrgChecked = false;
     isOAUTHValid = null;
@@ -239,7 +239,7 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
     if (customHeaders) {
         header = customHeaders;
     }
-    if(!header["accept"]){
+    if (!header["accept"]) {
         header["accept"] = 'application/json';
     }
 
@@ -335,7 +335,7 @@ export async function callTCA(url, doLog, conf) {
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
 export async function uploadToCloud(formDataType, localFileLocation, uploadFileURI) {
-    return new Promise( async function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         let formData = new require('form-data')();
         log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')');
         formData.append(formDataType, require("fs").createReadStream(localFileLocation));
@@ -383,6 +383,46 @@ export async function uploadToCloud(formDataType, localFileLocation, uploadFileU
         formData.pipe(query);
     });
 }
+
+
+// Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
+export async function downloadFromCloud(localFileLocation, downloadFileURI) {
+    return new Promise(async function (resolve, reject) {
+        const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
+        log(INFO, '     DOWNLOADING: ' + colors.blue(downloadURL));
+        log(INFO, '              TO: ' + colors.blue(localFileLocation));
+        let headers = {};
+        if (isOauthUsed() && await isOAUTHLoginValid()) {
+            headers["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
+        } else {
+            const lCookie = await cLogin();
+            // console.log(lCookie);
+            headers["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        }
+        const axios = require('axios').default;
+        axios.get(downloadURL, {
+            responseType: 'arraybuffer',
+            headers
+        })
+            .then(response => {
+                try {
+                    const fs = require('fs');
+                    fs.writeFileSync(localFileLocation, response.data, 'utf8');
+                    log(INFO, ' DOWNLOAD RESULT: ' + colors.green('DONE'));
+                    resolve()
+                } catch (err) {
+                    log(INFO, ' DOWNLOAD RESULT: ' + colors.red('ERROR'));
+                    log(ERROR, 'Problem Storing the file: ' + err);
+                    reject(err);
+                }
+            })
+            .catch(ex => {
+                log(ERROR, 'Problem downloading the file: ' + ex);
+                reject(ex);
+            });
+    });
+}
+
 
 // Function to show claims for the configured user
 export async function showCloudInfo(showTable, showSandbox) {

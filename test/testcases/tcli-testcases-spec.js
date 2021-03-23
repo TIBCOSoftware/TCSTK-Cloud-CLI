@@ -361,9 +361,16 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         // TODO: Get more than 200 folders
         expect(run(CLI_EXECUTOR + 'show-org-folders -a NONE')).toBe(true);
-        // TODO: Get content of a known folder (perhaps when you can upload)
-        // expect(run(CLI_EXECUTOR + 'show-org-folders -a CloudStarterSample')).toBe(true);
-        // CloudStarterSample
+        // Get content of a known folder
+        expect(run(CLI_EXECUTOR + 'show-org-folders -a discoverapp_assets')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'download-file-from-org-folder -a discoverapp_assets:ALL')).toBe(true);
+        // Create a folder
+        // TODO: Create a function to delete an (empty folder), and delete a cloud file
+        // expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(false);
+
+        expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a jasmine_test_folder:tibco-cloud.properties:SAME')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'download-file-from-org-folder -a jasmine_test_folder:tibco-cloud.properties')).toBe(true);
     });
 
     // TCI Apps

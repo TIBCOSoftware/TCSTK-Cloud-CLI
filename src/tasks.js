@@ -553,6 +553,10 @@ export async function uploadFileWrapper() {
     await CFILES.uploadFileToOrgFolder();
 }
 
+export async function downloadFileWrapper() {
+    const CFILES = require('./build/cloud-files');
+    await CFILES.downloadFileFromOrgFolder();
+}
 
 export async function showPropertiesWrapper() {
     const PROPM = require('./build/property-file-management');
