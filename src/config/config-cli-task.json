@@ -811,28 +811,28 @@
       ],
       "category": "cloud-starters"
     },
-    "messaging-show-summary": {
+    "show-messaging-summary": {
       "description": "Show summary of cloud messaging",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showMessagingSummaryWrapper",
       "taskAlternativeNames": [
-        "show-summary"
+        "show-summary", "messaging-show-summary"
       ],
       "availableOnOs": [
         "all"
       ],
       "category": "messaging"
     },
-    "messaging-show-clients": {
+    "show-messaging-clients": {
       "description": "Show clients of cloud messaging",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showMessagingClientsWrapper",
       "taskAlternativeNames": [
-        "show-clients"
+        "show-clients", "messaging-show-clients"
       ],
       "availableOnOs": [
         "all"

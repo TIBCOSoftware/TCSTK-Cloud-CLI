@@ -150,9 +150,9 @@
 ---
 
 
-[messaging-show-summary](./messaging-show-summary.md) - Show summary of cloud messaging
+[show-messaging-summary](./show-messaging-summary.md) - Show summary of cloud messaging
 
-[messaging-show-clients](./messaging-show-clients.md) - Show clients of cloud messaging
+[show-messaging-clients](./show-messaging-clients.md) - Show clients of cloud messaging
 
 
 ## spotfire
