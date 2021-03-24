@@ -124,11 +124,13 @@
 ---
 
 
-[show-org-folders](./show-org-folders.md) - Displays the content of the LiveApps Organization Folders.
+[show-cloud-folders](./show-cloud-folders.md) - Displays the content of the LiveApps Organization Folders.
 
-[create-org-folder](./create-org-folder.md) - Creates a new Organizational Folder.
+[create-cloud-folder](./create-cloud-folder.md) - Creates a new LiveApps Organization Folder.
 
-[upload-file-to-org-folder](./upload-file-to-org-folder.md) - Uploads a file to an org folder
+[upload-file-to-cloud-folder](./upload-file-to-cloud-folder.md) - Uploads a file to a LiveApps Organization Folder
+
+[download-file-from-cloud-folder](./download-file-from-cloud-folder.md) - Downloads file(s) from a LiveApps Organization Folder to disk
 
 
 ## tci

@@ -337,8 +337,10 @@ export async function callTCA(url, doLog, conf) {
 export async function uploadToCloud(formDataType, localFileLocation, uploadFileURI) {
     return new Promise(async function (resolve, reject) {
         let formData = new require('form-data')();
-        log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')');
-        formData.append(formDataType, require("fs").createReadStream(localFileLocation));
+        const fs = require('fs');
+        const {size: fileSize} = fs.statSync(localFileLocation);
+        log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')'  + ' Filesize: ' + readableSize(fileSize));
+        formData.append(formDataType, fs.createReadStream(localFileLocation));
         const header = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         // Possibly add OAUTH Header...
@@ -408,7 +410,8 @@ export async function downloadFromCloud(localFileLocation, downloadFileURI) {
                 try {
                     const fs = require('fs');
                     fs.writeFileSync(localFileLocation, response.data, 'utf8');
-                    log(INFO, ' DOWNLOAD RESULT: ' + colors.green('DONE'));
+                    const {size: fileSize} = fs.statSync(localFileLocation);
+                    log(INFO, ' DOWNLOAD RESULT: ' + colors.green('DONE')  + ' Filesize: ' + readableSize(fileSize));
                     resolve()
                 } catch (err) {
                     log(INFO, ' DOWNLOAD RESULT: ' + colors.red('ERROR'));
@@ -423,6 +426,30 @@ export async function downloadFromCloud(localFileLocation, downloadFileURI) {
     });
 }
 
+function readableSize(sizeBytes) {
+    if(sizeBytes < 1024) {
+        return sizeBytes + ' Bytes';
+    } else {
+        const fsKb = Math.round(sizeBytes / 1024 * 100) / 100;
+        if(fsKb < 1024) {
+            return fsKb + ' KB';
+        } else {
+            const fsMb = Math.round(fsKb / 1024 * 100) / 100;
+            if(fsMb < 1024) {
+                return fsMb + ' MB';
+            } else {
+                if (fsMb < 1024) {
+                    const fsGb = Math.round(fsMb / 1024 * 100) / 100;
+                    return fsGb + ' GB';
+                }
+            }
+        }
+
+    }
+
+
+
+}
 
 // Function to show claims for the configured user
 export async function showCloudInfo(showTable, showSandbox) {
