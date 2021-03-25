@@ -239,6 +239,8 @@ parseOAUTHToken = function (stringToken, doLog) {
     return re;
 }
 
+// TODO: Add function to parse ClientID
+
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
 getOrganization = function (forceRefresh) {

@@ -394,6 +394,7 @@ export async function changeOrganization() {
             addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', '');
         }
         // Update the Cloud property file with that new Client ID
+        // addOrUpdateProperty(getPropFileName(), 'CloudLogin.clientID', '[Organization: ' + orgDetails.accountDisplayName + ']' + clientID );
         addOrUpdateProperty(getPropFileName(), 'CloudLogin.clientID', clientID);
         // Invalidate login to login to new environment
         CCOM.invalidateLogin();
