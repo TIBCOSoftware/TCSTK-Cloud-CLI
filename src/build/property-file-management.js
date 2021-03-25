@@ -83,13 +83,17 @@ export async function generateCloudPropertyFiles() {
             }
             await configurePropFile('./' + propFilesToGenerate, reg, accId,doOauth);
         }
-        const tcliIprop = propForMFile.substr(0, propForMFile.length - 1);
+        let tcliIprop = propForMFile.substr(0, propForMFile.length - 1);
         log(INFO, 'Property for tcli interaction: ' + tcliIprop);
         const doUpdate = await askMultipleChoiceQuestion('Do you want to add this to your manage-multiple-cloud-starters property file ?', ['YES', 'NO']);
         if (doUpdate === 'YES') {
             let fileName = await askQuestion('What is file name of multiple property file ? (press enter for: manage-multiple-cloud-starters.properties)');
             if (fileName === '') {
                 fileName = 'manage-multiple-cloud-starters.properties';
+            }
+            const currVal = require('properties-reader')(fileName).path().Multiple_Interaction_Property_Files;
+            if(currVal){
+                tcliIprop = currVal + ',' + tcliIprop;
             }
             addOrUpdateProperty(fileName, 'Multiple_Interaction_Property_Files', tcliIprop);
         } else {
