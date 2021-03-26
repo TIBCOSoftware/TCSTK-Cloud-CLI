@@ -246,10 +246,11 @@ let OrganizationGl = '';
 getOrganization = function (forceRefresh) {
     if (forceRefresh) {
         OrganizationGl = '';
+        globalOAUTH = null;
     }
     if (OrganizationGl === '' && isOauthUsed()) {
         if (globalOAUTH == null) {
-            getProp('CloudLogin.OAUTH_Token');
+            getProp('CloudLogin.OAUTH_Token', true, true);
             // It could be that there is just the OAUTH token
         }
         if (globalOAUTH != null && globalOAUTH.Org) {
