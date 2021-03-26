@@ -95,10 +95,10 @@ export async function promptTask(stDir, cwdDir) {
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
     return new Promise(function (resolve) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-        let pMes = '[TCLI - ' + colors.blue(getRegion(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
+        let pMes = '[TCLI - ' + colors.blue(getRegion(true, true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         // If there is an org, show it
-        if (getOrganization() !== '') {
-            pMes = '[TCLI - ' + colors.blue(getRegion(true) + ' - ' + getOrganization(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
+        if (getOrganization(true) !== '') {
+            pMes = '[TCLI - ' + colors.blue(getRegion(true, true) + ' - ' + getOrganization(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         }
         inquirer.prompt([{
             type: 'autocomplete',
@@ -152,7 +152,7 @@ export async function promptTask(stDir, cwdDir) {
             if (getProp('CloudLogin.pass').toString() !== '') {
                 additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
             }
-            if (getOrganization() !== '') {
+            if (getOrganization(true) !== '') {
                 additionalArugments += ' --org "' + getOrganization(true) + '"';
             }
             let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;

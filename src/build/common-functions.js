@@ -206,6 +206,7 @@ getProp = function (propName, forceRefresh, forceGlobalRefresh) {
             }
         }
     }
+    log(DEBUG, 'Returning Property [END]: ', re);
     return re;
 }
 
@@ -991,8 +992,8 @@ getPEXConfig = function () {
 
 isOauthUsed = function () {
     let re = false;
-    if (getProp('CloudLogin.OAUTH_Token')) {
-        if (getProp('CloudLogin.OAUTH_Token').trim() !== '') {
+    if (getProp('CloudLogin.OAUTH_Token', true, true)) {
+        if (getProp('CloudLogin.OAUTH_Token', true, true).trim() !== '') {
             re = true
         }
     }
