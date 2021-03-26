@@ -101,15 +101,7 @@ What is file name of multiple property file ? (press enter for: manage-multiple-
 ../manage-multiple-cloud-starters.properties
 ```
 
-For every organization we now have a file that looks somewhat like this:
-
-![TCLI_Show_Links](imgs/004_ClientID_Replace.png#zoom)
-
-Now replace the ***Client ID*** (in ***CloudLogin.clientID***) with the ID from that specific environment, from here:
-
-https://account.cloud.tibco.com/manage/settings/oAuthTokens
-
-After you have done that for all the environment files, let's go back to our Multiple Property file. 
+> ***Note***: The ClientID will automatically be added to all the property files, and if you use OAUTH in the main file and OAUTH Token will be generated automatically (in that case you can ignore the steps below.)
 
 ---
 ## Structure of the Multiple Property file
