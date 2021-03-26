@@ -55,7 +55,9 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |                     show-cloud-starters |  Show Applications of LiveApps WebApps |
  |        show-cloud-starter-links |  Show Links to Applications of LiveApps WebApps |
 |show-properties|  Show the properties in your properties file (and possibly the global values)|
- |                 change-region |  Change the Region in the tibco-cloud properties file |
+ |                 change-cloud-region |  Change the Region in the tibco-cloud properties file |
+| show-cloud-organizations | Shows the Cloud Organization and potentially more details |
+| change-cloud-organization | Changes the Organization in the cloud-properties file |
  |                     obfuscate-password |  Obfuscate a password and put it in the tibco-cloud properties file |
  |                         start-cloud-starter |  Start your local cloud starter project |
  |                         build-cloud-starter |  Build your local cloud starter project |
@@ -95,16 +97,22 @@ These are the available TIBCO Cloud™ CLI Tasks:
  |rotate-oauth-token|  Revokes your existing OAUTH token and then generates a new one. |
  |validate-and-rotate-oauth-token|  Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it. |
  |generate-cloud-property-files|  Generates a list of cloud property files (used to interact with multiple cloud organizations) |
- |show-org-folders|  Displays the content of the LiveApps Organization Folders, and allow you to download content. |
+ |show-cloud-folders|  Displays the content of the LiveApps Organization Folders, and allow you to download content. |
+|create-cloud-folder | Creates a new LiveApps Organization Folder |
+|upload-file-to-cloud-folder | Uploads a file to a LiveApps Organization Folder |
+|download-file-from-cloud-folder | Downloads file(s) from a LiveApps Organization Folder to disk |
  |show-live-apps-groups|  Displays the LiveApps groups and their users. |
  |create-live-apps-group|  Creates a new LiveApps group. |
  |show-live-apps-users|  Shows the users in LiveApps (which can be added to groups). |
+| show-live-apps-sandbox | Displays the LiveApps Sandbox ID's for Production and Development |
+| show-live-apps-actions | Displays the LiveApps actions (Creators & Actions) for a CaseType |
  |add-user-to-group|  Adds a user to a LiveApps group. |
  |validate|  Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.|
  |add-or-update-property|  Adds or Updates a property in a file.|
 |messaging-show-summary|  Show summary of cloud messaging|
 |messaging-show-clients|  Show clients of cloud messaging|
 |browse-spotfire-library|  List Spotfire Analytical Reports and browse through folders on the Spotfire Library|
+| list-spotfire-library | Lists all components(DXP's, Mods, Information links, Data files or Data connections) in your SF Library. |
  |                    update-tcli|  Update the Cloud CLI |
  |                          exit |  Quit the console |
  |                          help |  Display's help message|
