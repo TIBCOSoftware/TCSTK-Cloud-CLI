@@ -153,7 +153,7 @@ export async function promptTask(stDir, cwdDir) {
                 additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
             }
             if (getOrganization() !== '') {
-                additionalArugments += ' --org "' + getOrganization() + '"';
+                additionalArugments += ' --org "' + getOrganization(true) + '"';
             }
             let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
             run(commandTcli);

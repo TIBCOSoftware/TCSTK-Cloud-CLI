@@ -672,7 +672,11 @@ addOrUpdateProperty = function (location, property, value, comment, checkForGlob
                 }
             }
             if (propFound) {
-                log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
+                if(property != 'CloudLogin.clientID'){
+                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
+                } else {
+                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow('[NEW CLIENT ID]') + ' (in:' + location + ')');
+                }
             } else {
                 // append prop to the end.
                 log(INFO, 'Property NOT found: ' + colors.blue(property) + ' We are adding it and set it to: ' + colors.yellow(value) + ' (in:' + location + ')');
