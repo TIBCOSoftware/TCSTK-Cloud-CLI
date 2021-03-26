@@ -13,7 +13,7 @@ const cTsks = cliTaskConfig.cliTasks;
 let gTasksDescr = [];
 let gTasksNames = [];
 let gCategory = ['ALL'];
-let globalLastCommand = 'help-tcli';
+let globalLastCommand = 'help';
 
 // Wrapper to main task
 export async function mainT(cat) {
