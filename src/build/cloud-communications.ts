@@ -1,3 +1,14 @@
+import {
+    askQuestion,
+    createTableValue,
+    DEBUG, ERROR, getCurrentRegion, getOrganization, getProp, getRegion,
+    INFO,
+    isOauthUsed,
+    log, logO, obfuscatePW,
+    setOrganization, setProperty,
+    WARNING
+} from "./common-functions";
+
 require('./common-functions');
 const colors = require('colors');
 const cloudConfig = require('../config/config-cloud.json');
@@ -86,7 +97,7 @@ export function invalidateLogin() {
     isOAUTHValid = null;
 }
 
-export async function cLogin(tenant, customLoginURL, forceClientID) {
+export async function cLogin(tenant?, customLoginURL?, forceClientID?) {
     const fClientID = forceClientID || false;
     if (isOauthUsed() && !fClientID) {
         log(DEBUG, 'Using OAUTH for Authentication...');
@@ -209,7 +220,7 @@ async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
 
 // Function to call the Tibco Cloud
 // TODO: Accept, URL, doLog and possible config
-async function callURLA(url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside, customHeaders) {
+async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant?, customLoginURL?, returnResponse?, forceOAUTH?, forceCLIENTID?, handleErrorOutside?, customHeaders?) {
     const doErrorOutside = handleErrorOutside || false;
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
@@ -235,7 +246,7 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
             body = postRequest;
         }
     }
-    let header = {};
+    let header:any = {};
     if (customHeaders) {
         header = customHeaders;
     }

@@ -1,3 +1,14 @@
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    copyFile, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
+    getPropFileName, INFO,
+    log,
+    logLine, mkdirIfNotExist,
+    pexTable, sleep
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 //TODO Possibly circular dependency ???
 const VAL = require('./validation');

@@ -1,5 +1,7 @@
+import {askMultipleChoiceQuestionSearch, doesFileExist, ERROR, INFO, log, WARNING} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
-const ECHOMD = require('./../echomd/echomd').echomd;
+const ECHOMD = require('../echomd/echomd').echomd;
 const colors = require('colors');
 
 const GIT_HUB_LINK_RAW = 'https://raw.githubusercontent.com/TIBCOSoftware/TCSTK-Cloud-CLI/master/docs';

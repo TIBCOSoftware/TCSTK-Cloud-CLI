@@ -1,3 +1,15 @@
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch,
+    askQuestion, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
+    getPropFileName,
+    INFO,
+    log,
+    logLine, mkdirIfNotExist,
+    pexTable,
+    run, WARNING
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');

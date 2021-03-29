@@ -6,6 +6,16 @@ const colors = require('colors');
 
 require('./build/common-functions');
 import arg from 'arg';
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion,
+    DEBUG, displayOpeningMessage, ERROR, getGlobalConfig, getProp,
+    INFO, isGlobalOauthDefined,
+    log, obfuscatePW, setGlobalAnswers,
+    setMultipleOptions, setOrganization, setProperty, setPropFileName, updateCloudLogin, updateRegion,
+    updateTCLI,
+    WARNING
+} from "./build/common-functions";
 
 let propFileName;
 

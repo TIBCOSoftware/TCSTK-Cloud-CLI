@@ -1,3 +1,5 @@
+import {createTable, ERROR, getPEXConfig, INFO, isOauthUsed, log, pexTable} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const colors = require('colors');
 

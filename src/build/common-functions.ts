@@ -5,7 +5,7 @@ const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properti
 const colors = require('colors');
 
 // Display opening
-displayOpeningMessage = function () {
+export function displayOpeningMessage() {
     //const pjson = require('./package.json');
     //console.log(process.env.npm_package_version);
     const version = require('../../package.json').version;
@@ -17,7 +17,7 @@ displayOpeningMessage = function () {
 }
 
 // function to view the global connection configuration, and display's none if not set
-displayGlobalConnectionConfig = function () {
+export function displayGlobalConnectionConfig() {
     // console.log('Global Connection Config: ');
     let re = false;
     log(INFO, 'Global Tibco Cloud Propfile: ' + GLOBALPropertyFileName);
@@ -64,7 +64,7 @@ displayGlobalConnectionConfig = function () {
     return re;
 }
 
-isGlobalOauthDefined = function () {
+export function isGlobalOauthDefined() {
     if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         if (indexObj(propsG, 'CloudLogin.OAUTH_Token') === undefined) {
@@ -78,7 +78,7 @@ isGlobalOauthDefined = function () {
 }
 
 // Function to replace string in file
-replaceInFile = function (from, to, filePattern) {
+export function replaceInFile(from, to, filePattern) {
     const patternToUse = filePattern || './**';
     const regex = new RegExp(from, 'g');
     const options = {
@@ -99,7 +99,7 @@ replaceInFile = function (from, to, filePattern) {
 }
 
 // function to set the global connection configuration
-updateGlobalConnectionConfig = async function () {
+export async function updateGlobalConnectionConfig() {
     // update the config.
     log(INFO, 'Update Connection Config: ');
     // Create the global common package if it does not exist.
@@ -132,7 +132,7 @@ updateGlobalConnectionConfig = async function () {
 }
 
 // Function to get an indexed object wiht a String
-indexObj = function (obj, is, value) {
+export function indexObj(obj, is, value?) {
     if (typeof is == 'string')
         return indexObj(obj, is.split('.'), value);
     else if (is.length === 1 && value !== undefined)
@@ -150,12 +150,12 @@ let propsGl;
 let globalMultipleOptions = {};
 // Function to get a property
 let globalOAUTH = null;
-getOAUTHDetails = function () {
+export function getOAUTHDetails() {
     log(DEBUG, 'Returning globalOAUTH: ', globalOAUTH);
     return globalOAUTH;
 }
 
-getProp = function (propName, forceRefresh, forceGlobalRefresh) {
+export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
     log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh, 'Forcing a Global Refresh: ', forceGlobalRefresh);
     if (forceRefresh) {
         propsGl = null;
@@ -210,7 +210,7 @@ getProp = function (propName, forceRefresh, forceGlobalRefresh) {
     return re;
 }
 
-parseOAUTHToken = function (stringToken, doLog) {
+export function parseOAUTHToken(stringToken, doLog) {
     let showLog = doLog || false;
     let re = {};
     log(DEBUG, 'Parsing OAUTH Token: ', stringToken);
@@ -244,7 +244,7 @@ parseOAUTHToken = function (stringToken, doLog) {
 
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
-getOrganization = function (forceRefresh) {
+export function getOrganization(forceRefresh) {
     if (forceRefresh) {
         OrganizationGl = '';
         globalOAUTH = null;
@@ -261,12 +261,12 @@ getOrganization = function (forceRefresh) {
     log(DEBUG, 'Returning org: ' + OrganizationGl);
     return OrganizationGl;
 }
-setOrganization = function (org) {
+export function setOrganization(org) {
     log(DEBUG, 'Setting org: ' + org);
     OrganizationGl = org;
 }
 
-setProperty = function (name, value) {
+export function setProperty(name, value) {
     //console.log('BEFORE propsGl: ' , propsGl);
     log(DEBUG, 'Setting Property) Name: ', name, ' Value: ', value);
     if (propsGl == null) {
@@ -288,28 +288,28 @@ function set(path, value, obj) {
     schema[pList[len - 1]] = value;
 }
 
-setPropFileName = function (propFileName) {
+export function setPropFileName(propFileName) {
     LOCALPropertyFileName = propFileName;
     log(DEBUG, 'Using Property File: ' + LOCALPropertyFileName);
 }
-getPropFileName = function () {
+export function getPropFileName() {
     return LOCALPropertyFileName;
 }
-setMultipleOptions = function (mOptions) {
+export function setMultipleOptions(mOptions) {
     globalMultipleOptions = mOptions;
     log(DEBUG, 'Using Multiple Options: ', globalMultipleOptions);
 }
-getMultipleOptions = function () {
+export function getMultipleOptions() {
     return globalMultipleOptions;
 }
 
 // Function to trim string
-trim = function (value) {
+export function trim(value) {
     return value.replace(/^\s*/, "").replace(/\s*$/, "");
 }
 
 // Function to create a new multiple prop file
-createMultiplePropertyFile = async function () {
+export async function createMultiplePropertyFile() {
     // 'manage-multiple-cloud-starters.properties'
     let mPropFileName = 'manage-multiple-cloud-starters.properties';
     let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: \x1b[34mmanage-multiple-cloud-starters\033[0m) ?');
@@ -336,7 +336,7 @@ createMultiplePropertyFile = async function () {
 }
 
 // Function to copy a file
-copyFile = function (fromFile, toFile) {
+export function copyFile(fromFile, toFile) {
     log(INFO, 'Copying File from: ' + fromFile + ' to: ' + toFile);
     const fs = require('fs');
     fs.copyFileSync(fromFile, toFile);
@@ -344,7 +344,7 @@ copyFile = function (fromFile, toFile) {
 
 
 // function to ask a question
-askQuestion = async function (question, type = 'input') {
+export async function askQuestion(question, type = 'input') {
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
         let re = 'result';
@@ -367,7 +367,7 @@ askQuestion = async function (question, type = 'input') {
 }
 
 // function to ask a question
-askMultipleChoiceQuestion = async function (question, options) {
+export async function askMultipleChoiceQuestion(question, options) {
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
         let re = 'result';
@@ -396,7 +396,7 @@ askMultipleChoiceQuestion = async function (question, options) {
 
 let gOptions = [];
 // Ask a question to a user, and allow the user to search through a possilbe set of options
-askMultipleChoiceQuestionSearch = async function (question, options) {
+export async function askMultipleChoiceQuestionSearch(question, options) {
     let re = '';
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
@@ -422,7 +422,7 @@ askMultipleChoiceQuestionSearch = async function (question, options) {
 
 //User interaction
 const _F = require('lodash');
-searchAnswerF = function (answers, input) {
+export function searchAnswerF(answers, input) {
     const fuzzyF = require('fuzzy');
     input = input || '';
     return new Promise(function (resolve) {
@@ -440,7 +440,7 @@ searchAnswerF = function (answers, input) {
 let useGlobalAnswers = false;
 let globalAnswers = [];
 
-setGlobalAnswers = function (answers) {
+export function setGlobalAnswers(answers) {
     // console.log('Answers: ' , answers);
     if (answers) {
         // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
@@ -456,7 +456,7 @@ setGlobalAnswers = function (answers) {
     }
 }
 
-getLastGlobalAnswer = function (question) {
+export function getLastGlobalAnswer(question) {
     let re = '';
     if (globalAnswers && globalAnswers.length > 0) {
         re = globalAnswers.shift();
@@ -469,7 +469,7 @@ getLastGlobalAnswer = function (question) {
 }
 
 // Update the cloud login properties
-updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh, defaultClientID, defaultEmail) {
+export async function updateCloudLogin(propFile, forceRefresh, forceGlobalRefresh, defaultClientID, defaultEmail) {
     // Client ID
     let cidQuestion = 'What is your Client ID ?';
     let useCID = '';
@@ -512,14 +512,14 @@ updateCloudLogin = async function (propFile, forceRefresh, forceGlobalRefresh, d
 }
 
 // Obfuscate a password
-obfuscatePW = function (toObfuscate) {
+export function obfuscatePW(toObfuscate) {
     const fus = require('./fuzzy-search.js');
     // return '#' + Buffer.from(toObfuscate).toString('base64');
     return fus.search(toObfuscate);
 }
 
 // function to update the tenant
-updateRegion = async function (propFile) {
+export async function updateRegion(propFile) {
     const re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     if (re === 'US - Oregon') {
         addOrUpdateProperty(propFile, 'CloudLogin.Region', 'US');
@@ -532,7 +532,7 @@ updateRegion = async function (propFile) {
     }
 }
 
-getCurrentRegion = function (showRegion) {
+export function getCurrentRegion(showRegion) {
     let displayRegion = false;
     if (showRegion) {
         displayRegion = showRegion;
@@ -561,7 +561,7 @@ getCurrentRegion = function (showRegion) {
     return re;
 }
 
-getCurrentAWSRegion = function () {
+export function getCurrentAWSRegion() {
     // Oregon
     let re = 'us-west-2';
     switch (getCurrentRegion()) {
@@ -578,7 +578,7 @@ getCurrentAWSRegion = function () {
 }
 
 // Translates an AWS region into normal region description.
-translateAWSRegion = function (awsRegion) {
+export function translateAWSRegion(awsRegion) {
     switch (awsRegion) {
         case 'us-west-2':
             return 'US - Oregon';
@@ -593,18 +593,18 @@ translateAWSRegion = function (awsRegion) {
 }
 
 // Gets region (in Capitals)
-getRegion = function (forceRefresh, forceGlobalRefresh) {
+export function getRegion(forceRefresh, forceGlobalRefresh) {
     return getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh).toString().toUpperCase();
 }
 
-updateTCLI = function () {
+export function updateTCLI() {
     log(INFO, 'Updating Cloud CLI) Current Version: ' + require('../../package.json').version);
     run('npm -g install @tibco-tcstk/cloud-cli');
     log(INFO, 'New Cloud CLI Version: ');
     run('tcli -v');
 }
 
-updateCloudPackages = function () {
+export function updateCloudPackages() {
     log(INFO, 'Updating all packages starting with @tibco-tcstk in your package.json');
     // TODO: Investigate if we can install update-by-scope in node_modules of the cli
     run('npm install -g update-by-scope && npx update-by-scope @tibco-tcstk npm install');
@@ -613,7 +613,7 @@ updateCloudPackages = function () {
 }
 
 
-updateTCLIwrapper = function () {
+export function updateTCLIwrapper() {
     return new Promise(async function (resolve, reject) {
         updateTCLI();
         resolve();
@@ -623,7 +623,7 @@ updateTCLIwrapper = function () {
 // TODO: Move this function to PropFileManagement
 // TODO: Implement Check for global (see if the old value is USE-GLOBAL, and then update the global file)
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
-addOrUpdateProperty = function (location, property, value, comment, checkForGlobal) {
+export function addOrUpdateProperty(location, property, value, comment?, checkForGlobal?) {
     log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ') Use Global: ', checkForGlobal);
     // Check for global is true by default
     let doCheckForGlobal = true;
@@ -696,7 +696,7 @@ addOrUpdateProperty = function (location, property, value, comment, checkForGlob
 }
 
 // Get the global configuration
-getGlobalConfig = function () {
+export function getGlobalConfig() {
     if (doesFileExist(GLOBALPropertyFileName)) {
         return require('properties-reader')(GLOBALPropertyFileName).path();
     } else {
@@ -706,7 +706,7 @@ getGlobalConfig = function () {
 }
 
 // Getter
-getGLOBALPropertyFileName = function () {
+export function getGLOBALPropertyFileName() {
     return GLOBALPropertyFileName;
 }
 
@@ -716,7 +716,7 @@ getLOCALPropertyFileName = function() {
 }*/
 
 // Run an OS Command
-run = function (command, failOnError) {
+export function run(command, failOnError?) {
     let doFail = true;
     if (failOnError != null) {
         doFail = failOnError;
@@ -743,14 +743,14 @@ run = function (command, failOnError) {
 }
 
 // Function to copy a directory
-copyDir = function (fromDir, toDir) {
+export function copyDir(fromDir, toDir) {
     const fse = require('fs-extra');
     log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fse.copySync(fromDir, toDir, {overwrite: true});
 }
 
 // Function to delete a file but does not fail when the file does not exits
-deleteFile = function (file) {
+export function deleteFile(file) {
     log(INFO, 'Deleting File: ' + file);
     try {
         fs.unlinkSync(file);
@@ -762,7 +762,7 @@ deleteFile = function (file) {
 }
 
 // Delete a folder
-deleteFolder = function (folder) {
+export function deleteFolder(folder) {
     const del = require('del');
     log(INFO, 'Deleting Folder: ' + folder);
     return del([
@@ -771,7 +771,7 @@ deleteFolder = function (folder) {
 }
 
 // Create a directory if it does not exists
-mkdirIfNotExist = function (dir) {
+export function mkdirIfNotExist(dir) {
     const fs = require('fs');
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
@@ -779,7 +779,7 @@ mkdirIfNotExist = function (dir) {
 }
 
 // Check if a file exists
-doesFileExist = function (checkFile) {
+export function doesFileExist(checkFile) {
     const fsCom = require('fs');
     log(DEBUG, "Checking if file exists: " + checkFile);
     try {
@@ -791,7 +791,7 @@ doesFileExist = function (checkFile) {
 }
 
 // function to deternmine enabled tasks for workspace
-determineEnabledTasks = function (cliTaskConfig) {
+export function determineEnabledTasks(cliTaskConfig) {
     const cTsks = cliTaskConfig.cliTasks;
     const re = [];
     for (cliTask in cTsks) {
@@ -812,7 +812,7 @@ determineEnabledTasks = function (cliTaskConfig) {
     return re;
 }
 
-isPortAvailable = async function (port) {
+export async function isPortAvailable(port) {
     log(DEBUG, 'Checking Port Availability: ' + port);
     const tcpPortUsed = require('tcp-port-used');
     const pUsed = await tcpPortUsed.check(port, '127.0.0.1');
@@ -820,14 +820,14 @@ isPortAvailable = async function (port) {
 }
 
 
-sleep = async function (ms) {
+export async function sleep(ms) {
     //TODO: Add moving dots..
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }
 
-createTable = function (arrayObject, config, doShowTable) {
+export function createTable(arrayObject, config, doShowTable) {
     const tableObject = {};
     for (const element in arrayObject) {
         const tableRow = {};
@@ -849,7 +849,7 @@ createTable = function (arrayObject, config, doShowTable) {
     return tableObject;
 }
 
-iterateTable = function (tObject) {
+export function iterateTable(tObject) {
     const re = [];
     for (const property in tObject) {
         re.push(tObject[property]);
@@ -858,7 +858,7 @@ iterateTable = function (tObject) {
 }
 
 // Creates a flat table with names and values
-createTableValue = function (name, value, table, headerName, headerValue) {
+export function createTableValue(name, value, table, headerName, headerValue) {
     let hName = headerName || 'NAME';
     let hValue = headerValue || 'VALUE';
     table = table || [];
@@ -870,7 +870,7 @@ createTableValue = function (name, value, table, headerName, headerValue) {
 }
 
 // Print and possibly export Table to CSV
-pexTable = function (tObject, tName, config, doPrint) {
+export function pexTable(tObject, tName, config, doPrint) {
     if (!config) {
         config = {};
         config.export = false;
@@ -948,7 +948,7 @@ pexTable = function (tObject, tName, config, doPrint) {
 }
 
 // Provide configuration for exporting table
-getPEXConfig = function () {
+export function getPEXConfig() {
     const re = {};
     // table-export-to-csv= YES | NO
     let table_export_to_csv = 'NO';
@@ -990,7 +990,7 @@ getPEXConfig = function () {
     return re;
 }
 
-isOauthUsed = function () {
+export function isOauthUsed() {
     let re = false;
     if (getProp('CloudLogin.OAUTH_Token', true, true)) {
         if (getProp('CloudLogin.OAUTH_Token', true, true).trim() !== '') {
@@ -1000,7 +1000,7 @@ isOauthUsed = function () {
     return re;
 }
 
-isIterable = function (obj) {
+export function isIterable(obj) {
     // checks for null and undefined
     if (obj == null) {
         return false;
@@ -1009,7 +1009,7 @@ isIterable = function (obj) {
 }
 
 // Get the TIBCO Cloud Starter Development Kit from GIT
-getGit = function (source, target, tag) {
+export function getGit(source, target, tag) {
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
     if (tag == null || tag === 'LATEST' || tag === '') {
         run('git clone "' + source + '" "' + target + '" ');
@@ -1019,7 +1019,7 @@ getGit = function (source, target, tag) {
 }
 
 // Function to install NPM packages
-npmInstall = function (location, packageToUse) {
+export function npmInstall(location, packageToUse) {
     return new Promise(function (resolve, reject) {
         if (packageToUse != null) {
             run('cd ' + location + ' && npm install ' + packageToUse);
@@ -1031,25 +1031,25 @@ npmInstall = function (location, packageToUse) {
 }
 
 //Common log function
-global.INFO = 'INFO';
-global.WARNING = 'WARNING';
-global.DEBUG = 'DEBUG';
-global.ERROR = 'ERROR';
+export const INFO = 'INFO';
+export const WARNING = 'WARNING';
+export const DEBUG = 'DEBUG';
+export const ERROR = 'ERROR';
 //const useDebug = (propsF.Use_Debug == 'true');
 let useDebug = false;
 
-setLogDebug = function (debug) {
+export function setLogDebug(debug) {
     // console.log('Setting debug to: ' + debug)
     useDebug = (debug === 'true');
 }
 
 // Function moved to TS
-log = function (level, ...message) {
+export function log(level, ...message) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level === DEBUG && !useDebug)) {
         // const timeStamp = new Date();
         // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
-        if (level === global.ERROR) {
+        if (level === ERROR) {
             for (let mN in message) {
                 // Removes password in console
                 if (typeof message[mN] == 'string' && message[mN].indexOf('--pass') > 0) {
@@ -1059,7 +1059,7 @@ log = function (level, ...message) {
             console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', '\x1b[31m', ...message, '\033[0m');
             process.exitCode = 1;
         } else {
-            if (level === global.WARNING) {
+            if (level === WARNING) {
                 console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
             } else {
                 console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ', ...message, '\033[0m');
@@ -1069,14 +1069,14 @@ log = function (level, ...message) {
 }
 
 
-logO = function (level, message) {
+export function logO(level, message) {
     if (!(level === DEBUG && !useDebug)) {
         console.log(message);
     }
 }
 
 //Function to log on one line...
-logLine = function (message) {
+export function logLine(message) {
     const readline = require('readline');
     readline.cursorTo(process.stdout, 0);
     process.stdout.write(message);
@@ -1087,7 +1087,7 @@ logLine = function (message) {
 const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 
-upgradeToV2 = function (isGlobal, propFile) {
+export function upgradeToV2(isGlobal, propFile) {
     let host = '';
     let curl = '';
     let newORG = 'US';
@@ -1186,7 +1186,7 @@ function createPropINE(isGlobal, propFile, propName, value, comment) {
 }
 
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
-checkGlobalForUpgrade = function () {
+export function checkGlobalForUpgrade() {
     if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         if (propsG.Cloud_Properties_Version == null) {

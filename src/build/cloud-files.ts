@@ -1,3 +1,15 @@
+import {
+    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTable, ERROR, getOrganization, getPEXConfig, getProp,
+    getPropFileName,
+    INFO,
+    iterateTable,
+    log,
+    logLine, mkdirIfNotExist,
+    pexTable
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const USERGROUPS = require('./user-groups');
 const colors = require('colors');

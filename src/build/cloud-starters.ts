@@ -1,4 +1,18 @@
 // Package Definitions
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, copyDir,
+    copyFile,
+    createTableValue,
+    deleteFile,
+    deleteFolder, doesFileExist, ERROR, getCurrentRegion, getPEXConfig, getProp, getPropFileName,
+    INFO, isIterable,
+    isOauthUsed, isPortAvailable, iterateTable,
+    log,
+    logLine, mkdirIfNotExist, npmInstall,
+    pexTable, run, WARNING
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
 const USERGROUPS = require('./user-groups');

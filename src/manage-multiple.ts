@@ -1,4 +1,15 @@
 // This file manages the applications
+import {
+    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTableValue, DEBUG, ERROR,
+    getMultipleOptions, indexObj, INFO,
+    iterateTable,
+    log,
+    parseOAUTHToken,
+    run, trim, WARNING
+} from "./build/common-functions";
+
 require('./build/common-functions');
 let mFile = '';
 const colors = require('colors');

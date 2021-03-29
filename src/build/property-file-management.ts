@@ -1,4 +1,30 @@
 import {isOAUTHLoginValid} from "./cloud-communications";
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion,
+    askMultipleChoiceQuestionSearch,
+    askQuestion,
+    copyFile,
+    createTable,
+    createTableValue,
+    DEBUG,
+    doesFileExist,
+    ERROR,
+    getCurrentRegion,
+    getGLOBALPropertyFileName,
+    getOAUTHDetails,
+    getPEXConfig,
+    getProp,
+    getPropFileName,
+    indexObj,
+    INFO,
+    isOauthUsed,
+    iterateTable,
+    log,
+    pexTable,
+    run, translateAWSRegion,
+    WARNING
+} from "./common-functions";
 
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');

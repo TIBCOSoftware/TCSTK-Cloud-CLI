@@ -1,3 +1,13 @@
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion,
+    createTable,
+    createTableValue, DEBUG, ERROR, getCurrentRegion,
+    getOAUTHDetails, getOrganization, getProp, getPropFileName, getRegion, INFO,
+    iterateTable,
+    log, WARNING
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const colors = require('colors');
 

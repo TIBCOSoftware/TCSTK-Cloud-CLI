@@ -1,3 +1,16 @@
+import {
+    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTable,
+    DEBUG, getCurrentAWSRegion, getCurrentRegion, getOrganization, getPEXConfig, getProp,
+    getPropFileName,
+    INFO,
+    iterateTable,
+    log,
+    pexTable,
+    run, WARNING
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const colors = require('colors');
 

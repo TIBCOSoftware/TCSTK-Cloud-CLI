@@ -1,3 +1,12 @@
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion,
+    askQuestion,
+    ERROR, getOrganization, getProp, getPropFileName, INFO,
+    iterateTable,
+    log
+} from "./common-functions";
+
 const colors = require('colors');
 const LA = require('./live-apps');
 const CFILES = require('./cloud-files');

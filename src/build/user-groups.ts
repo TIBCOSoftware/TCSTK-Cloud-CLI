@@ -1,3 +1,13 @@
+import {
+    askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTable,
+    getPEXConfig, INFO,
+    iterateTable,
+    log,
+    pexTable
+} from "./common-functions";
+
 const CCOM = require('./cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');

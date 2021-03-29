@@ -1,4 +1,26 @@
 //import functions
+import {
+    askMultipleChoiceQuestion,
+    askQuestion, createMultiplePropertyFile,
+    DEBUG,
+    deleteFolder,
+    displayGlobalConnectionConfig, displayOpeningMessage,
+    ERROR,
+    getGit,
+    getOrganization,
+    getProp,
+    getPropFileName, getRegion,
+    INFO,
+    isOauthUsed,
+    log, obfuscatePW,
+    replaceInFile,
+    run,
+    setLogDebug, setProperty,
+    trim, updateCloudPackages,
+    updateGlobalConnectionConfig, updateRegion,
+    upgradeToV2
+} from "./build/common-functions";
+
 require('./build/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;

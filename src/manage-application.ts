@@ -1,4 +1,12 @@
 // This file manages the applications
+import {
+    askMultipleChoiceQuestion,
+    askQuestion, createMultiplePropertyFile, DEBUG, displayGlobalConnectionConfig, ERROR, INFO,
+    log,
+    replaceInFile, run, setLogDebug, setProperty,
+    updateGlobalConnectionConfig
+} from "./build/common-functions";
+
 require('./build/common-functions');
 const configApp = require('./config/config-template.json');
 const templatesToUse = [];
