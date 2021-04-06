@@ -147,7 +147,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
 }
 
 // Function to generate an OAUTH Token
-export async function generateOauthToken(tokenNameOverride, verbose, returnProp) {
+export async function generateOauthToken(tokenNameOverride, verbose, returnProp?) {
     log(INFO, 'Generating OAUTH Token...');
     // const generateOauthUrl = 'https://' + getCurrentRegion() + CCOM.clURI.generate_oauth
     let skipCall = false;

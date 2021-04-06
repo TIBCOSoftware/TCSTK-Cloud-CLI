@@ -26,7 +26,7 @@ let isOrgChecked = false;
 // An HTTP request based on Axios library
 // TODO: Look at managing Axios error handling
 // https://stackoverflow.com/questions/43842711/can-i-throw-error-in-axios-post-based-on-response-status
-export async function doRequest(url, options, data) {
+export async function doRequest(url, options?, data?) {
     const axios = require('axios').default;
     axios.defaults.validateStatus = () => {
         return true;
@@ -37,7 +37,7 @@ export async function doRequest(url, options, data) {
     }
     try {
         const responseAxios = await axios(url, options);
-        const response = {};
+        const response = {} as any;
         response.body = '';
         response.statusCode = responseAxios.status;
         response.headers = responseAxios.headers;
@@ -61,7 +61,7 @@ export function doManualRequest(url, options, data) {
             res.setEncoding('utf8');
             // console.log(res);
             let responseTXT = '';
-            let response = {};
+            let response = {} as any;
             response.body = '';
             response.statusCode = res.statusCode;
             response.headers = res.headers;
@@ -195,8 +195,8 @@ async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     const response = await doRequest(encodeURI(TCbaseURL), {
         headers: header,
         method: 'POST'
-    }, postForm);
-    let re = '';
+    }, postForm) as any;
+    let re = '' as any;
     //console.log(response.body);
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
@@ -225,7 +225,7 @@ async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
     const reResponse = returnResponse || false;
-    let lCookie = {};
+    let lCookie:any = {};
     if (!fOAUTH) {
         lCookie = await cLogin(tenant, customLoginURL);
     }
@@ -282,7 +282,7 @@ async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant
             log(INFO, '-    BODY: ' + body);
         }
     }
-    let response = {};
+    let response:any = {};
     if (cMethod.toLowerCase() === 'get') {
         response = await doRequest(encodeURI(url), {
             headers: header
@@ -330,7 +330,7 @@ async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant
 }
 
 // Wrapper around the callURL function that takes a config object
-export async function callTCA(url, doLog, conf) {
+export async function callTCA(url, doLog?, conf?) {
     if (conf == null) {
         conf = {};
     }
@@ -346,8 +346,9 @@ export async function callTCA(url, doLog, conf) {
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
 export async function uploadToCloud(formDataType, localFileLocation, uploadFileURI) {
-    return new Promise(async function (resolve, reject) {
-        let formData = new require('form-data')();
+    return new Promise<void>(async function (resolve, reject) {
+        const fd = require('form-data');
+        let formData = new fd();
         const fs = require('fs');
         const {size: fileSize} = fs.statSync(localFileLocation);
         log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')'  + ' Filesize: ' + readableSize(fileSize));
@@ -400,7 +401,7 @@ export async function uploadToCloud(formDataType, localFileLocation, uploadFileU
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
 export async function downloadFromCloud(localFileLocation, downloadFileURI) {
-    return new Promise(async function (resolve, reject) {
+    return new Promise<void>(async function (resolve, reject) {
         const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
         log(INFO, '     DOWNLOADING: ' + colors.blue(downloadURL));
         log(INFO, '              TO: ' + colors.blue(localFileLocation));
@@ -465,13 +466,13 @@ function readableSize(sizeBytes) {
 // Function to show claims for the configured user
 export async function showCloudInfo(showTable, showSandbox) {
     const doShowSandbox = showSandbox || false;
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
+    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
     }
     const response = await callTCA(clURI.claims);
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
+    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' After Show Cloud');
     let nvs = createTableValue('REGION', getRegion());
     nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
     nvs = createTableValue('FIRST NAME', response.firstName, nvs);
@@ -487,7 +488,7 @@ export async function showCloudInfo(showTable, showSandbox) {
     if (doShowTable) {
         console.table(nvs);
     }
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
+    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' Final Show Cloud');
 }
 
 // TODO: What to do with passwords and where is this used ?

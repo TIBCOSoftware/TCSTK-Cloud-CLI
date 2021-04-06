@@ -17,7 +17,7 @@ const colors = require('colors');
 //const art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
-export async function showTCI(showTable, returnRaw) {
+export async function showTCI(showTable?, returnRaw?): Promise<any> {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -56,8 +56,8 @@ export async function monitorTCI() {
         // TODO: move this logic to common lib
         let email = getProp('CloudLogin.email');
         let pass = getProp('CloudLogin.pass');
-        if (pass === 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
-        if (email === 'USE-GLOBAL') email = propsG.CloudLogin.email;
+        // if (pass === 'USE-GLOBAL') pass = propsG.CloudLogin.pass;
+        // if (email === 'USE-GLOBAL') email = propsG.CloudLogin.email;
         if (pass === '') {
             pass = require('yargs').argv.pass;
             // console.log('Pass from args: ' + pass);
@@ -138,7 +138,7 @@ function getTIBCli() {
 
 // Use WSU to generate TCI code
 function wsuAddTci() {
-    return new Promise(async function (resolve) {
+    return new Promise<void>(async function (resolve) {
         // TODO: Implement
         console.log('TODO: Implement');
         resolve();
@@ -146,7 +146,7 @@ function wsuAddTci() {
 }
 
 function wsuListTci() {
-    return new Promise(async function (resolve) {
+    return new Promise<void>(async function (resolve) {
         // TODO: Remove web scaffolding utility ?
         /*const wsu = require('@tibco-tcstk/web-scaffolding-utility');
         console.log(wsu.API.getVersion());

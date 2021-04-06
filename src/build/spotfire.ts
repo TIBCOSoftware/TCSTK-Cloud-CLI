@@ -18,7 +18,7 @@ let jSession;
 let xSRF;
 
 
-async function callSpotfire(url, doLog, conf) {
+async function callSpotfire(url, doLog, conf?) {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
     if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
         if (!jSession || !xSRF) {
@@ -198,7 +198,7 @@ export async function listSpotfire() {
             }
             await listOnType(typeToSearch, typeForSearch);
         }
-        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
+        if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), 'After SF List');
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }

@@ -17,9 +17,9 @@ const colors = require('colors');
 
 // Function to process the multiple property file
 // processMultipleFile = function (propfileName) {
-processMultipleFile = function () {
+export function processMultipleFile() {
     // setLogDebug('true');
-    let mOpts = getMultipleOptions();
+    let mOpts:any = getMultipleOptions();
     mFile = mOpts.name;
     // log(INFO, '- Managing Multiple, Using file: ' + mFile);
     // Go Over All Cloud Starter Jobs
@@ -109,7 +109,7 @@ processMultipleFile = function () {
                     let taskType = '';
                     let task = '';
 
-                    let tObj = {};
+                    let tObj:any = {};
                     try {
                         tObj = JSON.parse(jTask);
                     } catch (e) {
@@ -177,9 +177,9 @@ processMultipleFile = function () {
 
 const TCLI_INTERACTVIE = 'tcli-interactive';
 
-multipleInteraction = async function () {
+export async function multipleInteraction() {
     const PropertiesReader = require('properties-reader');
-    let mOpts = getMultipleOptions();
+    let mOpts:any = getMultipleOptions();
     mFile = mOpts.name;
     let failOnError = getMProp('Fail_On_Error');
     if (failOnError == null) {
@@ -325,7 +325,7 @@ multipleInteraction = async function () {
 let propsM;
 let fileExtension = '';
 
-getMProp = function (property, propFileName) {
+function getMProp(property, propFileName?) {
     let propFileToUse = mFile;
     if (propFileName && propFileName.trim() != null) {
         propFileToUse = propFileName;
@@ -357,7 +357,7 @@ getMProp = function (property, propFileName) {
 }
 
 
-replaceDollar = function (content) {
+function replaceDollar(content) {
     if (content.includes('${') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('${') + 2, content.indexOf('${') + 2 + content.substring(content.indexOf('${') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: ' + subProp);
@@ -368,7 +368,7 @@ replaceDollar = function (content) {
     return content;
 }
 
-replaceAtSign = function (content, propFile) {
+function replaceAtSign(content, propFile) {
     if (content.includes('@{') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
@@ -379,7 +379,7 @@ replaceAtSign = function (content, propFile) {
     return content;
 }
 
-getPropFromFile = function (property, file) {
+function getPropFromFile(property, file) {
     log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
     const PropertiesReader = require('properties-reader');
     const propsToGet = PropertiesReader(file).path();

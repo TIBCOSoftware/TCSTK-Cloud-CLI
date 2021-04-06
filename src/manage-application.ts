@@ -25,16 +25,16 @@ export async function newStarter() {
     let starterName = '';
     let starterTemplate = '';
     let doStart = true;
-    for (let arg in process.argv) {
-        if (process.argv[arg] === 'new') {
-            if (process.argv.length - 1 > arg) {
-                const temp = parseInt(arg) + 1;
+    for (let argN = 0; argN < process.argv.length; argN++) {
+        if (process.argv[argN] === 'new') {
+            if (process.argv.length - 1 > argN) {
+                const temp = argN + 1;
                 starterName = process.argv[temp];
             }
         }
-        if (process.argv[arg] === '--template' || process.argv[arg] === '-t') {
-            if (process.argv.length - 1 > arg) {
-                const temp = parseInt(arg) + 1;
+        if (process.argv[argN] === '--template' || process.argv[argN] === '-t') {
+            if (process.argv.length - 1 > argN) {
+                const temp = argN + 1;
                 starterTemplate = process.argv[temp];
                 for (let key in configApp.templates) {
                     if (configApp.templates.hasOwnProperty(key)) {
@@ -45,7 +45,7 @@ export async function newStarter() {
                 }
             }
         }
-        if (process.argv[arg] === '--surpressStart' || process.argv[arg] === '-s') {
+        if (process.argv[argN] === '--surpressStart' || process.argv[argN] === '-s') {
             doStart = false;
         }
     }
@@ -57,7 +57,7 @@ export async function newStarter() {
         starterTemplate = await askMultipleChoiceQuestion('Which Template would you like to use for your cloud starter ?', templatesToUse);
     }
     log(INFO, '    Cloud Starter Name: ' + starterName);
-    let stTempJson = {};
+    let stTempJson:any = {};
     for (let key in configApp.templates) {
         if (configApp.templates.hasOwnProperty(key)) {
             if (starterTemplate === configApp.templates[key].displayName) {
@@ -97,7 +97,7 @@ function createNewStarter(name, template, doStart) {
             }
         }
     } else {
-        const fromDir = global.PROJECT_ROOT + template.templateFolder;
+        const fromDir = (global as any).PROJECT_ROOT + template.templateFolder;
         copyDir(fromDir, toDir);
     }
     try {

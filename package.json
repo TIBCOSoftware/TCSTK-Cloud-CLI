@@ -43,7 +43,7 @@
   },
   "bin": {
     "tcli": "dist/tcli/main.js",
-    "tcli_dev": "src/bin/cloud-cli.js"
+    "tcli_dev": "built/bin/cloud-cli.js"
   },
   "pkg": {
     "assets": [

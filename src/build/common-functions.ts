@@ -89,7 +89,7 @@ export function replaceInFile(from, to, filePattern) {
     };
     const replace = require('replace-in-file');
     let results = replace.sync(options);
-    for (result of results) {
+    for (const result of results) {
         if (result.numReplacements > 0) {
             log(INFO, '\x1b[0m    [FILE] ', result.file);
             log(INFO, '\x1b[0m[REPLACED] [FROM: |\x1b[32m' + from + '\x1b[0m|] [TO: |\x1b[32m' + to + '\x1b[0m|]', '(Number of Replacements: ' + result.numReplacements + ')');
@@ -107,10 +107,10 @@ export async function updateGlobalConnectionConfig() {
     // Check if the global propfile exists, if not create one
     if (!doesFileExist(GLOBALPropertyFileName)) {
         // Create Global config from template
-        copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName);
+        copyFile((global as any).PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName);
     }
     if (!doesFileExist(globalTCpropFolder + 'package.json')) {
-        copyFile(global.PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json');
+        copyFile((global as any).PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json');
         log(INFO, 'Inserted package.json...');
     }
     // Get Cloud Environment
@@ -150,6 +150,7 @@ let propsGl;
 let globalMultipleOptions = {};
 // Function to get a property
 let globalOAUTH = null;
+
 export function getOAUTHDetails() {
     log(DEBUG, 'Returning globalOAUTH: ', globalOAUTH);
     return globalOAUTH;
@@ -244,7 +245,8 @@ export function parseOAUTHToken(stringToken, doLog) {
 
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
-export function getOrganization(forceRefresh) {
+
+export function getOrganization(forceRefresh?) {
     if (forceRefresh) {
         OrganizationGl = '';
         globalOAUTH = null;
@@ -261,6 +263,7 @@ export function getOrganization(forceRefresh) {
     log(DEBUG, 'Returning org: ' + OrganizationGl);
     return OrganizationGl;
 }
+
 export function setOrganization(org) {
     log(DEBUG, 'Setting org: ' + org);
     OrganizationGl = org;
@@ -292,13 +295,16 @@ export function setPropFileName(propFileName) {
     LOCALPropertyFileName = propFileName;
     log(DEBUG, 'Using Property File: ' + LOCALPropertyFileName);
 }
+
 export function getPropFileName() {
     return LOCALPropertyFileName;
 }
+
 export function setMultipleOptions(mOptions) {
     globalMultipleOptions = mOptions;
     log(DEBUG, 'Using Multiple Options: ', globalMultipleOptions);
 }
+
 export function getMultipleOptions() {
     return globalMultipleOptions;
 }
@@ -312,7 +318,7 @@ export function trim(value) {
 export async function createMultiplePropertyFile() {
     // 'manage-multiple-cloud-starters.properties'
     let mPropFileName = 'manage-multiple-cloud-starters.properties';
-    let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: \x1b[34mmanage-multiple-cloud-starters\033[0m) ?');
+    let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: ' + colors.blue('manage-multiple-cloud-starters') + ') ?');
     // console.log('nameAnsw: ' + nameAnsw);
     if (nameAnsw != null && nameAnsw !== '' && nameAnsw.toLowerCase() !== 'default') {
         mPropFileName = nameAnsw + '.properties';
@@ -320,7 +326,7 @@ export async function createMultiplePropertyFile() {
     const targetFile = process.cwd() + '/' + mPropFileName;
     let doWrite = true;
     if (doesFileExist(targetFile)) {
-        const doOverWrite = await askMultipleChoiceQuestion('The property file: \x1b[34m' + mPropFileName + '\033[0m already exists, do you want to Overwrite it ?', ['YES', 'NO']);
+        const doOverWrite = await askMultipleChoiceQuestion('The property file: ' + colors.yellow(mPropFileName) + ' already exists, do you want to Overwrite it ?', ['YES', 'NO']);
         if (doOverWrite === 'NO') {
             doWrite = false;
             log(INFO, 'OK, I won\'t do anything :-)');
@@ -328,10 +334,10 @@ export async function createMultiplePropertyFile() {
     }
     if (doWrite) {
         log(INFO, 'Creating new multiple property file: ' + mPropFileName);
-        copyFile(global.PROJECT_ROOT + 'templates/multiple.properties', targetFile);
+        copyFile((global as any).PROJECT_ROOT + 'templates/multiple.properties', targetFile);
         //'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
-        log(INFO, 'Now configure the multiple property file and then run "\x1b[34mtcli -m\033[0m" (for default fileq name) \nor "\x1b[34mtcli -m <propfile name> [-j <job-name> -e <environment-name>]\033[0m" to execute...');
-        log(INFO, 'Or run "\x1b[34mtcli -i\033[0m" to interact with multiple cloud environments...');
+        log(INFO, 'Now configure the multiple property file and then run "' + colors.blue('tcli -m') + '" (for default file name) \nor "' + colors.blue('tcli -m <propfile name> [-j <job-name> -e <environment-name>]') + '" to execute...');
+        log(INFO, 'Or run "' + colors.blue('tcli -i') + '" to interact with multiple cloud environments...');
     }
 }
 
@@ -395,6 +401,7 @@ export async function askMultipleChoiceQuestion(question, options) {
 }
 
 let gOptions = [];
+
 // Ask a question to a user, and allow the user to search through a possilbe set of options
 export async function askMultipleChoiceQuestionSearch(question, options) {
     let re = '';
@@ -422,6 +429,7 @@ export async function askMultipleChoiceQuestionSearch(question, options) {
 
 //User interaction
 const _F = require('lodash');
+
 export function searchAnswerF(answers, input) {
     const fuzzyF = require('fuzzy');
     input = input || '';
@@ -469,7 +477,7 @@ export function getLastGlobalAnswer(question) {
 }
 
 // Update the cloud login properties
-export async function updateCloudLogin(propFile, forceRefresh, forceGlobalRefresh, defaultClientID, defaultEmail) {
+export async function updateCloudLogin(propFile, forceRefresh?, forceGlobalRefresh?, defaultClientID?, defaultEmail?) {
     // Client ID
     let cidQuestion = 'What is your Client ID ?';
     let useCID = '';
@@ -532,7 +540,7 @@ export async function updateRegion(propFile) {
     }
 }
 
-export function getCurrentRegion(showRegion) {
+export function getCurrentRegion(showRegion?) {
     let displayRegion = false;
     if (showRegion) {
         displayRegion = showRegion;
@@ -593,7 +601,7 @@ export function translateAWSRegion(awsRegion) {
 }
 
 // Gets region (in Capitals)
-export function getRegion(forceRefresh, forceGlobalRefresh) {
+export function getRegion(forceRefresh?, forceGlobalRefresh?) {
     return getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh).toString().toUpperCase();
 }
 
@@ -614,7 +622,7 @@ export function updateCloudPackages() {
 
 
 export function updateTCLIwrapper() {
-    return new Promise(async function (resolve, reject) {
+    return new Promise<void>(async function (resolve, reject) {
         updateTCLI();
         resolve();
     });
@@ -664,16 +672,16 @@ export function addOrUpdateProperty(location, property, value, comment?, checkFo
                 }
             }
             let dataForFile = '';
-            for (let line in dataLines) {
-                if (line !== (dataLines.length - 1)) {
-                    dataForFile += dataLines[line] + '\n';
+            for (let lineN = 0; dataLines < dataLines.length; lineN++) {
+                if (lineN !== (dataLines.length - 1)) {
+                    dataForFile += dataLines[lineN] + '\n';
                 } else {
                     // The last one:
-                    dataForFile += dataLines[line];
+                    dataForFile += dataLines[lineN];
                 }
             }
             if (propFound) {
-                if(property != 'CloudLogin.clientID'){
+                if (property != 'CloudLogin.clientID') {
                     log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
                 } else {
                     log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow('[NEW CLIENT ID]') + ' (in:' + location + ')');
@@ -795,11 +803,11 @@ export function doesFileExist(checkFile) {
 export function determineEnabledTasks(cliTaskConfig) {
     const cTsks = cliTaskConfig.cliTasks;
     const re = [];
-    for (cliTask in cTsks) {
+    for (const cliTask in cTsks) {
         console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
         let allowed = false;
         if (cTsks[cliTask].availableOnOs != null) {
-            for (allowedOS of cTsks[cliTask].availableOnOs) {
+            for (const allowedOS of cTsks[cliTask].availableOnOs) {
                 console.log('OS:' + allowedOS);
                 if (allowedOS === process.platform || allowedOS === 'all') {
                     allowed = true;
@@ -837,7 +845,7 @@ export function createTable(arrayObject, config, doShowTable) {
         //log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
         for (let conf of config.entries) {
             if (conf.format && conf.format.toLowerCase() === 'date') {
-                const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+                const options:any = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
                 tableRow[conf.header] = new Date(_F.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
             } else {
                 tableRow[conf.header] = _F.get(arrayObject[element], conf.field);
@@ -859,7 +867,7 @@ export function iterateTable(tObject) {
 }
 
 // Creates a flat table with names and values
-export function createTableValue(name, value, table, headerName, headerValue) {
+export function createTableValue(name, value, table?, headerName?, headerValue?) {
     let hName = headerName || 'NAME';
     let hValue = headerValue || 'VALUE';
     table = table || [];
@@ -913,15 +921,18 @@ export function pexTable(tObject, tName, config, doPrint) {
                 headerForFile = 'ORGANIZATION, EXPORT TIME';
                 let lineForFile = getOrganization() + ',' + now;
                 for (let [key, value] of Object.entries(line)) {
+                    let myValue:any = value;
                     // console.log(`${key}: ${value}`);
-                    if ((key && key.indexOf && key.indexOf(',') > 0) || (value && value.indexOf && value.indexOf(',') > 0)) {
-                        log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${value}); we are removing it...`);
-                        additionalMessage = colors.yellow(' (We have removed some comma\'s from the data...)');
-                        if (key.replaceAll) {
-                            key = key.replaceAll(',', '');
-                        }
-                        if (value.replaceAll) {
-                            value = value.replaceAll(',', '');
+                    if(myValue) {
+                        if ((key && key.indexOf && key.indexOf(',') > 0) || (myValue && myValue.indexOf && myValue.indexOf(',') > 0)) {
+                            log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${myValue}); we are removing it...`);
+                            additionalMessage = colors.yellow(' (We have removed some comma\'s from the data...)');
+                            if (key.replaceAll) {
+                                key = key.replaceAll(',', '');
+                            }
+                            if (myValue.replaceAll) {
+                                myValue = myValue.replaceAll(',', '');
+                            }
                         }
                     }
                     if (newFile) {
@@ -950,7 +961,7 @@ export function pexTable(tObject, tName, config, doPrint) {
 
 // Provide configuration for exporting table
 export function getPEXConfig() {
-    const re = {};
+    const re:any = {};
     // table-export-to-csv= YES | NO
     let table_export_to_csv = 'NO';
     if (getProp('Table_Export_To_CSV') != null) {
@@ -1021,7 +1032,7 @@ export function getGit(source, target, tag) {
 
 // Function to install NPM packages
 export function npmInstall(location, packageToUse) {
-    return new Promise(function (resolve, reject) {
+    return new Promise<void>(function (resolve, reject) {
         if (packageToUse != null) {
             run('cd ' + location + ' && npm install ' + packageToUse);
         } else {
@@ -1057,13 +1068,13 @@ export function log(level, ...message) {
                     message[mN] = message[mN].replace(/--pass \".*\"/, '')
                 }
             }
-            console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', '\x1b[31m', ...message, '\033[0m');
+            console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', colors.red(...message));
             process.exitCode = 1;
         } else {
             if (level === WARNING) {
                 console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
             } else {
-                console.log('\x1b[35m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ', ...message, '\033[0m');
+                console.log(colors.magenta('TIBCO CLOUD CLI] (' + level + ') '), ...message);
             }
         }
     }
@@ -1186,7 +1197,8 @@ function createPropINE(isGlobal, propFile, propName, value, comment) {
     }
 }
 
-if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
+if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), 'BEFORE Check for Global Upgrade');
+
 export function checkGlobalForUpgrade() {
     if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
@@ -1195,6 +1207,7 @@ export function checkGlobalForUpgrade() {
             upgradeToV2(true, GLOBALPropertyFileName);
         }
     }
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'AFTER Check for Global Upgrade');
+    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), 'AFTER Check for Global Upgrade');
 }
+
 checkGlobalForUpgrade();

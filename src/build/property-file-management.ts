@@ -237,7 +237,7 @@ export async function updateProperty() {
                         log(INFO, 'OK, I won\'t do anything :-)');
                         doUpdate = false;
                     } else {
-                        let laAction = laActions.find(e => e.name === laActD);
+                        let laAction:any = laActions.find(e => e.name === laActD);
                         if (laAction) {
                             pValue = laAction.id
                         } else {
@@ -290,12 +290,12 @@ export function disableProperty(location, property, comment) {
                 }
             }
             let dataForFile = '';
-            for (let line in dataLines) {
-                if (line !== (dataLines.length - 1)) {
-                    dataForFile += dataLines[line] + '\n';
+            for (let lineN = 0; dataLines < dataLines.length; lineN++) {
+                if (lineN !== (dataLines.length - 1)) {
+                    dataForFile += dataLines[lineN] + '\n';
                 } else {
                     // The last one:
-                    dataForFile += dataLines[line];
+                    dataForFile += dataLines[lineN];
                 }
             }
             if (propFound) {
@@ -316,7 +316,7 @@ export function disableProperty(location, property, comment) {
 // display current properties in a table
 export function showPropertiesTable() {
     // Get the properties object
-    let props = {};
+    let props:any = {};
     if (doesFileExist(getPropFileName())) {
         const propLoad = require('properties-reader')(getPropFileName());
         props = propLoad.path();
@@ -325,10 +325,11 @@ export function showPropertiesTable() {
             log(INFO, 'GLOBAL Property File Name: ' + colors.blue(getGLOBALPropertyFileName()));
         }
         let nvs = [];
-        for (const [key, value] of Object.entries(props)) {
+        for (const [key, valueP] of Object.entries(props)) {
             if (key === 'CloudLogin') {
-                for (const [key, value] of Object.entries(props.CloudLogin)) {
-                    if (value === 'USE-GLOBAL') {
+                for (const [key, valueL] of Object.entries(props.CloudLogin)) {
+                    const myValueL:any = valueL;
+                    if (myValueL === 'USE-GLOBAL') {
                         let displayValue = getProp('CloudLogin.' + key);
                         if (key === 'pass') {
                             if (displayValue !== '') {
@@ -342,11 +343,11 @@ export function showPropertiesTable() {
                         nvs = createTableValue('CloudLogin.' + key, displayValue + ' [FROM GLOBAL]', nvs);
                     } else {
                         if (key !== 'OAUTH_Token') {
-                            nvs = createTableValue('CloudLogin.' + key, value, nvs);
+                            nvs = createTableValue('CloudLogin.' + key, myValueL, nvs);
                         } else {
                             // This is to check if there is a manual token
-                            if (value.length < 40) {
-                                nvs = createTableValue('CloudLogin.' + key, value, nvs);
+                            if (myValueL.length < 40) {
+                                nvs = createTableValue('CloudLogin.' + key, myValueL, nvs);
                             }
                         }
                     }
@@ -362,10 +363,10 @@ export function showPropertiesTable() {
                     }
                 }
             } else {
-                if (value === 'USE-GLOBAL') {
+                if (valueP === 'USE-GLOBAL') {
                     nvs = createTableValue(key, getProp(key) + ' [FROM GLOBAL]', nvs);
                 } else {
-                    nvs = createTableValue(key, value, nvs);
+                    nvs = createTableValue(key, valueP, nvs);
                 }
             }
         }

@@ -104,8 +104,8 @@ export function generateCloudDescriptor() {
         let now = "";
         let buildOn = "";
         if (ADD_DESCRIPTOR_TIMESTAMP === 'YES') {
-            now = (new Date()).getTime();
-            buildOn = new Date();
+            now = (new Date()).getTime().toString();
+            buildOn = (new Date()).toString();
         }
         const pJsonObj = require('jsonfile').readFileSync(packageJson);
         let name = "";
@@ -232,7 +232,7 @@ export async function showAvailableApps(showTable) {
             }
             appTemp['LATEST DEPLOYED'] = latestDeployed;
             const created = new Date(response[app].creationDate);
-            const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            const options:any = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
             const optionsT = {hour: 'numeric'};
             appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
             //appTemp['CREATED TIME'] = created.toLocaleTimeString();
@@ -344,7 +344,7 @@ export async function getAppLinks(showTable) {
             nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
             nvs = createTableValue('NAME', app.name, nvs);
             const appN = i++;
-            const tempDet = await getApplicationDetails(app.name, app.publishedVersion, false);
+            const tempDet:any = await getApplicationDetails(app.name, app.publishedVersion, false);
             logLine("Processing App: (" + appN + '/' + apps.length + ')...');
             if (isIterable(tempDet)) {
                 for (let appD of tempDet) {
@@ -393,7 +393,7 @@ export async function uploadApp(application) {
 
 // Function to publish the application to the cloud
 export async function publishApp(application) {
-    return new Promise(async function (resolve) {
+    return new Promise<void>(async function (resolve) {
         // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
         const response = await CCOM.callTCA(CCOM.clURI.app_info, false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);

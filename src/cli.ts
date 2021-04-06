@@ -16,6 +16,7 @@ import {
     updateTCLI,
     WARNING
 } from "./build/common-functions";
+import {multipleInteraction, processMultipleFile} from "./manage-multiple";
 
 let propFileName;
 
@@ -95,7 +96,7 @@ const isWindows = process.platform === 'win32';
 
 // Main function
 export async function cli(args) {
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' CLI INIT');
+    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' CLI INIT');
     //console.log('start');
     const options = parseArgumentsIntoOptions(args);
     const appRoot = process.env.PWD;
@@ -206,8 +207,8 @@ export async function cli(args) {
                         // if we use a global config
                         if (getGlobalConfig()) {
                             log(DEBUG, 'Using Global Connection Configuration...');
-                            // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
-                            fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
+                            // console.log((global as any).PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
+                            fs.copyFileSync((global as any).PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
                             if (!isGlobalOauthDefined()) {
                                 const PROPM = require('./build/property-file-management');
                                 PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
@@ -216,7 +217,7 @@ export async function cli(args) {
 
                         } else {
                             log(DEBUG, 'Using Local Connection Configuration...');
-                            fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
+                            fs.copyFileSync((global as any).PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
                             log(INFO, 'Created New TIBCO Cloud Property file ' + colors.green('(Using LOCAL configuration)') + ': ' + colors.blue(cwdir + '/' + propFileName));
                             await updateRegion(propFileName);
                             await updateCloudLogin(propFileName, true);
@@ -269,9 +270,9 @@ export async function cli(args) {
     if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
         // Start the specified Task
         if (projectManagementMode) {
-            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Tasks');
+            if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' BEFORE Loading Tasks');
             require('./tasks');
-            if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Loading Tasks');
+            if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' AFTER Loading Tasks');
         } else {
             require('./manage-application');
         }

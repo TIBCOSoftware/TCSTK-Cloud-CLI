@@ -67,7 +67,7 @@ export async function showHelpOnTask(task) {
         }
     } catch (err) {
         const hFile = 'docs/tasks/' + task + '.md';
-        if (doesFileExist(global.PROJECT_ROOT + hFile)) {
+        if (doesFileExist((global as any).PROJECT_ROOT + hFile)) {
             log(WARNING, 'Offline Help: ')
             displayMDFile(hFile);
         } else {
@@ -109,6 +109,6 @@ function getAndListTasks() {
 // Function to display an MD File in the Console
 function displayMDFile(mdFile) {
     const fs = require('fs');
-    const mdFileContent = fs.readFileSync(global.PROJECT_ROOT + mdFile, 'utf8');
+    const mdFileContent = fs.readFileSync((global as any).PROJECT_ROOT + mdFile, 'utf8');
     console.log(ECHOMD(mdFileContent));
 }

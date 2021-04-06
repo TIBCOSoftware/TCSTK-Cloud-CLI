@@ -22,7 +22,7 @@ import {
 } from "./build/common-functions";
 
 require('./build/common-functions');
-if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
+if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;
 const colors = require('colors');
 // Constants
@@ -107,7 +107,7 @@ export function loadTaskDesc(category) {
             }
         }
     }
-    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
+    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' After task descriptions');
 }
 
 //Main Cloud CLI Questions
@@ -115,7 +115,7 @@ export async function promptTask(stDir, cwdDir) {
     const inquirer = require('inquirer');
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
-    return new Promise(function (resolve) {
+    return new Promise<void>(function (resolve) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - ' + colors.blue(getRegion(true, true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
         // If there is an org, show it
