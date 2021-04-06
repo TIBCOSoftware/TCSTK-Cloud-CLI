@@ -753,6 +753,7 @@ export function copyDir(fromDir, toDir) {
 export function deleteFile(file) {
     log(INFO, 'Deleting File: ' + file);
     try {
+        const fs = require('fs');
         fs.unlinkSync(file);
         //file removed
     } catch (err) {
