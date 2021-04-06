@@ -329,12 +329,12 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'validate -a case_in_state:123:crap')).toBe(false);
 
         // TODO: this test is a bit specific to the environment, when available upload a file first.
-        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:datasources:CallcenterExample.csv')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_exist:datasources')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_exist:datasourcesNotExists')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:datasources')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:datasources:CallcenterExampleNotExist.csv')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:datasourcesNotExists:CallcenterExample.csv')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:discoverapp_assets:ic-documentation.svg')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_exist:discoverapp_assets')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_exist:discoverapp_assetsNotExists')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:discoverapp_assets')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:discoverapp_assets:ic-documentationNotExist.svg')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:discoverapp_assetsNotExists:ic-documentation.svg')).toBe(false);
         // validate -a Org_Folder_And_File_exist:datasources:CallcenterExample.csv
         // TODO: Look at other validations
         // tcli validate -a LiveApps_app_exist,Discovercompliance+Discoverimprovement+Discoveranalysis
