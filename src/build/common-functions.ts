@@ -3,6 +3,7 @@
 const globalTCpropFolder = __dirname + '/../../../common/';
 const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
 const colors = require('colors');
+const _ = require('lodash');
 
 // Display opening
 export function displayOpeningMessage() {
@@ -34,24 +35,24 @@ export function displayGlobalConnectionConfig() {
         //file exists
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         let passType = "STORED IN PLAIN TEXT !";
-        if (indexObj(propsG, 'CloudLogin.pass') === "") {
+        if (_.get(propsG, 'CloudLogin.pass') === "") {
             passType = "NOT STORED";
         }
-        if (indexObj(propsG, 'CloudLogin.pass').charAt(0) === '#' || indexObj(propsG, 'CloudLogin.pass').startsWith('@#')) {
+        if (_.get(propsG, 'CloudLogin.pass').charAt(0) === '#' || _.get(propsG, 'CloudLogin.pass').startsWith('@#')) {
             passType = "OBFUSCATED";
         }
         log(INFO, 'Global Connection Configuration:');
         const globalConfig = {
-            "CLOUD REGION": indexObj(propsG, 'CloudLogin.Region'),
-            "EMAIL": indexObj(propsG, 'CloudLogin.email'),
-            "CLIENT ID": indexObj(propsG, 'CloudLogin.clientID'),
+            "CLOUD REGION": _.get(propsG, 'CloudLogin.Region'),
+            "EMAIL": _.get(propsG, 'CloudLogin.email'),
+            "CLIENT ID": _.get(propsG, 'CloudLogin.clientID'),
             "PASSWORD": passType,
-            "OAUTH TOKEN NAME": indexObj(propsG, 'CloudLogin.OAUTH_Generate_Token_Name')
+            "OAUTH TOKEN NAME": _.get(propsG, 'CloudLogin.OAUTH_Generate_Token_Name')
         };
         console.table(globalConfig);
         if (isGlobalOauthDefined()) {
             log(INFO, 'Global OAUTH Configuration:');
-            parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), true);
+            parseOAUTHToken(_.get(propsG, 'CloudLogin.OAUTH_Token'), true);
         } else {
             log(INFO, 'No Global OAUTH Configuration Set...');
         }
@@ -67,10 +68,10 @@ export function displayGlobalConnectionConfig() {
 export function isGlobalOauthDefined() {
     if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
-        if (indexObj(propsG, 'CloudLogin.OAUTH_Token') === undefined) {
+        if (_.get(propsG, 'CloudLogin.OAUTH_Token') === undefined) {
             return false;
         } else {
-            return Object.keys(parseOAUTHToken(indexObj(propsG, 'CloudLogin.OAUTH_Token'), false)).length !== 0;
+            return Object.keys(parseOAUTHToken(_.get(propsG, 'CloudLogin.OAUTH_Token'), false)).length !== 0;
         }
     } else {
         return false;
@@ -131,7 +132,8 @@ export async function updateGlobalConnectionConfig() {
     await updateCloudLogin(GLOBALPropertyFileName, false, true, defClientID, defEmail);
 }
 
-// Function to get an indexed object wiht a String
+// Function to get an indexed object with a String
+/*
 export function indexObj(obj, is, value?) {
     if (typeof is == 'string')
         return indexObj(obj, is.split('.'), value);
@@ -141,7 +143,7 @@ export function indexObj(obj, is, value?) {
         return obj;
     else
         return indexObj(obj[is[0]], is.slice(1), value);
-}
+}*/
 
 // 
 let globalProperties;
@@ -170,7 +172,7 @@ export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
     let re = null;
     if (propsGl != null) {
         try {
-            re = indexObj(propsGl, propName);
+            re = _.get(propsGl, propName);
         } catch (e) {
             log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
             process.exit(1);
@@ -182,7 +184,7 @@ export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
                     globalProperties = require('properties-reader')(GLOBALPropertyFileName).path();
                 }
                 try {
-                    re = indexObj(globalProperties, propName);
+                    re = _.get(globalProperties, propName);
                 } catch (e) {
                     log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
                     process.exit(1);
@@ -428,8 +430,6 @@ export async function askMultipleChoiceQuestionSearch(question, options) {
 }
 
 //User interaction
-const _F = require('lodash');
-
 export function searchAnswerF(answers, input) {
     const fuzzyF = require('fuzzy');
     input = input || '';
@@ -441,7 +441,7 @@ export function searchAnswerF(answers, input) {
                     return el.original;
                 })
             );
-        }, _F.random(30, 60));
+        }, _.random(30, 60));
     });
 }
 
@@ -642,7 +642,7 @@ export function addOrUpdateProperty(location, property, value, comment?, checkFo
     if (doCheckForGlobal && location === LOCALPropertyFileName && doesFileExist(GLOBALPropertyFileName)) {
         // We are updating the local prop file
         const localProps = require('properties-reader')(LOCALPropertyFileName).path();
-        if (indexObj(localProps, property) === 'USE-GLOBAL') {
+        if (_.get(localProps, property) === 'USE-GLOBAL') {
             location = GLOBALPropertyFileName;
             log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
         }
@@ -846,9 +846,9 @@ export function createTable(arrayObject, config, doShowTable) {
         for (let conf of config.entries) {
             if (conf.format && conf.format.toLowerCase() === 'date') {
                 const options:any = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-                tableRow[conf.header] = new Date(_F.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
+                tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
             } else {
-                tableRow[conf.header] = _F.get(arrayObject[element], conf.field);
+                tableRow[conf.header] = _.get(arrayObject[element], conf.field);
             }
         }
         tableObject[rowNumber] = tableRow;
@@ -1123,7 +1123,7 @@ export function upgradeToV2(isGlobal, propFile) {
             newORG = 'USE-GLOBAL';
         }
     }
-    let pass = indexObj(propsTemp, 'CloudLogin.pass');
+    let pass = _.get(propsTemp, 'CloudLogin.pass');
     if (pass && pass !== '' && pass !== 'USE-GLOBAL' && !pass.startsWith('@#')) {
         const fus = require('./fuzzy-search.js');
         if (pass.startsWith('#')) {

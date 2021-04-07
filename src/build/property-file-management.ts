@@ -16,7 +16,6 @@ import {
     getPEXConfig,
     getProp,
     getPropFileName,
-    indexObj,
     INFO,
     isOauthUsed,
     iterateTable,
@@ -30,6 +29,7 @@ const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
 const LA = require('./live-apps');
 const colors = require('colors');
+const _ = require('lodash');
 
 // Get a list of all the organizations
 async function getOrganizations() {
@@ -254,7 +254,7 @@ export async function updateProperty() {
         if (doesFileExist(getGLOBALPropertyFileName())) {
             // We are updating the local prop file
             const localProps = require('properties-reader')(getPropFileName()).path();
-            if (indexObj(localProps, pName) === 'USE-GLOBAL') {
+            if (_.get(localProps, pName) === 'USE-GLOBAL') {
                 // location = GLOBALPropertyFileName;
                 const propToUse = await askMultipleChoiceQuestion('Found USE-GLOBAL for property: ' + pName + '. Do you want to update the GLOBAL or the LOCAL property file ?', ['GLOBAL', 'LOCAL']);
                 checkForGlobal = 'global' === propToUse.toLowerCase();

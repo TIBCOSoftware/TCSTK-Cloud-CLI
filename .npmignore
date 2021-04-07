@@ -41,3 +41,4 @@
 # swagger Tmp folder
 /swaggerTmp/**
 
+/ts-out

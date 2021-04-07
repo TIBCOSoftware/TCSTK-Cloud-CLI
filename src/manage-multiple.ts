@@ -3,7 +3,7 @@ import {
     addOrUpdateProperty, askMultipleChoiceQuestionSearch,
     askQuestion,
     createTableValue, DEBUG, ERROR,
-    getMultipleOptions, indexObj, INFO,
+    getMultipleOptions, INFO,
     iterateTable,
     log,
     parseOAUTHToken,
@@ -13,6 +13,7 @@ import {
 require('./build/common-functions');
 let mFile = '';
 const colors = require('colors');
+const _ = require('lodash');
 
 
 // Function to process the multiple property file
@@ -345,7 +346,7 @@ function getMProp(property, propFileName?) {
     }
     let re;
     if (propsM != null) {
-        re = indexObj(propsM, property);
+        re = _.get(propsM, property);
         if (re != null) {
             re = replaceDollar(re);
         }
@@ -383,7 +384,7 @@ function getPropFromFile(property, file) {
     log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
     const PropertiesReader = require('properties-reader');
     const propsToGet = PropertiesReader(file).path();
-    const re = indexObj(propsToGet, property);
+    const re = _.get(propsToGet, property);
     log(DEBUG, 'Returning Property(' + property + '): ', re);
     return re;
 }

@@ -1,4 +1,4 @@
-// #!/usr/bin/env node
+#!/usr/bin/env ts-node
 (global as any).TIME = new Date();
 (global as any).SHOW_START_TIME = false;
 (global as any).PROJECT_ROOT = __dirname + '/../../';
