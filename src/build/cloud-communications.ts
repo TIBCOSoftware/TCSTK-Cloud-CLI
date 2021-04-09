@@ -8,8 +8,9 @@ import {
     setOrganization, setProperty,
     WARNING
 } from "./common-functions";
-
-require('./common-functions');
+import {Global} from "../models/base";
+declare var global: Global;
+// require('./common-functions');
 const colors = require('colors');
 const cloudConfig = require('../config/config-cloud.json');
 // TODO: if Cloud_Location provided replace |cloud.tibco.com|
@@ -466,13 +467,13 @@ function readableSize(sizeBytes) {
 // Function to show claims for the configured user
 export async function showCloudInfo(showTable, showSandbox) {
     const doShowSandbox = showSandbox || false;
-    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' BEFORE Show Cloud');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
     }
     const response = await callTCA(clURI.claims);
-    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' After Show Cloud');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud');
     let nvs = createTableValue('REGION', getRegion());
     nvs = createTableValue('ORGANIZATION', getOrganization(), nvs);
     nvs = createTableValue('FIRST NAME', response.firstName, nvs);
@@ -488,7 +489,7 @@ export async function showCloudInfo(showTable, showSandbox) {
     if (doShowTable) {
         console.table(nvs);
     }
-    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' Final Show Cloud');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
 }
 
 // TODO: What to do with passwords and where is this used ?

@@ -20,9 +20,10 @@ import {
     updateGlobalConnectionConfig, updateRegion,
     upgradeToV2
 } from "./build/common-functions";
-
-require('./build/common-functions');
-if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' AFTER Common');
+import {Global} from "./models/base";
+declare var global: Global;
+// require('./build/common-functions');
+if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;
 const colors = require('colors');
 // Constants
@@ -107,7 +108,7 @@ export function loadTaskDesc(category) {
             }
         }
     }
-    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' After task descriptions');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
 }
 
 //Main Cloud CLI Questions

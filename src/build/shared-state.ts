@@ -9,6 +9,7 @@ import {
     pexTable,
     run, WARNING
 } from "./common-functions";
+import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
 const CCOM = require('./cloud-communications');
 const LA = require('./live-apps');
@@ -121,7 +122,7 @@ export async function getSharedState(showTable) {
         sTemp['SCOPE'] = sState[state].scope;
         sTemp['CREATED BY'] = sState[state].createdByName;
         const created = new Date(sState[state].createdDate);
-        const options: any = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+        const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
         sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
         sTemp['MODIFIED BY'] = sState[state].modifiedByName;
         const modified = new Date(sState[state].modifiedDate);

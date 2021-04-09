@@ -10,6 +10,8 @@ import {
     logLine,
     pexTable
 } from "./common-functions";
+import {Global} from "../models/base";
+declare var global: Global;
 
 const CCOM = require('./cloud-communications');
 const colors = require('colors');
@@ -198,7 +200,7 @@ export async function listSpotfire() {
             }
             await listOnType(typeToSearch, typeForSearch);
         }
-        if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), 'After SF List');
+        if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }

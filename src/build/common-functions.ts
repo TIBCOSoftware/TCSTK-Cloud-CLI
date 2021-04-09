@@ -1,5 +1,8 @@
 // This file does not depend on any other files
 // All inputs are provided as input to the functions
+import {Global} from "../models/base";
+import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+declare var global: Global;
 const globalTCpropFolder = __dirname + '/../../../common/';
 const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
 const colors = require('colors');
@@ -108,10 +111,10 @@ export async function updateGlobalConnectionConfig() {
     // Check if the global propfile exists, if not create one
     if (!doesFileExist(GLOBALPropertyFileName)) {
         // Create Global config from template
-        copyFile((global as any).PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName);
+        copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName);
     }
     if (!doesFileExist(globalTCpropFolder + 'package.json')) {
-        copyFile((global as any).PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json');
+        copyFile(global.PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json');
         log(INFO, 'Inserted package.json...');
     }
     // Get Cloud Environment
@@ -132,20 +135,6 @@ export async function updateGlobalConnectionConfig() {
     await updateCloudLogin(GLOBALPropertyFileName, false, true, defClientID, defEmail);
 }
 
-// Function to get an indexed object with a String
-/*
-export function indexObj(obj, is, value?) {
-    if (typeof is == 'string')
-        return indexObj(obj, is.split('.'), value);
-    else if (is.length === 1 && value !== undefined)
-        return obj[is[0]] = value;
-    else if (is.length === 0)
-        return obj;
-    else
-        return indexObj(obj[is[0]], is.slice(1), value);
-}*/
-
-// 
 let globalProperties;
 let LOCALPropertyFileName;
 let propsGl;
@@ -179,24 +168,12 @@ export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
         }
         log(DEBUG, 'Returning Property: ', re);
         if (re === 'USE-GLOBAL') {
-            if (doesFileExist(GLOBALPropertyFileName)) {
-                if (globalProperties == null || forceGlobalRefresh) {
-                    globalProperties = require('properties-reader')(GLOBALPropertyFileName).path();
-                }
-                try {
-                    re = _.get(globalProperties, propName);
-                } catch (e) {
-                    log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
-                    process.exit(1);
-                }
-                log(DEBUG, 'Got Property From Global: ', re);
-            } else {
-                log(DEBUG, 'No Global Configuration Set...');
-                return false;
-            }
+            re = getPropertyFromGlobal(propName, forceGlobalRefresh);
         }
     } else {
-        log(ERROR, 'Property file not set yet...')
+        log(DEBUG, 'Local Property file not set yet, trying to get it from global');
+        // No local property file, try to get it from global
+        re = getPropertyFromGlobal(propName, forceGlobalRefresh);
     }
     if (re && propName === 'CloudLogin.OAUTH_Token') {
         const key = 'Token:';
@@ -212,6 +189,27 @@ export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
     log(DEBUG, 'Returning Property [END]: ', re);
     return re;
 }
+
+function getPropertyFromGlobal(propName, forceGlobalRefresh) {
+    let re = null;
+    if (doesFileExist(GLOBALPropertyFileName)) {
+        if (globalProperties == null || forceGlobalRefresh) {
+            globalProperties = require('properties-reader')(GLOBALPropertyFileName).path();
+        }
+        try {
+            re = _.get(globalProperties, propName);
+        } catch (e) {
+            log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
+            process.exit(1);
+        }
+        log(DEBUG, 'Got Property From Global: ', re);
+    } else {
+        log(DEBUG, 'No Global Configuration Set...');
+        return false;
+    }
+    return re;
+}
+
 
 export function parseOAUTHToken(stringToken, doLog) {
     let showLog = doLog || false;
@@ -336,7 +334,7 @@ export async function createMultiplePropertyFile() {
     }
     if (doWrite) {
         log(INFO, 'Creating new multiple property file: ' + mPropFileName);
-        copyFile((global as any).PROJECT_ROOT + 'templates/multiple.properties', targetFile);
+        copyFile(global.PROJECT_ROOT + 'templates/multiple.properties', targetFile);
         //'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
         log(INFO, 'Now configure the multiple property file and then run "' + colors.blue('tcli -m') + '" (for default file name) \nor "' + colors.blue('tcli -m <propfile name> [-j <job-name> -e <environment-name>]') + '" to execute...');
         log(INFO, 'Or run "' + colors.blue('tcli -i') + '" to interact with multiple cloud environments...');
@@ -672,7 +670,7 @@ export function addOrUpdateProperty(location, property, value, comment?, checkFo
                 }
             }
             let dataForFile = '';
-            for (let lineN = 0; dataLines < dataLines.length; lineN++) {
+            for (let lineN = 0; lineN < dataLines.length; lineN++) {
                 if (lineN !== (dataLines.length - 1)) {
                     dataForFile += dataLines[lineN] + '\n';
                 } else {
@@ -681,10 +679,17 @@ export function addOrUpdateProperty(location, property, value, comment?, checkFo
                 }
             }
             if (propFound) {
-                if (property != 'CloudLogin.clientID') {
-                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
-                } else {
+                let doLog = true;
+                if (property === 'CloudLogin.clientID') {
                     log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow('[NEW CLIENT ID]') + ' (in:' + location + ')');
+                    doLog = false;
+                }
+                if (property === 'CloudLogin.OAUTH_Token') {
+                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow('[NEW OAUTH TOKEN]') + ' (in:' + location + ')');
+                    doLog = false;
+                }
+                if (doLog){
+                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
                 }
             } else {
                 // append prop to the end.
@@ -845,7 +850,7 @@ export function createTable(arrayObject, config, doShowTable) {
         //log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
         for (let conf of config.entries) {
             if (conf.format && conf.format.toLowerCase() === 'date') {
-                const options:any = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+                const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
                 tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
             } else {
                 tableRow[conf.header] = _.get(arrayObject[element], conf.field);
@@ -1197,7 +1202,7 @@ function createPropINE(isGlobal, propFile, propName, value, comment) {
     }
 }
 
-if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), 'BEFORE Check for Global Upgrade');
+if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade');
 
 export function checkGlobalForUpgrade() {
     if (doesFileExist(GLOBALPropertyFileName)) {
@@ -1207,7 +1212,7 @@ export function checkGlobalForUpgrade() {
             upgradeToV2(true, GLOBALPropertyFileName);
         }
     }
-    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), 'AFTER Check for Global Upgrade');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'AFTER Check for Global Upgrade');
 }
 
 checkGlobalForUpgrade();

@@ -8,6 +8,8 @@ import {
     logLine, mkdirIfNotExist,
     pexTable, sleep
 } from "./common-functions";
+import {Global} from "../models/base";
+declare var global: Global;
 
 const CCOM = require('./cloud-communications');
 //TODO Possibly circular dependency ???
@@ -283,7 +285,7 @@ export async function createLAImportFile() {
         mkdirIfNotExist(CASE_FOLDER);
         mkdirIfNotExist(importFolder);
         log(INFO, 'Creating new Live Aps Import Configuration file: ' + impConfFileName);
-        copyFile((global as any).PROJECT_ROOT + 'templates/import-live-apps-data-configuration.json', targetFile);
+        copyFile(global.PROJECT_ROOT + 'templates/import-live-apps-data-configuration.json', targetFile);
         // log(INFO, 'Now configure the multiple propety file and then run "\x1b[34mtcli -m\033[0m" (for default propety name) or "\x1b[34mtcli -m <propfile name>\033[0m" to execute...');
     }
 }

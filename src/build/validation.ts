@@ -6,6 +6,8 @@ import {
     iterateTable,
     log
 } from "./common-functions";
+import {Global} from "../models/base";
+declare var global: Global;
 
 const colors = require('colors');
 const LA = require('./live-apps');
@@ -18,7 +20,7 @@ const CS = require('./cloud-starters');
 // Function, that does all sorts of validations
 export async function validate() {
     //console.log('Validate ',new Date());
-    if ((global as any).SHOW_START_TIME) console.log((new Date()).getTime() - (global as any).TIME.getTime(), ' Validate');
+    if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
     // TODO: Add; case_folder_exist,
     const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_Exist', 'Case_Not_Exist', 'Case_In_State'];
     const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();

@@ -6,6 +6,8 @@ import {
     replaceInFile, run, setLogDebug, setProperty,
     updateGlobalConnectionConfig
 } from "./build/common-functions";
+import {Global} from "./models/base";
+declare var global: Global;
 
 require('./build/common-functions');
 const configApp = require('./config/config-template.json');
@@ -97,7 +99,7 @@ function createNewStarter(name, template, doStart) {
             }
         }
     } else {
-        const fromDir = (global as any).PROJECT_ROOT + template.templateFolder;
+        const fromDir = global.PROJECT_ROOT + template.templateFolder;
         copyDir(fromDir, toDir);
     }
     try {

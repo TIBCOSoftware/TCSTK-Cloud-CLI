@@ -12,6 +12,7 @@ import {
     logLine, mkdirIfNotExist, npmInstall,
     pexTable, run, WARNING
 } from "./common-functions";
+import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
@@ -232,7 +233,7 @@ export async function showAvailableApps(showTable) {
             }
             appTemp['LATEST DEPLOYED'] = latestDeployed;
             const created = new Date(response[app].creationDate);
-            const options:any = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
             const optionsT = {hour: 'numeric'};
             appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
             //appTemp['CREATED TIME'] = created.toLocaleTimeString();
