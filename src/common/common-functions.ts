@@ -601,7 +601,13 @@ export function translateAWSRegion(awsRegion) {
 
 // Gets region (in Capitals)
 export function getRegion(forceRefresh?, forceGlobalRefresh?) {
-    return getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh).toString().toUpperCase();
+    const re = getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh);
+    if(re){
+        return re.toString().toUpperCase();
+    } else {
+        log(ERROR, 'Region not specified, please set the CloudLogin.Region property...');
+        process.exit(1);
+    }
 }
 
 export function updateTCLI() {
@@ -1081,7 +1087,7 @@ export function log(level, ...message) {
             if (level === WARNING) {
                 console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
             } else {
-                console.log(colors.magenta('TIBCO CLOUD CLI] (' + level + ') '), ...message);
+                console.log(colors.magenta('TS TIBCO CLOUD CLI] (' + level + ') '), ...message);
             }
         }
     }

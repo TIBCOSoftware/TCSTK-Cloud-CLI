@@ -211,7 +211,7 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'undo-lib-sources')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'get-cloud-libs-from-git')).toBe(true);
-        // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'tenants')).toBe(true);
+        // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
     });
 
     // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Form and Schematics'
@@ -233,11 +233,11 @@ describe("tcli testsuite", function () {
     it("TEMPLATE: Analytics Template and Schematics", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true);
-        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'tenants-deploy')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-cloud-starter')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy-cloud-starter')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + CSName + ':YES')).toBe(true);
     });
-
 
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Generate files'
     it("TCLI: Generate files", function () {
@@ -378,12 +378,11 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-tci-apps')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a ')).toBe(false);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a NONE')).toBe(true);
-        /* TODO: Uncomment for Jenkins, this only works on Jenkins server */
+        /* Comment for Local, this only works on Jenkins server */
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:my_manifest.json:my_other_flogo.json')).toBe(true);
-        // discover_backend_service
     });
 
     // Shared State Testcases
@@ -467,7 +466,7 @@ describe("tcli testsuite", function () {
         require('./../../ts-out/build/tables');
     });
 
-    // Fail on purpose (to block tenants pipeline)
+    // Fail on purpose (to block build pipeline)
     // jasmine --config=test/support/jasmine.json --filter='FAIL'
     xit("FAIL", function () {
         expect(false).toBe(true);
