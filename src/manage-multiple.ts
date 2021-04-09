@@ -1,14 +1,27 @@
 // This file manages the applications
-require('./build/common-functions');
+import {
+    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTableValue, DEBUG, ERROR,
+    getMultipleOptions, INFO,
+    iterateTable,
+    log,
+    parseOAUTHToken,
+    run, trim, WARNING
+} from "./common/common-functions";
+import {TCLITask} from "./models/tcli-models";
+
+require('./common/common-functions');
 let mFile = '';
 const colors = require('colors');
+const _ = require('lodash');
 
 
 // Function to process the multiple property file
 // processMultipleFile = function (propfileName) {
-processMultipleFile = function () {
+export function processMultipleFile() {
     // setLogDebug('true');
-    let mOpts = getMultipleOptions();
+    let mOpts:any = getMultipleOptions();
     mFile = mOpts.name;
     // log(INFO, '- Managing Multiple, Using file: ' + mFile);
     // Go Over All Cloud Starter Jobs
@@ -74,7 +87,7 @@ processMultipleFile = function () {
         }
         log(INFO, logS + ' Environments: ' + environments);
         const environmentsA = environments.split(',');
-        // TODO: Allow for a pre environment command (like git pulls or build)
+        // TODO: Allow for a pre environment command (like git pulls or tenants)
         for (var j = 0; j < environmentsA.length; j++) {
             const currentEnvironment = trim(environmentsA[j]);
             const logSE = logS + colors.green(' [JOB: ' + currentEnvironment + '] ');
@@ -98,7 +111,7 @@ processMultipleFile = function () {
                     let taskType = '';
                     let task = '';
 
-                    let tObj = {};
+                    let tObj:any = {};
                     try {
                         tObj = JSON.parse(jTask);
                     } catch (e) {
@@ -166,9 +179,9 @@ processMultipleFile = function () {
 
 const TCLI_INTERACTVIE = 'tcli-interactive';
 
-multipleInteraction = async function () {
+export async function multipleInteraction() {
     const PropertiesReader = require('properties-reader');
-    let mOpts = getMultipleOptions();
+    let mOpts:any = getMultipleOptions();
     mFile = mOpts.name;
     let failOnError = getMProp('Fail_On_Error');
     if (failOnError == null) {
@@ -216,7 +229,7 @@ multipleInteraction = async function () {
                         eRow['AUTHENTICATION TYPE'] = 'CLIENT ID';
                     }
                 }
-                //TODO: Pick up OAUTH
+                // Pick up OAUTH
                 if (curProps.CloudLogin.OAUTH_Token) {
                     if (curProps.CloudLogin.OAUTH_Token.trim() !== '') {
                         eRow['AUTHENTICATION TYPE'] = 'OAUTH';
@@ -264,9 +277,7 @@ multipleInteraction = async function () {
             displayTask = TCLI_INTERACTVIE;
         } else {
             if (chosenEnv === 'CHANGE TASK') {
-                const cliTaskConfigCLI = require('./config/config-cli-task.json');
-                let cTsks = cliTaskConfigCLI.cliTasks;
-
+                const cTsks = require('./config/config-cli-task.json').cliTasks as TCLITask[];
                 const taskDescription = [TCLI_INTERACTVIE];
                 const taskTarget = [''];
                 for (let cliTask in cTsks) {
@@ -286,7 +297,6 @@ multipleInteraction = async function () {
             } else {
                 // 5. Execute the task, when it was none go back directly when it was a task have pause message before displaying the table again
                 let propFileToUse = '';
-
                 for (let envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber];
                     let command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask;
@@ -314,7 +324,7 @@ multipleInteraction = async function () {
 let propsM;
 let fileExtension = '';
 
-getMProp = function (property, propFileName) {
+function getMProp(property, propFileName?) {
     let propFileToUse = mFile;
     if (propFileName && propFileName.trim() != null) {
         propFileToUse = propFileName;
@@ -334,7 +344,7 @@ getMProp = function (property, propFileName) {
     }
     let re;
     if (propsM != null) {
-        re = indexObj(propsM, property);
+        re = _.get(propsM, property);
         if (re != null) {
             re = replaceDollar(re);
         }
@@ -345,8 +355,7 @@ getMProp = function (property, propFileName) {
     return re;
 }
 
-
-replaceDollar = function (content) {
+function replaceDollar(content) {
     if (content.includes('${') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('${') + 2, content.indexOf('${') + 2 + content.substring(content.indexOf('${') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: ' + subProp);
@@ -357,7 +366,7 @@ replaceDollar = function (content) {
     return content;
 }
 
-replaceAtSign = function (content, propFile) {
+function replaceAtSign(content, propFile) {
     if (content.includes('@{') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
@@ -368,11 +377,11 @@ replaceAtSign = function (content, propFile) {
     return content;
 }
 
-getPropFromFile = function (property, file) {
+function getPropFromFile(property, file) {
     log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
     const PropertiesReader = require('properties-reader');
     const propsToGet = PropertiesReader(file).path();
-    const re = indexObj(propsToGet, property);
+    const re = _.get(propsToGet, property);
     log(DEBUG, 'Returning Property(' + property + '): ', re);
     return re;
 }

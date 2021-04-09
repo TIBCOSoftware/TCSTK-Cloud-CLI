@@ -272,6 +272,7 @@
       "description": "Change the Region in the cloud-properties file",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": false,
       "task": "changeRegion",
       "taskAlternativeNames": [
         "change-region","cr"
@@ -285,6 +286,7 @@
       "description": "Shows the Cloud Organization and potentially more details",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": true,
       "task": "showOrganizationWrapper",
       "taskAlternativeNames": [
         "show-organizations","show-orgs"

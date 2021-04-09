@@ -1,11 +1,26 @@
-const CCOM = require('./cloud-communications');
+import {
+    askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTable,
+    DEBUG, ERROR, getCurrentRegion, getOrganization,
+    getPEXConfig,
+    INFO,
+    isOauthUsed,
+    log,
+    logLine,
+    pexTable
+} from "../common/common-functions";
+import {Global} from "../models/base";
+declare var global: Global;
+
+const CCOM = require('../common/cloud-communications');
 const colors = require('colors');
 
 let jSession;
 let xSRF;
 
 
-async function callSpotfire(url, doLog, conf) {
+async function callSpotfire(url, doLog, conf?) {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
     if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
         if (!jSession || !xSRF) {

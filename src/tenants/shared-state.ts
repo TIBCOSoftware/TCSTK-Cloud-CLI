@@ -1,4 +1,17 @@
-const CCOM = require('./cloud-communications');
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch,
+    askQuestion, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
+    getPropFileName,
+    INFO,
+    log,
+    logLine, mkdirIfNotExist,
+    pexTable,
+    run, WARNING
+} from "../common/common-functions";
+import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+
+const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');
 
@@ -109,7 +122,7 @@ export async function getSharedState(showTable) {
         sTemp['SCOPE'] = sState[state].scope;
         sTemp['CREATED BY'] = sState[state].createdByName;
         const created = new Date(sState[state].createdDate);
-        const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+        const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
         sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
         sTemp['MODIFIED BY'] = sState[state].modifiedByName;
         const modified = new Date(sState[state].modifiedDate);
@@ -168,7 +181,7 @@ export async function showSharedStateDetails() {
     const sStateList = await getSharedState(true);
     if (sStateList.length > 0) {
         // Pick Item from the list
-        let selectedState = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
+        let selectedState: any = await selectSharedState(sStateList, 'Which Shared State do you like to get the Details from ?');
         // Show details on the item
         log(INFO, 'CONTEXT:' + selectedState.name + ' (' + selectedState.id + ')\n', selectedState, '\n------------------------------');
         log(INFO, 'JSON CONTENT: ' + selectedState.name + ' (' + selectedState.id + ')\n', JSON.parse(selectedState.content.json), '\n------------------------------');
@@ -217,7 +230,7 @@ export async function removeSharedStateEntry() {
     const sStateList = await getSharedState(true);
     if (sStateList.length > 0) {
         // Pick Item from the list
-        let selectedState = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
+        let selectedState: any = await selectSharedState(sStateList, 'Which Shared State would you like to remove ?');
         log(INFO, 'Removing Shared State: ' + selectedState.name + ' (' + selectedState.id + ')');
         // Ask if you really want to delete the selected shared state entry
         let decision = 'YES';
@@ -271,7 +284,7 @@ export async function clearSharedState() {
 
 
 // Export the Shared state filter to a folder
-export async function exportSharedState(verbose) {
+export async function exportSharedState(verbose?) {
     let reNumberOfStates = 0;
     let doVerbose = verbose || false;
     // Show Shared State List
@@ -332,7 +345,7 @@ async function importSharedStateFile(ssFile) {
     log(DEBUG, 'Importing: ' + ssFile);
     const fs = require('fs');
     const contentContextFile = fs.readFileSync(ssFile).toString();
-    let ssObject = {};
+    let ssObject: any = {};
     try {
         ssObject = JSON.parse(contentContextFile);
     } catch (e) {
@@ -442,7 +455,7 @@ let ignoreChanges = 0;
 //A shared state watcher (every time the file changes, the shared state is updated)
 export function watchSharedState() {
     const chokidar = require('chokidar');
-    return new Promise(async function (resolve) {
+    return new Promise<void>(async function (resolve) {
         //Do the login now, so it does not have to be done later
         await prepSharedStateProps();
         await CCOM.cLogin();

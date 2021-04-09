@@ -53,6 +53,8 @@ describe("tcli testsuite", function () {
         // "update-tcli"
 
     });
+    // BASIC CLI TASKS: jasmine --config=test/support/jasmine.json --filter='TCLI:'
+
 
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Basic Operations'
     // Show cloud with Basic Authentication
@@ -155,7 +157,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-cases')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-actions -a none')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-live-apps-actions -a all')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'show-actions -a Discoveranalysis')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-actions -a Discovercompliance')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-actions -a NOT_Exists')).toBe(false);
 
     });
@@ -231,11 +233,11 @@ describe("tcli testsuite", function () {
     it("TEMPLATE: Analytics Template and Schematics", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true);
-        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-deploy')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-cloud-starter')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy-cloud-starter')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + CSName + ':YES')).toBe(true);
     });
-
 
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Generate files'
     it("TCLI: Generate files", function () {
@@ -292,10 +294,6 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:FAKE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(false);
 
-
-
-
-
     });
 
 
@@ -306,14 +304,14 @@ describe("tcli testsuite", function () {
         // TODO: Allow for NONE
         // TODO: Allow for All
         // TODO: Allow for default on name input
-        expect(run(CLI_EXECUTOR + 'export-live-apps-case-type -a Discoveranalysis:Discoveranalysis.json')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'export-live-apps-case-type -a Discovercompliance:Discovercompliance.json')).toBe(true);
         // TODO: Allow for NONE
         // TODO: Allow for All
 
-        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discoveranalysis:DiscoFOLDER/')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discovercompliance:DiscoFOLDER/')).toBe(true);
         // Allow for default on folder input
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:Case_Folder:none:./Cases (~{ORGAniZAtION})/"')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discoveranalysis:DEFAULT')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'export-live-apps-cases -a Discovercompliance:DEFAULT')).toBe(true);
     });
 
     // Validation Testcases
@@ -337,7 +335,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'validate -a Org_Folder_And_File_exist:discoverapp_assetsNotExists:ic-documentation.svg')).toBe(false);
         // validate -a Org_Folder_And_File_exist:datasources:CallcenterExample.csv
         // TODO: Look at other validations
-        // tcli validate -a LiveApps_app_exist,Discovercompliance+Discoverimprovement+Discoveranalysis
+        // tcli validate -a LiveApps_app_exist,Discovercompliance+Discoverimprovement+Discovercompliance
         // tcli validate -a tci_app_exist,test+graniteStateCRM
         // tcli validate -a cloud_starter_exist,labs-processmining-ui
     });
@@ -380,11 +378,11 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-tci-apps')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a ')).toBe(false);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a NONE')).toBe(true);
+        /* Comment for Local, this only works on Jenkins server */
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:my_manifest.json:my_other_flogo.json')).toBe(true);
-        // discover_backend_service
     });
 
     // Shared State Testcases
@@ -393,13 +391,13 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:SandboxID')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Test:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:AppID:none:SPECIAL:LiveApps_AppID:Discoveranalysis')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:AppID:none:SPECIAL:LiveApps_AppID:Discovercompliance')).toBe(true);
         // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:ActionID1:none:SPECIAL:LiveApps_ActionID:none')).toBe(true);
-        // expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:none"')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:New analysis"')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:Abort"')).toBe(true);
+        // expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discovercompliance:none"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discovercompliance:Raise compliance issue"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discovercompliance:Escalate"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:NOT_EXITS:Abort"')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discoveranalysis:NOT_EXISTS"')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "default:ActionID1:none:SPECIAL:LiveApps_ActionID:Discovercompliance:NOT_EXISTS"')).toBe(false);
     });
 
     // Spotfire Testcases
@@ -432,7 +430,7 @@ describe("tcli testsuite", function () {
     // FS Testcases
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Fuzzy Search'
     it("TCLI: Fuzzy Search", function () {
-        const fus = require('./../../src/build/fuzzy-search.js');
+        const fus = require('../../src/common/fuzzy-search.js');
         for (let i = 0 ; i < 1000 ; i++) {
             let randomString = generateRandomString(Math.floor(Math.random() * 100));
             expect(fus.find(fus.search(randomString)) == randomString).toBe(true);
@@ -465,13 +463,34 @@ describe("tcli testsuite", function () {
     // Show cloud with Basic Authentication
     // jasmine --config=test/support/jasmine.json --filter='table testing'
     it("table testing", function () {
-        require('./../../src/build/tables');
+        require('./../../ts-out/build/tables');
     });
 
     // Fail on purpose (to block build pipeline)
     // jasmine --config=test/support/jasmine.json --filter='FAIL'
     xit("FAIL", function () {
         expect(false).toBe(true);
+    });
+
+    // a testcase to validate the names of the cli tasks (no clashing names)
+    // jasmine --config=test/support/jasmine.json --filter='test task names'
+    it("test task names", function () {
+        const tasks = require('./../../ts-out/config/config-cli-task.json').cliTasks;
+        const taskNames = [];
+        for (let task in tasks) {
+            if(taskNames.indexOf(task) > 0){
+                fail('Duplicate Task Name: ' + task);
+            }
+            taskNames.push(task);
+            if(tasks[task].taskAlternativeNames){
+                for(tskA of tasks[task].taskAlternativeNames){
+                    if(taskNames.indexOf(tskA) > 0){
+                        fail('Duplicate Alternative Task Name: ' + tskA);
+                    }
+                    taskNames.push(tskA);
+                }
+            }
+        }
     });
 
     // TODO: Test Multiple

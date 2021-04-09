@@ -1,10 +1,23 @@
-require('./common-functions');
+import {
+    askQuestion,
+    createTableValue,
+    DEBUG, ERROR, getCurrentRegion, getOrganization, getProp, getRegion,
+    INFO,
+    isOauthUsed,
+    log, logO, obfuscatePW,
+    setOrganization, setProperty,
+    WARNING
+} from "./common-functions";
+import {Global} from "../models/base";
+import {CallConfig, MappingGroup} from "../models/tcli-models";
+declare var global: Global;
+// require('./common-functions');
 const colors = require('colors');
 const cloudConfig = require('../config/config-cloud.json');
 // TODO: if Cloud_Location provided replace |cloud.tibco.com|
 // see https://liveapps.tenant-integration.tcie.pro/webresource/apps/GatherSmart/index.html#/starterApp/splash
 export const clURI = cloudConfig.endpoints;
-export const mappings = cloudConfig.mappings;
+export const mappings = cloudConfig.mappings as MappingGroup;
 
 let loginC = null;
 let doOAuthNotify = true;
@@ -15,7 +28,7 @@ let isOrgChecked = false;
 // An HTTP request based on Axios library
 // TODO: Look at managing Axios error handling
 // https://stackoverflow.com/questions/43842711/can-i-throw-error-in-axios-post-based-on-response-status
-export async function doRequest(url, options, data) {
+export async function doRequest(url, options?, data?) {
     const axios = require('axios').default;
     axios.defaults.validateStatus = () => {
         return true;
@@ -26,7 +39,7 @@ export async function doRequest(url, options, data) {
     }
     try {
         const responseAxios = await axios(url, options);
-        const response = {};
+        const response = {} as any;
         response.body = '';
         response.statusCode = responseAxios.status;
         response.headers = responseAxios.headers;
@@ -50,7 +63,7 @@ export function doManualRequest(url, options, data) {
             res.setEncoding('utf8');
             // console.log(res);
             let responseTXT = '';
-            let response = {};
+            let response = {} as any;
             response.body = '';
             response.statusCode = res.statusCode;
             response.headers = res.headers;
@@ -86,7 +99,7 @@ export function invalidateLogin() {
     isOAUTHValid = null;
 }
 
-export async function cLogin(tenant, customLoginURL, forceClientID) {
+export async function cLogin(tenant?, customLoginURL?, forceClientID?) {
     const fClientID = forceClientID || false;
     if (isOauthUsed() && !fClientID) {
         log(DEBUG, 'Using OAUTH for Authentication...');
@@ -184,8 +197,8 @@ async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
     const response = await doRequest(encodeURI(TCbaseURL), {
         headers: header,
         method: 'POST'
-    }, postForm);
-    let re = '';
+    }, postForm) as any;
+    let re = '' as any;
     //console.log(response.body);
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg);
@@ -209,12 +222,12 @@ async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
 
 // Function to call the Tibco Cloud
 // TODO: Accept, URL, doLog and possible config
-async function callURLA(url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside, customHeaders) {
+async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant?, customLoginURL?, returnResponse?, forceOAUTH?, forceCLIENTID?, handleErrorOutside?, customHeaders?) {
     const doErrorOutside = handleErrorOutside || false;
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
     const reResponse = returnResponse || false;
-    let lCookie = {};
+    let lCookie:any = {};
     if (!fOAUTH) {
         lCookie = await cLogin(tenant, customLoginURL);
     }
@@ -235,7 +248,7 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
             body = postRequest;
         }
     }
-    let header = {};
+    let header:any = {};
     if (customHeaders) {
         header = customHeaders;
     }
@@ -271,7 +284,7 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
             log(INFO, '-    BODY: ' + body);
         }
     }
-    let response = {};
+    let response:any = {};
     if (cMethod.toLowerCase() === 'get') {
         response = await doRequest(encodeURI(url), {
             headers: header
@@ -319,7 +332,7 @@ async function callURLA(url, method, postRequest, contentType, doLog, tenant, cu
 }
 
 // Wrapper around the callURL function that takes a config object
-export async function callTCA(url, doLog, conf) {
+export async function callTCA(url:string, doLog?:boolean, conf?:CallConfig) {
     if (conf == null) {
         conf = {};
     }
@@ -335,8 +348,9 @@ export async function callTCA(url, doLog, conf) {
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
 export async function uploadToCloud(formDataType, localFileLocation, uploadFileURI) {
-    return new Promise(async function (resolve, reject) {
-        let formData = new require('form-data')();
+    return new Promise<void>(async function (resolve, reject) {
+        const fd = require('form-data');
+        let formData = new fd();
         const fs = require('fs');
         const {size: fileSize} = fs.statSync(localFileLocation);
         log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')'  + ' Filesize: ' + readableSize(fileSize));
@@ -389,7 +403,7 @@ export async function uploadToCloud(formDataType, localFileLocation, uploadFileU
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
 export async function downloadFromCloud(localFileLocation, downloadFileURI) {
-    return new Promise(async function (resolve, reject) {
+    return new Promise<void>(async function (resolve, reject) {
         const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
         log(INFO, '     DOWNLOADING: ' + colors.blue(downloadURL));
         log(INFO, '              TO: ' + colors.blue(localFileLocation));

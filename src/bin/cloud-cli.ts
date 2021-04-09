@@ -1,4 +1,6 @@
-// #!/usr/bin/env node
+// #!/usr/bin/env ts-node --project /Users/hpeters@tibco.com/WebstormProjects/TCSTK-Cloud-CLI_Typescript/tsconfig.json
+import {Global} from "../models/base";
+declare var global: Global;
 global.TIME = new Date();
 global.SHOW_START_TIME = false;
 global.PROJECT_ROOT = __dirname + '/../../';

@@ -1,7 +1,22 @@
 // Package Definitions
-const CCOM = require('./cloud-communications');
-const OAUTH = require('./oauth');
-const USERGROUPS = require('./user-groups');
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, copyDir,
+    copyFile,
+    createTableValue,
+    deleteFile,
+    deleteFolder, doesFileExist, ERROR, getCurrentRegion, getPEXConfig, getProp, getPropFileName,
+    INFO, isIterable,
+    isOauthUsed, isPortAvailable, iterateTable,
+    log,
+    logLine, mkdirIfNotExist, npmInstall,
+    pexTable, run, WARNING
+} from "../common/common-functions";
+import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+
+const CCOM = require('../common/cloud-communications');
+const OAUTH = require('../common/oauth');
+const USERGROUPS = require('../tenants/user-groups');
 const colors = require('colors');
 
 export async function start() {
@@ -90,8 +105,8 @@ export function generateCloudDescriptor() {
         let now = "";
         let buildOn = "";
         if (ADD_DESCRIPTOR_TIMESTAMP === 'YES') {
-            now = (new Date()).getTime();
-            buildOn = new Date();
+            now = (new Date()).getTime().toString();
+            buildOn = (new Date()).toString();
         }
         const pJsonObj = require('jsonfile').readFileSync(packageJson);
         let name = "";
@@ -143,7 +158,7 @@ export function buildCloudStarterZip(cloudStarter) {
         BUILD_COMMAND = getProp('BUILD_COMMAND');
     } else {
         log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
+        addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng tenants --prod )>');
     }
     const csURL = '/webresource/apps/' + cloudStarter + '/';
     deleteFile('./dist/' + cloudStarter + '.zip');
@@ -151,7 +166,7 @@ export function buildCloudStarterZip(cloudStarter) {
     if (getProp('Add_Descriptor') === 'YES') {
         generateCloudDescriptor();
     }
-    //hashrouting build configurable
+    //hashrouting tenants configurable
     let buildCommand = BUILD_COMMAND;
     let bType = 'CUSTOM';
     if (BUILD_COMMAND === 'HASHROUTING') {
@@ -218,7 +233,7 @@ export async function showAvailableApps(showTable) {
             }
             appTemp['LATEST DEPLOYED'] = latestDeployed;
             const created = new Date(response[app].creationDate);
-            const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+            const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
             const optionsT = {hour: 'numeric'};
             appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
             //appTemp['CREATED TIME'] = created.toLocaleTimeString();
@@ -330,7 +345,7 @@ export async function getAppLinks(showTable) {
             nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
             nvs = createTableValue('NAME', app.name, nvs);
             const appN = i++;
-            const tempDet = await getApplicationDetails(app.name, app.publishedVersion, false);
+            const tempDet:any = await getApplicationDetails(app.name, app.publishedVersion, false);
             logLine("Processing App: (" + appN + '/' + apps.length + ')...');
             if (isIterable(tempDet)) {
                 for (let appD of tempDet) {
@@ -379,7 +394,7 @@ export async function uploadApp(application) {
 
 // Function to publish the application to the cloud
 export async function publishApp(application) {
-    return new Promise(async function (resolve) {
+    return new Promise<void>(async function (resolve) {
         // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
         const response = await CCOM.callTCA(CCOM.clURI.app_info, false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);
@@ -414,16 +429,16 @@ export function injectLibSources() {
 // Function to go back to the compiled versions of the libraries
 export function undoLibSources() {
     log('INFO', 'Undo-ing Injecting Lib Sources');
-    //Move back to Angular build files
+    //Move back to Angular tenants files
     var now = new Date();
     mkdirIfNotExist('./backup/');
     // Make Backups in the back up folder
     copyFile('./tsconfig.json', './backup/tsconfig-Before-Build(' + now + ').json');
     copyFile('./angular.json', './backup/angular-Before-Build(' + now + ').json');
     copyFile('./package.json', './backup/package-Before-Build(' + now + ').json');
-    copyFile('./tsconfig.build.json', './tsconfig.json');
-    copyFile('./angular.build.json', './angular.json');
-    // copyFile('./package.build.json', './package.json');
+    copyFile('./tsconfig.tenants.json', './tsconfig.json');
+    copyFile('./angular.tenants.json', './angular.json');
+    // copyFile('./package.tenants.json', './package.json');
     //Delete Project folder
     //FIX: Just delete those folders imported...
     deleteFolder('./projects/tibco-tcstk/tc-core-lib');

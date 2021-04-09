@@ -1,3 +1,5 @@
+import {askMultipleChoiceQuestion, askQuestion, getProp, INFO, log, run} from "../common/common-functions";
+
 const colors = require('colors');
 const posSchematics = require('../config/config-schematics.json').schematicConfig;
 

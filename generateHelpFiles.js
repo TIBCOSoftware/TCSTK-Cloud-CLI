@@ -1,4 +1,4 @@
-require('./src/build/common-functions');
+require('./src/common/common-functions');
 // ---
 // ### Alternatives
 

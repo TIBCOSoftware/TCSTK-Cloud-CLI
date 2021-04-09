@@ -1,5 +1,10 @@
+import {askMultipleChoiceQuestionSearch, doesFileExist, ERROR, INFO, log, WARNING} from "./common-functions";
+import {Global} from "../models/base";
+import {TCLITask} from "../models/tcli-models";
+declare var global: Global;
+
 const CCOM = require('./cloud-communications');
-const ECHOMD = require('./../echomd/echomd').echomd;
+const ECHOMD = require('../echomd/echomd').echomd;
 const colors = require('colors');
 
 const GIT_HUB_LINK_RAW = 'https://raw.githubusercontent.com/TIBCOSoftware/TCSTK-Cloud-CLI/master/docs';
@@ -78,27 +83,26 @@ export async function showHelpOnTask(task) {
 
 // Get a list of tasks and show them.
 function getAndListTasks() {
-    const cliTaskConfig = require('./../config/config-cli-task.json');
-    const hTasks = []
-    const cTsks = cliTaskConfig.cliTasks;
-    for (let cliTask in cTsks) {
+    const cliTasks = require('../config/config-cli-task.json').cliTasks as TCLITask[];
+    const hTasks:string[] = [];
+    for (let cliTask in cliTasks) {
         let allowed = false;
-        if (cTsks[cliTask].availableOnOs != null) {
-            for (let allowedOS of cTsks[cliTask].availableOnOs) {
+        if (cliTasks[cliTask].availableOnOs != null) {
+            for (let allowedOS of cliTasks[cliTask].availableOnOs) {
                 // console.log('OS:' + allowedOS);
                 if (allowedOS === process.platform || allowedOS === 'all') {
                     allowed = true;
                 }
             }
         }
-        if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && allowed) {
+        if (cliTasks[cliTask].enabled && !cliTasks[cliTask].internal && allowed) {
             hTasks.push(cliTask);
             let str = cliTask;
             const x = 45 - cliTask.length;
             for (let i = 0; i < x; i++) {
                 str = ' ' + str;
             }
-            console.log(colors.cyan(str + ':') + ' ' + cTsks[cliTask].description);
+            console.log(colors.cyan(str + ':') + ' ' + cliTasks[cliTask].description);
         }
     }
     return hTasks;

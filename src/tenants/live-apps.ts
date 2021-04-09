@@ -1,6 +1,19 @@
-const CCOM = require('./cloud-communications');
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    copyFile, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
+    getPropFileName, INFO,
+    log,
+    logLine, mkdirIfNotExist,
+    pexTable, sleep
+} from "../common/common-functions";
+import {Global} from "../models/base";
+declare var global: Global;
+
+const CCOM = require('../common/cloud-communications');
 //TODO Possibly circular dependency ???
-const VAL = require('./validation');
+const VAL = require('../common/validation');
 const colors = require('colors');
 
 let globalProductionSandbox = null;
@@ -317,7 +330,7 @@ export async function importLiveAppsData() {
         log(INFO, 'Getting App Id for LA Application ' + importAppName);
         const apps = await showLiveApps(false, false);
         //console.log(apps);
-        let appData = {};
+        let appData:any = {};
         for (let app of apps) {
             if (app.name === importAppName) {
                 importAppId = app.applicationId;

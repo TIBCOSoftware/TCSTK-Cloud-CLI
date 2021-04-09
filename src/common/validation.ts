@@ -1,9 +1,20 @@
+import {
+    addOrUpdateProperty,
+    askMultipleChoiceQuestion,
+    askQuestion,
+    ERROR, getOrganization, getProp, getPropFileName, INFO,
+    iterateTable,
+    log
+} from "./common-functions";
+import {Global} from "../models/base";
+declare var global: Global;
+
 const colors = require('colors');
-const LA = require('./live-apps');
-const CFILES = require('./cloud-files');
-const USERGROUPS = require('./user-groups');
-const TCI = require('./tci');
-const CS = require('./cloud-starters');
+const LA = require('../tenants/live-apps');
+const CFILES = require('../tenants/cloud-files');
+const USERGROUPS = require('../tenants/user-groups');
+const TCI = require('../tenants/tci');
+const CS = require('../cloud-starters/cloud-starters');
 
 
 // Function, that does all sorts of validations

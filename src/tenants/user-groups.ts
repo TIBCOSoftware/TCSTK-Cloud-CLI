@@ -1,8 +1,18 @@
-const CCOM = require('./cloud-communications');
+import {
+    askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTable,
+    getPEXConfig, INFO,
+    iterateTable,
+    log,
+    pexTable
+} from "../common/common-functions";
+
+const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');
 
-export async function getGroupsTable(showTable) {
+export async function getGroupsTable(showTable?) {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -88,7 +98,7 @@ export async function addUserToGroup() {
     }
     const groupDecision = await askMultipleChoiceQuestionSearch('For which group would you like to ADD a user ?', selectGroup);
     if (groupDecision !== 'NONE') {
-        let currentUsersInGroupT = [];
+        let currentUsersInGroupT:any = [];
         for (let gr of iterateTable(groupT)) {
             if (groupDecision === gr.Name) {
                 groupIdToAdd = gr.Id;

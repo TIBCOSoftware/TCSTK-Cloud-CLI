@@ -1,4 +1,16 @@
-const CCOM = require('./cloud-communications');
+import {
+    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
+    askQuestion,
+    createTable, ERROR, getOrganization, getPEXConfig, getProp,
+    getPropFileName,
+    INFO,
+    iterateTable,
+    log,
+    logLine, mkdirIfNotExist,
+    pexTable
+} from "../common/common-functions";
+
+const CCOM = require('../common/cloud-communications');
 const USERGROUPS = require('./user-groups');
 const colors = require('colors');
 

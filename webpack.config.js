@@ -12,7 +12,7 @@ fs.readdirSync('node_modules')
     });
 
 module.exports = {
-    entry: './src/bin/cloud-cli.js',
+    entry: './ts-out/bin/cloud-cli.js',
     output: {
         path: path.join(__dirname, 'dist/tcli/'),
         filename: 'main.js'
