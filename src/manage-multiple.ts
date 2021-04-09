@@ -8,9 +8,10 @@ import {
     log,
     parseOAUTHToken,
     run, trim, WARNING
-} from "./build/common-functions";
+} from "./common/common-functions";
+import {TCLITask} from "./models/tcli-models";
 
-require('./build/common-functions');
+require('./common/common-functions');
 let mFile = '';
 const colors = require('colors');
 const _ = require('lodash');
@@ -86,7 +87,7 @@ export function processMultipleFile() {
         }
         log(INFO, logS + ' Environments: ' + environments);
         const environmentsA = environments.split(',');
-        // TODO: Allow for a pre environment command (like git pulls or build)
+        // TODO: Allow for a pre environment command (like git pulls or tenants)
         for (var j = 0; j < environmentsA.length; j++) {
             const currentEnvironment = trim(environmentsA[j]);
             const logSE = logS + colors.green(' [JOB: ' + currentEnvironment + '] ');
@@ -228,7 +229,7 @@ export async function multipleInteraction() {
                         eRow['AUTHENTICATION TYPE'] = 'CLIENT ID';
                     }
                 }
-                //TODO: Pick up OAUTH
+                // Pick up OAUTH
                 if (curProps.CloudLogin.OAUTH_Token) {
                     if (curProps.CloudLogin.OAUTH_Token.trim() !== '') {
                         eRow['AUTHENTICATION TYPE'] = 'OAUTH';
@@ -276,9 +277,7 @@ export async function multipleInteraction() {
             displayTask = TCLI_INTERACTVIE;
         } else {
             if (chosenEnv === 'CHANGE TASK') {
-                const cliTaskConfigCLI = require('./config/config-cli-task.json');
-                let cTsks = cliTaskConfigCLI.cliTasks;
-
+                const cTsks = require('./config/config-cli-task.json').cliTasks as TCLITask[];
                 const taskDescription = [TCLI_INTERACTVIE];
                 const taskTarget = [''];
                 for (let cliTask in cTsks) {
@@ -298,7 +297,6 @@ export async function multipleInteraction() {
             } else {
                 // 5. Execute the task, when it was none go back directly when it was a task have pause message before displaying the table again
                 let propFileToUse = '';
-
                 for (let envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber];
                     let command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask;
@@ -356,7 +354,6 @@ function getMProp(property, propFileName?) {
     log(DEBUG, 'Returning Property(' + property + '): ', re);
     return re;
 }
-
 
 function replaceDollar(content) {
     if (content.includes('${') && content.includes('}')) {

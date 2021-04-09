@@ -8,10 +8,10 @@ import {
     logLine, mkdirIfNotExist,
     pexTable,
     run, WARNING
-} from "./common-functions";
+} from "../common/common-functions";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
-const CCOM = require('./cloud-communications');
+const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');
 

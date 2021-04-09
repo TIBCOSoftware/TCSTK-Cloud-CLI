@@ -2,6 +2,7 @@
 // All inputs are provided as input to the functions
 import {Global} from "../models/base";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+import {Mapping} from "../models/tcli-models";
 declare var global: Global;
 const globalTCpropFolder = __dirname + '/../../../common/';
 const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
@@ -756,6 +757,7 @@ export function run(command, failOnError?) {
 }
 
 // Function to copy a directory
+
 export function copyDir(fromDir, toDir) {
     const fse = require('fs-extra');
     log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
@@ -841,7 +843,7 @@ export async function sleep(ms) {
     });
 }
 
-export function createTable(arrayObject, config, doShowTable) {
+export function createTable(arrayObject:any, config: Mapping, doShowTable:boolean) {
     const tableObject = {};
     for (const element in arrayObject) {
         const tableRow = {};

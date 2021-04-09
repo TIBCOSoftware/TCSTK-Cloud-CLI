@@ -4,7 +4,7 @@ import {createMultiplePropertyFileWrapper, manageGlobalConfig, newStarter} from 
 
 const colors = require('colors');
 
-require('./build/common-functions');
+require('./common/common-functions');
 import arg from 'arg';
 import {
     addOrUpdateProperty,
@@ -15,9 +15,10 @@ import {
     setMultipleOptions, setOrganization, setProperty, setPropFileName, updateCloudLogin, updateRegion,
     updateTCLI,
     WARNING
-} from "./build/common-functions";
+} from "./common/common-functions";
 import {multipleInteraction, processMultipleFile} from "./manage-multiple";
 import {Global} from "./models/base";
+import {TCLITask} from "./models/tcli-models";
 declare var global: Global;
 
 let propFileName;
@@ -147,7 +148,7 @@ export async function cli(args) {
 
     // Show help
     if (options.help || options.task === 'help') {
-        const HELP = require('./build/help');
+        const HELP = require('./common/help');
         if (options.task !== '' && options.task !== 'help') {
             await HELP.showHelpOnTask(options.task)
         } else {
@@ -212,7 +213,7 @@ export async function cli(args) {
                             // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
                             if (!isGlobalOauthDefined()) {
-                                const PROPM = require('./build/property-file-management');
+                                const PROPM = require('./common/property-file-management');
                                 PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
                             }
                             log(INFO, 'Created New TIBCO Cloud Property file ' + colors.green('(Using GLOBAL configuration)') + ': ' + colors.blue(cwdir + '/' + propFileName));
@@ -288,7 +289,7 @@ export async function cli(args) {
             }
             // Check if the task exists...
             const cliTaskConfigCLI = require('./config/config-cli-task.json');
-            const cTsks = cliTaskConfigCLI.cliTasks;
+            const cTsks = cliTaskConfigCLI.cliTasks as TCLITask[];
             let taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-do'];
             let taskExist = false;
             let directTask = false;

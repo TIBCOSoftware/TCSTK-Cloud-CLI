@@ -27,7 +27,7 @@ import {
 
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
-const LA = require('./live-apps');
+const LA = require('../tenants/live-apps');
 const colors = require('colors');
 const _ = require('lodash');
 

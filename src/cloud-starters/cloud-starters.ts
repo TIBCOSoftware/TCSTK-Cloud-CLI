@@ -11,12 +11,12 @@ import {
     log,
     logLine, mkdirIfNotExist, npmInstall,
     pexTable, run, WARNING
-} from "./common-functions";
+} from "../common/common-functions";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
-const CCOM = require('./cloud-communications');
-const OAUTH = require('./oauth');
-const USERGROUPS = require('./user-groups');
+const CCOM = require('../common/cloud-communications');
+const OAUTH = require('../common/oauth');
+const USERGROUPS = require('../tenants/user-groups');
 const colors = require('colors');
 
 export async function start() {
@@ -158,7 +158,7 @@ export function buildCloudStarterZip(cloudStarter) {
         BUILD_COMMAND = getProp('BUILD_COMMAND');
     } else {
         log(INFO, 'No BUILD_COMMAND Property found; Adding BUILD_COMMAND to ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng build --prod )>');
+        addOrUpdateProperty(getPropFileName(), 'BUILD_COMMAND', 'HASHROUTING', 'Build command to use: Options: HASHROUTING | NON-HASHROUTING | <a custom command (example: ng tenants --prod )>');
     }
     const csURL = '/webresource/apps/' + cloudStarter + '/';
     deleteFile('./dist/' + cloudStarter + '.zip');
@@ -166,7 +166,7 @@ export function buildCloudStarterZip(cloudStarter) {
     if (getProp('Add_Descriptor') === 'YES') {
         generateCloudDescriptor();
     }
-    //hashrouting build configurable
+    //hashrouting tenants configurable
     let buildCommand = BUILD_COMMAND;
     let bType = 'CUSTOM';
     if (BUILD_COMMAND === 'HASHROUTING') {
@@ -429,16 +429,16 @@ export function injectLibSources() {
 // Function to go back to the compiled versions of the libraries
 export function undoLibSources() {
     log('INFO', 'Undo-ing Injecting Lib Sources');
-    //Move back to Angular build files
+    //Move back to Angular tenants files
     var now = new Date();
     mkdirIfNotExist('./backup/');
     // Make Backups in the back up folder
     copyFile('./tsconfig.json', './backup/tsconfig-Before-Build(' + now + ').json');
     copyFile('./angular.json', './backup/angular-Before-Build(' + now + ').json');
     copyFile('./package.json', './backup/package-Before-Build(' + now + ').json');
-    copyFile('./tsconfig.build.json', './tsconfig.json');
-    copyFile('./angular.build.json', './angular.json');
-    // copyFile('./package.build.json', './package.json');
+    copyFile('./tsconfig.tenants.json', './tsconfig.json');
+    copyFile('./angular.tenants.json', './angular.json');
+    // copyFile('./package.tenants.json', './package.json');
     //Delete Project folder
     //FIX: Just delete those folders imported...
     deleteFolder('./projects/tibco-tcstk/tc-core-lib');

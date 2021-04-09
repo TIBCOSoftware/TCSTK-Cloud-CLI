@@ -7,13 +7,13 @@ import {
     log,
     logLine, mkdirIfNotExist,
     pexTable, sleep
-} from "./common-functions";
+} from "../common/common-functions";
 import {Global} from "../models/base";
 declare var global: Global;
 
-const CCOM = require('./cloud-communications');
+const CCOM = require('../common/cloud-communications');
 //TODO Possibly circular dependency ???
-const VAL = require('./validation');
+const VAL = require('../common/validation');
 const colors = require('colors');
 
 let globalProductionSandbox = null;

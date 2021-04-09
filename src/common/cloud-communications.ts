@@ -9,6 +9,7 @@ import {
     WARNING
 } from "./common-functions";
 import {Global} from "../models/base";
+import {CallConfig, MappingGroup} from "../models/tcli-models";
 declare var global: Global;
 // require('./common-functions');
 const colors = require('colors');
@@ -16,7 +17,7 @@ const cloudConfig = require('../config/config-cloud.json');
 // TODO: if Cloud_Location provided replace |cloud.tibco.com|
 // see https://liveapps.tenant-integration.tcie.pro/webresource/apps/GatherSmart/index.html#/starterApp/splash
 export const clURI = cloudConfig.endpoints;
-export const mappings = cloudConfig.mappings;
+export const mappings = cloudConfig.mappings as MappingGroup;
 
 let loginC = null;
 let doOAuthNotify = true;
@@ -331,7 +332,7 @@ async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant
 }
 
 // Wrapper around the callURL function that takes a config object
-export async function callTCA(url, doLog?, conf?) {
+export async function callTCA(url:string, doLog?:boolean, conf?:CallConfig) {
     if (conf == null) {
         conf = {};
     }

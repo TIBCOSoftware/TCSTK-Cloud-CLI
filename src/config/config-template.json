@@ -1,6 +1,7 @@
 {
-  "templates": {
-    "TCSTK-base-template-git": {
+  "templates": [
+    {
+      "name": "TCSTK-base-template-git",
       "displayName": "Basic Cloud Starter Template - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "",
@@ -26,7 +27,8 @@
         }
       ]
     },
-    "TCSTK-case-manager-app-git": {
+    {
+      "name": "TCSTK-case-manager-app-git",
       "displayName": "Case Manager App - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
@@ -54,7 +56,8 @@
         }
       ]
     },
-    "Form-Template-Git": {
+    {
+      "name": "Form-Template-Git",
       "displayName": "Form Template - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "",
@@ -73,7 +76,8 @@
         }
       ]
     },
-    "TCSTK-spotfire-template-git": {
+    {
+      "name": "TCSTK-spotfire-template-git",
       "displayName": "Analytics Application Template - LATEST Angular 10",
       "enabled": true,
       "templateFolder": "",
@@ -95,7 +99,8 @@
         }
       ]
     },
-    "process-discovery": {
+    {
+      "name": "process-discovery",
       "displayName": "Process Discovery (GIT)",
       "enabled": false,
       "templateFolder": "",
@@ -111,7 +116,8 @@
       ],
       "replacements": []
     },
-    "process-discovery-replace": {
+    {
+      "name": "process-discovery-replace",
       "displayName": "Process Discovery Replace (GIT)",
       "enabled": false,
       "templateFolder": "",
@@ -132,7 +138,8 @@
         }
       ]
     },
-    "template-sample": {
+    {
+      "name": "template-sample",
       "displayName": "Your Template",
       "enabled": false,
       "templateFolder": "/applicationTemplate/",
@@ -151,7 +158,6 @@
         }
       ]
     }
-  },
+  ],
   "useDebug": false
 }
-

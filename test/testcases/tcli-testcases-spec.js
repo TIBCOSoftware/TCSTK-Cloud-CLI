@@ -211,7 +211,7 @@ describe("tcli testsuite", function () {
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'undo-lib-sources')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
         // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'get-cloud-libs-from-git')).toBe(true);
-        // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true);
+        // expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'tenants')).toBe(true);
     });
 
     // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Form and Schematics'
@@ -233,7 +233,7 @@ describe("tcli testsuite", function () {
     it("TEMPLATE: Analytics Template and Schematics", function () {
         const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime();
         expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true);
-        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-deploy')).toBe(true);
+        expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'tenants-deploy')).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'validate -a cloud_starter_exist:' + CSName)).toBe(true);
         expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'delete-cloud-starter -a ' + CSName + ':YES')).toBe(true);
     });
@@ -383,8 +383,6 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:my_manifest.json:my_other_flogo.json')).toBe(true);
-
-
         // discover_backend_service
     });
 
@@ -433,7 +431,7 @@ describe("tcli testsuite", function () {
     // FS Testcases
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Fuzzy Search'
     it("TCLI: Fuzzy Search", function () {
-        const fus = require('./../../src/build/fuzzy-search.js');
+        const fus = require('../../src/common/fuzzy-search.js');
         for (let i = 0 ; i < 1000 ; i++) {
             let randomString = generateRandomString(Math.floor(Math.random() * 100));
             expect(fus.find(fus.search(randomString)) == randomString).toBe(true);
@@ -469,18 +467,36 @@ describe("tcli testsuite", function () {
         require('./../../ts-out/build/tables');
     });
 
-    // Fail on purpose (to block build pipeline)
+    // Fail on purpose (to block tenants pipeline)
     // jasmine --config=test/support/jasmine.json --filter='FAIL'
     xit("FAIL", function () {
         expect(false).toBe(true);
     });
 
+    // a testcase to validate the names of the cli tasks (no clashing names)
+    // jasmine --config=test/support/jasmine.json --filter='test task names'
+    it("test task names", function () {
+        const tasks = require('./../../ts-out/config/config-cli-task.json').cliTasks;
+        const taskNames = [];
+        for (let task in tasks) {
+            if(taskNames.indexOf(task) > 0){
+                fail('Duplicate Task Name: ' + task);
+            }
+            taskNames.push(task);
+            if(tasks[task].taskAlternativeNames){
+                for(tskA of tasks[task].taskAlternativeNames){
+                    if(taskNames.indexOf(tskA) > 0){
+                        fail('Duplicate Alternative Task Name: ' + tskA);
+                    }
+                    taskNames.push(tskA);
+                }
+            }
+        }
+    });
+
     // TODO: Test Multiple
 
     // TODO: Test Export Table (use does file exist test)
-
-    // TODO: Create a testcase to validate the names of the cli tasks (no clashing names)
-
 
     /*
 Difficult to TEST:

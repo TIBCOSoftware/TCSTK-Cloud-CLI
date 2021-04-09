@@ -9,9 +9,9 @@ import {
     log,
     pexTable,
     run, WARNING
-} from "./common-functions";
+} from "../common/common-functions";
 
-const CCOM = require('./cloud-communications');
+const CCOM = require('../common/cloud-communications');
 const colors = require('colors');
 
 //const art = require('ascii-art');
@@ -66,7 +66,7 @@ export async function monitorTCI() {
             pass = Buffer.from(pass, 'base64').toString();
         }
         if (pass && pass.startsWith('@#')) {
-            const fus = require('./fuzzy-search.js');
+            const fus = require('../common/fuzzy-search.js');
             pass = fus.find(pass);
         }
         pass = pass.replace('$', '\\$')

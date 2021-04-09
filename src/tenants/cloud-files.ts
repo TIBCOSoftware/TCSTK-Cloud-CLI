@@ -8,9 +8,9 @@ import {
     log,
     logLine, mkdirIfNotExist,
     pexTable
-} from "./common-functions";
+} from "../common/common-functions";
 
-const CCOM = require('./cloud-communications');
+const CCOM = require('../common/cloud-communications');
 const USERGROUPS = require('./user-groups');
 const colors = require('colors');
 

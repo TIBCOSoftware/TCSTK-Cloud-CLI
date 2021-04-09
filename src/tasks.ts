@@ -19,10 +19,11 @@ import {
     trim, updateCloudPackages,
     updateGlobalConnectionConfig, updateRegion,
     upgradeToV2
-} from "./build/common-functions";
+} from "./common/common-functions";
 import {Global} from "./models/base";
+import {TCLITask} from "./models/tcli-models";
 declare var global: Global;
-// require('./build/common-functions');
+// require('./tenants/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;
 const colors = require('colors');
@@ -31,7 +32,7 @@ const BACK = 'BACK';
 const BACK_TO_ALL = 'BACK TO ALL TASKS';
 const CAT_QUESTION = 'From which category would you like to select a task ?';
 const cliTaskConfig = require('./config/config-cli-task.json');
-const cTsks = cliTaskConfig.cliTasks;
+const cTsks = cliTaskConfig.cliTasks as TCLITask[];
 // Comes from prop file
 let gTasksDescr = [];
 let gTasksNames = [];
@@ -214,44 +215,44 @@ export async function browseTasks() {
 
 export async function testTask() {
     console.log('Test...');
-    const PROPM = require('./build/property-file-management');
+    const PROPM = require('./common/property-file-management');
     await PROPM.getClientIDforOrg();
 
 }
 
 // Function to display help
 export async function helptcliWrapper() {
-    const HELP = require('./build/help');
+    const HELP = require('./common/help');
     await HELP.showInteractiveHelp();
 }
 
 // Function to show cloud info
 export async function showCloud() {
-    const CCOM = require('./build/cloud-communications');
+    const CCOM = require('./common/cloud-communications');
     await CCOM.showCloudInfo();
 }
 
 // Start Cloud Starter Locally
 export async function startWrapper() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.start();
 }
 
 // Test Cloud Starter Locally
 export async function testCSWrapper() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.testCS();
 }
 
 // Test Cloud Starter Locally Headless
 export async function testCSHeadlessWrapper() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.testCSHeadless();
 }
 
 // Function to publish the cloud starter
 export async function publish() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.publishApp(getProp('App_Name'));
     log(INFO, 'APP PUBLISHED: ' + getProp('App_Name'));
     CS.showAppLinkInfo();
@@ -259,26 +260,26 @@ export async function publish() {
 
 // Show all the cloud starters
 export async function showApps() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.showAvailableApps(true);
 }
 
 // Show all the cloud starters
 export async function deleteAppWrapper() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.deleteApp();
 }
 
 
 //Show all the cloud starter links
 export async function showLinks() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.getAppLinks(true);
 }
 
-// Function to build the cloud starter
+// Function to tenants the cloud starter
 export async function buildCloudStarter() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.cleanDist();
     log('INFO', 'Building... ' + getProp('App_Name'));
     CS.buildCloudStarterZip(getProp('App_Name'));
@@ -286,8 +287,8 @@ export async function buildCloudStarter() {
 
 // Function to delpoy the cloud starter
 export async function deploy() {
-    const CCOM = require('./build/cloud-communications');
-    const CS = require('./build/cloud-starters');
+    const CCOM = require('./common/cloud-communications');
+    const CS = require('./cloud-starters/cloud-starters');
     log(INFO, 'Deploying ' + getProp('App_Name') + ' to)');
     await CCOM.showCloudInfo();
     await CS.uploadApp(getProp('App_Name'));
@@ -317,7 +318,7 @@ export async function getCLgit() {
 // Inject the sources from the libs into a cloud starter project
 export async function injectLibSourcesWrapper() {
     //'clean', 'get-cloud-libs-from-git', 'format-project-for-lib-sources', 'clean'
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     await CS.cleanDist();
     await getCLgit();
     CS.injectLibSources();
@@ -326,13 +327,13 @@ export async function injectLibSourcesWrapper() {
 
 // Inject the sources from the libs into a cloud starter project
 export async function undoLibSourcesWrapper() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     CS.undoLibSources();
 }
 
 // Function to generate the cloud descriptor
 export function generateCloudDescriptorWrapper() {
-    const CS = require('./build/cloud-starters');
+    const CS = require('./cloud-starters/cloud-starters');
     CS.generateCloudDescriptor();
 }
 
@@ -344,13 +345,13 @@ export async function changeRegion() {
 
 // Function to change the organization in the properties file
 export async function changeOrganizationWrapper() {
-    const PROPM = require('./build/property-file-management');
+    const PROPM = require('./common/property-file-management');
     await PROPM.changeOrganization();
 }
 
 // Function to change the organization in the properties file
 export async function showOrganizationWrapper() {
-    const PROPM = require('./build/property-file-management');
+    const PROPM = require('./common/property-file-management');
     await PROPM.showOrganization();
 }
 
@@ -407,101 +408,101 @@ export async function createMultiplePropertyFileWrapper() {
 
 // Display the shared state entries to a user
 export async function createSharedStateWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.createSharedState();
 }
 
 // Display the shared state entries to a user
 export async function showSharedState() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.getSharedState(true);
 }
 
 // Display the details of a shared state
 export async function showSharedStateDetailsWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.showSharedStateDetails();
 }
 
 export async function removeSharedStateEntryWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.removeSharedStateEntry();
 }
 
 export async function clearSharedStateWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.clearSharedState();
 }
 
 export async function exportSharedStateWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.exportSharedState();
 }
 
 export async function importSharedStateWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.importSharedState();
 }
 
 export async function watchSharedStateMainWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.watchSharedStateMain();
 }
 
 export async function watchSharedStateWrapper() {
-    const SHST = require('./build/shared-state');
+    const SHST = require('./tenants/shared-state');
     await SHST.watchSharedState();
 }
 
 // Function to show liveApps
 export async function showLiveAppsWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.showLiveApps(true, true);
 }
 
 // Function to show liveApps Actions
 export async function showLiveAppsActionsWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.showLiveAppsActions();
 }
 
 // Function to show liveApps Actions
 export async function showLiveAppsSandboxWrapper() {
-    const CCOM = require('./build/cloud-communications');
+    const CCOM = require('./common/cloud-communications');
     await CCOM.showCloudInfo(true,true);
 }
 
 // Function to export liveApps cases
 export async function exportLiveAppsDataWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.exportLiveAppsData();
 }
 
 export async function generateLiveAppsImportConfiguration() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.createLAImportFile();
 }
 
 // Function to
 export async function importLiveAppsDataWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.importLiveAppsData();
 }
 
 // Function to
 export async function csvToJsonLiveAppsDataWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.csvToJsonLiveAppsData();
 }
 
 // Function to
 export async function jsonToCsvLiveAppsDataWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.jsonToCsvLiveAppsData();
 }
 
 export async function exportLiveAppsCaseTypeWrapper() {
-    const LA = require('./build/live-apps');
+    const LA = require('./tenants/live-apps');
     await LA.exportLiveAppsCaseType();
 }
 
@@ -511,143 +512,143 @@ export function updateCloudPackagesWrapper() {
 }
 
 export async function showTCIWrapper() {
-    const TCI = require('./build/tci');
+    const TCI = require('./tenants/tci');
     await TCI.showTCI();
 }
 
 export async function monitorTCIWrapper() {
-    const TCI = require('./build/tci');
+    const TCI = require('./tenants/tci');
     await TCI.monitorTCI();
 }
 
 export async function exportTCIAppWrapper() {
-    const TCI = require('./build/tci');
+    const TCI = require('./tenants/tci');
     await TCI.exportTCIApp();
 }
 
 
 export async function browseSpotfireLibraryWrapper() {
-    const SPOTFIRE = require('./build/spotfire');
+    const SPOTFIRE = require('./tenants/spotfire');
     await SPOTFIRE.browseSpotfire();
 }
 
 export async function listSpotfireLibraryWrapper() {
-    const SPOTFIRE = require('./build/spotfire');
+    const SPOTFIRE = require('./tenants/spotfire');
     await SPOTFIRE.listSpotfire();
 }
 
 export async function generateOauthTokenWrapper() {
-    const OAUTH = require('./build/oauth');
+    const OAUTH = require('./common/oauth');
     await OAUTH.generateOauthToken();
 }
 
 export async function showOauthTokenWrapper() {
-    const OAUTH = require('./build/oauth');
+    const OAUTH = require('./common/oauth');
     await OAUTH.showOauthToken();
 }
 
 export async function revokeOauthTokenWrapper() {
-    const OAUTH = require('./build/oauth');
+    const OAUTH = require('./common/oauth');
     await OAUTH.revokeOauthToken();
 }
 
 export async function rotateOauthTokenWrapper() {
-    const OAUTH = require('./build/oauth');
+    const OAUTH = require('./common/oauth');
     await OAUTH.rotateOauthToken();
 }
 
 export async function validateAndRotateOauthTokenWrapper() {
-    const OAUTH = require('./build/oauth');
+    const OAUTH = require('./common/oauth');
     await OAUTH.validateAndRotateOauthToken(false);
 }
 
 export async function showOrgFoldersWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.showOrgFolders();
 }
 
 export async function createOrgFolderWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.createOrgFolder();
 }
 
 export async function uploadFileWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.uploadFileToOrgFolder();
 }
 
 export async function downloadFileWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.downloadFileFromOrgFolder();
 }
 
 export async function showPropertiesWrapper() {
-    const PROPM = require('./build/property-file-management');
+    const PROPM = require('./common/property-file-management');
     await PROPM.showPropertiesTable();
 }
 
 export async function generateCloudPropertyFilesWrapper() {
-    const PROPM = require('./build/property-file-management');
+    const PROPM = require('./common/property-file-management');
     await PROPM.generateCloudPropertyFiles();
 }
 
 export async function exportOrgFolderWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.exportOrgFolder();
 }
 
 export async function importOrgFolderWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.importOrgFolder();
 }
 
 export async function watchOrgFolderWrapper() {
-    const CFILES = require('./build/cloud-files');
+    const CFILES = require('./tenants/cloud-files');
     await CFILES.watchOrgFolder();
 }
 
 export async function showLiveAppsGroupsWrapper() {
-    const USERGROUPS = require('./build/user-groups');
+    const USERGROUPS = require('./tenants/user-groups');
     await USERGROUPS.showLiveAppsGroups();
 }
 
 export async function createLiveAppsGroupWrapper() {
-    const USERGROUPS = require('./build/user-groups');
+    const USERGROUPS = require('./tenants/user-groups');
     await USERGROUPS.createLiveAppsGroup();
 }
 
 export async function showLiveAppsUsersWrapper() {
-    const USERGROUPS = require('./build/user-groups');
+    const USERGROUPS = require('./tenants/user-groups');
     await USERGROUPS.showLiveAppsUsers(true, false);
 }
 
 export async function addUserToGroupWrapper() {
-    const USERGROUPS = require('./build/user-groups');
+    const USERGROUPS = require('./tenants/user-groups');
     await USERGROUPS.addUserToGroup();
 }
 
 export async function validateWrapper() {
-    const VAL = require('./build/validation');
+    const VAL = require('./common/validation');
     await VAL.validate();
 }
 
 export async function updatePropertyWrapper() {
-    const PROPM = require('./build/property-file-management');
+    const PROPM = require('./common/property-file-management');
     await PROPM.updateProperty();
 }
 
 export async function schematicAddWrapper() {
-    const SCHEMATICS = require('./build/schematics');
+    const SCHEMATICS = require('./cloud-starters/schematics');
     await SCHEMATICS.schematicAdd();
 }
 
 export async function showMessagingSummaryWrapper() {
-    const MESSAGING = require('./build/messaging');
+    const MESSAGING = require('./tenants/messaging');
     await MESSAGING.showSummary();
 }
 
 export async function showMessagingClientsWrapper() {
-    const MESSAGING = require('./build/messaging');
+    const MESSAGING = require('./tenants/messaging');
     await MESSAGING.showClients();
 }
 

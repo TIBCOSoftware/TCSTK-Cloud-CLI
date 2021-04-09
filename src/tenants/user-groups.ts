@@ -6,9 +6,9 @@ import {
     iterateTable,
     log,
     pexTable
-} from "./common-functions";
+} from "../common/common-functions";
 
-const CCOM = require('./cloud-communications');
+const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');
 
