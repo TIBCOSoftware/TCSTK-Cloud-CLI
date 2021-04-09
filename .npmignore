@@ -26,6 +26,7 @@
 /applicationTemplate/template1
 /applicationTemplate/template2
 /src/**/*.js
+/src/**/*.ts
 
 # documentation tutorials (with pictures)
 /docs/tutorials/**
@@ -41,4 +42,5 @@
 # swagger Tmp folder
 /swaggerTmp/**
 
-/ts-out
+/ts-out/**
+/src/**
