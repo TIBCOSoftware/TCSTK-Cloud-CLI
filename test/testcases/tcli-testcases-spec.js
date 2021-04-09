@@ -383,6 +383,8 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:my_manifest.json:my_other_flogo.json')).toBe(true);
+
+
     });
 
     // Shared State Testcases
@@ -463,7 +465,7 @@ describe("tcli testsuite", function () {
     // Show cloud with Basic Authentication
     // jasmine --config=test/support/jasmine.json --filter='table testing'
     it("table testing", function () {
-        require('./../../ts-out/build/tables');
+        require('./../../ts-out/common/tables');
     });
 
     // Fail on purpose (to block build pipeline)
