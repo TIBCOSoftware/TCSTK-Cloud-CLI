@@ -1,6 +1,7 @@
 import {askMultipleChoiceQuestionSearch, doesFileExist, ERROR, INFO, log, WARNING} from "./common-functions";
 import {Global} from "../models/base";
 import {TCLITask} from "../models/tcli-models";
+
 declare var global: Global;
 
 const CCOM = require('./cloud-communications');
@@ -8,7 +9,7 @@ const ECHOMD = require('../echomd/echomd').echomd;
 const colors = require('colors');
 
 const GIT_HUB_LINK_RAW = 'https://raw.githubusercontent.com/TIBCOSoftware/TCSTK-Cloud-CLI/master/docs';
-const GIT_HUB_LINK_DOC = 'https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/master/docs';
+// const GIT_HUB_LINK_DOC = 'https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/master/docs';
 
 
 // Show help on the console
@@ -51,10 +52,10 @@ export async function showInteractiveHelp() {
 }
 
 // Help function that shows help on a specific task
-export async function showHelpOnTask(task) {
+export async function showHelpOnTask(task: string) {
     // Get Task help from github
     const url = GIT_HUB_LINK_RAW + '/tasks/' + task + '.md';
-    const docUrl = GIT_HUB_LINK_DOC + '/tasks/' + task + '.md';
+    // const docUrl = GIT_HUB_LINK_DOC + '/tasks/' + task + '.md';
     try {
         let onlineHelp = await CCOM.doRequest(encodeURI(url), {
             headers: {
@@ -62,7 +63,7 @@ export async function showHelpOnTask(task) {
                 'Content-Type': 'application/json'
             }
         })
-        if(onlineHelp.statusCode === 200){
+        if (onlineHelp.statusCode === 200) {
             log(INFO, 'Online Help: ')
             console.log(ECHOMD(onlineHelp.body));
         } else {
@@ -84,32 +85,35 @@ export async function showHelpOnTask(task) {
 // Get a list of tasks and show them.
 function getAndListTasks() {
     const cliTasks = require('../config/config-cli-task.json').cliTasks as TCLITask[];
-    const hTasks:string[] = [];
+    const hTasks: string[] = [];
     for (let cliTask in cliTasks) {
-        let allowed = false;
-        if (cliTasks[cliTask].availableOnOs != null) {
-            for (let allowedOS of cliTasks[cliTask].availableOnOs) {
-                // console.log('OS:' + allowedOS);
-                if (allowedOS === process.platform || allowedOS === 'all') {
-                    allowed = true;
+        if (cliTask) {
+            const task = cliTasks[cliTask]!;
+            let allowed = false;
+            if (task.availableOnOs != null) {
+                for (let allowedOS of task.availableOnOs) {
+                    // console.log('OS:' + allowedOS);
+                    if (allowedOS === process.platform || allowedOS === 'all') {
+                        allowed = true;
+                    }
                 }
             }
-        }
-        if (cliTasks[cliTask].enabled && !cliTasks[cliTask].internal && allowed) {
-            hTasks.push(cliTask);
-            let str = cliTask;
-            const x = 45 - cliTask.length;
-            for (let i = 0; i < x; i++) {
-                str = ' ' + str;
+            if (task.enabled && !task.internal && allowed) {
+                hTasks.push(cliTask);
+                let str = cliTask;
+                const x = 45 - cliTask.length;
+                for (let i = 0; i < x; i++) {
+                    str = ' ' + str;
+                }
+                console.log(colors.cyan(str + ':') + ' ' + task.description);
             }
-            console.log(colors.cyan(str + ':') + ' ' + cliTasks[cliTask].description);
         }
     }
     return hTasks;
 }
 
 // Function to display an MD File in the Console
-function displayMDFile(mdFile) {
+function displayMDFile(mdFile: string) {
     const fs = require('fs');
     const mdFileContent = fs.readFileSync(global.PROJECT_ROOT + mdFile, 'utf8');
     console.log(ECHOMD(mdFileContent));

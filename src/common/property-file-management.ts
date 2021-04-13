@@ -1,4 +1,4 @@
-import {isOAUTHLoginValid} from "./cloud-communications";
+// import {isOAUTHLoginValid} from "./cloud-communications";
 import {
     addOrUpdateProperty,
     askMultipleChoiceQuestion,
@@ -24,6 +24,7 @@ import {
     run, translateAWSRegion,
     WARNING
 } from "./common-functions";
+import {ORGFile, ORGInfo} from "../models/tcli-models";
 
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
@@ -48,10 +49,10 @@ export async function generateCloudPropertyFiles() {
     if (projectName.trim() !== '') {
         projectName = projectName + '_';
     }
-    const propFilesALL = [];
-    const propFilesEU = [];
-    const propFilesUS = [];
-    const propFilesAU = [];
+    const propFilesALL: ORGFile[] = [];
+    const propFilesEU: ORGFile[] = [];
+    const propFilesUS: ORGFile[] = [];
+    const propFilesAU: ORGFile[] = [];
     const propOption = ['NONE', 'ALL', 'ALL EU', 'ALL US', 'ALL AU'];
     for (let org of organizations) {
         extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU);
@@ -66,9 +67,9 @@ export async function generateCloudPropertyFiles() {
     console.table(propFilesALL);
     const propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption);
     let doOauth = false;
-    if(isOauthUsed()){
+    if (isOauthUsed()) {
         const decision = await askMultipleChoiceQuestion('Do you want to generate OAUTH tokens for the new files ?', ['YES', 'NO']);
-        if(decision.toLowerCase() === 'yes') {
+        if (decision.toLowerCase() === 'yes') {
             doOauth = true;
         }
     }
@@ -79,21 +80,21 @@ export async function generateCloudPropertyFiles() {
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL EU') {
             genOne = false;
             for (let pFile of propFilesEU) {
-                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID,doOauth);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID, doOauth);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL US') {
             genOne = false;
             for (let pFile of propFilesUS) {
-                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID,doOauth);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID, doOauth);
                 propForMFile += pFile.PROP + ',';
             }
         }
         if (propFilesToGenerate === 'ALL' || propFilesToGenerate === 'ALL AU') {
             genOne = false;
             for (let pFile of propFilesAU) {
-                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID,doOauth);
+                await configurePropFile('./' + pFile.PROPERTY_FILE_NAME, pFile.REGION, pFile.ACCOUNT_ID, doOauth);
                 propForMFile += pFile.PROP + ',';
             }
         }
@@ -107,7 +108,7 @@ export async function generateCloudPropertyFiles() {
                     accId = pFile.ACCOUNT_ID;
                 }
             }
-            await configurePropFile('./' + propFilesToGenerate, reg, accId,doOauth);
+            await configurePropFile('./' + propFilesToGenerate, reg, accId, doOauth);
         }
         let tcliIprop = propForMFile.substr(0, propForMFile.length - 1);
         log(INFO, 'Property for tcli interaction: ' + tcliIprop);
@@ -118,7 +119,7 @@ export async function generateCloudPropertyFiles() {
                 fileName = 'manage-multiple-cloud-starters.properties';
             }
             const currVal = require('properties-reader')(fileName).path().Multiple_Interaction_Property_Files;
-            if(currVal){
+            if (currVal) {
                 tcliIprop = currVal + ',' + tcliIprop;
             }
             addOrUpdateProperty(fileName, 'Multiple_Interaction_Property_Files', tcliIprop);
@@ -131,23 +132,23 @@ export async function generateCloudPropertyFiles() {
 }
 
 // Extract Helper
-function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesEU, propFilesUS, propFilesAU) {
+function extractCloudInfo(org: ORGInfo, projectName: string, propOption: string[], propFilesALL: ORGFile[], propFilesEU: ORGFile[], propFilesUS: ORGFile[], propFilesAU: ORGFile[]) {
     const orgName = '' + org.accountDisplayName;
-    const accId = org.accountId;
+    const accId = org.accountId as string;
     let tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_');
-    let tOrgNameEU = {
+    let tOrgNameEU: ORGFile = {
         REGION: 'EU',
         PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'EU_' + tOrgName + '.properties',
         PROP: 'tibco-cloud-' + projectName + 'EU_' + tOrgName,
         ACCOUNT_ID: accId
     };
-    let tOrgNameUS = {
+    let tOrgNameUS: ORGFile = {
         REGION: 'US',
         PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'US_' + tOrgName + '.properties',
         PROP: 'tibco-cloud-' + projectName + 'US_' + tOrgName,
         ACCOUNT_ID: accId
     };
-    let tOrgNameAU = {
+    let tOrgNameAU: ORGFile = {
         REGION: 'AU',
         PROPERTY_FILE_NAME: 'tibco-cloud-' + projectName + 'AU_' + tOrgName + '.properties',
         PROP: 'tibco-cloud-' + projectName + 'AU_' + tOrgName,
@@ -161,19 +162,19 @@ function extractCloudInfo(org, projectName, propOption, propFilesALL, propFilesE
 }
 
 // Config property helper
-async function configurePropFile(fileName, region, accountId,doOauth) {
+async function configurePropFile(fileName: string, region: string, accountId: string, doOauth: boolean) {
     log(INFO, '[' + region + ']: Generating: ' + fileName);
-    let regToAdd = '';
+    // let regToAdd = '';
     copyFile(getPropFileName(), fileName);
     const ClientID = await getClientIDforOrg(accountId);
     addOrUpdateProperty(fileName, 'CloudLogin.clientID', ClientID);
     addOrUpdateProperty(fileName, 'CloudLogin.Region', region);
     // Possibly generate an OAUTH Token, on the new file
-    if(doOauth){
+    if (doOauth) {
         // Remove the OAUTH Token so it does not use that as the authentication
         addOrUpdateProperty(fileName, 'CloudLogin.OAUTH_Token', '');
         log(INFO, 'Generating OAUTH Token for: ' + fileName);
-        run('tcli -p "' + fileName + '" generate-oauth-token -a YES'  , false);
+        run('tcli -p "' + fileName + '" generate-oauth-token -a YES', false);
     }
 
 }
@@ -213,13 +214,13 @@ export async function updateProperty() {
         }
         if (vType === 'LiveApps_AppID' || vType === 'LiveApps_ActionID') {
             const apps = await LA.showLiveApps(true, false);
-            let laAppNameA = ['NONE'].concat(apps.map(v => v.name));
+            let laAppNameA = ['NONE'].concat(apps.map((v: any) => v.name));
             let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA);
             if (laAppD === 'NONE') {
                 log(INFO, 'OK, I won\'t do anything :-)');
                 doUpdate = false;
             } else {
-                let laApp = apps.find(e => e.name === laAppD.trim());
+                let laApp = apps.find((e: any) => e.name === laAppD.trim());
                 if (laApp == null) {
                     log(ERROR, 'App not found: ' + laAppD);
                     doUpdate = false;
@@ -237,7 +238,7 @@ export async function updateProperty() {
                         log(INFO, 'OK, I won\'t do anything :-)');
                         doUpdate = false;
                     } else {
-                        let laAction:any = laActions.find(e => e.name === laActD);
+                        let laAction: any = laActions.find(e => e.name === laActD);
                         if (laAction) {
                             pValue = laAction.id
                         } else {
@@ -266,7 +267,7 @@ export async function updateProperty() {
 }
 
 // Function comment out a property in a prop file
-export function disableProperty(location, property, comment) {
+export function disableProperty(location: string, property: string, comment: string) {
     log(DEBUG, 'Disabling: ' + property + ' in:' + location);
     // Check if file exists
     const fs = require('fs');
@@ -316,7 +317,7 @@ export function disableProperty(location, property, comment) {
 // display current properties in a table
 export function showPropertiesTable() {
     // Get the properties object
-    let props:any = {};
+    let props: any = {};
     if (doesFileExist(getPropFileName())) {
         const propLoad = require('properties-reader')(getPropFileName());
         props = propLoad.path();
@@ -328,7 +329,7 @@ export function showPropertiesTable() {
         for (const [key, valueP] of Object.entries(props)) {
             if (key === 'CloudLogin') {
                 for (const [key, valueL] of Object.entries(props.CloudLogin)) {
-                    const myValueL:any = valueL;
+                    const myValueL: any = valueL;
                     if (myValueL === 'USE-GLOBAL') {
                         let displayValue = getProp('CloudLogin.' + key);
                         if (key === 'pass') {
@@ -380,7 +381,7 @@ export function showPropertiesTable() {
 
 
 // Function to get the Client ID
-export async function getClientID(headers) {
+export async function getClientID(headers: any) {
     log(INFO, 'Getting Client ID...');
     let clientID;
     clientID = (await CCOM.callTCA(CCOM.clURI.get_clientID, true, {
@@ -441,7 +442,7 @@ export async function changeOrganization() {
     }
 }
 
-function mapOrg(org) {
+function mapOrg(org: ORGInfo) {
     org.name = org.accountDisplayName;
     if (org.ownersInfo) {
         let i = 1;
@@ -451,7 +452,7 @@ function mapOrg(org) {
         }
     }
     if (org.regions) {
-        org.regions = org.regions.map(reg => translateAWSRegion(reg));
+        org.regions = org.regions.map((reg: any) => translateAWSRegion(reg));
         let i = 1;
         for (const reg of org.regions) {
             org['Region ' + i] = reg;
@@ -465,7 +466,7 @@ function mapOrg(org) {
 
 
 // Options; doShow, doChoose, question
-async function displayOrganizations(doShow, doChoose, question) {
+async function displayOrganizations(doShow: boolean, doChoose: boolean, question: string) {
     const organizations = await getOrganizations();
     const myOrgs = [];
     for (let org of organizations) {
@@ -494,7 +495,7 @@ async function displayOrganizations(doShow, doChoose, question) {
     }
 }
 
-function getSpecificOrganization(organizations, name) {
+function getSpecificOrganization(organizations: ORGInfo[], name: any) {
     for (let org of organizations) {
         if (name === org.accountDisplayName) {
             return org;
@@ -511,7 +512,7 @@ function getSpecificOrganization(organizations, name) {
 
 
 // display current properties in a table
-async function getClientIDforOrg(accountId) {
+async function getClientIDforOrg(accountId: string) {
     log(INFO, 'Getting client ID for organization, with account ID: ' + colors.blue(accountId));
     const postRequest = 'account-id=' + accountId + '&opaque-for-tenant=TSC';
     const response = await CCOM.callTCA(CCOM.clURI.reauthorize, false, {
@@ -527,7 +528,7 @@ async function getClientIDforOrg(accountId) {
     const loginCookie = response.headers['set-cookie'];
     const rxd = /domain=(.*?);/g;
     const rxt = /tsc=(.*?);/g;
-    const cookies = {"domain": rxd.exec(loginCookie)[1], "tsc": rxt.exec(loginCookie)[1]};
+    const cookies = {"domain": rxd.exec(loginCookie)![1], "tsc": rxt.exec(loginCookie)![1]};
 
     const axios = require('axios').default;
     axios.defaults.validateStatus = () => {

@@ -89,3 +89,21 @@ export interface PEXConfig {
     folder: string;
     filePreFix?: string;
 }
+
+export interface ORGFile {
+    REGION: string;
+    PROPERTY_FILE_NAME: string;
+    PROP: string;
+    ACCOUNT_ID: string;
+}
+
+export interface ORGInfo {
+    name?: string
+    accountDisplayName?: string;
+    accountId?: string;
+    ownersInfo?: any;
+    regions?: any;
+    childAccountsInfo?: any;
+    [x: string]: any;
+}
+

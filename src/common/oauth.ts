@@ -13,7 +13,7 @@ const colors = require('colors');
 
 // Function to display current configured OAUTH Settings...
 export function displayCurrentOauthDetails() {
-    if(getOAUTHDetails() == null){
+    if (getOAUTHDetails() == null) {
         getProp('CloudLogin.OAUTH_Token');
     }
     console.table(getOAUTHDetails());
@@ -22,7 +22,10 @@ export function displayCurrentOauthDetails() {
 // Function to display all OAUTH Tokens...
 export async function showOauthToken() {
     log(INFO, 'Displaying OAUTH Tokens...');
-    const response =  await CCOM.callTCA(CCOM.clURI.get_oauth,false  , {tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+    const response = await CCOM.callTCA(CCOM.clURI.get_oauth, false, {
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+    });
     // console.log(response);
     for (let rep in response) {
         if (response[rep]['lastAccessed']) {
@@ -42,7 +45,7 @@ export async function showOauthToken() {
 }
 
 // Function to revoke an OAUTH Token
-export async function revokeOauthToken(tokenName) {
+export async function revokeOauthToken(tokenName: string) {
     if (!tokenName) {
         //No token name provided so choose on from list
         const possibleTokensArrObj = await showOauthToken();
@@ -56,7 +59,13 @@ export async function revokeOauthToken(tokenName) {
     if (tokenName !== 'NO TOKEN') {
         log(INFO, 'Revoking OAUTH Token:  ' + tokenName);
         const postRequest = 'name=' + tokenName;
-        const response =  await CCOM.callTCA(CCOM.clURI.revoke_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+        const response = await CCOM.callTCA(CCOM.clURI.revoke_oauth, false, {
+            method: 'POST',
+            postRequest: postRequest,
+            contentType: 'application/x-www-form-urlencoded',
+            tenant: 'TSC',
+            customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+        });
         log(INFO, 'Result: ', colors.blue(response.message));
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
@@ -67,18 +76,19 @@ export async function revokeOauthToken(tokenName) {
 export async function rotateOauthToken() {
     if (getProp('CloudLogin.OAUTH_Generate_Token_Name') != null) {
         const tokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
-        const tokenNumber = Number(tokenName.split('_').pop().trim());
+        let tokenNumber = 0;
+        try {
+            tokenNumber = Number(tokenName.split('_').pop()!.trim());
+        } catch (e) {
+            log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1) token name: ' + colors.yellow(tokenName));
+        }
         let newTokenNumber = 0;
         let newTokenName = '';
         let doRotate = false;
         //console.log('Token Number: |' + tokenNumber + '|');
-        if (!isNaN(tokenNumber)) {
-            newTokenNumber = tokenNumber + 1;
-            newTokenName = tokenName.replace(String(tokenNumber), String(newTokenNumber));
-            doRotate = true;
-        } else {
-            log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1)')
-        }
+        newTokenNumber = tokenNumber + 1;
+        newTokenName = tokenName.replace(String(tokenNumber), String(newTokenNumber));
+        doRotate = true;
         //console.log('New Token Number: ' , newTokenNumber);
         // console.log('New Token Name: ' , newTokenName);
         if (doRotate) {
@@ -99,7 +109,7 @@ export async function rotateOauthToken() {
 }
 
 // Function that validates and rotates the OAUTH token if needed
-export async function validateAndRotateOauthToken(isInteractive) {
+export async function validateAndRotateOauthToken(isInteractive?: boolean ) {
 
     /* TODO: Actually check if the OAUTH Key Is valid...
     if(CCOM.isOAUTHLoginValid()){
@@ -147,7 +157,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
 }
 
 // Function to generate an OAUTH Token
-export async function generateOauthToken(tokenNameOverride, verbose, returnProp?) {
+export async function generateOauthToken(tokenNameOverride: string, verbose: boolean, returnProp?: boolean) {
     log(INFO, 'Generating OAUTH Token...');
     // const generateOauthUrl = 'https://' + getCurrentRegion() + CCOM.clURI.generate_oauth
     let skipCall = false;
@@ -200,8 +210,14 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp?
     if (!skipCall) {
         // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
         // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
-        const responseClaims =  await CCOM.callTCA(CCOM.clURI.claims);
-        const response =  await CCOM.callTCA(CCOM.clURI.generate_oauth, false, {method: 'POST', postRequest: postRequest, contentType: 'application/x-www-form-urlencoded', tenant: 'TSC', customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login});
+        const responseClaims = await CCOM.callTCA(CCOM.clURI.claims);
+        const response = await CCOM.callTCA(CCOM.clURI.generate_oauth, false, {
+            method: 'POST',
+            postRequest: postRequest,
+            contentType: 'application/x-www-form-urlencoded',
+            tenant: 'TSC',
+            customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+        });
         if (response) {
             if (response.error) {
                 log(ERROR, response.error_description);
@@ -229,7 +245,7 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp?
                     // console.log(responseClaims);
                     const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token;
                     // console.log(tokenToInject);
-                    if(returnProp){
+                    if (returnProp) {
                         return tokenToInject;
                     } else {
                         addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', tokenToInject);
@@ -240,4 +256,5 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp?
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
+    return;
 }

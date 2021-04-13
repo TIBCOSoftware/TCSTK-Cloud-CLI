@@ -232,7 +232,6 @@ async function listOnType(typeToList: SFType, typeName: string) {
                 if (teamFolder.DisplayName === getOrganization()) {
                     log(INFO, 'Organization Folder: ' + teamFolder.DisplayName + ' found...');
                     // console.log(teamFolder);
-                    GlCounter = 0;
                     const items = await iterateItems(teamFolder.Id, typeToList);
                     console.log('');
                     // console.log(items);
@@ -251,9 +250,6 @@ async function listOnType(typeToList: SFType, typeName: string) {
     }
 }
 
-
-let GlCounter = 0;
-
 async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> {
     // console.log('Finding: ' , type , ' in ', baseFolderId);
     let re:any[] = [];
@@ -262,7 +258,6 @@ async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> 
         // console.log(itItem.ItemType);
         if (itItem.ItemType === type) {
             // console.log('Found: ' + type);
-            GlCounter++;
             re.push(itItem);
         }
         if (itItem.IsFolder) {

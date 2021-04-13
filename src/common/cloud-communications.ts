@@ -10,7 +10,6 @@ import {
 } from "./common-functions";
 import {Global} from "../models/base";
 import {CallConfig, MappingGroup} from "../models/tcli-models";
-import {AxiosResponse} from "axios";
 
 declare var global: Global;
 // require('./common-functions');
@@ -602,14 +601,6 @@ export async function showCloudInfo(showTable:boolean, showSandbox: boolean) {
         console.table(nvs);
     }
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud');
-}
-
-// TODO: What to do with passwords and where is this used ?
-function checkPW() {
-    if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') === '') {
-        log(ERROR, 'Please provide your password to login to the tibco cloud in the file tibco-cloud.properties (for property: CloudLogin.pass)');
-        process.exit();
-    }
 }
 
 export async function isOAUTHLoginValid() {
