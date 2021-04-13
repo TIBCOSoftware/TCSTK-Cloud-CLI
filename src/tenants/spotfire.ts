@@ -11,16 +11,17 @@ import {
     pexTable
 } from "../common/common-functions";
 import {Global} from "../models/base";
+import {CallConfig, SFType} from "../models/tcli-models";
 declare var global: Global;
 
 const CCOM = require('../common/cloud-communications');
 const colors = require('colors');
 
-let jSession;
-let xSRF;
+let jSession: string;
+let xSRF: string;
 
 
-async function callSpotfire(url, doLog, conf?) {
+async function callSpotfire(url: string, doLog?:boolean, conf?:CallConfig): Promise<any> {
     // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
     if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
         if (!jSession || !xSRF) {
@@ -34,22 +35,23 @@ async function callSpotfire(url, doLog, conf?) {
             const response = await CCOM.callTCA(url, doLog, conf);
             const loginCookie = response.headers['set-cookie'];
             //  logO(DEBUG, loginCookie);
-            jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)[1];
-            xSRF = /XSRF-TOKEN=(.*?);/g.exec(loginCookie)[1];
-
+            jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)![1]!;
+            xSRF = /XSRF-TOKEN=(.*?);/g.exec(loginCookie)![1]!;
             log(DEBUG, 'Got Spotfire Details] jSession: ', jSession);
             log(DEBUG, 'Got Spotfire Details]     xSRF: ', xSRF);
             return callSpotfire(url, doLog, originalConf);
         } else {
-            const header = {};
+            const header:any = {};
             header["cookie"] = "JSESSIONID=" + jSession;
             header["X-XSRF-TOKEN"] = xSRF;
             header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
+            conf = {...conf,customHeaders: header};
+            /*
             if (conf) {
                 conf['customHeaders'] = header;
             } else {
                 conf = {customHeaders: header};
-            }
+            }*/
             return await CCOM.callTCA(url, doLog, conf);
         }
     } else {
@@ -71,7 +73,7 @@ async function callSpotfire(url, doLog, conf?) {
 
 const SF_TYPES = ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"];
 
-async function getSFolderInfo(folderId) {
+async function getSFolderInfo(folderId:string) {
     const request = {
         "folderId": folderId,
         "types": SF_TYPES
@@ -181,7 +183,7 @@ export async function listSpotfire() {
     const questionTypes = ['Spotfire Reports', 'Spotfire Mods', 'Information links', 'Data files', 'Data connections', 'NONE', 'ALL'];
     const typeForSearch = await askMultipleChoiceQuestionSearch('What Spotfire Library item would you like to list ?', questionTypes);
     if (typeForSearch.toLowerCase() !== 'none') {
-        const map = {
+        const map:any = {
             'Spotfire Reports': 'spotfire.dxp',
             'Spotfire Mods': 'spotfire.mod',
             'Information links': 'spotfire.query',
@@ -191,14 +193,14 @@ export async function listSpotfire() {
         if(typeForSearch.toLowerCase() === 'all'){
             for (const [ReadableName, SFTypeName] of Object.entries(map)) {
                 log(INFO, 'Looking for: ' + colors.blue(ReadableName)  + ' in library:');
-                await listOnType(SFTypeName, ReadableName);
+                await listOnType(SFTypeName as SFType, ReadableName);
             }
         } else {
             let typeToSearch = typeForSearch;
             if(map[typeForSearch] != null){
                 typeToSearch = map[typeForSearch];
             }
-            await listOnType(typeToSearch, typeForSearch);
+            await listOnType(typeToSearch as SFType, typeForSearch);
         }
         if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
     } else {
@@ -207,7 +209,7 @@ export async function listSpotfire() {
 }
 
 
-async function listOnType(typeToList, typeName) {
+async function listOnType(typeToList: SFType, typeName: string) {
 
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     // console.log(SFSettings);
@@ -252,9 +254,9 @@ async function listOnType(typeToList, typeName) {
 
 let GlCounter = 0;
 
-async function iterateItems(baseFolderId, type) {
+async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> {
     // console.log('Finding: ' , type , ' in ', baseFolderId);
-    let re = [];
+    let re:any[] = [];
     const iterateFolder = await getSFolderInfo(baseFolderId);
     for (let itItem of iterateFolder.Children) {
         // console.log(itItem.ItemType);

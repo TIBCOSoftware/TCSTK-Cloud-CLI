@@ -74,7 +74,7 @@ export async function rotateOauthToken() {
         //console.log('Token Number: |' + tokenNumber + '|');
         if (!isNaN(tokenNumber)) {
             newTokenNumber = tokenNumber + 1;
-            newTokenName = tokenName.replace(tokenNumber, newTokenNumber);
+            newTokenName = tokenName.replace(String(tokenNumber), String(newTokenNumber));
             doRotate = true;
         } else {
             log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1)')
@@ -118,7 +118,7 @@ export async function validateAndRotateOauthToken(isInteractive) {
     getProp('CloudLogin.OAUTH_Token');
     let oauth_required_hours_valid = 168;
     if (getProp('CloudLogin.OAUTH_Required_Hours_Valid') != null) {
-        oauth_required_hours_valid = getProp('CloudLogin.OAUTH_Required_Hours_Valid');
+        oauth_required_hours_valid = Number(getProp('CloudLogin.OAUTH_Required_Hours_Valid'));
     } else {
         log(INFO, 'No CloudLogin.OAUTH_Required_Hours_Valid property found; We are adding it to: ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Required_Hours_Valid', oauth_required_hours_valid, 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.');
@@ -185,7 +185,7 @@ export async function generateOauthToken(tokenNameOverride, verbose, returnProp?
     // Check for valid hours (336 by default; 2 weeks)
     let OauthHours = 336;
     if (getProp('CloudLogin.OAUTH_Generate_Valid_Hours') != null) {
-        OauthHours = getProp('CloudLogin.OAUTH_Generate_Valid_Hours');
+        OauthHours = Number(getProp('CloudLogin.OAUTH_Generate_Valid_Hours'));
     } else {
         log(INFO, 'No OAuthKey_Generate_Valid_Hours found; This is needed to specify how log the OAUTH Token is valid for');
         let decision = await askMultipleChoiceQuestion('Would you like to add this to ' + getPropFileName() + ' ?', ['YES', 'NO']);

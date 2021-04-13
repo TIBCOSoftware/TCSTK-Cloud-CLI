@@ -12,7 +12,7 @@ const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
 const colors = require('colors');
 
-export async function getGroupsTable(showTable?) {
+export async function getGroupsTable(showTable?:boolean): Promise<any> {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -24,7 +24,7 @@ export async function getGroupsTable(showTable?) {
 }
 
 // Function that shows live apps group and who is in it.
-export async function showLiveAppsGroups() {
+export async function showLiveAppsGroups(): Promise<void> {
     const groupT = await getGroupsTable();
     let selectGroup = ['NONE', 'ALL'];
     for (let gr of iterateTable(groupT)) {
@@ -50,7 +50,7 @@ export async function showLiveAppsGroups() {
 }
 
 // Function to create LiveApps Group
-export async function createLiveAppsGroup() {
+export async function createLiveAppsGroup():Promise<void> {
     log(INFO, 'Creating LiveApps Group...');
     const gName = await askQuestion('What is the name of the group you would like to create ? (use "NONE" or press enter to not create a group)');
     if (gName !== '' || gName.toLowerCase() !== 'none') {
@@ -70,7 +70,7 @@ export async function createLiveAppsGroup() {
 }
 
 // Function that shows the LiveApps Users
-export async function showLiveAppsUsers(showTable, hideTestUsers) {
+export async function showLiveAppsUsers(showTable:boolean, hideTestUsers:boolean) {
     const oResponse = await CCOM.callTCA(CCOM.clURI.la_users);
     const usersTable = createTable(oResponse, CCOM.mappings.la_users, false);
     if (hideTestUsers) {

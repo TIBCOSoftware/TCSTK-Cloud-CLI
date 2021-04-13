@@ -10,25 +10,28 @@ import {
 } from "./common-functions";
 import {Global} from "../models/base";
 import {CallConfig, MappingGroup} from "../models/tcli-models";
+import {AxiosResponse} from "axios";
+
 declare var global: Global;
 // require('./common-functions');
 const colors = require('colors');
 const cloudConfig = require('../config/config-cloud.json');
+
 // TODO: if Cloud_Location provided replace |cloud.tibco.com|
 // see https://liveapps.tenant-integration.tcie.pro/webresource/apps/GatherSmart/index.html#/starterApp/splash
 export const clURI = cloudConfig.endpoints;
 export const mappings = cloudConfig.mappings as MappingGroup;
 
-let loginC = null;
+let loginC: any = null;
 let doOAuthNotify = true;
-let isOAUTHValid;
+let isOAUTHValid: boolean | null;
 let toldClientID = false;
 let isOrgChecked = false;
 
 // An HTTP request based on Axios library
 // TODO: Look at managing Axios error handling
 // https://stackoverflow.com/questions/43842711/can-i-throw-error-in-axios-post-based-on-response-status
-export async function doRequest(url, options?, data?) {
+export async function doRequest(url: string, options?: any, data?: any) {
     const axios = require('axios').default;
     axios.defaults.validateStatus = () => {
         return true;
@@ -56,10 +59,10 @@ export async function doRequest(url, options?, data?) {
 }
 
 // We have replaced this manual request by Axios, to handle weird characters
-export function doManualRequest(url, options, data) {
+export function doManualRequest(url: string, options: any, data: any) {
     const https = require('https');
     return new Promise((resolve, reject) => {
-        const req = https.request(url, options, (res) => {
+        const req = https.request(url, options, (res: any) => {
             res.setEncoding('utf8');
             // console.log(res);
             let responseTXT = '';
@@ -67,7 +70,7 @@ export function doManualRequest(url, options, data) {
             response.body = '';
             response.statusCode = res.statusCode;
             response.headers = res.headers;
-            res.on('data', (chunk) => {
+            res.on('data', (chunk: any) => {
                 responseTXT += chunk;
             });
             res.on('end', () => {
@@ -79,7 +82,7 @@ export function doManualRequest(url, options, data) {
                 resolve(response);
             });
         });
-        req.on('error', (err) => {
+        req.on('error', (err: any) => {
             reject(err);
         });
         if (data) {
@@ -99,7 +102,7 @@ export function invalidateLogin() {
     isOAUTHValid = null;
 }
 
-export async function cLogin(tenant?, customLoginURL?, forceClientID?) {
+export async function cLogin(tenant?: string, customLoginURL?: string, forceClientID?: boolean) {
     const fClientID = forceClientID || false;
     if (isOauthUsed() && !fClientID) {
         log(DEBUG, 'Using OAUTH for Authentication...');
@@ -111,7 +114,12 @@ export async function cLogin(tenant?, customLoginURL?, forceClientID?) {
         if (!isOrgChecked) {
             // Setting this to temp so it breaks the call stack
             // setOrganization('TEMP');
-            const response = await callURLA('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true, false, true);
+            // const response = await callURLA('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true, false, true);
+            const response = await callTCA(clURI.account_info, false, {
+                forceOAUTH: true,
+                forceCLIENTID: false,
+                handleErrorOutside: true
+            });
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
                 log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
@@ -186,12 +194,12 @@ export async function cLogin(tenant?, customLoginURL?, forceClientID?) {
 }
 
 // Function that logs into the cloud and returns a cookie
-async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
+async function cloudLoginV3(tenantID: string, clientID: string, email: string, pass: string, TCbaseURL: string) {
     const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + encodeURIComponent(pass);
     log(DEBUG, 'cloudLoginV3]   URL: ' + TCbaseURL);
     log(DEBUG, 'cloudLoginV3]  POST: ' + 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email);
     // log(INFO, 'With Form: ' + postForm);
-    const header = {};
+    const header: any = {};
     header['Content-Type'] = 'application/x-www-form-urlencoded';
     header['Content-Length'] = postForm.length;
     const response = await doRequest(encodeURI(TCbaseURL), {
@@ -211,7 +219,7 @@ async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
         logO(DEBUG, loginCookie);
         const rxd = /domain=(.*?);/g;
         const rxt = /tsc=(.*?);/g;
-        re = {"domain": rxd.exec(loginCookie)[1], "tsc": rxt.exec(loginCookie)[1]};
+        re = {"domain": rxd.exec(loginCookie)![1]!, "tsc": rxt.exec(loginCookie)![1]!};
         logO(DEBUG, re.domain);
         logO(DEBUG, re.tsc);
         logO(DEBUG, re);
@@ -222,7 +230,8 @@ async function cloudLoginV3(tenantID, clientID, email, pass, TCbaseURL) {
 
 // Function to call the Tibco Cloud
 // TODO: Accept, URL, doLog and possible config
-async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant?, customLoginURL?, returnResponse?, forceOAUTH?, forceCLIENTID?, handleErrorOutside?, customHeaders?) {
+/*
+async function callURLA(url:string, method?, postRequest?, contentType?, doLog?, tenant?, customLoginURL?, returnResponse?, forceOAUTH?, forceCLIENTID?, handleErrorOutside?, customHeaders?) {
     const doErrorOutside = handleErrorOutside || false;
     const fOAUTH = forceOAUTH || false;
     const fCLIENTID = forceCLIENTID || false;
@@ -329,10 +338,10 @@ async function callURLA(url, method?, postRequest?, contentType?, doLog?, tenant
             log(ERROR, 'No Body Returned, Status: ', response.statusCode);
         }
     }
-}
+} */
 
 // Wrapper around the callURL function that takes a config object
-export async function callTCA(url:string, doLog?:boolean, conf?:CallConfig) {
+export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     if (conf == null) {
         conf = {};
     }
@@ -342,20 +351,128 @@ export async function callTCA(url:string, doLog?:boolean, conf?:CallConfig) {
         log(WARNING, 'Using another BASE URL: ', getProp('CloudLogin.Cloud_Location'))
     }
     const urlToCall = 'https://' + getCurrentRegion() + url;
+
+    const doErrorOutside = conf.handleErrorOutside || false;
+    const fOAUTH = conf.forceOAUTH || false;
+    const fCLIENTID = conf.forceCLIENTID || false;
+    const reResponse = conf.returnResponse || false;
+    let lCookie: any = {};
+    if (!fOAUTH) {
+        lCookie = await cLogin(conf.tenant, conf.customLoginURL);
+    }
+    if (fCLIENTID) {
+        lCookie = await cLogin(conf.tenant, conf.customLoginURL, true);
+    }
+    const cMethod = conf.method || 'GET';
+    let cdoLog = false;
+    if (doLog != null) {
+        cdoLog = doLog;
+    }
+    const cType = conf.contentType || 'application/json';
+    let body = '';
+    if (cMethod.toLowerCase() !== 'get') {
+        if (cType === 'application/json') {
+            body = JSON.stringify(conf.postRequest);
+        } else {
+            body = conf.postRequest;
+        }
+    }
+    let header: any = {};
+    if (conf.customHeaders) {
+        header = conf.customHeaders;
+    }
+    if (!header["accept"]) {
+        header["accept"] = 'application/json';
+    }
+
+    header["Content-Type"] = cType;
+    // Check if we need to provide the OAUTH token
+    if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
+        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
+    } else {
+        if (header["cookie"]) {
+            header["cookie"] += "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        } else {
+            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        }
+    }
+    if (fCLIENTID) {
+        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+        delete header.Authorization;
+    }
+
+    if (cdoLog) {
+        log(INFO, '--- CALLING SERVICE ---');
+        log(INFO, '- URL(' + cMethod + '): ' + url);
+        log(DEBUG, '-  METHOD: ' + cMethod);
+        log(INFO, '- CONTENT: ' + cType);
+        log(DEBUG, '-  HEADER: ', header);
+    }
+    if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'delete')) {
+        if (cdoLog) {
+            log(INFO, '-    BODY: ' + body);
+        }
+    }
+    let response: any = {};
+    if (cMethod.toLowerCase() === 'get') {
+        response = await doRequest(encodeURI(urlToCall), {
+            headers: header
+        })
+    } else {
+        if (body != null) {
+            header['Content-Length'] = body.length;
+        }
+        response = await doRequest(encodeURI(urlToCall), {
+            headers: header,
+            method: cMethod.toUpperCase()
+        }, body)
+    }
+    if (response.statusCode != 200 && !doErrorOutside) {
+        if (response.body != null) {
+            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode + ' \n Message: ', response.body);
+        } else {
+            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode);
+        }
+        process.exit(1);
+    }
+    if (response.body != null) {
+        if (response.body.errorMsg != null) {
+            if (doErrorOutside) {
+                return response.body;
+            } else {
+                log(ERROR, response.body.errorMsg);
+                // log(ERROR, response.body);
+            }
+            return null;
+        } else {
+            if (reResponse) {
+                return response;
+            }
+            // log(INFO, '-  RESPONSE: ', response.body);
+            return response.body;
+        }
+    } else {
+        if (reResponse) {
+            return response;
+        } else {
+            log(ERROR, 'No Body Returned, Status: ', response.statusCode);
+        }
+    }
+
     //url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
-    return await callURLA(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
+    // return await callURLA(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function uploadToCloud(formDataType, localFileLocation, uploadFileURI) {
+export async function uploadToCloud(formDataType: string, localFileLocation: string, uploadFileURI: string) {
     return new Promise<void>(async function (resolve, reject) {
         const fd = require('form-data');
         let formData = new fd();
         const fs = require('fs');
         const {size: fileSize} = fs.statSync(localFileLocation);
-        log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')'  + ' Filesize: ' + readableSize(fileSize));
+        log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')' + ' Filesize: ' + readableSize(fileSize));
         formData.append(formDataType, fs.createReadStream(localFileLocation));
-        const header = {};
+        const header: any = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         // Possibly add OAUTH Header...
         if (isOauthUsed() && await isOAUTHLoginValid()) {
@@ -370,9 +487,9 @@ export async function uploadToCloud(formDataType, localFileLocation, uploadFileU
             path: uploadFileURI,
             method: 'POST',
             headers: header
-        }, (res) => {
+        }, (res: any) => {
             let data = '';
-            res.on("data", (chunk) => {
+            res.on("data", (chunk: any) => {
                 data += chunk.toString('utf8');
             });
             res.on('end', () => {
@@ -392,7 +509,7 @@ export async function uploadToCloud(formDataType, localFileLocation, uploadFileU
                 resolve();
             })
         });
-        query.on("error", (e) => {
+        query.on("error", (e: any) => {
             console.error(e);
             resolve();
         });
@@ -402,12 +519,12 @@ export async function uploadToCloud(formDataType, localFileLocation, uploadFileU
 
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function downloadFromCloud(localFileLocation, downloadFileURI) {
+export async function downloadFromCloud(localFileLocation: string, downloadFileURI: string) {
     return new Promise<void>(async function (resolve, reject) {
         const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
         log(INFO, '     DOWNLOADING: ' + colors.blue(downloadURL));
         log(INFO, '              TO: ' + colors.blue(localFileLocation));
-        let headers = {};
+        let headers: any = {};
         if (isOauthUsed() && await isOAUTHLoginValid()) {
             headers["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         } else {
@@ -420,12 +537,12 @@ export async function downloadFromCloud(localFileLocation, downloadFileURI) {
             responseType: 'arraybuffer',
             headers
         })
-            .then(response => {
+            .then((response: { data: any; }) => {
                 try {
                     const fs = require('fs');
                     fs.writeFileSync(localFileLocation, response.data, 'utf8');
                     const {size: fileSize} = fs.statSync(localFileLocation);
-                    log(INFO, ' DOWNLOAD RESULT: ' + colors.green('DONE')  + ' Filesize: ' + readableSize(fileSize));
+                    log(INFO, ' DOWNLOAD RESULT: ' + colors.green('DONE') + ' Filesize: ' + readableSize(fileSize));
                     resolve()
                 } catch (err) {
                     log(INFO, ' DOWNLOAD RESULT: ' + colors.red('ERROR'));
@@ -433,40 +550,34 @@ export async function downloadFromCloud(localFileLocation, downloadFileURI) {
                     reject(err);
                 }
             })
-            .catch(ex => {
+            .catch((ex: string) => {
                 log(ERROR, 'Problem downloading the file: ' + ex);
                 reject(ex);
             });
     });
 }
 
-function readableSize(sizeBytes) {
-    if(sizeBytes < 1024) {
+function readableSize(sizeBytes: number) {
+    if (sizeBytes < 1024) {
         return sizeBytes + ' Bytes';
     } else {
         const fsKb = Math.round(sizeBytes / 1024 * 100) / 100;
-        if(fsKb < 1024) {
+        if (fsKb < 1024) {
             return fsKb + ' KB';
         } else {
             const fsMb = Math.round(fsKb / 1024 * 100) / 100;
-            if(fsMb < 1024) {
+            if (fsMb < 1024) {
                 return fsMb + ' MB';
             } else {
-                if (fsMb < 1024) {
-                    const fsGb = Math.round(fsMb / 1024 * 100) / 100;
-                    return fsGb + ' GB';
-                }
+                const fsGb = Math.round(fsMb / 1024 * 100) / 100;
+                return fsGb + ' GB';
             }
         }
-
     }
-
-
-
 }
 
 // Function to show claims for the configured user
-export async function showCloudInfo(showTable, showSandbox) {
+export async function showCloudInfo(showTable:boolean, showSandbox: boolean) {
     const doShowSandbox = showSandbox || false;
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;

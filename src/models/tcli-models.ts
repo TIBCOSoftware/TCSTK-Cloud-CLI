@@ -68,3 +68,24 @@ export interface CallConfig {
     handleErrorOutside?: boolean;
     customHeaders?: any;
 }
+
+export interface OAUTHConfig {
+    Token_Name?: string;
+    Region?: string;
+    User?: string;
+    Org?: string;
+    Scope?: string;
+    Expiry_Date?: number;
+    Expiry_Date_Display?: string;
+    /* added this since the object is parsed */
+    [key: string]:any;
+}
+
+export type SFType = 'spotfire.dxp' | 'spotfire.mod' | 'spotfire.query' | 'spotfire.sbdf' | 'spotfire.dataconnection';
+
+export interface PEXConfig {
+    export: boolean;
+    tables: string;
+    folder: string;
+    filePreFix?: string;
+}

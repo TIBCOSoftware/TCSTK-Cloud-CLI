@@ -2,7 +2,7 @@
 // All inputs are provided as input to the functions
 import {Global} from "../models/base";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
-import {Mapping} from "../models/tcli-models";
+import {Mapping, OAUTHConfig, PEXConfig} from "../models/tcli-models";
 declare var global: Global;
 const globalTCpropFolder = __dirname + '/../../../common/';
 const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
@@ -10,7 +10,7 @@ const colors = require('colors');
 const _ = require('lodash');
 
 // Display opening
-export function displayOpeningMessage() {
+export function displayOpeningMessage(): void {
     //const pjson = require('./package.json');
     //console.log(process.env.npm_package_version);
     const version = require('../../package.json').version;
@@ -22,7 +22,7 @@ export function displayOpeningMessage() {
 }
 
 // function to view the global connection configuration, and display's none if not set
-export function displayGlobalConnectionConfig() {
+export function displayGlobalConnectionConfig(): boolean {
     // console.log('Global Connection Config: ');
     let re = false;
     log(INFO, 'Global Tibco Cloud Propfile: ' + GLOBALPropertyFileName);
@@ -60,16 +60,14 @@ export function displayGlobalConnectionConfig() {
         } else {
             log(INFO, 'No Global OAUTH Configuration Set...');
         }
-
     } else {
         log(INFO, 'No Global Configuration Set...');
     }
-
     // Returns true if the global file exists and false if it does not exists.
     return re;
 }
 
-export function isGlobalOauthDefined() {
+export function isGlobalOauthDefined(): boolean {
     if (doesFileExist(GLOBALPropertyFileName)) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();
         if (_.get(propsG, 'CloudLogin.OAUTH_Token') === undefined) {
@@ -83,7 +81,7 @@ export function isGlobalOauthDefined() {
 }
 
 // Function to replace string in file
-export function replaceInFile(from, to, filePattern) {
+export function replaceInFile(from: string, to: string, filePattern:string):any {
     const patternToUse = filePattern || './**';
     const regex = new RegExp(from, 'g');
     const options = {
@@ -124,10 +122,10 @@ export async function updateGlobalConnectionConfig() {
 
     // Bump up the OAUTH Token
     const OTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name');
-    const tokenNumber = Number(OTokenName.split('_').pop().trim());
+    const tokenNumber = Number(OTokenName.split('_').pop()!.trim());
     if (!isNaN(tokenNumber)) {
         const newTokenNumber = tokenNumber + 1;
-        const newTokenName = OTokenName.replace(tokenNumber, newTokenNumber);
+        const newTokenName = OTokenName.replace(String(tokenNumber), String(newTokenNumber));
         addOrUpdateProperty(GLOBALPropertyFileName, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName);
         log(INFO, 'Updating Global Token Name: ', newTokenName);
     }
@@ -136,19 +134,19 @@ export async function updateGlobalConnectionConfig() {
     await updateCloudLogin(GLOBALPropertyFileName, false, true, defClientID, defEmail);
 }
 
-let globalProperties;
-let LOCALPropertyFileName;
-let propsGl;
+let globalProperties: any;
+let LOCALPropertyFileName: string;
+let propsGl:any;
 let globalMultipleOptions = {};
 // Function to get a property
-let globalOAUTH = null;
+let globalOAUTH:any = null;
 
 export function getOAUTHDetails() {
     log(DEBUG, 'Returning globalOAUTH: ', globalOAUTH);
     return globalOAUTH;
 }
 
-export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
+export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefresh?:boolean): string {
     log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh, 'Forcing a Global Refresh: ', forceGlobalRefresh);
     if (forceRefresh) {
         propsGl = null;
@@ -191,7 +189,7 @@ export function getProp(propName, forceRefresh?, forceGlobalRefresh?) {
     return re;
 }
 
-function getPropertyFromGlobal(propName, forceGlobalRefresh) {
+function getPropertyFromGlobal(propName: string, forceGlobalRefresh?:boolean) {
     let re = null;
     if (doesFileExist(GLOBALPropertyFileName)) {
         if (globalProperties == null || forceGlobalRefresh) {
@@ -212,25 +210,29 @@ function getPropertyFromGlobal(propName, forceGlobalRefresh) {
 }
 
 
-export function parseOAUTHToken(stringToken, doLog) {
+export function parseOAUTHToken(token:string, doLog: boolean):OAUTHConfig {
     let showLog = doLog || false;
-    let re = {};
-    log(DEBUG, 'Parsing OAUTH Token: ', stringToken);
-    let elements = stringToken.match(/(?<=\[\s*).*?(?=\s*\])/gs);
+    let re:OAUTHConfig = {};
+    log(DEBUG, 'Parsing OAUTH Token: ', token);
+    let elements = token.match(/(?<=\[\s*).*?(?=\s*\])/gs);
     if (Symbol.iterator in Object(elements)) {
-        for (let el of elements) {
-            // let nameValue = el.split(':');
-            let nameValue = el.split(/:/);
-            let key = nameValue.shift().trim().replace(' ', '_');
-            let val = nameValue.join(':').trim();
-            if (key && val) {
-                log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|');
-                if (key === 'Expiry_Date') {
-                    //Parse expiry date
-                    re[key + '_Display'] = val;
-                    re[key] = Date.parse(val);
-                } else {
-                    re[key] = val;
+        if(elements) {
+            for (let el of elements) {
+                // let nameValue = el.split(':');
+                let nameValue = el.split(/:/);
+                if(nameValue && nameValue.length > 1) {
+                    let key = nameValue.shift()!.trim().replace(' ', '_');
+                    let val = nameValue.join(':').trim();
+                    if (key && val) {
+                        log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|');
+                        if (key === 'Expiry_Date') {
+                            //Parse expiry date
+                            re[key + '_Display'] = val;
+                            re[key] = Date.parse(val);
+                        } else {
+                            re[key] = val;
+                        }
+                    }
                 }
             }
         }
@@ -247,7 +249,7 @@ export function parseOAUTHToken(stringToken, doLog) {
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
 
-export function getOrganization(forceRefresh?) {
+export function getOrganization(forceRefresh?: boolean) {
     if (forceRefresh) {
         OrganizationGl = '';
         globalOAUTH = null;
@@ -265,12 +267,12 @@ export function getOrganization(forceRefresh?) {
     return OrganizationGl;
 }
 
-export function setOrganization(org) {
+export function setOrganization(org: string) {
     log(DEBUG, 'Setting org: ' + org);
     OrganizationGl = org;
 }
 
-export function setProperty(name, value) {
+export function setProperty(name: string, value: string) {
     //console.log('BEFORE propsGl: ' , propsGl);
     log(DEBUG, 'Setting Property) Name: ', name, ' Value: ', value);
     if (propsGl == null) {
@@ -280,19 +282,20 @@ export function setProperty(name, value) {
     //console.log('AFTER propsGl: ' , propsGl);
 }
 
-function set(path, value, obj) {
+
+function set(path: string, value: string, obj: any) {
     let schema = obj;  // a moving reference to internal objects within obj
     const pList = path.split('.');
     const len = pList.length;
     for (let i = 0; i < len - 1; i++) {
-        const elem = pList[i];
+        const elem = pList[i]!;
         if (!schema[elem]) schema[elem] = {}
         schema = schema[elem];
     }
-    schema[pList[len - 1]] = value;
+    schema[pList[len - 1]!] = value;
 }
 
-export function setPropFileName(propFileName) {
+export function setPropFileName(propFileName: string) {
     LOCALPropertyFileName = propFileName;
     log(DEBUG, 'Using Property File: ' + LOCALPropertyFileName);
 }
@@ -301,7 +304,7 @@ export function getPropFileName() {
     return LOCALPropertyFileName;
 }
 
-export function setMultipleOptions(mOptions) {
+export function setMultipleOptions(mOptions: { name?: string; job?: string; environment?: string; }) {
     globalMultipleOptions = mOptions;
     log(DEBUG, 'Using Multiple Options: ', globalMultipleOptions);
 }
@@ -311,7 +314,7 @@ export function getMultipleOptions() {
 }
 
 // Function to trim string
-export function trim(value) {
+export function trim(value: string) {
     return value.replace(/^\s*/, "").replace(/\s*$/, "");
 }
 
@@ -343,7 +346,7 @@ export async function createMultiplePropertyFile() {
 }
 
 // Function to copy a file
-export function copyFile(fromFile, toFile) {
+export function copyFile(fromFile: string, toFile: string) {
     log(INFO, 'Copying File from: ' + fromFile + ' to: ' + toFile);
     const fs = require('fs');
     fs.copyFileSync(fromFile, toFile);
@@ -351,7 +354,7 @@ export function copyFile(fromFile, toFile) {
 
 
 // function to ask a question
-export async function askQuestion(question, type = 'input') {
+export async function askQuestion(question: string, type = 'input') {
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
         let re = 'result';
@@ -360,10 +363,10 @@ export async function askQuestion(question, type = 'input') {
             type: type,
             name: 'result',
             message: question,
-            filter: function (val) {
+            filter: (val:any) => {
                 return val;
             }
-        }]).then((answers) => {
+        }]).then((answers:any) => {
             logO(DEBUG, answers);
             re = answers.result;
         });
@@ -374,7 +377,7 @@ export async function askQuestion(question, type = 'input') {
 }
 
 // function to ask a question
-export async function askMultipleChoiceQuestion(question, options) {
+export async function askMultipleChoiceQuestion(question: string, options: any[]) {
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
         let re = 'result';
@@ -384,14 +387,14 @@ export async function askMultipleChoiceQuestion(question, options) {
             name: 'result',
             message: question,
             choices: options,
-            filter: function (val) {
+            filter: (val:any) => {
                 return val;
             }
-        }]).then((answers) => {
+        }]).then((answers:any) => {
             logO(DEBUG, answers);
             re = answers.result;
             //return answers.result;
-        }).catch(error => {
+        }).catch((error: any) => {
             log(ERROR, error);
         });
         return re;
@@ -401,10 +404,10 @@ export async function askMultipleChoiceQuestion(question, options) {
 
 }
 
-let gOptions = [];
+let gOptions: any[] = [];
 
 // Ask a question to a user, and allow the user to search through a possilbe set of options
-export async function askMultipleChoiceQuestionSearch(question, options) {
+export async function askMultipleChoiceQuestionSearch(question: string, options: any[]) {
     let re = '';
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
@@ -417,7 +420,7 @@ export async function askMultipleChoiceQuestionSearch(question, options) {
             message: question,
             source: searchAnswerF,
             pageSize: 4
-        }]).then((answers) => {
+        }]).then((answers: { command: string; }) => {
             // console.log('answers: ' , answers);
             logO(DEBUG, answers);
             re = answers.command;
@@ -429,14 +432,14 @@ export async function askMultipleChoiceQuestionSearch(question, options) {
 }
 
 //User interaction
-export function searchAnswerF(answers, input) {
+export function searchAnswerF(_answers: any, input: string) {
     const fuzzyF = require('fuzzy');
     input = input || '';
     return new Promise(function (resolve) {
         setTimeout(function () {
             const fuzzyResult = fuzzyF.filter(input, gOptions);
             resolve(
-                fuzzyResult.map(function (el) {
+                fuzzyResult.map(function (el: { original: any; }) {
                     return el.original;
                 })
             );
@@ -445,9 +448,9 @@ export function searchAnswerF(answers, input) {
 }
 
 let useGlobalAnswers = false;
-let globalAnswers = [];
+let globalAnswers: string[] = [];
 
-export function setGlobalAnswers(answers) {
+export function setGlobalAnswers(answers: string) {
     // console.log('Answers: ' , answers);
     if (answers) {
         // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
@@ -463,10 +466,10 @@ export function setGlobalAnswers(answers) {
     }
 }
 
-export function getLastGlobalAnswer(question) {
+export function getLastGlobalAnswer(question: string) {
     let re = '';
     if (globalAnswers && globalAnswers.length > 0) {
-        re = globalAnswers.shift();
+        re = globalAnswers.shift()!;
         log(INFO, 'Injected answer: ', colors.blue(re), ' For question: ', question);
     } else {
         log(ERROR, 'No answer left for question: ' + question);
@@ -476,7 +479,7 @@ export function getLastGlobalAnswer(question) {
 }
 
 // Update the cloud login properties
-export async function updateCloudLogin(propFile, forceRefresh?, forceGlobalRefresh?, defaultClientID?, defaultEmail?) {
+export async function updateCloudLogin(propFile: string, forceRefresh?: boolean, forceGlobalRefresh?: boolean, defaultClientID?: string, defaultEmail?: string) {
     // Client ID
     let cidQuestion = 'What is your Client ID ?';
     let useCID = '';
@@ -519,14 +522,14 @@ export async function updateCloudLogin(propFile, forceRefresh?, forceGlobalRefre
 }
 
 // Obfuscate a password
-export function obfuscatePW(toObfuscate) {
+export function obfuscatePW(toObfuscate: string) {
     const fus = require('./fuzzy-search.js');
     // return '#' + Buffer.from(toObfuscate).toString('base64');
     return fus.search(toObfuscate);
 }
 
 // function to update the tenant
-export async function updateRegion(propFile) {
+export async function updateRegion(propFile: string) {
     const re = await askMultipleChoiceQuestionSearch('Which Region would you like to use ? ', ['US - Oregon', 'EU - Ireland', 'AU - Sydney']);
     if (re === 'US - Oregon') {
         addOrUpdateProperty(propFile, 'CloudLogin.Region', 'US');
@@ -539,7 +542,7 @@ export async function updateRegion(propFile) {
     }
 }
 
-export function getCurrentRegion(showRegion?) {
+export function getCurrentRegion(showRegion?: boolean) {
     let displayRegion = false;
     if (showRegion) {
         displayRegion = showRegion;
@@ -585,7 +588,7 @@ export function getCurrentAWSRegion() {
 }
 
 // Translates an AWS region into normal region description.
-export function translateAWSRegion(awsRegion) {
+export function translateAWSRegion(awsRegion: string) {
     switch (awsRegion) {
         case 'us-west-2':
             return 'US - Oregon';
@@ -597,10 +600,11 @@ export function translateAWSRegion(awsRegion) {
             return 'AU - Sydney';
             break;
     }
+    return '';
 }
 
 // Gets region (in Capitals)
-export function getRegion(forceRefresh?, forceGlobalRefresh?) {
+export function getRegion(forceRefresh?: boolean, forceGlobalRefresh?: boolean) {
     const re = getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh);
     if(re){
         return re.toString().toUpperCase();
@@ -627,7 +631,7 @@ export function updateCloudPackages() {
 
 
 export function updateTCLIwrapper() {
-    return new Promise<void>(async function (resolve, reject) {
+    return new Promise<void>(async function (resolve) {
         updateTCLI();
         resolve();
     });
@@ -636,7 +640,7 @@ export function updateTCLIwrapper() {
 // TODO: Move this function to PropFileManagement
 // TODO: Implement Check for global (see if the old value is USE-GLOBAL, and then update the global file)
 // Function to add or update property to a file, and possibly adds a comment if the property does not exists
-export function addOrUpdateProperty(location, property, value, comment?, checkForGlobal?) {
+export function addOrUpdateProperty(location: string, property: string, value: string | number, comment?: string, checkForGlobal?: boolean) {
     log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ') Use Global: ', checkForGlobal);
     // Check for global is true by default
     let doCheckForGlobal = true;
@@ -736,7 +740,7 @@ getLOCALPropertyFileName = function() {
 }*/
 
 // Run an OS Command
-export function run(command, failOnError?) {
+export function run(command: string, failOnError?: boolean) {
     let doFail = true;
     if (failOnError != null) {
         doFail = failOnError;
@@ -764,14 +768,14 @@ export function run(command, failOnError?) {
 
 // Function to copy a directory
 
-export function copyDir(fromDir, toDir) {
+export function copyDir(fromDir: string, toDir: string) {
     const fse = require('fs-extra');
     log(INFO, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
     fse.copySync(fromDir, toDir, {overwrite: true});
 }
 
 // Function to delete a file but does not fail when the file does not exits
-export function deleteFile(file) {
+export function deleteFile(file: string) {
     log(INFO, 'Deleting File: ' + file);
     try {
         const fs = require('fs');
@@ -784,7 +788,7 @@ export function deleteFile(file) {
 }
 
 // Delete a folder
-export function deleteFolder(folder) {
+export function deleteFolder(folder: string) {
     const del = require('del');
     log(INFO, 'Deleting Folder: ' + folder);
     return del([
@@ -793,7 +797,7 @@ export function deleteFolder(folder) {
 }
 
 // Create a directory if it does not exists
-export function mkdirIfNotExist(dir) {
+export function mkdirIfNotExist(dir: string) {
     const fs = require('fs');
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
@@ -801,7 +805,7 @@ export function mkdirIfNotExist(dir) {
 }
 
 // Check if a file exists
-export function doesFileExist(checkFile) {
+export function doesFileExist(checkFile: string) {
     const fsCom = require('fs');
     log(DEBUG, "Checking if file exists: " + checkFile);
     try {
@@ -813,7 +817,8 @@ export function doesFileExist(checkFile) {
 }
 
 // function to deternmine enabled tasks for workspace
-export function determineEnabledTasks(cliTaskConfig) {
+/*
+export function determineEnabledTasks(cliTaskConfig: { cliTasks: any; }) {
     const cTsks = cliTaskConfig.cliTasks;
     const re = [];
     for (const cliTask in cTsks) {
@@ -832,9 +837,9 @@ export function determineEnabledTasks(cliTaskConfig) {
         }
     }
     return re;
-}
+}*/
 
-export async function isPortAvailable(port) {
+export async function isPortAvailable(port: string | number) {
     log(DEBUG, 'Checking Port Availability: ' + port);
     const tcpPortUsed = require('tcp-port-used');
     const pUsed = await tcpPortUsed.check(port, '127.0.0.1');
@@ -842,17 +847,17 @@ export async function isPortAvailable(port) {
 }
 
 
-export async function sleep(ms) {
+export async function sleep(ms: number) {
     //TODO: Add moving dots..
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }
 
-export function createTable(arrayObject:any, config: Mapping, doShowTable:boolean) {
-    const tableObject = {};
+export function createTable(arrayObject:any[], config: Mapping, doShowTable:boolean):any {
+    const tableObject:any = {};
     for (const element in arrayObject) {
-        const tableRow = {};
+        const tableRow:any = {};
         const rowNumber = parseInt(element) + 1;
         // TODO: Change to debug
         //log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
@@ -871,7 +876,7 @@ export function createTable(arrayObject:any, config: Mapping, doShowTable:boolea
     return tableObject;
 }
 
-export function iterateTable(tObject) {
+export function iterateTable(tObject:any): any[] {
     const re = [];
     for (const property in tObject) {
         re.push(tObject[property]);
@@ -880,11 +885,11 @@ export function iterateTable(tObject) {
 }
 
 // Creates a flat table with names and values
-export function createTableValue(name, value, table?, headerName?, headerValue?) {
+export function createTableValue(name:string, value:any, table?:any, headerName?:string, headerValue?:string) {
     let hName = headerName || 'NAME';
     let hValue = headerValue || 'VALUE';
     table = table || [];
-    let entry = {};
+    let entry:any = {};
     entry[hName] = name;
     entry[hValue] = value;
     table[table.length] = entry;
@@ -892,12 +897,8 @@ export function createTableValue(name, value, table?, headerName?, headerValue?)
 }
 
 // Print and possibly export Table to CSV
-export function pexTable(tObject, tName, config, doPrint) {
-    if (!config) {
-        config = {};
-        config.export = false;
-    }
-    let printT = true;
+export function pexTable(tObject: any, tName: string, config: PEXConfig, doPrint: boolean) {
+    let printT;
     if (doPrint == null) {
         printT = true;
     } else {
@@ -973,8 +974,7 @@ export function pexTable(tObject, tName, config, doPrint) {
 }
 
 // Provide configuration for exporting table
-export function getPEXConfig() {
-    const re:any = {};
+export function getPEXConfig(): PEXConfig {
     // table-export-to-csv= YES | NO
     let table_export_to_csv = 'NO';
     if (getProp('Table_Export_To_CSV') != null) {
@@ -1008,11 +1008,12 @@ export function getPEXConfig() {
         log(INFO, 'No Table_Export_Tables property found; We are adding it to: ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states');
     }
-    re.export = table_export_to_csv.toLowerCase() === 'yes';
-    re.folder = table_export_folder;
-    re.filePreFix = table_export_file_prefix;
-    re.tables = table_export_tables;
-    return re;
+    return {
+        export: table_export_to_csv.toLowerCase() === 'yes',
+        folder: table_export_folder,
+        filePreFix: table_export_file_prefix,
+        tables: table_export_tables
+    };
 }
 
 export function isOauthUsed() {
@@ -1025,7 +1026,7 @@ export function isOauthUsed() {
     return re;
 }
 
-export function isIterable(obj) {
+export function isIterable(obj:any) {
     // checks for null and undefined
     if (obj == null) {
         return false;
@@ -1034,7 +1035,7 @@ export function isIterable(obj) {
 }
 
 // Get the TIBCO Cloud Starter Development Kit from GIT
-export function getGit(source, target, tag) {
+export function getGit(source: string, target: string, tag?: string) {
     log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
     if (tag == null || tag === 'LATEST' || tag === '') {
         run('git clone "' + source + '" "' + target + '" ');
@@ -1044,8 +1045,8 @@ export function getGit(source, target, tag) {
 }
 
 // Function to install NPM packages
-export function npmInstall(location, packageToUse) {
-    return new Promise<void>(function (resolve, reject) {
+export function npmInstall(location: string, packageToUse?: string) {
+    return new Promise<void>(function (resolve) {
         if (packageToUse != null) {
             run('cd ' + location + ' && npm install ' + packageToUse);
         } else {
@@ -1063,13 +1064,18 @@ export const ERROR = 'ERROR';
 //const useDebug = (propsF.Use_Debug == 'true');
 let useDebug = false;
 
-export function setLogDebug(debug) {
-    // console.log('Setting debug to: ' + debug)
-    useDebug = (debug === 'true');
+export function setLogDebug(debug: string | boolean) {
+    useDebug = false;
+    if(typeof debug == 'boolean'){
+        useDebug = debug;
+    }
+    if(typeof debug == 'string'){
+        useDebug = debug === 'true';
+    }
 }
 
 // Function moved to TS
-export function log(level, ...message) {
+export function log(level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR', ...message: any) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level === DEBUG && !useDebug)) {
         // const timeStamp = new Date();
@@ -1094,14 +1100,14 @@ export function log(level, ...message) {
 }
 
 
-export function logO(level, message) {
+export function logO(level: string, message: any) {
     if (!(level === DEBUG && !useDebug)) {
         console.log(message);
     }
 }
 
 //Function to log on one line...
-export function logLine(message) {
+export function logLine(message: any) {
     const readline = require('readline');
     readline.cursorTo(process.stdout, 0);
     process.stdout.write(message);
@@ -1112,7 +1118,7 @@ export function logLine(message) {
 const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)';
 
-export function upgradeToV2(isGlobal, propFile) {
+export function upgradeToV2(isGlobal: boolean, propFile: string) {
     let host = '';
     let curl = '';
     let newORG = 'US';
@@ -1131,7 +1137,6 @@ export function upgradeToV2(isGlobal, propFile) {
         if (propsTemp.Shared_State_Scope != null) {
             defaultSharedStateFilter = propsTemp.Shared_State_Scope;
         }
-
         if (propsTemp.cloudHost === 'USE-GLOBAL' || propsTemp.Cloud_URL === 'USE-GLOBAL') {
             newORG = 'USE-GLOBAL';
         }
@@ -1195,7 +1200,7 @@ export function upgradeToV2(isGlobal, propFile) {
 
 
 // Upgrade Helper: Create Propety If Not Exists
-function createPropINE(isGlobal, propFile, propName, value, comment) {
+function createPropINE(isGlobal: boolean, propFile: string, propName: string, value: string, comment: string) {
     let doUpdate;
     if (isGlobal) {
         const propsG = require('properties-reader')(GLOBALPropertyFileName).path();

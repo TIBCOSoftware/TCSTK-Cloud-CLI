@@ -113,6 +113,7 @@ export function processMultipleFile() {
 
                     let tObj:any = {};
                     try {
+                        console.log('Parsing: ' , jTask);
                         tObj = JSON.parse(jTask);
                     } catch (e) {
                         log(ERROR, 'Parsing error on: |' + jTask + '| (' + e.message + ')');

@@ -17,7 +17,7 @@ const colors = require('colors');
 //const art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
 // Show TCI Apps
-export async function showTCI(showTable?, returnRaw?): Promise<any> {
+export async function showTCI(showTable?:boolean, returnRaw?:boolean): Promise<any> {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -121,9 +121,8 @@ export async function exportTCIApp() {
     }
 }
 
-
-
-function getTIBCli() {
+// Return the location of TIBCLI
+function getTIBCli(): string {
     let re = '';
     if (getProp('TIBCLI_Location') != null) {
         re = getProp('TIBCLI_Location');
@@ -135,28 +134,3 @@ function getTIBCli() {
     }
     return re;
 }
-
-// Use WSU to generate TCI code
-function wsuAddTci() {
-    return new Promise<void>(async function (resolve) {
-        // TODO: Implement
-        console.log('TODO: Implement');
-        resolve();
-    });
-}
-
-function wsuListTci() {
-    return new Promise<void>(async function (resolve) {
-        // TODO: Remove web scaffolding utility ?
-        /*const wsu = require('@tibco-tcstk/web-scaffolding-utility');
-        console.log(wsu.API.getVersion());
-        wsu.API.login(getProp('CloudLogin.clientID'), getProp('CloudLogin.email'), getProp('CloudLogin.pass'));
-        // console.log(wsu.API.getArtefactList("TCI").createTable());
-        const afList = wsu.API.getArtefactList(wsu.API.flavour.TCI);
-        console.table(afList.createTable());
-        */
-        resolve();
-
-    });
-}
-

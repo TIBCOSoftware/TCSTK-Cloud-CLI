@@ -378,12 +378,12 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-tci-apps')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a ')).toBe(false);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a NONE')).toBe(true);
-        /* Comment for Local, this only works on Jenkins server */
+        /* Comment for Local, this only works on Jenkins server
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:my_manifest.json:my_other_flogo.json')).toBe(true);
-
+*/
 
     });
 
