@@ -427,6 +427,10 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'list-spotfire-library -a "Data connections"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'list-spotfire-library -a spotfire.mod')).toBe(true);
         expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineSpotfireTest_1')).toBe(true);
+
+        // TODO: Create a delete item task
+        // tcli copy-sf -a "Spotfire Reports:/Teams/Discover MVP DEV/Discover/main/archive/project_discover_latest_v130:/Teams/TIBCO LABS"
+
     });
 
     // FS Testcases

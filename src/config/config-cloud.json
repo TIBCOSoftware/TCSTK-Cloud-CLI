@@ -26,6 +26,8 @@
     "tci_export_app": "integration.cloud.tibco.com/wistudio/v2/metadata",
     "sf_settings": "spotfire-next.cloud.tibco.com/spotfire/wp/settings",
     "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo",
+    "sf_copy": "spotfire-next.cloud.tibco.com/spotfire/rest/library/copy",
+    "sf_rename": "spotfire-next.cloud.tibco.com/spotfire/rest/library/modifyTitle",
     "mes_system": "messaging.cloud.tibco.com/tcm/v1/system",
     "mes_sum": "messaging.cloud.tibco.com/tcm/v1/system/summary",
     "mes_durables": "messaging.cloud.tibco.com/tcm/v1/system/durables",

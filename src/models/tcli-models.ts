@@ -81,7 +81,6 @@ export interface OAUTHConfig {
     [key: string]:any;
 }
 
-export type SFType = 'spotfire.dxp' | 'spotfire.mod' | 'spotfire.query' | 'spotfire.sbdf' | 'spotfire.dataconnection';
 
 export interface PEXConfig {
     export: boolean;

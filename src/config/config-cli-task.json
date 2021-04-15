@@ -869,6 +869,20 @@
       ],
       "category": "spotfire"
     },
+    "copy-spotfire-library-item": {
+      "description": "Copies a Spotfire Library Item (a DXP for example) from one place to another (possibly between organizations).",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "copySpotfireLibraryWrapper",
+      "taskAlternativeNames": [
+        "copy-sf", "copy-library-item"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
     "show-oauth-tokens": {
       "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
       "enabled": true,

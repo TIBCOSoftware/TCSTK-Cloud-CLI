@@ -537,6 +537,12 @@ export async function listSpotfireLibraryWrapper() {
     await SPOTFIRE.listSpotfire();
 }
 
+export async function copySpotfireLibraryWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.copySpotfire();
+}
+
+
 export async function generateOauthTokenWrapper() {
     const OAUTH = require('./common/oauth');
     await OAUTH.generateOauthToken();
