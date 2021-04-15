@@ -1,19 +1,20 @@
 // Package Definitions
 import {
-    addOrUpdateProperty, col,
+    col,
     copyDir,
     copyFile,
     createTableValue,
     deleteFile,
-    deleteFolder, doesFileExist, ERROR, getCurrentRegion, getPEXConfig, getProp, getPropFileName,
-    INFO, isIterable,
+    deleteFolder, doesFileExist, getCurrentRegion, getPEXConfig,
+    isIterable,
     isOauthUsed, isPortAvailable, iterateTable,
-    log,
-    logLine, mkdirIfNotExist, npmInstall,
-    pexTable, run, WARNING
+    mkdirIfNotExist, npmInstall,
+    pexTable, run
 } from "../common/common-functions";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch} from "../common/user-interaction";
+import {ERROR, INFO, log, logLine, WARNING} from "../common/logging";
+import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
 const OAUTH = require('../common/oauth');

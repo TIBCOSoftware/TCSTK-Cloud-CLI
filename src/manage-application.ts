@@ -1,13 +1,14 @@
 // This file manages the applications
 import {
-    copyDir, createMultiplePropertyFile, DEBUG, displayGlobalConnectionConfig, ERROR, getGit, INFO,
-    log,
-    replaceInFile, run, setLogDebug, setProperty,
+    copyDir, createMultiplePropertyFile, displayGlobalConnectionConfig,getGit,
+    replaceInFile, run,
     updateGlobalConnectionConfig
 } from "./common/common-functions";
 import {Global} from "./models/base";
 import {Template} from "./models/tcli-models";
 import {askMultipleChoiceQuestion, askQuestion} from "./common/user-interaction";
+import {DEBUG, ERROR, INFO, log, setLogDebug} from "./common/logging";
+import {setProperty} from "./common/property-file-management";
 
 declare var global: Global;
 

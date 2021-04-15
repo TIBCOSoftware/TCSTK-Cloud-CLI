@@ -1,18 +1,16 @@
 import {
     col,
     createTable,
-    DEBUG, ERROR, getCurrentRegion, getOrganization,
+    getCurrentRegion, getOrganization,
     getPEXConfig,
-    INFO,
     isOauthUsed,
-    log,
-    logLine,
-    pexTable, WARNING
+    pexTable
 } from "../common/common-functions";
 import {Global} from "../models/base";
 import {CallConfig} from "../models/tcli-models";
 import {SFCopyRequest, SFFolderInfo, SFLibObject, SFType} from "../models/spotfire";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 
 declare var global: Global;
 

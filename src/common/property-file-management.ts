@@ -1,50 +1,204 @@
-// import {isOAUTHLoginValid} from "./cloud-communications";
 import {
-    addOrUpdateProperty,
     col,
     copyFile,
-    createTable,
     createTableValue,
-    DEBUG,
     doesFileExist,
-    ERROR,
-    getCurrentRegion,
-    getGLOBALPropertyFileName,
-    getOAUTHDetails,
     getPEXConfig,
-    getProp,
-    getPropFileName,
-    INFO,
     isOauthUsed,
-    log,
     pexTable,
-    run,
-    WARNING
+    run
 } from "./common-functions";
 import {ORGFile, ORGInfo} from "../models/tcli-models";
-import {SelectedAccount} from "../models/organizations";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./user-interaction";
-import {getClientIDforOrg} from "./organization-management";
-
-const CCOM = require('./cloud-communications');
+import {getClientIDforOrg, getOrganizations} from "./organization-management";
+import {DEBUG, ERROR, INFO, log, WARNING} from "./logging";
+import {getOAUTHDetails, parseOAUTHToken, setOAUTHDetails} from "./oauth";
 const LA = require('../tenants/live-apps');
-
 const _ = require('lodash');
 
-// Get a list of all the organizations
-export async function getOrganizations() {
-    return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
-        tenant: 'TSC',
-        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
-    })).accountsInfo;
+let globalProperties: any;
+let propsGl:any;
+
+// TODO: Move this to home folder (and add migration)
+export const globalTCpropFolder = __dirname + '/../../../common/';
+const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
+export function getGLOBALPropertyFileName() {
+    return GLOBALPropertyFileName;
 }
 
-// Get a list of all the organizations
-export async function getCurrentOrganizationInfo(): Promise<SelectedAccount> {
-    return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
-        tenant: 'TSC',
-        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
-    })).selectedAccount;
+let LOCALPropertyFileName: string;
+export function setPropFileName(propFileName: string) {
+    LOCALPropertyFileName = propFileName;
+    log(DEBUG, 'Using Property File: ' + LOCALPropertyFileName);
+}
+export function getPropFileName() {
+    return LOCALPropertyFileName;
+}
+
+// Function to set a property (in memory)
+export function setProperty(name: string, value: string) {
+    //console.log('BEFORE propsGl: ' , propsGl);
+    log(DEBUG, 'Setting Property) Name: ', name, ' Value: ', value);
+    if (propsGl == null) {
+        propsGl = {};
+    }
+    set(name, value, propsGl);
+    //console.log('AFTER propsGl: ' , propsGl);
+}
+
+function set(path: string, value: string, obj: any) {
+    let schema = obj;  // a moving reference to internal objects within obj
+    const pList = path.split('.');
+    const len = pList.length;
+    for (let i = 0; i < len - 1; i++) {
+        const elem = pList[i]!;
+        if (!schema[elem]) schema[elem] = {}
+        schema = schema[elem];
+    }
+    schema[pList[len - 1]!] = value;
+}
+
+export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefresh?:boolean): string {
+    log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh, 'Forcing a Global Refresh: ', forceGlobalRefresh);
+    if (forceRefresh) {
+        propsGl = null;
+    }
+    if (propsGl == null) {
+        if (doesFileExist(LOCALPropertyFileName)) {
+            const propLoad = require('properties-reader')(LOCALPropertyFileName);
+            propsGl = propLoad.path();
+        }
+    }
+    let re = null;
+    if (propsGl != null) {
+        try {
+            re = _.get(propsGl, propName);
+        } catch (e) {
+            log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
+            process.exit(1);
+        }
+        log(DEBUG, 'Returning Property: ', re);
+        if (re === 'USE-GLOBAL') {
+            re = getPropertyFromGlobal(propName, forceGlobalRefresh);
+        }
+    } else {
+        log(DEBUG, 'Local Property file not set yet, trying to get it from global');
+        // No local property file, try to get it from global
+        re = getPropertyFromGlobal(propName, forceGlobalRefresh);
+    }
+    if (re && propName === 'CloudLogin.OAUTH_Token') {
+        const key = 'Token:';
+        if (re.indexOf(key) > 0) {
+            const orgOInfo = re;
+            re = re.substring(re.indexOf(key) + key.length);
+            // Look for other token parts
+            if (getOAUTHDetails() == null) {
+                setOAUTHDetails(parseOAUTHToken(orgOInfo, false));
+            }
+        }
+    }
+    log(DEBUG, 'Returning Property [END]: ', re);
+    return re;
+}
+
+function getPropertyFromGlobal(propName: string, forceGlobalRefresh?:boolean) {
+    let re = null;
+    if (doesFileExist(GLOBALPropertyFileName)) {
+        if (globalProperties == null || forceGlobalRefresh) {
+            globalProperties = require('properties-reader')(GLOBALPropertyFileName).path();
+        }
+        try {
+            re = _.get(globalProperties, propName);
+        } catch (e) {
+            log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')');
+            process.exit(1);
+        }
+        log(DEBUG, 'Got Property From Global: ', re);
+    } else {
+        log(DEBUG, 'No Global Configuration Set...');
+        return false;
+    }
+    return re;
+}
+
+// Function to add or update property to a file, and possibly adds a comment if the property does not exists
+export function addOrUpdateProperty(location: string, property: string, value: string | number, comment?: string, checkForGlobal?: boolean) {
+    log(DEBUG, 'Updating: ' + property + ' to: ' + value + ' (in:' + location + ') Use Global: ', checkForGlobal);
+    // Check for global is true by default
+    let doCheckForGlobal = true;
+    if (checkForGlobal != null) {
+        doCheckForGlobal = checkForGlobal
+    }
+    // If we check for global and if the global file exist, see if we need to update the global file instead.
+    if (doCheckForGlobal && location === LOCALPropertyFileName && doesFileExist(GLOBALPropertyFileName)) {
+        // We are updating the local prop file
+        const localProps = require('properties-reader')(LOCALPropertyFileName).path();
+        if (_.get(localProps, property) === 'USE-GLOBAL') {
+            location = GLOBALPropertyFileName;
+            log(INFO, 'Found ' + col.blue('USE-GLOBAL') + ' for property: ' + col.blue(property) + ', so updating the GLOBAL Property file...')
+        }
+    }
+    // Check if file exists
+    const fs = require('fs');
+    try {
+        if (fs.existsSync(location)) {
+            //file exists
+            log(DEBUG, 'Property file found: ' + location);
+            // Check if file contains property
+            // const data = fs.readFileSync(location, 'utf8');
+            const dataLines = fs.readFileSync(location, 'utf8').split('\n');
+            let propFound = false;
+            for (let lineNumber in dataLines) {
+                if (!dataLines[lineNumber].startsWith('#')) {
+                    // console.log('Line: ', dataLines[lineNumber]);
+                    const reg = new RegExp(property + '\\s*=\\s*(.*)');
+                    const regNl = new RegExp(property + '\\s*=');
+                    if (dataLines[lineNumber].search(reg) > -1 || dataLines[lineNumber].search(regNl) > -1) {
+                        // We found the property
+                        log(DEBUG, `Property found: ${property} We are updating it to: ${value}`);
+                        dataLines[lineNumber] = property + '=' + value;
+                        propFound = true;
+                    }
+
+                }
+            }
+            let dataForFile = '';
+            for (let lineN = 0; lineN < dataLines.length; lineN++) {
+                if (lineN !== (dataLines.length - 1)) {
+                    dataForFile += dataLines[lineN] + '\n';
+                } else {
+                    // The last one:
+                    dataForFile += dataLines[lineN];
+                }
+            }
+            if (propFound) {
+                let doLog = true;
+                if (property === 'CloudLogin.clientID') {
+                    log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[NEW CLIENT ID]') + ' (in:' + location + ')');
+                    doLog = false;
+                }
+                if (property === 'CloudLogin.OAUTH_Token') {
+                    log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[NEW OAUTH TOKEN]') + ' (in:' + location + ')');
+                    doLog = false;
+                }
+                if (doLog){
+                    log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow(value) + ' (in:' + location + ')');
+                }
+            } else {
+                // append prop to the end.
+                log(INFO, 'Property NOT found: ' + col.blue(property) + ' We are adding it and set it to: ' + col.yellow(value) + ' (in:' + location + ')');
+                if (comment) {
+                    dataForFile += '\n# ' + comment;
+                }
+                dataForFile += '\n' + property + '=' + value + '\n';
+            }
+            fs.writeFileSync(location, dataForFile, 'utf8');
+        } else {
+            log(ERROR, 'Property File does not exist: ' + location);
+        }
+    } catch (err) {
+        console.error(err)
+    }
 }
 
 

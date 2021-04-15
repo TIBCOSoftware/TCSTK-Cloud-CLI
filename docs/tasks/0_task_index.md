@@ -96,6 +96,8 @@
 
 [import-live-apps-cases](./import-live-apps-cases.md) - Import Cases to Live Apps
 
+[copy-live-apps-between-organizations](./copy-live-apps-between-organizations.md) - Copies a LiveApps application between organizations.
+
 
 ## shared-state
 
@@ -163,6 +165,8 @@
 [browse-spotfire-library](./browse-spotfire-library.md) - List Spotfire Analytical Reports and browse through folders on the Spotfire Library.
 
 [list-spotfire-library](./list-spotfire-library.md) - Lists all components(DXP's, Mods, Information links, Data files or Data connections) in your SF Library.
+
+[copy-spotfire-library-item](./copy-spotfire-library-item.md) - Copies a Spotfire Library Item (a DXP for example) from one place to another (possibly between organizations).
 
 
 ## oauth

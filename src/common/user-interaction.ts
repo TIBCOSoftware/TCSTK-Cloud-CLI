@@ -1,5 +1,6 @@
-import {col, DEBUG, ERROR, INFO, log, logO} from "./common-functions";
+import {col} from "./common-functions";
 import _ from "lodash";
+import {DEBUG, ERROR, INFO, log, logO} from "./logging";
 
 // function to ask a question
 export async function askQuestion(question: string, type = 'input') {

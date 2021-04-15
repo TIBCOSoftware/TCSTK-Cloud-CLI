@@ -1,15 +1,16 @@
 // This file manages the applications
 import {
-    addOrUpdateProperty, col,
-    createTableValue, DEBUG, ERROR,
-    getMultipleOptions, INFO,
+    col,
+    createTableValue,
+    getMultipleOptions,
     iterateTable,
-    log,
-    parseOAUTHToken,
-    run, trim, WARNING
+    run, trim
 } from "./common/common-functions";
 import {TCLITask} from "./models/tcli-models";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "./common/user-interaction";
+import {addOrUpdateProperty} from "./common/property-file-management";
+import {parseOAUTHToken} from "./common/oauth";
+import {DEBUG, ERROR, INFO, log, WARNING} from "./common/logging";
 
 require('./common/common-functions');
 let mFile = '';

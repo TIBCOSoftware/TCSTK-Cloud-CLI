@@ -6,7 +6,6 @@
 
 This is useful if you want to remove multiple shared state entries at once.
 
-
 The following properties in the cloud properties file are being used:
 
 > Shared_State_Filter

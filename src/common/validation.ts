@@ -1,12 +1,12 @@
 import {
-    addOrUpdateProperty,
     col,
-    ERROR, getOrganization, getProp, getPropFileName, INFO,
-    iterateTable,
-    log
+    getOrganization,
+    iterateTable
 } from "./common-functions";
 import {Global} from "../models/base";
 import {askMultipleChoiceQuestion, askQuestion} from "./user-interaction";
+import {ERROR, INFO, log} from "./logging";
+import {addOrUpdateProperty, getProp, getPropFileName} from "./property-file-management";
 declare var global: Global;
 
 

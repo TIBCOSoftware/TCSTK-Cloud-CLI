@@ -1,15 +1,14 @@
 import {
-    addOrUpdateProperty, col,
-    DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
-    getPropFileName,
-    INFO,
-    log,
-    logLine, mkdirIfNotExist,
+    col,
+    doesFileExist, getOrganization, getPEXConfig,
+    mkdirIfNotExist,
     pexTable,
-    run, WARNING
+    run
 } from "../common/common-functions";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
+import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');

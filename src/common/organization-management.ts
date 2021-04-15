@@ -1,18 +1,34 @@
-
 import {
-    addOrUpdateProperty, col, createTable, DEBUG,
-    getCurrentRegion,
-    getOAUTHDetails, getPEXConfig, getProp,
-    getPropFileName,
-    INFO,
+    col, createTable,
+    getCurrentRegion, getOrganization,
+    getPEXConfig,
     isOauthUsed, iterateTable,
-    log, pexTable, translateAWSRegion
+    pexTable, translateAWSRegion
 } from "./common-functions";
 import {ORGInfo} from "../models/tcli-models";
-import {getOrganizations} from "./property-file-management";
 import {askMultipleChoiceQuestionSearch} from "./user-interaction";
+import {SelectedAccount} from "../models/organizations";
+import {getOAUTHDetails} from "./oauth";
+import {addOrUpdateProperty, getProp, getPropFileName} from "./property-file-management";
+import {DEBUG, INFO, log} from "./logging";
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
+
+// Get a list of all the organizations
+export async function getOrganizations() {
+    return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+    })).accountsInfo;
+}
+
+// Get a list of all the organizations
+export async function getCurrentOrganizationInfo(): Promise<SelectedAccount> {
+    return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+    })).selectedAccount;
+}
 
 // Function to get the Client ID
 export async function getClientID(headers: any) {
@@ -52,7 +68,7 @@ export async function changeOrganization(accountId?: string) {
         // Ask to which organization you would like to switch
         orgAccountId = (await displayOrganizations(true, true, 'Which organization would you like to change to ?') ).accountId;
     }
-    log(INFO, 'Changing Organization to: ' , accountId);
+    log(INFO, 'Changing Organization to: ' , col.blue(orgAccountId));
     if (orgAccountId) {
         // Get the clientID for that organization
         const clientID = await getClientIDforOrg(orgAccountId)
@@ -78,6 +94,7 @@ export async function changeOrganization(accountId?: string) {
             // Generate a new OAUTH Token
             await OAUTH.generateOauthToken(null, true, false);
         }
+        log(INFO, col.bold.green('Successfully changed to organization: ' + getOrganization()))
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }

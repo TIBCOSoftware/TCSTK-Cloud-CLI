@@ -1,5 +1,7 @@
-import {col, getProp, INFO, log, run} from "../common/common-functions";
+import {col, run} from "../common/common-functions";
 import {askMultipleChoiceQuestion, askQuestion} from "../common/user-interaction";
+import {INFO, log} from "../common/logging";
+import {getProp} from "../common/property-file-management";
 
 
 const posSchematics = require('../config/config-schematics.json').schematicConfig;

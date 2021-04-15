@@ -1,12 +1,12 @@
 import {
     col,
     createTable,
-    getPEXConfig, INFO,
+    getPEXConfig,
     iterateTable,
-    log,
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {INFO, log} from "../common/logging";
 
 const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');

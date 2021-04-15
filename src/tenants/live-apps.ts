@@ -1,18 +1,14 @@
 import {
-    addOrUpdateProperty,
     col,
-    copyFile, createTable, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
-    getPropFileName, INFO,
-    log,
-    logLine, mkdirIfNotExist,
+    copyFile, createTable, doesFileExist, getOrganization, getPEXConfig,
+    mkdirIfNotExist,
     pexTable, sleep
 } from "../common/common-functions";
 import {Global} from "../models/base";
-import {
-    getCurrentOrganizationInfo
-} from "../common/property-file-management";
-import {changeOrganization, displayOrganizations} from "../common/organization-management";
+import {changeOrganization, displayOrganizations, getCurrentOrganizationInfo} from "../common/organization-management";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {DEBUG, ERROR, INFO, log, logLine} from "../common/logging";
+import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 declare var global: Global;
 
@@ -572,8 +568,8 @@ export async function copyLiveApps() {
             log(INFO, 'Application shared on current organization with id:' , col.blue(shareRes));
             // Step 6: Switch to the target organization
             const currentOrgInfo = await getCurrentOrganizationInfo();
-            log(INFO, '    Current Organization: ' , currentOrgInfo.displayName);
-            log(INFO, 'Changing to Organization: ' , targetOrgInfo.accountDisplayName);
+            log(INFO, '    Current Organization: ' , col.blue(currentOrgInfo.displayName));
+            log(INFO, 'Changing to Organization: ' , col.blue(targetOrgInfo.accountDisplayName));
             await changeOrganization(targetOrgInfo.accountId);
             // Step 7: Receive the LiveApps App
             const receiveReq = {

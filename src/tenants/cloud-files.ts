@@ -1,14 +1,13 @@
 import {
-    addOrUpdateProperty, col,
-    createTable, ERROR, getOrganization, getPEXConfig, getProp,
-    getPropFileName,
-    INFO,
+    col,
+    createTable, getOrganization, getPEXConfig,
     iterateTable,
-    log,
-    logLine, mkdirIfNotExist,
+    mkdirIfNotExist,
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {ERROR, INFO, log, logLine} from "../common/logging";
+import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
 const USERGROUPS = require('./user-groups');

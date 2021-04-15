@@ -1,15 +1,66 @@
 import {
-    addOrUpdateProperty,
     col,
     createTable,
-    createTableValue, DEBUG, ERROR, getCurrentRegion,
-    getOAUTHDetails, getOrganization, getProp, getPropFileName, getRegion, INFO,
-    iterateTable,
-    log, WARNING
+    createTableValue, getCurrentRegion,
+    getOrganization, getRegion,
+    iterateTable
 } from "./common-functions";
 import {askMultipleChoiceQuestion} from "./user-interaction";
+import {DEBUG, ERROR, INFO, log, WARNING} from "./logging";
+import {OAUTHConfig} from "../models/tcli-models";
+import {addOrUpdateProperty, getProp, getPropFileName} from "./property-file-management";
 
 const CCOM = require('./cloud-communications');
+
+let globalOAUTH:OAUTHConfig = null;
+
+export function getOAUTHDetails() {
+    log(DEBUG, 'Returning globalOAUTH: ', globalOAUTH);
+    return globalOAUTH;
+}
+
+export function setOAUTHDetails(oConfig:OAUTHConfig) {
+    log(DEBUG, 'Setting globalOAUTH: ', oConfig);
+    globalOAUTH = oConfig;
+}
+
+
+export function parseOAUTHToken(token:string, doLog: boolean):OAUTHConfig {
+    let showLog = doLog || false;
+    let re:OAUTHConfig = {};
+    log(DEBUG, 'Parsing OAUTH Token: ', token);
+    let elements = token.match(/(?<=\[\s*).*?(?=\s*\])/gs);
+    if (Symbol.iterator in Object(elements)) {
+        if(elements) {
+            for (let el of elements) {
+                // let nameValue = el.split(':');
+                let nameValue = el.split(/:/);
+                if(nameValue && nameValue.length > 1) {
+                    let key = nameValue.shift()!.trim().replace(' ', '_');
+                    let val = nameValue.join(':').trim();
+                    if (key && val) {
+                        log(DEBUG, 'Name: |' + key + '| Value: |' + val + '|');
+                        if (key === 'Expiry_Date') {
+                            //Parse expiry date
+                            re[key + '_Display'] = val;
+                            re[key] = Date.parse(val);
+                        } else {
+                            re[key] = val;
+                        }
+                    }
+                }
+            }
+        }
+        if (showLog) {
+            log(INFO, 'OAUTH Details:');
+            console.table(re);
+        }
+    }
+    return re;
+}
+
+
+
 
 
 // Function to display current configured OAUTH Settings...

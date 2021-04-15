@@ -1,12 +1,11 @@
 import arg from 'arg';
 import {
-    addOrUpdateProperty, col,
-    DEBUG, displayOpeningMessage, ERROR, getGlobalConfig, getProp,
-    INFO, isGlobalOauthDefined,
-    log, obfuscatePW, RECORDER,
-    setMultipleOptions, setOrganization, setProperty, setPropFileName, updateCloudLogin, updateRegion,
-    updateTCLI,
-    WARNING
+    col,
+    displayOpeningMessage, getGlobalConfig,
+    isGlobalOauthDefined,
+    obfuscatePW,
+    setMultipleOptions, setOrganization, updateCloudLogin, updateRegion,
+    updateTCLI
 } from "./common/common-functions";
 import {multipleInteraction, processMultipleFile} from "./manage-multiple";
 import {Global} from "./models/base";
@@ -17,6 +16,8 @@ import {
     isGlobalAnswersUsed,
     setGlobalAnswers
 } from "./common/user-interaction";
+import {addOrUpdateProperty, getProp, setProperty, setPropFileName} from "./common/property-file-management";
+import {DEBUG, ERROR, INFO, log, RECORDER, WARNING} from "./common/logging";
 declare var global: Global;
 
 let propFileName;

@@ -1,4 +1,7 @@
-require('./src/common/common-functions');
+require('./ts-out/common/common-functions');
+const {replaceInFile} = require("./ts-out/common/common-functions");
+const {copyFile} = require("./ts-out/common/common-functions");
+const {doesFileExist} = require("./ts-out/common/common-functions");
 // ---
 // ### Alternatives
 
@@ -38,11 +41,8 @@ function main(OnlyGenerateNew) {
 
 function generateIndex() {
     const tasks = require('./src/config/config-cli-task.json').cliTasks;
-
     let dataForFile = '# TCLI TASKS: \n\n---';
-
     const tsksCAT = {};
-
     for (let tn in tasks) {
         if (tasks[tn].enabled == true && tasks[tn].internal == false) {
             if (tn != '') {
@@ -57,14 +57,12 @@ function generateIndex() {
         }
     }
     console.log(tsksCAT);
-
     for (const [key, value] of Object.entries(tsksCAT)) {
         dataForFile += '\n\n\n## ' + key + '\n\n---\n';
         for (const [tKey, tVal] of Object.entries(value)) {
             dataForFile += '\n\n' + tVal;
         }
     }
-
     const fs = require('fs');
     fs.writeFileSync('docs/tasks/0_task_index.md', dataForFile, 'utf8');
 

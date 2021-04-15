@@ -1,15 +1,14 @@
 import {
-    addOrUpdateProperty, col,
+    col,
     createTable,
-    DEBUG, getCurrentAWSRegion, getCurrentRegion, getOrganization, getPEXConfig, getProp,
-    getPropFileName,
-    INFO,
+    getCurrentAWSRegion, getCurrentRegion, getOrganization, getPEXConfig,
     iterateTable,
-    log,
     pexTable,
-    run, WARNING
+    run
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {DEBUG, INFO, log, WARNING} from "../common/logging";
+import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
 

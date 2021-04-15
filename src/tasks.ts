@@ -2,20 +2,15 @@
 import {
     col,
     createMultiplePropertyFile,
-    DEBUG,
     deleteFolder,
     displayGlobalConnectionConfig, displayOpeningMessage,
-    ERROR,
     getGit,
     getOrganization,
-    getProp,
-    getPropFileName, getRegion,
-    INFO,
+    getRegion,
     isOauthUsed,
-    log, obfuscatePW,
+    obfuscatePW,
     replaceInFile,
     run,
-    setLogDebug, setProperty,
     trim, updateCloudPackages,
     updateGlobalConnectionConfig, updateRegion,
     upgradeToV2
@@ -23,6 +18,9 @@ import {
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
 import {askMultipleChoiceQuestion, askQuestion} from "./common/user-interaction";
+import {getProp, getPropFileName, setProperty} from "./common/property-file-management";
+import {DEBUG, ERROR, INFO, log, setLogDebug} from "./common/logging";
+import {changeOrganization} from "./common/organization-management";
 
 declare var global: Global;
 // require('./tenants/common-functions');
@@ -278,7 +276,6 @@ export async function deleteAppWrapper() {
     await CS.deleteApp();
 }
 
-
 //Show all the cloud starter links
 export async function showLinks() {
     const CS = require('./cloud-starters/cloud-starters');
@@ -353,14 +350,14 @@ export async function changeRegion() {
 
 // Function to change the organization in the properties file
 export async function changeOrganizationWrapper() {
-    const PROPM = require('./common/property-file-management');
-    await PROPM.changeOrganization();
+    const ORGS = require('./common/organization-management');
+    await ORGS.changeOrganization();
 }
 
 // Function to change the organization in the properties file
 export async function showOrganizationWrapper() {
-    const PROPM = require('./common/property-file-management');
-    await PROPM.showOrganization();
+    const ORGS = require('./common/organization-management');
+    await ORGS.showOrganization();
 }
 
 export async function obfuscate() {

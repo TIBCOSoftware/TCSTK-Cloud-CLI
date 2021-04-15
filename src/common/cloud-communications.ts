@@ -1,16 +1,16 @@
 import {
     col,
     createTableValue,
-    DEBUG, ERROR, getCurrentRegion, getOrganization, getProp, getRegion,
-    INFO,
+    getCurrentRegion, getOrganization, getRegion,
     isOauthUsed,
-    log, logO, obfuscatePW,
-    setOrganization, setProperty,
-    WARNING
+    obfuscatePW,
+    setOrganization,
 } from "./common-functions";
 import {Global} from "../models/base";
 import {CallConfig, MappingGroup} from "../models/tcli-models";
 import {askQuestion} from "./user-interaction";
+import {DEBUG, ERROR, INFO, log, logO, WARNING} from "./logging";
+import {getProp, setProperty} from "./property-file-management";
 
 declare var global: Global;
 // require('./common-functions');

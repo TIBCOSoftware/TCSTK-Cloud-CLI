@@ -1,7 +1,8 @@
-import {col, doesFileExist, ERROR, INFO, log, WARNING} from "./common-functions";
+import {col, doesFileExist} from "./common-functions";
 import {Global} from "../models/base";
 import {TCLITask} from "../models/tcli-models";
 import {askMultipleChoiceQuestionSearch} from "./user-interaction";
+import {ERROR, INFO, log, WARNING} from "./logging";
 
 declare var global: Global;
 
