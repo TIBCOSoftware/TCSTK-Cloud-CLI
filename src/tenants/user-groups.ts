@@ -1,16 +1,16 @@
 import {
-    askMultipleChoiceQuestionSearch,
-    askQuestion,
+    col,
     createTable,
     getPEXConfig, INFO,
     iterateTable,
     log,
     pexTable
 } from "../common/common-functions";
+import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 
 const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
-const colors = require('colors');
+
 
 export async function getGroupsTable(showTable?:boolean): Promise<any> {
     let doShowTable = true;
@@ -140,7 +140,7 @@ export async function addUserToGroup() {
                     userIdToAdd = usr.Id;
                 }
             }
-            log(INFO, 'Adding user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + ']');
+            log(INFO, 'Adding user: ' + col.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + col.green(groupDecision) + '[ID:' + groupIdToAdd + ']');
             const postGroupMapping = {
                 sandboxId: await LA.getProductionSandbox(),
                 groupId: groupIdToAdd,
@@ -148,7 +148,7 @@ export async function addUserToGroup() {
             }
             const oResponse =  await CCOM.callTCA( CCOM.clURI.la_user_group_mapping, false, {method: 'POST',  postRequest: postGroupMapping});
             if (oResponse != null) {
-                log(INFO, 'Successfully added user: ' + colors.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + colors.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
+                log(INFO, 'Successfully added user: ' + col.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + col.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
 
             }
         } else {

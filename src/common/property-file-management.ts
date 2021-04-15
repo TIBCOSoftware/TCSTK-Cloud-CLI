@@ -1,9 +1,7 @@
 // import {isOAUTHLoginValid} from "./cloud-communications";
 import {
     addOrUpdateProperty,
-    askMultipleChoiceQuestion,
-    askMultipleChoiceQuestionSearch,
-    askQuestion,
+    col,
     copyFile,
     createTable,
     createTableValue,
@@ -18,27 +16,37 @@ import {
     getPropFileName,
     INFO,
     isOauthUsed,
-    iterateTable,
     log,
     pexTable,
-    run, translateAWSRegion,
+    run,
     WARNING
 } from "./common-functions";
 import {ORGFile, ORGInfo} from "../models/tcli-models";
+import {SelectedAccount} from "../models/organizations";
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./user-interaction";
+import {getClientIDforOrg} from "./organization-management";
 
 const CCOM = require('./cloud-communications');
-const OAUTH = require('./oauth');
 const LA = require('../tenants/live-apps');
-const colors = require('colors');
+
 const _ = require('lodash');
 
 // Get a list of all the organizations
-async function getOrganizations() {
+export async function getOrganizations() {
     return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
         tenant: 'TSC',
         customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
     })).accountsInfo;
 }
+
+// Get a list of all the organizations
+export async function getCurrentOrganizationInfo(): Promise<SelectedAccount> {
+    return (await CCOM.callTCA(CCOM.clURI.account_info, false, {
+        tenant: 'TSC',
+        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+    })).selectedAccount;
+}
+
 
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {
@@ -259,7 +267,7 @@ export async function updateProperty() {
                 // location = GLOBALPropertyFileName;
                 const propToUse = await askMultipleChoiceQuestion('Found USE-GLOBAL for property: ' + pName + '. Do you want to update the GLOBAL or the LOCAL property file ?', ['GLOBAL', 'LOCAL']);
                 checkForGlobal = 'global' === propToUse.toLowerCase();
-                // log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
+                // log(INFO, 'Found ' + col.blue('USE-GLOBAL') + ' for property: ' + col.blue(property) + ', so updating the GLOBAL Property file...')
             }
         }
         addOrUpdateProperty(pFile, pName, pValue, pComment, checkForGlobal);
@@ -301,10 +309,10 @@ export function disableProperty(location: string, property: string, comment: str
             }
             if (propFound) {
                 fs.writeFileSync(location, dataForFile, 'utf8');
-                log(INFO, 'Disabled Property: ' + colors.blue(property) + ' (in:' + location + ')');
+                log(INFO, 'Disabled Property: ' + col.blue(property) + ' (in:' + location + ')');
             } else {
                 // append prop to the end.
-                log(WARNING, 'Property NOT found: ' + colors.blue(property) + ' to disable... (in:' + location + ')');
+                log(WARNING, 'Property NOT found: ' + col.blue(property) + ' to disable... (in:' + location + ')');
             }
         } else {
             log(ERROR, 'Property File does not exist: ' + location);
@@ -321,9 +329,9 @@ export function showPropertiesTable() {
     if (doesFileExist(getPropFileName())) {
         const propLoad = require('properties-reader')(getPropFileName());
         props = propLoad.path();
-        log(INFO, ' LOCAL Property File Name: ' + colors.blue(getPropFileName()));
+        log(INFO, ' LOCAL Property File Name: ' + col.blue(getPropFileName()));
         if (getGLOBALPropertyFileName() && getGLOBALPropertyFileName() !== '') {
-            log(INFO, 'GLOBAL Property File Name: ' + colors.blue(getGLOBALPropertyFileName()));
+            log(INFO, 'GLOBAL Property File Name: ' + col.blue(getGLOBALPropertyFileName()));
         }
         let nvs = [];
         for (const [key, valueP] of Object.entries(props)) {
@@ -374,175 +382,4 @@ export function showPropertiesTable() {
         // Print table
         pexTable(nvs, 'tibco-cloud-properties', getPEXConfig(), true);
     }
-}
-
-
-// TODO: Create a function that lists all client ID's
-
-
-// Function to get the Client ID
-export async function getClientID(headers: any) {
-    log(INFO, 'Getting Client ID...');
-    let clientID;
-    clientID = (await CCOM.callTCA(CCOM.clURI.get_clientID, true, {
-        method: 'POST',
-        forceCLIENTID: true,
-        tenant: 'TSC',
-        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login,
-        headers
-    })).ClientID;
-    log(INFO, 'Client ID: ', clientID);
-    return clientID;
-}
-
-export async function showOrganization() {
-    log(INFO, 'Showing Organizations:');
-    // List all the organizations
-    const orgDetails = await displayOrganizations(true, true, 'For which organization would you like more details ?');
-    if (orgDetails) {
-        delete orgDetails.ownersInfo;
-        delete orgDetails.regions;
-        delete orgDetails.childAccountsInfo
-        console.table(orgDetails);
-    }
-}
-
-export async function changeOrganization() {
-    log(INFO, 'Changing Organization...');
-    // List all the organizations
-    // Ask to which organization you would like to switch
-    const orgDetails = await displayOrganizations(true, true, 'Which organization would you like to change to ?');
-    if (orgDetails) {
-        // Get the clientID for that organization
-        const clientID = await getClientIDforOrg(orgDetails.accountId)
-        // console.log('Client ID: ' + clientID);
-        let doOauth = false;
-        // If Oauth is being used: revoke the Key on the Old Organization
-        if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
-            doOauth = true;
-            const oDetails = getOAUTHDetails();
-            log(INFO, 'Revoking your OAUTH Token on previous environment(' + colors.blue(oDetails.Org) + '), Token Name: ' + colors.blue(oDetails.Token_Name))
-            await OAUTH.revokeOauthToken(oDetails.Token_Name);
-            addOrUpdateProperty(getPropFileName(), 'CloudLogin.OAUTH_Token', '');
-        }
-        // Update the Cloud property file with that new Client ID
-        // addOrUpdateProperty(getPropFileName(), 'CloudLogin.clientID', '[Organization: ' + orgDetails.accountDisplayName + ']' + clientID );
-        addOrUpdateProperty(getPropFileName(), 'CloudLogin.clientID', clientID);
-        // Invalidate login to login to new environment
-        CCOM.invalidateLogin();
-        // Property file needs to be reloaded; forcing a refresh
-        getProp('CloudLogin.clientID', true, true);
-        // If Oauth is being used: Generate a Key on the new Org
-        if (doOauth) {
-            // Generate a new OAUTH Token
-            await OAUTH.generateOauthToken(null, true, false);
-        }
-    } else {
-        log(INFO, 'OK, I won\'t do anything :-)');
-    }
-}
-
-function mapOrg(org: ORGInfo) {
-    org.name = org.accountDisplayName;
-    if (org.ownersInfo) {
-        let i = 1;
-        for (const owner of org.ownersInfo) {
-            org['Owner ' + i] = owner.firstName + ' ' + owner.lastName + ' (' + owner.email + ')';
-            i++;
-        }
-    }
-    if (org.regions) {
-        org.regions = org.regions.map((reg: any) => translateAWSRegion(reg));
-        let i = 1;
-        for (const reg of org.regions) {
-            org['Region ' + i] = reg;
-            i++;
-        }
-    } else {
-        org.regions = ['NONE'];
-    }
-    return org;
-}
-
-
-// Options; doShow, doChoose, question
-async function displayOrganizations(doShow: boolean, doChoose: boolean, question: string) {
-    const organizations = await getOrganizations();
-    const myOrgs = [];
-    for (let org of organizations) {
-        org.type = 'Main';
-        org = mapOrg(org);
-        myOrgs.push(org);
-        const main = org.accountDisplayName;
-        if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
-            for (let child of org.childAccountsInfo) {
-                child.type = 'Child of ' + main;
-                child = mapOrg(child);
-                myOrgs.push(child);
-            }
-        }
-    }
-    const tObject = createTable(myOrgs, CCOM.mappings.account_info, false);
-    pexTable(tObject, 'organizations', getPEXConfig(), doShow);
-    if (doChoose) {
-        const orgA = await askMultipleChoiceQuestionSearch(question, ['NONE', ...iterateTable(tObject).map(v => v['Organization Name'])]);
-        const selectedOrg = iterateTable(tObject).filter(v => v['Organization Name'] === orgA)[0];
-        let orgDetails;
-        if (selectedOrg) {
-            orgDetails = getSpecificOrganization(organizations, selectedOrg['Organization Name']);
-        }
-        return orgDetails;
-    }
-}
-
-function getSpecificOrganization(organizations: ORGInfo[], name: any) {
-    for (let org of organizations) {
-        if (name === org.accountDisplayName) {
-            return org;
-        }
-        if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
-            for (let child of org.childAccountsInfo) {
-                if (name === child.accountDisplayName) {
-                    return child;
-                }
-            }
-        }
-    }
-}
-
-
-// display current properties in a table
-async function getClientIDforOrg(accountId: string) {
-    log(INFO, 'Getting client ID for organization, with account ID: ' + colors.blue(accountId));
-    const postRequest = 'account-id=' + accountId + '&opaque-for-tenant=TSC';
-    const response = await CCOM.callTCA(CCOM.clURI.reauthorize, false, {
-        method: 'POST',
-        postRequest: postRequest,
-        contentType: 'application/x-www-form-urlencoded',
-        tenant: 'TSC',
-        customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login,
-        forceCLIENTID: true,
-        returnResponse: true
-    });
-
-    const loginCookie = response.headers['set-cookie'];
-    const rxd = /domain=(.*?);/g;
-    const rxt = /tsc=(.*?);/g;
-    const cookies = {"domain": rxd.exec(loginCookie)![1], "tsc": rxt.exec(loginCookie)![1]};
-
-    const axios = require('axios').default;
-    axios.defaults.validateStatus = () => {
-        return true;
-    };
-    const options = {
-        method: "POST",
-        headers: {
-            cookie: "tsc=" + cookies.tsc + "; domain=" + cookies.domain
-        }
-    }
-    // Get the ClientID
-    const clientIDResponse = (await axios('https://' + getCurrentRegion() + CCOM.clURI.get_clientID, options)).data;
-    // Invalidate the login after using Re-Authorize
-    CCOM.invalidateLogin();
-    return clientIDResponse.ClientID;
 }

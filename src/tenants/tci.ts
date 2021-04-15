@@ -1,6 +1,5 @@
 import {
-    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
-    askQuestion,
+    addOrUpdateProperty, col,
     createTable,
     DEBUG, getCurrentAWSRegion, getCurrentRegion, getOrganization, getPEXConfig, getProp,
     getPropFileName,
@@ -10,9 +9,10 @@ import {
     pexTable,
     run, WARNING
 } from "../common/common-functions";
+import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 
 const CCOM = require('../common/cloud-communications');
-const colors = require('colors');
+
 
 //const art = require('ascii-art');
 //https://www.npmjs.com/package/ascii-art-font
@@ -71,7 +71,7 @@ export async function monitorTCI() {
         }
         pass = pass.replace('$', '\\$')
         run(tibCli + ' login -u "' + email + '" -p "' + pass + '" -o "' + getOrganization() + '" -r "' + getCurrentAWSRegion() + '"');
-        log(INFO, 'Monitoring ' + colors.yellow('[' + appToMonitor + ']') + ' in organization ' + colors.blue('[' + getOrganization() + ']'))
+        log(INFO, 'Monitoring ' + col.yellow('[' + appToMonitor + ']') + ' in organization ' + col.blue('[' + getOrganization() + ']'))
         run(tibCli + ' monitor applog -s ' + appToMonitor);
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
@@ -103,7 +103,7 @@ export async function exportTCIApp() {
                 }
                 if(manifestFileName.toLowerCase() != 'none') {
                     require('jsonfile').writeFileSync(manifestFileName, flogoAppExport.manifest, storeOptions);
-                    log(INFO, 'Stored Flogo Manifest: ' + colors.blue(manifestFileName));
+                    log(INFO, 'Stored Flogo Manifest: ' + col.blue(manifestFileName));
                     log(WARNING, 'Not all components of the manifest are exported in the same way as a manual export...');
                 }
                 let flogoFileName = await askQuestion('Which filename would you like to use for the Flogo JSON export ? (press enter or use DEFAULT to use flogo.json, or use NONE to not export the Flogo JSON)');
@@ -112,7 +112,7 @@ export async function exportTCIApp() {
                 }
                 if(flogoFileName.toLowerCase() != 'none'){
                     require('jsonfile').writeFileSync(flogoFileName, flogoAppExport.flogoJson, storeOptions);
-                    log(INFO, 'Stored Flogo json: ' + colors.blue(flogoFileName));
+                    log(INFO, 'Stored Flogo json: ' + col.blue(flogoFileName));
                 }
             }
         }

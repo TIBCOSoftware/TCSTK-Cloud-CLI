@@ -1,15 +1,15 @@
 import {
     addOrUpdateProperty,
-    askMultipleChoiceQuestion,
-    askQuestion,
+    col,
     ERROR, getOrganization, getProp, getPropFileName, INFO,
     iterateTable,
     log
 } from "./common-functions";
 import {Global} from "../models/base";
+import {askMultipleChoiceQuestion, askQuestion} from "./user-interaction";
 declare var global: Global;
 
-const colors = require('colors');
+
 const LA = require('../tenants/live-apps');
 const CFILES = require('../tenants/cloud-files');
 const USERGROUPS = require('../tenants/user-groups');
@@ -37,10 +37,10 @@ export async function validate() {
                 valueFound = false;
             }
             if (val != null && valueFound) {
-                validationOk('Property ' + colors.blue(prop) + '\x1b[0m exists...');
+                validationOk('Property ' + col.blue(prop) + '\x1b[0m exists...');
                 if (valD === 'property_is_set' || valD === 'property_is_set_ask') {
                     if (getProp(prop).trim() !== '') {
-                        validationOk('Property ' + colors.blue(prop) + '\x1b[0m is set: ' + colors.yellow(getProp(prop)));
+                        validationOk('Property ' + col.blue(prop) + '\x1b[0m is set: ' + col.yellow(getProp(prop)));
                     } else {
                         validationFailed('Property ' + prop + ' does not have a value...');
                         if (valD === 'property_is_set_ask') {
@@ -117,9 +117,9 @@ export async function validateLACaseState(caseRefToValidate, stateToValidate) {
     await validateLACase(caseRefToValidate, 'case_exist');
     const caseData = JSON.parse((await LA.getLaCaseByReference(caseRefToValidate)).untaggedCasedata);
     if (caseData.state === stateToValidate) {
-        validationOk('Case with Reference ' + colors.blue(caseRefToValidate) + '\x1b[0m is in the expected state ' + colors.blue(stateToValidate) + '\x1b[0m on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+        validationOk('Case with Reference ' + col.blue(caseRefToValidate) + '\x1b[0m is in the expected state ' + col.blue(stateToValidate) + '\x1b[0m on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
     } else {
-        validationFailed('Case with Reference ' + colors.blue(caseRefToValidate) + '\x1b[0m EXISTS BUT is NOT in the expected state ' + colors.yellow(stateToValidate) + '\x1b[0m But in this State: ' + colors.blue(caseData.state) + '\x1b[0m  on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+        validationFailed('Case with Reference ' + col.blue(caseRefToValidate) + '\x1b[0m EXISTS BUT is NOT in the expected state ' + col.yellow(stateToValidate) + '\x1b[0m But in this State: ' + col.blue(caseData.state) + '\x1b[0m  on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
     }
 }
 
@@ -140,16 +140,16 @@ export async function validateLACase(casesToValidate, valType) {
         }
         // console.log('Valid: ', validCase, ' casesToValidate: ', casesToValidate, ' valType: ', valType);
         if (validCase && valType === 'case_exist') {
-            validationOk('Case with Reference ' + colors.blue(casRef) + '\x1b[0m exist on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+            validationOk('Case with Reference ' + col.blue(casRef) + '\x1b[0m exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         }
         if (!validCase && valType === 'case_exist') {
-            validationFailed('Case with Reference ' + colors.blue(casRef) + '\x1b[0m does not exist on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+            validationFailed('Case with Reference ' + col.blue(casRef) + '\x1b[0m does not exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         }
         if (!validCase && valType === 'case_not_exist') {
-            validationOk('Case with Reference ' + colors.blue(casRef) + '\x1b[0m was NOT EXPECTED to exist on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+            validationOk('Case with Reference ' + col.blue(casRef) + '\x1b[0m was NOT EXPECTED to exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         }
         if (validCase && valType === 'case_not_exist') {
-            validationFailed('Case with Reference ' + colors.blue(casRef) + '\x1b[0m was NOT EXPECTED to exist(but it DOES) on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+            validationFailed('Case with Reference ' + col.blue(casRef) + '\x1b[0m was NOT EXPECTED to exist(but it DOES) on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         }
     }
 }
@@ -160,20 +160,20 @@ async function validationItemHelper(items, type, search) {
     for (let app of itemArray) {
         let laApp = items.find(e => e[search] === app.trim());
         if (laApp != null) {
-            validationOk(type + ' ' + colors.blue(app) + '\x1b[0m exist on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+            validationOk(type + ' ' + col.blue(app) + '\x1b[0m exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         } else {
-            validationFailed(type + ' ' + colors.blue(app) + '\x1b[0m does not exist on organization: ' + colors.blue(getOrganization()) + '\x1b[0m...');
+            validationFailed(type + ' ' + col.blue(app) + '\x1b[0m does not exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         }
     }
     return itemsToValidate;
 }
 
 function validationOk(message) {
-    log(INFO, colors.green(' [VALIDATION --OK--] \x1b[0m' + message))
+    log(INFO, col.green(' [VALIDATION --OK--] \x1b[0m' + message))
 }
 
 // TODO: Add option to exit on validation failure
 function validationFailed(message) {
-    log(ERROR, colors.red('[VALIDATION FAILED] \x1b[0m' + message));
+    log(ERROR, col.red('[VALIDATION FAILED] \x1b[0m' + message));
     process.exit(1);
 }

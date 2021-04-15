@@ -1,6 +1,7 @@
-import {askMultipleChoiceQuestion, askQuestion, getProp, INFO, log, run} from "../common/common-functions";
+import {col, getProp, INFO, log, run} from "../common/common-functions";
+import {askMultipleChoiceQuestion, askQuestion} from "../common/user-interaction";
 
-const colors = require('colors');
+
 const posSchematics = require('../config/config-schematics.json').schematicConfig;
 
 // Function to add a schematic (for cloud starters)
@@ -25,7 +26,7 @@ export async function schematicAdd() {
                     }
                 }
             }
-            question = 'Based on your application type ' + colors.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
+            question = 'Based on your application type ' + col.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
             initialList = false;
         }
         sType = await askMultipleChoiceQuestion(question, possibleSchematics);

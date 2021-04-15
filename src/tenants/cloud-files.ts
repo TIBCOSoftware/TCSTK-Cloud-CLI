@@ -1,6 +1,5 @@
 import {
-    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
-    askQuestion,
+    addOrUpdateProperty, col,
     createTable, ERROR, getOrganization, getPEXConfig, getProp,
     getPropFileName,
     INFO,
@@ -9,10 +8,11 @@ import {
     logLine, mkdirIfNotExist,
     pexTable
 } from "../common/common-functions";
+import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 
 const CCOM = require('../common/cloud-communications');
 const USERGROUPS = require('./user-groups');
-const colors = require('colors');
+
 
 const isWindows = process.platform === 'win32';
 const dirDelimiter = isWindows ? '\\' : '/';
@@ -35,7 +35,7 @@ async function prepCloudFileProps() {
         }
         CLOUD_FILES_FOLDER = CLOUD_FILES_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
         if (!cfInformed) {
-            log(INFO, 'Using Local Folder (for cloud files): ' + colors.blue(CLOUD_FILES_FOLDER));
+            log(INFO, 'Using Local Folder (for cloud files): ' + col.blue(CLOUD_FILES_FOLDER));
             cfInformed = true;
         }
     }
@@ -95,7 +95,7 @@ export async function getOrgFolderFiles(folderTable, folder, showFiles) {
 
 // Function to download an org folder file
 async function downLoadOrgFolderFile(folder, file) {
-    log(INFO, '    Cloud Folder: ' + colors.blue(folder) + ' File: ' + colors.blue(file));
+    log(INFO, '    Cloud Folder: ' + col.blue(folder) + ' File: ' + col.blue(file));
     // checkOrgFolderLocation();
     await prepCloudFileProps();
     mkdirIfNotExist(CLOUD_FILES_FOLDER);
@@ -165,7 +165,7 @@ export async function uploadFileToOrgFolder() {
                 cloudFileName = localFileLocation;
             }
         }
-        log(INFO, 'Creating ' + colors.blue(cloudFileName) + ' in folder: ' + colors.blue(folderDecision));
+        log(INFO, 'Creating ' + col.blue(cloudFileName) + ' in folder: ' + col.blue(folderDecision));
         await uploadFile(localFileLocation, folderDecision, cloudFileName);
 
     } else {

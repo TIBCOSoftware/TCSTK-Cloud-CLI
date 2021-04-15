@@ -1,15 +1,16 @@
 import {
     addOrUpdateProperty,
-    askMultipleChoiceQuestion,
+    col,
     createTable,
     createTableValue, DEBUG, ERROR, getCurrentRegion,
     getOAUTHDetails, getOrganization, getProp, getPropFileName, getRegion, INFO,
     iterateTable,
     log, WARNING
 } from "./common-functions";
+import {askMultipleChoiceQuestion} from "./user-interaction";
 
 const CCOM = require('./cloud-communications');
-const colors = require('colors');
+
 
 // Function to display current configured OAUTH Settings...
 export function displayCurrentOauthDetails() {
@@ -66,7 +67,7 @@ export async function revokeOauthToken(tokenName: string) {
             tenant: 'TSC',
             customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
         });
-        log(INFO, 'Result: ', colors.blue(response.message));
+        log(INFO, 'Result: ', col.blue(response.message));
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
@@ -80,7 +81,7 @@ export async function rotateOauthToken() {
         try {
             tokenNumber = Number(tokenName.split('_').pop()!.trim());
         } catch (e) {
-            log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1) token name: ' + colors.yellow(tokenName));
+            log(ERROR, 'For token rotation use this pattern: <TOKEN NAME>_<TOKEN NUMBER> (For example: MyToken_1) token name: ' + col.yellow(tokenName));
         }
         let newTokenNumber = 0;
         let newTokenName = '';
@@ -109,16 +110,7 @@ export async function rotateOauthToken() {
 }
 
 // Function that validates and rotates the OAUTH token if needed
-export async function validateAndRotateOauthToken(isInteractive?: boolean ) {
-
-    /* TODO: Actually check if the OAUTH Key Is valid...
-    if(CCOM.isOAUTHLoginValid()){
-           log(INFO, 'OAUTH is valid...');
-           // Show OAUTH Details:
-           parseOAUTHToken(getProp('CloudLogin.OAUTH_Token', true, true), true);
-        }
-     */
-
+export async function validateAndRotateOauthToken(isInteractive?: boolean) {
     let doInteraction = true;
     if (isInteractive != null) {
         doInteraction = isInteractive;

@@ -22,6 +22,8 @@
     "la_user_group_mapping": "liveapps.cloud.tibco.com/organisation/v1/userGroupMappings",
     "la_cases": "liveapps.cloud.tibco.com/case/v1/cases",
     "la_process": "liveapps.cloud.tibco.com/process/v1/processes",
+    "la_design": "liveapps.cloud.tibco.com/design/applications",
+    "la_design_apps": "liveapps.cloud.tibco.com/design/v1/applicationVersions",
     "tci_apps": "integration.cloud.tibco.com/api/v1/apps",
     "tci_export_app": "integration.cloud.tibco.com/wistudio/v2/metadata",
     "sf_settings": "spotfire-next.cloud.tibco.com/spotfire/wp/settings",
@@ -325,6 +327,43 @@
         {
           "header": "Available Regions",
           "field": "regions"
+        }
+      ]
+    },
+    "la_design_apps": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Id",
+          "field": "id"
+        },
+        {
+          "header": "Latest Version ID",
+          "field": "latestVersionId"
+        },
+        {
+          "header": "Owner",
+          "field": "owner"
+        },
+        {
+          "header": "Last Published On",
+          "field": "lastPublished.dateChanged",
+          "format": "DATE"
+        },
+        {
+          "header": "Validation",
+          "field": "latestValidationState"
+        },
+        {
+          "header": "Runtime State",
+          "field": "adminState"
+        },
+        {
+          "header": "Design-time State",
+          "field": "latestGovernanceState"
         }
       ]
     }

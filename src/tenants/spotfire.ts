@@ -1,6 +1,5 @@
 import {
-    askMultipleChoiceQuestionSearch,
-    askQuestion,
+    col,
     createTable,
     DEBUG, ERROR, getCurrentRegion, getOrganization,
     getPEXConfig,
@@ -13,11 +12,11 @@ import {
 import {Global} from "../models/base";
 import {CallConfig} from "../models/tcli-models";
 import {SFCopyRequest, SFFolderInfo, SFLibObject, SFType} from "../models/spotfire";
+import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 
 declare var global: Global;
 
 const CCOM = require('../common/cloud-communications');
-const colors = require('colors');
 
 let jSession: string;
 let xSRF: string;
@@ -96,7 +95,7 @@ export async function browseSpotfire() {
         if (sfReports.CurrentFolder.DisplayPath) {
             currentFolder = sfReports.CurrentFolder.DisplayPath;
         }
-        log(INFO, 'Current folder: ', colors.blue(currentFolder));
+        log(INFO, 'Current folder: ', col.blue(currentFolder));
         let items = [];
         for (let parent of sfReports.Ancestors) {
             if (parent.ItemType === 'spotfire.folder') {
@@ -175,7 +174,7 @@ export async function listSpotfire() {
     if (typeForSearch.toLowerCase() !== 'none') {
         if (typeForSearch.toLowerCase() === 'all') {
             for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
-                log(INFO, 'Looking for: ' + colors.blue(ReadableName) + ' in library:');
+                log(INFO, 'Looking for: ' + col.blue(ReadableName) + ' in library:');
                 await listOnType(SFTypeName as SFType);
             }
         } else {
@@ -239,8 +238,8 @@ export async function copySpotfire() {
             log(INFO, 'Getting all library folders that the item can be copied to...');
             const sfFolders = await listOnType('spotfire.folder', true);
             // 5: Ask what folder to copy to
-            log(INFO, 'Specify the target folder, you are currently in: ' + colors.blue(getOrganization()));
-            const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + colors.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
+            log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
+            const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
             // 6: Get the folder ID
             folderIdToCopyTo = sfFolders.find(v => v.DisplayPath === folderToCopyTo).Id;
             const copyRequest: SFCopyRequest = {
@@ -256,7 +255,7 @@ export async function copySpotfire() {
                 postRequest: copyRequest
             }) as SFLibObject[];
             if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
-                log(INFO, 'Successfully copied: ', colors.green(itemNameToCopy) + ' to ' + colors.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
+                log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
                 if(itemToCopy.Title !== SFCopy[0].Title){
                     log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
                 }
@@ -331,7 +330,7 @@ async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLib
             pexTable(tObject, 'list-spotfire', getPEXConfig(), true);
             return items;
         } else {
-            log(INFO, 'No ' + colors.yellow(getNameForSFType(typeToList)) + ' Found in ' + colors.blue(sfFolderToList.DisplayName) + '...');
+            log(INFO, 'No ' + col.yellow(getNameForSFType(typeToList)) + ' Found in ' + col.blue(sfFolderToList.DisplayName) + '...');
         }
     }
 }

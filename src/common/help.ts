@@ -1,12 +1,13 @@
-import {askMultipleChoiceQuestionSearch, doesFileExist, ERROR, INFO, log, WARNING} from "./common-functions";
+import {col, doesFileExist, ERROR, INFO, log, WARNING} from "./common-functions";
 import {Global} from "../models/base";
 import {TCLITask} from "../models/tcli-models";
+import {askMultipleChoiceQuestionSearch} from "./user-interaction";
 
 declare var global: Global;
 
 const CCOM = require('./cloud-communications');
 const ECHOMD = require('../echomd/echomd').echomd;
-const colors = require('colors');
+
 
 const GIT_HUB_LINK_RAW = 'https://raw.githubusercontent.com/TIBCOSoftware/TCSTK-Cloud-CLI/master/docs';
 // const GIT_HUB_LINK_DOC = 'https://github.com/TIBCOSoftware/TCSTK-Cloud-CLI/blob/master/docs';
@@ -16,7 +17,7 @@ const GIT_HUB_LINK_RAW = 'https://raw.githubusercontent.com/TIBCOSoftware/TCSTK-
 export async function showInlineHelp() {
     // TODO: show a more.. (by pressing enter to go down...)
     console.log('TIBCO Cloud CLI Version: ' + require('../../package.json').version);
-    console.log(colors.blue('tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]'));
+    console.log(col.blue('tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]'));
     console.log('Note: When you run "tcli" as a loose command it will bring you in an interactive menu based on context.');
     console.log('new: Create new Cloud starter. Usage] tcli new <name> [--template(-t)] <template-to-use>');
     console.log('        --debug: Display debug information.');
@@ -33,7 +34,7 @@ export async function showInlineHelp() {
     console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.\n');
     console.log('These are the available TIBCO CLOUD CLI Tasks:');
     getAndListTasks();
-    console.log(colors.yellow('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
+    console.log(col.yellow('For more info visit: ') + 'https://tibcosoftware.github.io/TCSToolkit/');
     console.log('To get specific help on a task type: tcli -h <TASKNAME> or tcli --help <TASKNAME>');
 }
 
@@ -105,7 +106,7 @@ function getAndListTasks() {
                 for (let i = 0; i < x; i++) {
                     str = ' ' + str;
                 }
-                console.log(colors.cyan(str + ':') + ' ' + task.description);
+                console.log(col.cyan(str + ':') + ' ' + task.description);
             }
         }
     }

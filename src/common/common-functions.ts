@@ -3,11 +3,13 @@
 import {Global} from "../models/base";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import {Mapping, OAUTHConfig, PEXConfig} from "../models/tcli-models";
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./user-interaction";
 declare var global: Global;
 const globalTCpropFolder = __dirname + '/../../../common/';
 const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
-const colors = require('colors');
 const _ = require('lodash');
+
+export const col = require('colors');
 
 // Display opening
 export function displayOpeningMessage(): void {
@@ -322,7 +324,7 @@ export function trim(value: string) {
 export async function createMultiplePropertyFile() {
     // 'manage-multiple-cloud-starters.properties'
     let mPropFileName = 'manage-multiple-cloud-starters.properties';
-    let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: ' + colors.blue('manage-multiple-cloud-starters') + ') ?');
+    let nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: ' + col.blue('manage-multiple-cloud-starters') + ') ?');
     // console.log('nameAnsw: ' + nameAnsw);
     if (nameAnsw != null && nameAnsw !== '' && nameAnsw.toLowerCase() !== 'default') {
         mPropFileName = nameAnsw + '.properties';
@@ -330,7 +332,7 @@ export async function createMultiplePropertyFile() {
     const targetFile = process.cwd() + '/' + mPropFileName;
     let doWrite = true;
     if (doesFileExist(targetFile)) {
-        const doOverWrite = await askMultipleChoiceQuestion('The property file: ' + colors.yellow(mPropFileName) + ' already exists, do you want to Overwrite it ?', ['YES', 'NO']);
+        const doOverWrite = await askMultipleChoiceQuestion('The property file: ' + col.yellow(mPropFileName) + ' already exists, do you want to Overwrite it ?', ['YES', 'NO']);
         if (doOverWrite === 'NO') {
             doWrite = false;
             log(INFO, 'OK, I won\'t do anything :-)');
@@ -340,8 +342,8 @@ export async function createMultiplePropertyFile() {
         log(INFO, 'Creating new multiple property file: ' + mPropFileName);
         copyFile(global.PROJECT_ROOT + 'templates/multiple.properties', targetFile);
         //'\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ') ' ,'\x1b[31m'
-        log(INFO, 'Now configure the multiple property file and then run "' + colors.blue('tcli -m') + '" (for default file name) \nor "' + colors.blue('tcli -m <propfile name> [-j <job-name> -e <environment-name>]') + '" to execute...');
-        log(INFO, 'Or run "' + colors.blue('tcli -i') + '" to interact with multiple cloud environments...');
+        log(INFO, 'Now configure the multiple property file and then run "' + col.blue('tcli -m') + '" (for default file name) \nor "' + col.blue('tcli -m <propfile name> [-j <job-name> -e <environment-name>]') + '" to execute...');
+        log(INFO, 'Or run "' + col.blue('tcli -i') + '" to interact with multiple cloud environments...');
     }
 }
 
@@ -351,6 +353,8 @@ export function copyFile(fromFile: string, toFile: string) {
     const fs = require('fs');
     fs.copyFileSync(fromFile, toFile);
 }
+
+/*
 
 
 // function to ask a question
@@ -481,13 +485,13 @@ export function getLastGlobalAnswer(question: string) {
     let re = '';
     if (globalAnswers && globalAnswers.length > 0) {
         re = globalAnswers.shift()!;
-        log(INFO, 'Injected answer: ', colors.blue(re), ' For question: ', question);
+        log(INFO, 'Injected answer: ', col.blue(re), ' For question: ', question);
     } else {
         log(ERROR, 'No answer left for question: ' + question);
         process.exit(1);
     }
     return re;
-}
+} */
 
 // Update the cloud login properties
 export async function updateCloudLogin(propFile: string, forceRefresh?: boolean, forceGlobalRefresh?: boolean, defaultClientID?: string, defaultEmail?: string) {
@@ -569,13 +573,13 @@ export function getCurrentRegion(showRegion?: boolean) {
     if (displayRegion) {
         switch (re) {
             case '':
-                log(INFO, 'Current Region: ' + colors.blue('US - Oregon'));
+                log(INFO, 'Current Region: ' + col.blue('US - Oregon'));
                 break;
             case 'eu.':
-                log(INFO, 'Current Region: ' + colors.blue('EU - Ireland'));
+                log(INFO, 'Current Region: ' + col.blue('EU - Ireland'));
                 break;
             case 'au.':
-                log(INFO, 'Current Region: ' + colors.blue('AU - Sydney'));
+                log(INFO, 'Current Region: ' + col.blue('AU - Sydney'));
                 break;
         }
     }
@@ -636,8 +640,8 @@ export function updateCloudPackages() {
     log(INFO, 'Updating all packages starting with @tibco-tcstk in your package.json');
     // TODO: Investigate if we can install update-by-scope in node_modules of the cli
     run('npm install -g update-by-scope && npx update-by-scope @tibco-tcstk npm install');
-    //const colors = require('colors');
-    log(INFO, colors.blue('Done Updating Cloud Packages...'));
+    //
+    log(INFO, col.blue('Done Updating Cloud Packages...'));
 }
 
 
@@ -664,7 +668,7 @@ export function addOrUpdateProperty(location: string, property: string, value: s
         const localProps = require('properties-reader')(LOCALPropertyFileName).path();
         if (_.get(localProps, property) === 'USE-GLOBAL') {
             location = GLOBALPropertyFileName;
-            log(INFO, 'Found ' + colors.blue('USE-GLOBAL') + ' for property: ' + colors.blue(property) + ', so updating the GLOBAL Property file...')
+            log(INFO, 'Found ' + col.blue('USE-GLOBAL') + ' for property: ' + col.blue(property) + ', so updating the GLOBAL Property file...')
         }
     }
     // Check if file exists
@@ -703,19 +707,19 @@ export function addOrUpdateProperty(location: string, property: string, value: s
             if (propFound) {
                 let doLog = true;
                 if (property === 'CloudLogin.clientID') {
-                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow('[NEW CLIENT ID]') + ' (in:' + location + ')');
+                    log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[NEW CLIENT ID]') + ' (in:' + location + ')');
                     doLog = false;
                 }
                 if (property === 'CloudLogin.OAUTH_Token') {
-                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow('[NEW OAUTH TOKEN]') + ' (in:' + location + ')');
+                    log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[NEW OAUTH TOKEN]') + ' (in:' + location + ')');
                     doLog = false;
                 }
                 if (doLog){
-                    log(INFO, 'Updated: ' + colors.blue(property) + ' to: ' + colors.yellow(value) + ' (in:' + location + ')');
+                    log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow(value) + ' (in:' + location + ')');
                 }
             } else {
                 // append prop to the end.
-                log(INFO, 'Property NOT found: ' + colors.blue(property) + ' We are adding it and set it to: ' + colors.yellow(value) + ' (in:' + location + ')');
+                log(INFO, 'Property NOT found: ' + col.blue(property) + ' We are adding it and set it to: ' + col.yellow(value) + ' (in:' + location + ')');
                 if (comment) {
                     dataForFile += '\n# ' + comment;
                 }
@@ -951,7 +955,7 @@ export function pexTable(tObject: any, tName: string, config: PEXConfig, doPrint
                     if(myValue) {
                         if ((key && key.indexOf && key.indexOf(',') > 0) || (myValue && myValue.indexOf && myValue.indexOf(',') > 0)) {
                             log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${myValue}); we are removing it...`);
-                            additionalMessage = colors.yellow(' (We have removed some comma\'s from the data...)');
+                            additionalMessage = col.yellow(' (We have removed some comma\'s from the data...)');
                             if (key.replaceAll) {
                                 key = key.replaceAll(',', '');
                             }
@@ -971,15 +975,15 @@ export function pexTable(tObject: any, tName: string, config: PEXConfig, doPrint
             if (newFile) {
                 dataForFile = headerForFile + '\n' + dataForFile;
                 fs.writeFileSync(fileName, dataForFile, 'utf8');
-                log(INFO, '--> (New File) Exported table to ' + colors.blue(fileName) + additionalMessage);
+                log(INFO, '--> (New File) Exported table to ' + col.blue(fileName) + additionalMessage);
             } else {
                 fs.appendFileSync(fileName, dataForFile, 'utf8');
-                log(INFO, '--> (Appended) Exported table data to ' + colors.blue(fileName) + additionalMessage);
+                log(INFO, '--> (Appended) Exported table data to ' + col.blue(fileName) + additionalMessage);
             }
         }
     }
     if (printT) {
-        log(INFO, colors.blue('TABLE] ' + tName));
+        log(INFO, col.blue('TABLE] ' + tName));
         console.table(tObject);
     }
 }
@@ -1099,16 +1103,16 @@ export function log(level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR' | 'RECORDER', 
                     message[mN] = message[mN].replace(/--pass \".*\"/, '')
                 }
             }
-            console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', colors.red(...message));
+            console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', col.red(...message));
             process.exitCode = 1;
         } else {
             if (level === WARNING) {
-                console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
+                console.log(col.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
             } else {
                 if(level === RECORDER){
-                    console.log(colors.bgWhite('[' + level + ']'), ...message);
+                    console.log(col.bgWhite('[' + level + ']'), ...message);
                 } else {
-                    console.log(colors.magenta('TS TIBCO CLOUD CLI] (' + level + ') '), ...message);
+                    console.log(col.magenta('TS TIBCO CLOUD CLI] (' + level + ') '), ...message);
                 }
 
             }
@@ -1175,15 +1179,15 @@ export function upgradeToV2(isGlobal: boolean, propFile: string) {
     }
     // console.log('newORG: ', newORG, 'host',host, 'curl',curl);
     let initialTokenName = 'MyCLIToken_1'
-    log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
+    log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
     if (isGlobal) {
         initialTokenName = 'MyGlobalCLIToken_1'
-        log(INFO, colors.rainbow('* AUTOMATICALLY Updating GLOBAL property file to V2.*'));
+        log(INFO, col.rainbow('* AUTOMATICALLY Updating GLOBAL property file to V2.*'));
     } else {
-        log(INFO, colors.rainbow('* AUTOMATICALLY Updating you property file to V2... *'));
+        log(INFO, col.rainbow('* AUTOMATICALLY Updating you property file to V2... *'));
     }
-    log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
-    log(INFO, colors.rainbow('* * * ') + ' Disabling Properties...');
+    log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
+    log(INFO, col.rainbow('* * * ') + ' Disabling Properties...');
     const PROPM = require('./property-file-management');
     PROPM.disableProperty(propFile, 'CloudLogin.tenantID', DisableMessage);
     PROPM.disableProperty(propFile, 'cloudHost', DisableMessage);
@@ -1191,8 +1195,8 @@ export function upgradeToV2(isGlobal: boolean, propFile: string) {
     PROPM.disableProperty(propFile, 'loginURE', DisableMessage);
     PROPM.disableProperty(propFile, 'appURE', DisableMessage);
     PROPM.disableProperty(propFile, 'Claims_URE', DisableMessage);
-    log(INFO, colors.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
-    log(INFO, colors.rainbow('* * * ') + ' Adding new Properties...');
+    log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'));
+    log(INFO, col.rainbow('* * * ') + ' Adding new Properties...');
     addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version', false);
     addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Oregon) - US\n#  EU Cloud (Ireland) - EU\n# AUS Cloud (Sydney) - AU\n# Options: US | EU | AU', false);
     // addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com', false);
@@ -1228,7 +1232,7 @@ function createPropINE(isGlobal: boolean, propFile: string, propName: string, va
     if (doUpdate) {
         addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment, false);
     } else {
-        log(INFO, 'Not changed the value of ' + colors.green(propName) + '...')
+        log(INFO, 'Not changed the value of ' + col.green(propName) + '...')
     }
 }
 

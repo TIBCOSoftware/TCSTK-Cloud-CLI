@@ -1,5 +1,5 @@
 import {
-    askQuestion,
+    col,
     createTableValue,
     DEBUG, ERROR, getCurrentRegion, getOrganization, getProp, getRegion,
     INFO,
@@ -10,10 +10,11 @@ import {
 } from "./common-functions";
 import {Global} from "../models/base";
 import {CallConfig, MappingGroup} from "../models/tcli-models";
+import {askQuestion} from "./user-interaction";
 
 declare var global: Global;
 // require('./common-functions');
-const colors = require('colors');
+
 const cloudConfig = require('../config/config-cloud.json');
 
 // TODO: if Cloud_Location provided replace |cloud.tibco.com|
@@ -131,7 +132,7 @@ export async function cLogin(tenant?: string, customLoginURL?: string, forceClie
             }
             if (response.selectedAccount) {
                 if (doOAuthNotify) {
-                    log(INFO, 'Using OAUTH Authentication, ORGANIZATION: ' + colors.blue(response.selectedAccount.displayName));
+                    log(INFO, 'Using OAUTH Authentication, ORGANIZATION: ' + col.blue(response.selectedAccount.displayName));
                     doOAuthNotify = false;
                 }
                 setOrganization(response.selectedAccount.displayName);
@@ -339,7 +340,7 @@ async function callURLA(url:string, method?, postRequest?, contentType?, doLog?,
     }
 } */
 
-// Wrapper around the callURL function that takes a config object
+// Function that calls the TIBCO Cloud and takes a config object
 export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     if (conf == null) {
         conf = {};
@@ -402,7 +403,7 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
 
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
-        log(INFO, '- URL(' + cMethod + '): ' + url);
+        log(INFO, '- URL(' + cMethod + '): ' + urlToCall);
         log(DEBUG, '-  METHOD: ' + cMethod);
         log(INFO, '- CONTENT: ' + cType);
         log(DEBUG, '-  HEADER: ', header);
@@ -428,9 +429,9 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     }
     if (response.statusCode != 200 && !doErrorOutside) {
         if (response.body != null) {
-            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode + ' \n Message: ', response.body);
+            log(ERROR, 'Error Calling URL: ' + urlToCall + ' Status: ' + response.statusCode + ' \n Message: ', response.body);
         } else {
-            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode);
+            log(ERROR, 'Error Calling URL: ' + urlToCall + ' Status: ' + response.statusCode);
         }
         process.exit(1);
     }
@@ -469,7 +470,7 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
         let formData = new fd();
         const fs = require('fs');
         const {size: fileSize} = fs.statSync(localFileLocation);
-        log(INFO, 'UPLOADING FILE: ' + colors.blue(localFileLocation) + ' (to:' + uploadFileURI + ')' + ' Filesize: ' + readableSize(fileSize));
+        log(INFO, 'UPLOADING FILE: ' + col.blue(localFileLocation) + ' (to:' + uploadFileURI + ')' + ' Filesize: ' + readableSize(fileSize));
         formData.append(formDataType, fs.createReadStream(localFileLocation));
         const header: any = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
@@ -496,7 +497,7 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
                 if (data) {
                     const dataObj = JSON.parse(data);
                     if (dataObj && dataObj.message) {
-                        log(INFO, ' UPLOAD RESULT:', colors.green(dataObj.message));
+                        log(INFO, ' UPLOAD RESULT:', col.green(dataObj.message));
                     } else {
                         log(WARNING, ' UPLOAD RESULT:', data);
                         reject();
@@ -521,8 +522,8 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
 export async function downloadFromCloud(localFileLocation: string, downloadFileURI: string) {
     return new Promise<void>(async function (resolve, reject) {
         const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
-        log(INFO, '     DOWNLOADING: ' + colors.blue(downloadURL));
-        log(INFO, '              TO: ' + colors.blue(localFileLocation));
+        log(INFO, '     DOWNLOADING: ' + col.blue(downloadURL));
+        log(INFO, '              TO: ' + col.blue(localFileLocation));
         let headers: any = {};
         if (isOauthUsed() && await isOAUTHLoginValid()) {
             headers["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
@@ -541,10 +542,10 @@ export async function downloadFromCloud(localFileLocation: string, downloadFileU
                     const fs = require('fs');
                     fs.writeFileSync(localFileLocation, response.data, 'utf8');
                     const {size: fileSize} = fs.statSync(localFileLocation);
-                    log(INFO, ' DOWNLOAD RESULT: ' + colors.green('DONE') + ' Filesize: ' + readableSize(fileSize));
+                    log(INFO, ' DOWNLOAD RESULT: ' + col.green('DONE') + ' Filesize: ' + readableSize(fileSize));
                     resolve()
                 } catch (err) {
-                    log(INFO, ' DOWNLOAD RESULT: ' + colors.red('ERROR'));
+                    log(INFO, ' DOWNLOAD RESULT: ' + col.red('ERROR'));
                     log(ERROR, 'Problem Storing the file: ' + err);
                     reject(err);
                 }

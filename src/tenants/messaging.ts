@@ -1,7 +1,7 @@
 import {createTable, ERROR, getPEXConfig, INFO, isOauthUsed, log, pexTable} from "../common/common-functions";
 
 const CCOM = require('../common/cloud-communications');
-const colors = require('colors');
+
 
 async function connectMes(url){
     if(isOauthUsed() && await CCOM.isOAUTHLoginValid()) {

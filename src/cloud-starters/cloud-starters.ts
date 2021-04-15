@@ -1,7 +1,7 @@
 // Package Definitions
 import {
-    addOrUpdateProperty,
-    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, copyDir,
+    addOrUpdateProperty, col,
+    copyDir,
     copyFile,
     createTableValue,
     deleteFile,
@@ -13,11 +13,12 @@ import {
     pexTable, run, WARNING
 } from "../common/common-functions";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch} from "../common/user-interaction";
 
 const CCOM = require('../common/cloud-communications');
 const OAUTH = require('../common/oauth');
 const USERGROUPS = require('../tenants/user-groups');
-const colors = require('colors');
+
 
 export async function start() {
     log(INFO, 'Starting: ' + getProp('App_Name'));
@@ -251,7 +252,7 @@ export async function showAvailableApps(showTable) {
         }
         pexTable(apps, 'cloud-starters', getPEXConfig(), false);
         if (doShowTable) {
-            log(INFO, colors.blue('TABLE] cloud-starters'));
+            log(INFO, col.blue('TABLE] cloud-starters'));
             console.table(appsDisplay)
         }
         return response;

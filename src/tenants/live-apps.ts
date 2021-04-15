@@ -1,20 +1,24 @@
 import {
     addOrUpdateProperty,
-    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch,
-    askQuestion,
-    copyFile, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
+    col,
+    copyFile, createTable, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
     getPropFileName, INFO,
     log,
     logLine, mkdirIfNotExist,
     pexTable, sleep
 } from "../common/common-functions";
 import {Global} from "../models/base";
+import {
+    getCurrentOrganizationInfo
+} from "../common/property-file-management";
+import {changeOrganization, displayOrganizations} from "../common/organization-management";
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+
 declare var global: Global;
 
 const CCOM = require('../common/cloud-communications');
-//TODO Possibly circular dependency ???
 const VAL = require('../common/validation');
-const colors = require('colors');
+
 
 let globalProductionSandbox = null;
 
@@ -46,7 +50,7 @@ async function checkCaseFolder() {
             await CCOM.showCloudInfo(false);
         }
         CASE_FOLDER = CASE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
-        log(INFO, 'Using Case Folder: ' + colors.blue(CASE_FOLDER));
+        log(INFO, 'Using Case Folder: ' + col.blue(CASE_FOLDER));
     }
 }
 
@@ -85,7 +89,19 @@ export async function showLiveApps(doShowTable, doCountCases) {
     return caseTypes;
 }
 
-export function stripLiveAppsActions(liveApp){
+// Function to show and return all the design time apps of LiveApps
+export async function showLiveAppsDesign(doShowTable?:boolean) {
+    // la_design
+    const laDesignApps = await CCOM.callTCA(CCOM.clURI.la_design);
+    if(doShowTable){
+        const laDesignAppsTable = createTable(laDesignApps, CCOM.mappings.la_design_apps, false)
+        pexTable(laDesignAppsTable, 'live-apps-design-apps', getPEXConfig(), true);
+    }
+    return laDesignApps;
+}
+
+// Function to get all the actions of a LiveApps App
+export function stripLiveAppsActions(liveApp) {
     let re;
     if (liveApp) {
         re = [];
@@ -107,10 +123,10 @@ export function stripLiveAppsActions(liveApp){
     return re;
 }
 
-function showActions(laApp, appName){
+function showActions(laApp, appName) {
     const laActions = stripLiveAppsActions(laApp);
-    if(laActions){
-        log(INFO, 'Live Apps Actions For ' + colors.bgBlue(laApp.name));
+    if (laActions) {
+        log(INFO, 'Live Apps Actions For ' + col.bgBlue(laApp.name));
         pexTable(laActions, 'live-apps-actions', getPEXConfig(), true);
     } else {
         log(ERROR, 'App not found: ' + appName);
@@ -123,7 +139,7 @@ export async function showLiveAppsActions() {
     const laAppNameA = ['NONE', 'ALL'].concat(apps.map(v => v.name));
     let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to see the actions ?', laAppNameA);
     if (laAppD.toLowerCase() !== 'none') {
-        if(laAppD.toLowerCase() === 'all'){
+        if (laAppD.toLowerCase() === 'all') {
             apps.forEach((app) => {
                 showActions(app, laAppD);
             })
@@ -330,7 +346,7 @@ export async function importLiveAppsData() {
         log(INFO, 'Getting App Id for LA Application ' + importAppName);
         const apps = await showLiveApps(false, false);
         //console.log(apps);
-        let appData:any = {};
+        let appData: any = {};
         for (let app of apps) {
             if (app.name === importAppName) {
                 importAppId = app.applicationId;
@@ -528,6 +544,60 @@ export async function importLiveAppsData() {
     }
 }
 
+// Function to copy LiveApps application between organizations
+export async function copyLiveApps() {
+    log(INFO, 'Copying LiveApps Application between organizations...');
+    // Step 1: Display the current LiveApps Apps
+    const laApps = await showLiveAppsDesign(true);
+    // Step 2: Select a LiveApps App (and it's id)
+    const laAppNameToCopy = await askMultipleChoiceQuestionSearch('Which LiveApps Application would you like to copy between organizations?', ['NONE', ...laApps.map(v => v.name)]);
+    if (laAppNameToCopy.toLowerCase() !== 'none') {
+        const laAppToCopy = laApps.find(v => v.name === laAppNameToCopy);
+        // Step 3: Display all organizations (preferably the ones that have LiveApps)
+        // Step 4: Select a target organization
+        const targetOrgInfo = await displayOrganizations(true, true, 'To which organization would you like to copy ' + laAppToCopy.name + ' ?')
+        // console.log(targetOrgInfo);
+        if (laAppToCopy && laAppToCopy.latestVersionId && targetOrgInfo && targetOrgInfo.accountDisplayName) {
+           const targetOrgName = targetOrgInfo.accountDisplayName;
+            // Step 5: Send a share command to the current organization
+            const shareReq = {
+                message: "Application shared through tcli",
+                disableEmailNotification: true,
+                recipients: [ getProp('CloudLogin.email') ]
+            }
+            const shareRes = await CCOM.callTCA(CCOM.clURI.la_design_apps + '/' + laAppToCopy.latestVersionId + '/applicationShare', false, {
+                method: 'POST',
+                postRequest: shareReq
+            });
+            log(INFO, 'Application shared on current organization with id:' , col.blue(shareRes));
+            // Step 6: Switch to the target organization
+            const currentOrgInfo = await getCurrentOrganizationInfo();
+            log(INFO, '    Current Organization: ' , currentOrgInfo.displayName);
+            log(INFO, 'Changing to Organization: ' , targetOrgInfo.accountDisplayName);
+            await changeOrganization(targetOrgInfo.accountId);
+            // Step 7: Receive the LiveApps App
+            const receiveReq = {
+                shareId: shareRes,
+                governanceState: "PUBLISHED"
+            }
+            const receiveRes = await CCOM.callTCA(CCOM.clURI.la_design_apps, false, {
+                method: 'POST',
+                postRequest: receiveReq
+            });
+            // Step 8: Switch back to the original organization
+            await changeOrganization(currentOrgInfo.accountId);
+            if(receiveRes) {
+                log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' +receiveRes+ ')');
+            } else {
+                log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' to ' + targetOrgName);
+            }
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
+
+}
+
 // Function to
 export function csvToJsonLiveAppsData() {
 // TODO: Implement
@@ -537,3 +607,4 @@ export function csvToJsonLiveAppsData() {
 export function jsonToCsvLiveAppsData() {
 // TODO: Implement
 }
+

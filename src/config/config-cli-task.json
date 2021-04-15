@@ -533,6 +533,19 @@
       ],
       "category": "live-apps"
     },
+    "copy-live-apps-between-organizations": {
+      "description": "Copies a LiveApps application between organizations.",
+      "enabled": true,
+      "internal": false,
+      "task": "copyLiveAppsWrapper",
+      "taskAlternativeNames": [
+        "copy-live-apps"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
     "csv-to-json-live-apps-data": {
       "description": "Convert CSV to JSON for LiveApps data",
       "enabled": false,

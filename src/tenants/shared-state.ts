@@ -1,7 +1,6 @@
 import {
-    addOrUpdateProperty,
-    askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch,
-    askQuestion, DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
+    addOrUpdateProperty, col,
+    DEBUG, doesFileExist, ERROR, getOrganization, getPEXConfig, getProp,
     getPropFileName,
     INFO,
     log,
@@ -10,10 +9,11 @@ import {
     run, WARNING
 } from "../common/common-functions";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 
 const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
-const colors = require('colors');
+
 
 //TODO: Move this to prop file
 const SHARED_STATE_STEP_SIZE = 400;
@@ -54,7 +54,7 @@ async function prepSharedStateProps() {
         }
         SHARED_STATE_FOLDER = SHARED_STATE_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
         if (!ssInformed) {
-            log(INFO, 'Using Shared State Folder: ' + colors.blue(SHARED_STATE_FOLDER));
+            log(INFO, 'Using Shared State Folder: ' + col.blue(SHARED_STATE_FOLDER));
             ssInformed = true;
         }
     }
@@ -73,7 +73,7 @@ export async function getSharedState(showTable) {
     if (getProp('Shared_State_Type') != null) {
         filterType = getProp('Shared_State_Type');
     }
-    log(INFO, 'Type of Shared State: ' + colors.blue(filterType));
+    log(INFO, 'Type of Shared State: ' + col.blue(filterType));
     while (moreStates && i < SHARED_STATE_MAX_CALLS) {
         let start = i * SHARED_STATE_STEP_SIZE;
         // let end = (i + 1) * SHARED_STATE_STEP_SIZE;
@@ -135,7 +135,7 @@ export async function getSharedState(showTable) {
     }
     pexTable(states, 'shared-states', getPEXConfig(), false);
     if (showTable) {
-        log(INFO, colors.blue('TABLE] shared-states'));
+        log(INFO, col.blue('TABLE] shared-states'));
         console.table(statesDisplay)
     }
     return sState;
@@ -208,7 +208,7 @@ export async function showSharedStateDetails() {
 // Removes a Shared State Entry
 export async function createSharedState() {
     const ssType = getProp('Shared_State_Type');
-    log(INFO, 'Creating Shared State Entry. Type: ' + colors.blue(ssType));
+    log(INFO, 'Creating Shared State Entry. Type: ' + col.blue(ssType));
     const ssName = await askQuestion('What is the name of the Shared State entry that you want to create ?');
     const postSS = {
         "name": ssName + '.' + ssType,
@@ -220,7 +220,7 @@ export async function createSharedState() {
     }
     const result = await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
     if (result != null) {
-        log(INFO, 'Successfully created ' + colors.yellow('EMPTY') + ' shared state entry, with ID: ' + colors.green(result) + ' and Name: ' + colors.green(ssName) + ' (' + colors.blue(ssType) + ')...')
+        log(INFO, 'Successfully created ' + col.yellow('EMPTY') + ' shared state entry, with ID: ' + col.green(result) + ' and Name: ' + col.green(ssName) + ' (' + col.blue(ssType) + ')...')
     }
 }
 
@@ -305,7 +305,7 @@ export async function exportSharedState(verbose?) {
             let contentObject = {};
             let scopeAdd = '';
             if (sSEntry.scope) {
-                log(INFO, 'Scope Found: ' + colors.blue(sSEntry.scope) + ' For Shared State: ' + colors.blue(sSEntry.name));
+                log(INFO, 'Scope Found: ' + col.blue(sSEntry.scope) + ' For Shared State: ' + col.blue(sSEntry.name));
                 scopeAdd = '.[SCOPE ' + sSEntry.scope + ']'
 
             }

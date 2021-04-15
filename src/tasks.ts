@@ -1,7 +1,7 @@
 //import functions
 import {
-    askMultipleChoiceQuestion,
-    askQuestion, createMultiplePropertyFile,
+    col,
+    createMultiplePropertyFile,
     DEBUG,
     deleteFolder,
     displayGlobalConnectionConfig, displayOpeningMessage,
@@ -22,12 +22,13 @@ import {
 } from "./common/common-functions";
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
+import {askMultipleChoiceQuestion, askQuestion} from "./common/user-interaction";
 
 declare var global: Global;
 // require('./tenants/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
 const version = require('../package.json').version;
-const colors = require('colors');
+
 // Constants
 const BACK = 'BACK';
 const BACK_TO_ALL = 'BACK TO ALL TASKS';
@@ -120,10 +121,10 @@ export async function promptTask(stDir, cwdDir) {
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
     return new Promise<void>(function (resolve) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-        let pMes = '[TCLI - ' + colors.blue(getRegion(true, true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
+        let pMes = '[TCLI - ' + col.blue(getRegion(true, true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
         // If there is an org, show it
         if (getOrganization(true) !== '') {
-            pMes = '[TCLI - ' + colors.blue(getRegion(true, true) + ' - ' + getOrganization(true)) + ' - ' + colors.yellow(getProp('App_Name')) + ']: ';
+            pMes = '[TCLI - ' + col.blue(getRegion(true, true) + ' - ' + getOrganization(true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
         }
         inquirer.prompt([{
             type: 'autocomplete',
@@ -134,7 +135,7 @@ export async function promptTask(stDir, cwdDir) {
             pageSize: 5
         }]).then(async function (answers) {
             let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => answers.command === el)];
-            log(INFO, 'Selected task] ' + colors.blue(selectedTask));
+            log(INFO, 'Selected task] ' + col.blue(selectedTask));
             let com = selectedTask;
             // Special case for help, call the inline help directly
             if (com === 'help') {
@@ -154,7 +155,7 @@ export async function promptTask(stDir, cwdDir) {
             if (com === 'quit') {
                 if (Math.random() < 0.1) {
                     //Quit with a quote
-                    console.log(colors.bgWhite(QUOTES[Math.floor(Math.random() * QUOTES.length)]));
+                    console.log(col.bgWhite(QUOTES[Math.floor(Math.random() * QUOTES.length)]));
                 }
                 console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
                 return resolve();
@@ -218,7 +219,12 @@ export async function browseTasks() {
 export async function testTask() {
     console.log('Test...');
     const PROPM = require('./common/property-file-management');
-    await PROPM.getClientIDforOrg();
+    // await PROPM.getClientIDforOrg();
+    const LA = require('./tenants/live-apps');
+    // const PROPM = require('./common/property-file-management');
+    const orgs = await PROPM.getCurrentOrganizationInfo();
+    console.log(orgs);
+    // await LA.showLiveAppsDesign(true);
 
 }
 
@@ -507,6 +513,12 @@ export async function exportLiveAppsCaseTypeWrapper() {
     const LA = require('./tenants/live-apps');
     await LA.exportLiveAppsCaseType();
 }
+
+export async function copyLiveAppsWrapper() {
+    const LA = require('./tenants/live-apps');
+    await LA.copyLiveApps();
+}
+
 
 export function updateCloudPackagesWrapper() {
     // Is coming from common

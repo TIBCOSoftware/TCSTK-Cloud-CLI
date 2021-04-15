@@ -1,7 +1,6 @@
 // This file manages the applications
 import {
-    addOrUpdateProperty, askMultipleChoiceQuestionSearch,
-    askQuestion,
+    addOrUpdateProperty, col,
     createTableValue, DEBUG, ERROR,
     getMultipleOptions, INFO,
     iterateTable,
@@ -10,10 +9,11 @@ import {
     run, trim, WARNING
 } from "./common/common-functions";
 import {TCLITask} from "./models/tcli-models";
+import {askMultipleChoiceQuestionSearch, askQuestion} from "./common/user-interaction";
 
 require('./common/common-functions');
 let mFile = '';
-const colors = require('colors');
+
 const _ = require('lodash');
 
 
@@ -71,12 +71,12 @@ export function processMultipleFile() {
             nvs = createTableValue(currentJob, environmentsA[l].trim(), nvs, 'JOB', 'ENVIRONMENT');
         }
     }
-    log(INFO, colors.blue('JOB SUMMARY]') + ' FILE: ' + mFile);
+    log(INFO, col.blue('JOB SUMMARY]') + ' FILE: ' + mFile);
     console.table(nvs);
 
     for (let i = 0; i < csJobsA.length; i++) {
         const currentJob = trim(csJobsA[i]);
-        const logS = colors.blue('[STARTER JOB: ' + currentJob + ']');
+        const logS = col.blue('[STARTER JOB: ' + currentJob + ']');
         // log(INFO, logS);
         // Per Starter Go Over the Configured Environments
         const currLoc = getMProp(currentJob + '_Location');
@@ -90,7 +90,7 @@ export function processMultipleFile() {
         // TODO: Allow for a pre environment command (like git pulls or tenants)
         for (var j = 0; j < environmentsA.length; j++) {
             const currentEnvironment = trim(environmentsA[j]);
-            const logSE = logS + colors.green(' [JOB: ' + currentEnvironment + '] ');
+            const logSE = logS + col.green(' [JOB: ' + currentEnvironment + '] ');
             const propFile = getMProp(currentEnvironment + '_PropertyFile');
             log(INFO, logSE + ' Property File: ' + propFile);
             // Per Environment Run the Configured Tasks
@@ -137,7 +137,7 @@ export function processMultipleFile() {
                     jvs = createTableValue(taskType, task, jvs, 'TYPE', 'TASK');
                 }
             }
-            log(INFO, colors.blue('TASK SUMMARY]') + ' ENVIRONMENT: ' + currentEnvironment);
+            log(INFO, col.blue('TASK SUMMARY]') + ' ENVIRONMENT: ' + currentEnvironment);
             console.table(jvs);
             for (let k = 0; k < jobTasksA.length; k++) {
                 // console.log('Parsing: ' , jobTasksA[k] , '|');
@@ -153,7 +153,7 @@ export function processMultipleFile() {
                     if(tObj.ANSWERS != null){
                         ansCom = ' -a ' + tObj.ANSWERS;
                     } */
-                    logT += colors.brightCyan('[' + (k + 1) + '] [TCLI TASK]\n');
+                    logT += col.brightCyan('[' + (k + 1) + '] [TCLI TASK]\n');
                     //TODO: USE Absolute path ? We can't for the moment, since -p option only takes relative path.
                     //const absPropFile = process.env.PWD + '/' + propFile;
                     //console.log('absPropFile: ' + absPropFile)
@@ -162,11 +162,11 @@ export function processMultipleFile() {
                     //command += 'tcli -p "' + propFile + '" ' + tObj.T + ansCom;
                 }
                 if (tObj.O != null) {
-                    logT += colors.brightCyan('[' + (k + 1) + '] [OS TASK]\n');
+                    logT += col.brightCyan('[' + (k + 1) + '] [OS TASK]\n');
                     command += tObj.O;
                 }
                 if (tObj.S != null) {
-                    logT += colors.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]\n' + tObj.S);
+                    logT += col.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]\n' + tObj.S);
                     command += 'node ' + tObj.S;
                 }
                 log(DEBUG, logT + 'Command (before replacing): ' + command);
@@ -246,12 +246,12 @@ export async function multipleInteraction() {
             // console.log(getMProp('CloudLogin.clientID', miPropFolder + miPropFile))
             environmentsTable[rowNumber] = eRow;
         }
-        console.log(colors.blue('|------------------------------------------------|'));
-        console.log(colors.blue('|     M U L T I P L E    I N T E R A C T I O N   |'));
-        console.log(colors.blue('|------------------------------------------------|'));
-        console.log(colors.blue(`|- TASK: ${displayTask} `));
-        //console.log(colors.blue('|------------------------------------------------|'));
-        //console.log(colors.blue('ENVIRONMENTS:'));
+        console.log(col.blue('|------------------------------------------------|'));
+        console.log(col.blue('|     M U L T I P L E    I N T E R A C T I O N   |'));
+        console.log(col.blue('|------------------------------------------------|'));
+        console.log(col.blue(`|- TASK: ${displayTask} `));
+        //console.log(col.blue('|------------------------------------------------|'));
+        //console.log(col.blue('ENVIRONMENTS:'));
         // 3. Display a table of all environments
         console.table(environmentsTable);
         // 4. Let the user choose an environment to execute on (include All and None/Quit, or Change the Task)
@@ -265,7 +265,7 @@ export async function multipleInteraction() {
         // TODO: Add change task
         let userOptions = ['ALL ENVIRONMENTS', ...environmentOptions]
         userOptions.push('QUIT', 'EXIT', 'CHANGE TASK', 'CHANGE TO INTERACTIVE CLI TASK');
-        let chosenEnv = await askMultipleChoiceQuestionSearch('On which environment would you like to run ' + colors.blue(displayTask) + ' ?', userOptions);
+        let chosenEnv = await askMultipleChoiceQuestionSearch('On which environment would you like to run ' + col.blue(displayTask) + ' ?', userOptions);
         if (chosenEnv === 'QUIT' || chosenEnv === 'EXIT') {
             console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
             process.exit(0);
@@ -302,12 +302,12 @@ export async function multipleInteraction() {
                     propFileToUse = miPropFilesA[envNumber];
                     let command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask;
                     if (chosenEnv === 'ALL ENVIRONMENTS') {
-                        console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
+                        console.log(col.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                         run(command, doFailOnError);
                         // await askQuestion('Press [enter] to continue...');
                     } else {
                         if (environmentOptions[envNumber] === chosenEnv) {
-                            console.log(colors.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
+                            console.log(col.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'));
                             // console.log('Propfile to use: ', miPropFilesA[envNumber]);
                             run(command, doFailOnError);
 

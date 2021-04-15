@@ -1,17 +1,9 @@
-'use strict';
-// File to manage the CLI Interaction
-import {createMultiplePropertyFileWrapper, manageGlobalConfig, newStarter} from "./manage-application";
-
-const colors = require('colors');
-
-require('./common/common-functions');
 import arg from 'arg';
 import {
-    addOrUpdateProperty,
-    askMultipleChoiceQuestion,
-    DEBUG, displayOpeningMessage, ERROR, getGivenAnswers, getGlobalConfig, getProp,
-    INFO, isGlobalAnswersUsed, isGlobalOauthDefined,
-    log, obfuscatePW, RECORDER, setGlobalAnswers,
+    addOrUpdateProperty, col,
+    DEBUG, displayOpeningMessage, ERROR, getGlobalConfig, getProp,
+    INFO, isGlobalOauthDefined,
+    log, obfuscatePW, RECORDER,
     setMultipleOptions, setOrganization, setProperty, setPropFileName, updateCloudLogin, updateRegion,
     updateTCLI,
     WARNING
@@ -19,6 +11,12 @@ import {
 import {multipleInteraction, processMultipleFile} from "./manage-multiple";
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
+import {
+    askMultipleChoiceQuestion,
+    getGivenAnswers,
+    isGlobalAnswersUsed,
+    setGlobalAnswers
+} from "./common/user-interaction";
 declare var global: Global;
 
 let propFileName;
@@ -216,12 +214,12 @@ export async function cli(args) {
                                 const PROPM = require('./common/property-file-management');
                                 PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
                             }
-                            log(INFO, 'Created New TIBCO Cloud Property file ' + colors.green('(Using GLOBAL configuration)') + ': ' + colors.blue(cwdir + '/' + propFileName));
+                            log(INFO, 'Created New TIBCO Cloud Property file ' + col.green('(Using GLOBAL configuration)') + ': ' + col.blue(cwdir + '/' + propFileName));
 
                         } else {
                             log(DEBUG, 'Using Local Connection Configuration...');
                             fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
-                            log(INFO, 'Created New TIBCO Cloud Property file ' + colors.green('(Using LOCAL configuration)') + ': ' + colors.blue(cwdir + '/' + propFileName));
+                            log(INFO, 'Created New TIBCO Cloud Property file ' + col.green('(Using LOCAL configuration)') + ': ' + col.blue(cwdir + '/' + propFileName));
                             await updateRegion(propFileName);
                             await updateCloudLogin(propFileName, true);
                         }
@@ -307,7 +305,7 @@ export async function cli(args) {
                             if (cTsks[cliTask].task) {
                                 directTask = true;
                                 directTaskMethod = cTsks[cliTask].task;
-                                log(INFO, 'Task: ' + options.task + ' --> ' + colors.blue(cliTask));
+                                log(INFO, 'Task: ' + options.task + ' --> ' + col.blue(cliTask));
                             }
                         }
                     }
@@ -345,7 +343,7 @@ export async function cli(args) {
                                 answers = answers.substring(0, answers.length - 1);
                                 taskCommand += ' -a "' + answers + '"';
                             }
-                            log(RECORDER, 'Replay-Command: ' + colors.underline(taskCommand));
+                            log(RECORDER, 'Replay-Command: ' + col.underline(taskCommand));
                         }
                     } catch (err) {
                         log(ERROR, 'Task ' + options.task + ' failed: ' + err.message);
