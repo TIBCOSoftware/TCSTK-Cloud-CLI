@@ -24,7 +24,7 @@ let propFileName;
 
 //const version = require('./package.json').version;
 
-function parseArgumentsIntoOptions(rawArgs) {
+function parseArgumentsIntoOptions(rawArgs: any) {
     let args;
     try {
         args = arg(
@@ -97,11 +97,11 @@ const isWindows = process.platform === 'win32';
 // const dirDelimiter = isWindows ? '\\' : '/';
 
 // Main function
-export async function cli(args) {
+export async function cli(args: any) {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' CLI INIT');
     //console.log('start');
     const options = parseArgumentsIntoOptions(args);
-    const appRoot = process.env.PWD;
+    const appRoot = process.env['PWD'];
     const cwdir = process.cwd();
     propFileName = options.propfile;
     setPropFileName(propFileName);
@@ -299,27 +299,30 @@ export async function cli(args) {
                 }
             }
             for (const cliTask in cTsks) {
-                if (cTsks[cliTask].taskAlternativeNames) {
-                    for (const altName of cTsks[cliTask].taskAlternativeNames) {
-                        if (altName === options.task) {
-                            taskExist = true;
-                            if (cTsks[cliTask].task) {
-                                directTask = true;
-                                directTaskMethod = cTsks[cliTask].task;
-                                log(INFO, 'Task: ' + options.task + ' --> ' + col.blue(cliTask));
+                if(cTsks[cliTask]) {
+                    const taskTemp = cTsks[cliTask]!;
+                    if (taskTemp.taskAlternativeNames) {
+                        for (const altName of taskTemp.taskAlternativeNames) {
+                            if (altName === options.task) {
+                                taskExist = true;
+                                if (taskTemp.task) {
+                                    directTask = true;
+                                    directTaskMethod = taskTemp.task;
+                                    log(INFO, 'Task: ' + options.task + ' --> ' + col.blue(cliTask));
+                                }
                             }
                         }
                     }
-                }
-                if (cliTask === options.task) {
-                    taskExist = true;
-                    if (cTsks[cliTask].task) {
-                        directTask = true;
-                        // directTaskFile = cTsks[cliTask].taskFile;
-                        directTaskMethod = cTsks[cliTask].task;
+                    if (cliTask === options.task) {
+                        taskExist = true;
+                        if (taskTemp.task) {
+                            directTask = true;
+                            // directTaskFile = cTsks[cliTask].taskFile;
+                            directTaskMethod = taskTemp.task;
+                        }
                     }
+                    taskArray.push(cliTask);
                 }
-                taskArray.push(cliTask);
             }
             if (!taskExist) {
                 log(ERROR, 'TASK: ' + options.task + ' does not exist...');

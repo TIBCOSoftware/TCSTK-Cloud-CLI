@@ -2,7 +2,7 @@
 // All inputs are provided as input to the functions
 import {Global} from "../models/base";
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
-import {Mapping, OAUTHConfig, PEXConfig} from "../models/tcli-models";
+import {Mapping, PEXConfig} from "../models/tcli-models";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./user-interaction";
 import {DEBUG, ERROR, INFO, log, WARNING} from "./logging";
 import {
@@ -10,7 +10,7 @@ import {
     getProp, getPropFileName, globalTCpropFolder,
     setProperty
 } from "./property-file-management";
-import {getOAUTHDetails, parseOAUTHToken, setOAUTHDetails} from "./oauth";
+import {getOAUTHDetails, parseOAUTHToken} from "./oauth";
 declare var global: Global;
 
 const _ = require('lodash');
@@ -256,15 +256,18 @@ let OrganizationGl = '';
 export function getOrganization(forceRefresh?: boolean) {
     if (forceRefresh) {
         OrganizationGl = '';
-        setOAUTHDetails(null);
+        // setOAUTHDetails(null);
+        getProp('CloudLogin.OAUTH_Token', true, true);
     }
     if (OrganizationGl === '' && isOauthUsed()) {
-        if (getOAUTHDetails() == null) {
+        // if (getOAUTHDetails() != null) {
+        // TODO: Run a test case with just the OAUTH Token
+        if (!getOAUTHDetails().Org) {
             getProp('CloudLogin.OAUTH_Token', true, true);
             // It could be that there is just the OAUTH token
         }
         if (getOAUTHDetails() != null && getOAUTHDetails().Org) {
-            OrganizationGl = getOAUTHDetails().Org
+            OrganizationGl = getOAUTHDetails().Org!;
         }
     }
     log(DEBUG, 'Returning org: ' + OrganizationGl);

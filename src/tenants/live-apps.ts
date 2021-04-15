@@ -9,6 +9,7 @@ import {changeOrganization, displayOrganizations, getCurrentOrganizationInfo} fr
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
+import {LApp} from "../models/live-apps";
 
 declare var global: Global;
 
@@ -16,7 +17,7 @@ const CCOM = require('../common/cloud-communications');
 const VAL = require('../common/validation');
 
 
-let globalProductionSandbox = null;
+let globalProductionSandbox: string;
 
 export async function getProductionSandbox() {
     if (!globalProductionSandbox) {
@@ -51,7 +52,7 @@ async function checkCaseFolder() {
 }
 
 // Get a LiveApps Case by Reference
-export async function getLaCaseByReference(caseRef) {
+export async function getLaCaseByReference(caseRef: string) {
     const caseData = await CCOM.callTCA(CCOM.clURI.la_cases + '/' + caseRef + '?$sandbox=' + await getProductionSandbox(), false, {handleErrorOutside: true});
     if (!caseData) {
         log(ERROR, 'Error Retrieving Case Data for ref: ', caseRef);
@@ -60,25 +61,27 @@ export async function getLaCaseByReference(caseRef) {
 }
 
 // Function to show LiveApps cases
-export async function showLiveApps(doShowTable, doCountCases) {
+export async function showLiveApps(doShowTable: boolean, doCountCases: boolean): Promise<LApp[]> {
     //TODO: Call can be optimized by only requesting the basics
-    const caseTypes = await CCOM.callTCA(CCOM.clURI.types + '?$sandbox=' + await getProductionSandbox() + '&$top=1000');
+    const caseTypes = await CCOM.callTCA(CCOM.clURI.types + '?$sandbox=' + await getProductionSandbox() + '&$top=1000') as LApp[];
     log(DEBUG, 'Case Types: ', caseTypes)
     // TODO: (maybe) get case owner
-    const cases = {};
-    for (const curCase in caseTypes) {
-        const caseTemp = {};
-        const appN = parseInt(curCase) + 1;
+    const cases: any = {};
+    let appN = 1;
+    for (const curApp of caseTypes) {
+        const caseTemp: any = {};
+        // const appN = parseInt(curCase) + 1;
         //log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
-        caseTemp['CASE NAME'] = caseTypes[curCase].name;
-        caseTemp['APPLICATION ID'] = caseTypes[curCase].applicationId;
-        caseTemp['VERSION'] = caseTypes[curCase].applicationVersion;
-        caseTemp['IS CASE'] = caseTypes[curCase].isCase;
+        caseTemp['CASE NAME'] = curApp.name;
+        caseTemp['APPLICATION ID'] = curApp.applicationId;
+        caseTemp['VERSION'] = curApp.applicationVersion;
+        caseTemp['IS CASE'] = curApp.isCase;
         if (doCountCases) {
             logLine("Counting Cases: (" + appN + '/' + caseTypes.length + ')...');
-            caseTemp['NUMBER OF CASES'] = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + caseTypes[curCase].applicationId + '&$count=true');
+            caseTemp['NUMBER OF CASES'] = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + curApp.applicationId + '&$count=true');
         }
         cases[appN] = caseTemp;
+        appN++;
     }
     console.log('\n');
     pexTable(cases, 'live-apps', getPEXConfig(), doShowTable);
@@ -86,10 +89,10 @@ export async function showLiveApps(doShowTable, doCountCases) {
 }
 
 // Function to show and return all the design time apps of LiveApps
-export async function showLiveAppsDesign(doShowTable?:boolean) {
+export async function showLiveAppsDesign(doShowTable?: boolean) {
     // la_design
     const laDesignApps = await CCOM.callTCA(CCOM.clURI.la_design);
-    if(doShowTable){
+    if (doShowTable) {
         const laDesignAppsTable = createTable(laDesignApps, CCOM.mappings.la_design_apps, false)
         pexTable(laDesignAppsTable, 'live-apps-design-apps', getPEXConfig(), true);
     }
@@ -97,10 +100,9 @@ export async function showLiveAppsDesign(doShowTable?:boolean) {
 }
 
 // Function to get all the actions of a LiveApps App
-export function stripLiveAppsActions(liveApp) {
-    let re;
+export function stripLiveAppsActions(liveApp: LApp) {
     if (liveApp) {
-        re = [];
+        let re: any[] = [];
         if (liveApp.creators) {
             re = re.concat(liveApp.creators.map(v => ({
                 type: 'CREATOR',
@@ -115,11 +117,13 @@ export function stripLiveAppsActions(liveApp) {
                 name: v.name
             })));
         }
+        return re;
     }
-    return re;
+    return;
 }
 
-function showActions(laApp, appName) {
+// Show the actions for a LA App
+function showActions(laApp: LApp, appName: string) {
     const laActions = stripLiveAppsActions(laApp);
     if (laActions) {
         log(INFO, 'Live Apps Actions For ' + col.bgBlue(laApp.name));
@@ -132,15 +136,15 @@ function showActions(laApp, appName) {
 
 export async function showLiveAppsActions() {
     const apps = await showLiveApps(true, false);
-    const laAppNameA = ['NONE', 'ALL'].concat(apps.map(v => v.name));
+    const laAppNameA = ['NONE', 'ALL'].concat(apps.map((v: { name: string; }) => v.name));
     let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to see the actions ?', laAppNameA);
     if (laAppD.toLowerCase() !== 'none') {
         if (laAppD.toLowerCase() === 'all') {
-            apps.forEach((app) => {
+            apps.forEach((app: LApp) => {
                 showActions(app, laAppD);
             })
         } else {
-            showActions(apps.find(e => e.name === laAppD.trim()), laAppD);
+            showActions(apps.find((e) => e.name === laAppD.trim())!, laAppD);
         }
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
@@ -158,22 +162,23 @@ const storeOptions = {spaces: 2, EOL: '\r\n'};
 export async function exportLiveAppsCaseType() {
     await checkCaseFolder();
     const cTypes = await showLiveApps(true, false);
-    let cTypeArray = [];
+    const cTypeArray = cTypes.map( app => app.name);
+    /*
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
-    }
-    let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-    let fName = await askQuestion('What file name would you like to export to ? (press enter or use DEFAULT for default):');
+    }*/
+    const typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
+    const fName = await askQuestion('What file name would you like to export to ? (press enter or use DEFAULT for default):');
     let appFound = false;
-    for (const curCase in cTypes) {
-        if (typeForExport === cTypes[curCase].name) {
+    for (const laApp of cTypes) {
+        if (typeForExport === laApp.name) {
             appFound = true;
             mkdirIfNotExist(CASE_FOLDER);
             let fileName = CASE_FOLDER + fName;
             if (fName === '' || fName.toLowerCase() === 'default') {
-                fileName = CASE_FOLDER + cTypes[curCase].name + '.' + cTypes[curCase].applicationVersion + '.type.json';
+                fileName = CASE_FOLDER + laApp.name + '.' + laApp.applicationVersion + '.type.json';
             }
-            require('jsonfile').writeFileSync(fileName, cTypes[curCase], storeOptions);
+            require('jsonfile').writeFileSync(fileName, laApp, storeOptions);
             log(INFO, 'Case Type File Stored: ' + fileName)
         }
     }
@@ -189,25 +194,28 @@ const exportCaseStepSize = 30;
 export async function exportLiveAppsData() {
     await checkCaseFolder();
     const cTypes = await showLiveApps(true, true);
-    let cTypeArray = [];
+    // let cTypeArray = [];
+    const cTypeArray = cTypes.map( app => app.name);
+    /*
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
-    }
-    let typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
-    let fName = await askQuestion('What Folder like to export to ? (press enter or use default, date get\'s added...)');
+    }*/
+    const typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
+    const fName = await askQuestion('What Folder like to export to ? (press enter or use default, date get\'s added...)');
     // let oneFileStore = await askMultipleChoiceQuestion('Do you also want to store all contents in one file ? (this is used for import)', ['YES', 'NO']);
-    let allCases = [];
+    let allCases: any[] = [];
     let appFound = false;
     for (let curCase in cTypeArray) {
         if (cTypeArray[curCase] === typeForExport) {
+            const laApp = cTypes[curCase]!;
             appFound = true;
             // count cases
-            const numberOfCasesForExport = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + '&$count=true');
+            const numberOfCasesForExport = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + laApp.applicationId + '&$count=true');
             log(INFO, 'Number of cases for export: ' + numberOfCasesForExport);
             const typeIdString = ' and typeId eq 1';
             // get cases in batch sizes
             for (let i = 0; i <= numberOfCasesForExport; i = i + exportCaseStepSize) {
-                let exportBatch = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
+                let exportBatch = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + laApp.applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
                 // console.log('Export Batch', exportBatch);
                 logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
                 allCases = allCases.concat(exportBatch);
@@ -236,7 +244,7 @@ export async function exportLiveAppsData() {
                 if (exCase.casedata != null) {
                     try {
                         // Get the details for every shared state entry
-                        contentObject = JSON.parse(' {  "' + cTypes[curCase].name + '" : ' + exCase.casedata + '}');
+                        contentObject = JSON.parse(' {  "' + cTypes[curCase]!.name + '" : ' + exCase.casedata + '}');
                         AllCaseArray.push(contentObject);
                         exCase.casedata = {'FILESTORE': contentFileName};
                         // And store them in a file / folder
@@ -479,7 +487,7 @@ export async function importLiveAppsData() {
                         method: 'POST',
                         postRequest: postRequest
                     });
-                    // log(INFO, 'Response: ' , response);
+                    log(DEBUG, 'Response: ' , response);
                 }
                 if (stepConf.type.toString().toLowerCase() === 'validate') {
                     // TODO: Add this to config: "fail-on-validation-error": true,
@@ -546,30 +554,30 @@ export async function copyLiveApps() {
     // Step 1: Display the current LiveApps Apps
     const laApps = await showLiveAppsDesign(true);
     // Step 2: Select a LiveApps App (and it's id)
-    const laAppNameToCopy = await askMultipleChoiceQuestionSearch('Which LiveApps Application would you like to copy between organizations?', ['NONE', ...laApps.map(v => v.name)]);
+    const laAppNameToCopy = await askMultipleChoiceQuestionSearch('Which LiveApps Application would you like to copy between organizations?', ['NONE', ...laApps.map((v: { name: string; }) => v.name)]);
     if (laAppNameToCopy.toLowerCase() !== 'none') {
-        const laAppToCopy = laApps.find(v => v.name === laAppNameToCopy);
+        const laAppToCopy = laApps.find((v: { name: string; }) => v.name === laAppNameToCopy);
         // Step 3: Display all organizations (preferably the ones that have LiveApps)
         // Step 4: Select a target organization
         const targetOrgInfo = await displayOrganizations(true, true, 'To which organization would you like to copy ' + laAppToCopy.name + ' ?')
         // console.log(targetOrgInfo);
         if (laAppToCopy && laAppToCopy.latestVersionId && targetOrgInfo && targetOrgInfo.accountDisplayName) {
-           const targetOrgName = targetOrgInfo.accountDisplayName;
+            const targetOrgName = targetOrgInfo.accountDisplayName;
             // Step 5: Send a share command to the current organization
             const shareReq = {
                 message: "Application shared through tcli",
                 disableEmailNotification: true,
-                recipients: [ getProp('CloudLogin.email') ]
+                recipients: [getProp('CloudLogin.email')]
             }
             const shareRes = await CCOM.callTCA(CCOM.clURI.la_design_apps + '/' + laAppToCopy.latestVersionId + '/applicationShare', false, {
                 method: 'POST',
                 postRequest: shareReq
             });
-            log(INFO, 'Application shared on current organization with id:' , col.blue(shareRes));
+            log(INFO, 'Application shared on current organization with id:', col.blue(shareRes));
             // Step 6: Switch to the target organization
             const currentOrgInfo = await getCurrentOrganizationInfo();
-            log(INFO, '    Current Organization: ' , col.blue(currentOrgInfo.displayName));
-            log(INFO, 'Changing to Organization: ' , col.blue(targetOrgInfo.accountDisplayName));
+            log(INFO, '    Current Organization: ', col.blue(currentOrgInfo.displayName));
+            log(INFO, 'Changing to Organization: ', col.blue(targetOrgInfo.accountDisplayName));
             await changeOrganization(targetOrgInfo.accountId);
             // Step 7: Receive the LiveApps App
             const receiveReq = {
@@ -582,8 +590,8 @@ export async function copyLiveApps() {
             });
             // Step 8: Switch back to the original organization
             await changeOrganization(currentOrgInfo.accountId);
-            if(receiveRes) {
-                log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' +receiveRes+ ')');
+            if (receiveRes) {
+                log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' + receiveRes + ')');
             } else {
                 log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' to ' + targetOrgName);
             }

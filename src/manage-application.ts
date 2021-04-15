@@ -14,7 +14,7 @@ declare var global: Global;
 
 // require('./common/common-functions');
 // const configApp = require('./config/config-template.json');
-const templatesToUse = [];
+const templatesToUse: string[] = [];
 const isWindows = process.platform === 'win32';
 
 // Function called from the cli to pick up info and call the create starter
@@ -33,13 +33,13 @@ export async function newStarter() {
         if (process.argv[argN] === 'new') {
             if (process.argv.length - 1 > argN) {
                 const temp = argN + 1;
-                starterName = process.argv[temp];
+                starterName = process.argv[temp]!;
             }
         }
         if (process.argv[argN] === '--template' || process.argv[argN] === '-t') {
             if (process.argv.length - 1 > argN) {
                 const temp = argN + 1;
-                starterTemplate = process.argv[temp];
+                starterTemplate = process.argv[temp]!;
                 for (let template of templates) {
                     if (starterTemplate === template.name) {
                         starterTemplate = template.displayName;

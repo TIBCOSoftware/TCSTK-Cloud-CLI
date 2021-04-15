@@ -92,7 +92,7 @@ export async function validate() {
         // console.log(folders);
         const chosenFolder = await validationItemHelper(iterateTable(folders), 'Org Folder', 'Name');
         if (valD === 'org_folder_and_file_exist') {
-            const files = await CFILES.getOrgFolderFiles(folders, chosenFolder, false);
+            const files = await CFILES.getOrgFolderFiles(chosenFolder, false);
             await validationItemHelper(iterateTable(files), 'Org File', 'Name');
         }
     }
@@ -112,7 +112,7 @@ export async function validate() {
 }
 
 // Validate the state of a case
-export async function validateLACaseState(caseRefToValidate, stateToValidate) {
+export async function validateLACaseState(caseRefToValidate: string, stateToValidate: string) {
     // First check if case exists
     await validateLACase(caseRefToValidate, 'case_exist');
     const caseData = JSON.parse((await LA.getLaCaseByReference(caseRefToValidate)).untaggedCasedata);
@@ -124,7 +124,7 @@ export async function validateLACaseState(caseRefToValidate, stateToValidate) {
 }
 
 // Validate if case exists or not
-export async function validateLACase(casesToValidate, valType) {
+export async function validateLACase(casesToValidate: string, valType: string) {
     const caseRefArray = casesToValidate.split('+');
     for (let casRef of caseRefArray) {
         let validCase = false;
@@ -154,7 +154,7 @@ export async function validateLACase(casesToValidate, valType) {
     }
 }
 
-async function validationItemHelper(items, type, search) {
+async function validationItemHelper(items: any[], type: string, search: string) {
     let itemsToValidate = await askQuestion('Which ' + type + ' would you like to validate (Use plus character to validate multiple ' + type + 's, for example: item1+item2) ?');
     let itemArray = itemsToValidate.split('+');
     for (let app of itemArray) {
@@ -168,12 +168,12 @@ async function validationItemHelper(items, type, search) {
     return itemsToValidate;
 }
 
-function validationOk(message) {
+function validationOk(message: string) {
     log(INFO, col.green(' [VALIDATION --OK--] \x1b[0m' + message))
 }
 
 // TODO: Add option to exit on validation failure
-function validationFailed(message) {
+function validationFailed(message: string) {
     log(ERROR, col.red('[VALIDATION FAILED] \x1b[0m' + message));
     process.exit(1);
 }

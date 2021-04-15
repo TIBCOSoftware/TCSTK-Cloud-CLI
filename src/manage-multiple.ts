@@ -22,7 +22,7 @@ const _ = require('lodash');
 // processMultipleFile = function (propfileName) {
 export function processMultipleFile() {
     // setLogDebug('true');
-    let mOpts:any = getMultipleOptions();
+    let mOpts: any = getMultipleOptions();
     mFile = mOpts.name;
     // log(INFO, '- Managing Multiple, Using file: ' + mFile);
     // Go Over All Cloud Starter Jobs
@@ -40,7 +40,7 @@ export function processMultipleFile() {
         if (csJobs != null) {
             log(WARNING, "Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...");
         } else {
-            log(ERROR, "Please specify the Cloud_Starter_JOBS property in: " + mFile +' (or the common file if used...)');
+            log(ERROR, "Please specify the Cloud_Starter_JOBS property in: " + mFile + ' (or the common file if used...)');
             process.exit(1);
         }
     }
@@ -58,17 +58,16 @@ export function processMultipleFile() {
         nvs = createTableValue('File Extension', fileExtension, nvs);
     }
     const csJobsA = csJobs.split(',');
-    let jobN = 0;
+    // let jobN = 0;
     for (let k = 0; k < csJobsA.length; k++) {
         const currentJob = csJobsA[k].trim();
         let environments = getMProp(currentJob + '_Environments');
-
         if (environmentOverride !== '') {
             environments = environmentOverride;
         }
         const environmentsA = environments.split(',');
         for (var l = 0; l < environmentsA.length; l++) {
-            jobN++;
+            // jobN++;
             nvs = createTableValue(currentJob, environmentsA[l].trim(), nvs, 'JOB', 'ENVIRONMENT');
         }
     }
@@ -112,9 +111,9 @@ export function processMultipleFile() {
                     let taskType = '';
                     let task = '';
 
-                    let tObj:any = {};
+                    let tObj: any = {};
                     try {
-                        console.log('Parsing: ' , jTask);
+                        console.log('Parsing: ', jTask);
                         tObj = JSON.parse(jTask);
                     } catch (e) {
                         log(ERROR, 'Parsing error on: |' + jTask + '| (' + e.message + ')');
@@ -183,7 +182,7 @@ const TCLI_INTERACTVIE = 'tcli-interactive';
 
 export async function multipleInteraction() {
     const PropertiesReader = require('properties-reader');
-    let mOpts:any = getMultipleOptions();
+    let mOpts: any = getMultipleOptions();
     mFile = mOpts.name;
     let failOnError = getMProp('Fail_On_Error');
     if (failOnError == null) {
@@ -209,10 +208,10 @@ export async function multipleInteraction() {
 
         // 1. Get list of property files to use and which task to execute
         const miPropFilesA = miPropFiles.split(',');
-        const environmentsTable = {};
+        const environmentsTable:any = {};
         let rowNumber = 0;
         for (let miP in miPropFilesA) {
-            var eRow = {};
+            var eRow:any = {};
             rowNumber++;
             // console.log('Prop file: ' + miPropFile);
             // TODO: Check for ALL and Exclude
@@ -283,10 +282,13 @@ export async function multipleInteraction() {
                 const taskDescription = [TCLI_INTERACTVIE];
                 const taskTarget = [''];
                 for (let cliTask in cTsks) {
-                    if (cTsks[cliTask].enabled && !cTsks[cliTask].internal && cTsks[cliTask].multipleInteraction) {
-                        // console.log('\x1b[36m%s\x1b[0m',':', ' ' + cTsks[cliTask].description);
-                        taskDescription.push(cliTask + ') ' + cTsks[cliTask].description);
-                        taskTarget.push(cliTask);
+                    if (cTsks[cliTask]) {
+                        const task = cTsks[cliTask]!;
+                        if (task.enabled && !task.internal && task.multipleInteraction) {
+                            // console.log('\x1b[36m%s\x1b[0m',':', ' ' + cTsks[cliTask].description);
+                            taskDescription.push(cliTask + ') ' + task.description);
+                            taskTarget.push(cliTask);
+                        }
                     }
                 }
                 let chosenTask = await askMultipleChoiceQuestionSearch('Which cli task would you like to switch to ?', taskDescription);
@@ -323,10 +325,10 @@ export async function multipleInteraction() {
     }
 }
 
-let propsM;
+let propsM: any;
 let fileExtension = '';
 
-function getMProp(property, propFileName?) {
+function getMProp(property: string, propFileName?: string) {
     let propFileToUse = mFile;
     if (propFileName && propFileName.trim() != null) {
         propFileToUse = propFileName;
@@ -357,7 +359,7 @@ function getMProp(property, propFileName?) {
     return re;
 }
 
-function replaceDollar(content) {
+function replaceDollar(content: string) {
     if (content.includes('${') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('${') + 2, content.indexOf('${') + 2 + content.substring(content.indexOf('${') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: ' + subProp);
@@ -368,7 +370,7 @@ function replaceDollar(content) {
     return content;
 }
 
-function replaceAtSign(content, propFile) {
+function replaceAtSign(content: string, propFile: string) {
     if (content.includes('@{') && content.includes('}')) {
         const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
         log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
@@ -379,7 +381,7 @@ function replaceAtSign(content, propFile) {
     return content;
 }
 
-function getPropFromFile(property, file) {
+function getPropFromFile(property: string, file: string) {
     log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
     const PropertiesReader = require('properties-reader');
     const propsToGet = PropertiesReader(file).path();

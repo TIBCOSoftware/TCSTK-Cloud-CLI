@@ -75,10 +75,7 @@ export async function cleanDist() {
 
 export function generateCloudDescriptor() {
     // Add Descriptor
-    let ADD_DESCRIPTOR = 'YES';
-    if (getProp('Add_Descriptor') !== null) {
-        ADD_DESCRIPTOR = getProp('Add_Descriptor');
-    } else {
+    if (!getProp('Add_Descriptor')) {
         log(INFO, 'No Add_Descriptor Property found; Adding Add_Descriptor to ' + getPropFileName());
         addOrUpdateProperty(getPropFileName(), 'Add_Descriptor', 'YES');
     }
@@ -153,7 +150,7 @@ export function showAppLinkInfo() {
 }
 
 // Build the zip for deployment
-export function buildCloudStarterZip(cloudStarter) {
+export function buildCloudStarterZip(cloudStarter: string) {
     // Check for Build Command
     let BUILD_COMMAND = 'HASHROUTING';
     if (getProp('BUILD_COMMAND') !== null) {
@@ -189,7 +186,7 @@ export function buildCloudStarterZip(cloudStarter) {
 }
 
 // function that shows all the availible applications in the cloud
-export async function showAvailableApps(showTable) {
+export async function showAvailableApps(showTable?: boolean) {
     //TODO: Use table config
     const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
     // TODO: loop over if there are more than 200
@@ -208,10 +205,10 @@ export async function showAvailableApps(showTable) {
         const users = iterateTable(await USERGROUPS.showLiveAppsUsers(false, true));
         // console.log('USERS: ', users);
         // TODO: Apparently apps can have tags, look into this...
-        let apps = {};
-        let appsDisplay = {};
+        let apps:any = {};
+        let appsDisplay:any = {};
         for (const app in response) {
-            const appTemp = {};
+            const appTemp:any = {};
             // const appTempDisplay = {};
             const appN = parseInt(app) + 1;
             //log(INFO, appN + ') APP NAME: ' + response[app].name  + ' Published Version: ' +  response[app].publishedVersion + ' (Latest:' + response[app].publishedVersion + ')') ;
@@ -236,7 +233,7 @@ export async function showAvailableApps(showTable) {
             appTemp['LATEST DEPLOYED'] = latestDeployed;
             const created = new Date(response[app].creationDate);
             const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-            const optionsT = {hour: 'numeric'};
+            // const optionsT = {hour: 'numeric'};
             appTemp['CREATED'] = created.toLocaleDateString("en-US", options);
             //appTemp['CREATED TIME'] = created.toLocaleTimeString();
             const lastModified = new Date(response[app].lastModifiedDate);
@@ -297,13 +294,13 @@ export async function deleteApp() {
 }
 
 // Get details of a cloud starter
-async function getApplicationDetails(application, version, showTable) {
+async function getApplicationDetails(application: any, version: string, showTable: boolean) {
     const doShowTable = (typeof showTable === 'undefined') ? false : showTable;
-    const details = {};
+    const details:any = {};
     //console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
     const artefactStepSize = 200;
     let hasMoreArtefacts = true;
-    let allArteFacts = [];
+    let allArteFacts:any[] = [];
     for (let i = 0; hasMoreArtefacts; i = i + artefactStepSize) {
         // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
         let skip = '';
@@ -322,7 +319,7 @@ async function getApplicationDetails(application, version, showTable) {
     }
     let i = 0;
     for (const det in allArteFacts) {
-        const appTemp = {};
+        const appTemp:any = {};
         let appN = i;
         i++;
         appTemp['CLOUD STARTER'] = application;
@@ -334,15 +331,15 @@ async function getApplicationDetails(application, version, showTable) {
 }
 
 // Get Links to all the applications
-export async function getAppLinks(showTable) {
+export async function getAppLinks(showTable?: boolean) {
     log(INFO, 'Getting Cloud Starter Links...');
-    const appLinkTable = {};
+    const appLinkTable:any = {};
     const apps = await showAvailableApps(false);
     if (apps) {
         let i = 1;
-        let nvs = [];
+        let nvs:any[] = [];
         for (let app of apps) {
-            const appTemp = {};
+            const appTemp:any = {};
             appTemp['APP NAME'] = app.name;
             nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs);
             nvs = createTableValue('NAME', app.name, nvs);
@@ -352,7 +349,7 @@ export async function getAppLinks(showTable) {
             if (isIterable(tempDet)) {
                 for (let appD of tempDet) {
                     // Get file after last slash in Descriptor file name; expected cloudstarter.json
-                    if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))[0])) {
+                    if (appD.name.includes(/[^/]*$/.exec(getProp('Descriptor_File'))![0])) {
                         const csInfo = await CCOM.callTCA(CCOM.clURI.apps + encodeURIComponent(app.name) + '/' + appD.name, false);
                         // const csInfo = callURL(cloudURL + 'webresource/apps/' + encodeURIComponent(app.name) + '/' + appD.name, null, null, null, false);
                         if (csInfo && csInfo.cloudstarter) {
@@ -387,7 +384,7 @@ export async function getAppLinks(showTable) {
 }
 
 // Function to upload a zip to the LiveApps ContentManagment API
-export async function uploadApp(application) {
+export async function uploadApp(application: string) {
     // We use the location here because the way the call is setup (with the host)
     const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/';
     const appLocation = './dist/' + application + '.zip'
@@ -395,10 +392,10 @@ export async function uploadApp(application) {
 }
 
 // Function to publish the application to the cloud
-export async function publishApp(application) {
+export async function publishApp(application: string) {
     return new Promise<void>(async function (resolve) {
         // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
-        const response = await CCOM.callTCA(CCOM.clURI.app_info, false, {method: 'PUT'});
+        const response = await CCOM.callTCA(CCOM.clURI.app_info + application + '/', false, {method: 'PUT'});
         log(INFO, 'Publish Result: ', response);
         resolve();
     });

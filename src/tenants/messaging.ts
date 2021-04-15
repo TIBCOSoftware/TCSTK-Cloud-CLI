@@ -4,7 +4,7 @@ import {ERROR, INFO, log} from "../common/logging";
 const CCOM = require('../common/cloud-communications');
 
 
-async function connectMes(url){
+async function connectMes(url: string){
     if(isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
        return await CCOM.callTCA(url, false);
     } else {

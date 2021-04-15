@@ -12,7 +12,7 @@ import {addOrUpdateProperty, getProp, getPropFileName} from "./property-file-man
 
 const CCOM = require('./cloud-communications');
 
-let globalOAUTH:OAUTHConfig = null;
+let globalOAUTH:OAUTHConfig;
 
 export function getOAUTHDetails() {
     log(DEBUG, 'Returning globalOAUTH: ', globalOAUTH);
@@ -24,7 +24,7 @@ export function setOAUTHDetails(oConfig:OAUTHConfig) {
     globalOAUTH = oConfig;
 }
 
-
+// A function to parse the oauth token from the property file
 export function parseOAUTHToken(token:string, doLog: boolean):OAUTHConfig {
     let showLog = doLog || false;
     let re:OAUTHConfig = {};

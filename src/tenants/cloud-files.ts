@@ -32,7 +32,7 @@ async function prepCloudFileProps() {
         if (!getOrganization()) {
             await CCOM.showCloudInfo(false);
         }
-        CLOUD_FILES_FOLDER = CLOUD_FILES_FOLDER.replace(/\~\{organization\}/ig, getOrganization());
+        CLOUD_FILES_FOLDER = CLOUD_FILES_FOLDER.replace(/~{organization}/ig, getOrganization());
         if (!cfInformed) {
             log(INFO, 'Using Local Folder (for cloud files): ' + col.blue(CLOUD_FILES_FOLDER));
             cfInformed = true;
@@ -41,10 +41,10 @@ async function prepCloudFileProps() {
 }
 
 // Get a list of Cloud folders
-export async function getOrgFolders(showFolders, countItems) {
+export async function getOrgFolders(showFolders: boolean, countItems: boolean) {
     const folderStepSize = 200;
     let hasMoreFolders = true;
-    let allFolders = [];
+    let allFolders: any[] = [];
     for (let i = 0; hasMoreFolders; i = i + folderStepSize) {
         // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
         let skip = '';
@@ -74,7 +74,7 @@ export async function getOrgFolders(showFolders, countItems) {
 }
 
 // Function to get org folders
-export async function getOrgFolderFiles(folderTable, folder, showFiles) {
+export async function getOrgFolderFiles(folder: string, showFiles: boolean) {
     const folderResp = await CCOM.callTCA(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/');
     const folderContentTable = createTable(folderResp, CCOM.mappings.la_org_folder_content, false);
     const users = await USERGROUPS.showLiveAppsUsers(false, false);
@@ -93,7 +93,7 @@ export async function getOrgFolderFiles(folderTable, folder, showFiles) {
 }
 
 // Function to download an org folder file
-async function downLoadOrgFolderFile(folder, file) {
+async function downLoadOrgFolderFile(folder: string, file: string) {
     log(INFO, '    Cloud Folder: ' + col.blue(folder) + ' File: ' + col.blue(file));
     // checkOrgFolderLocation();
     await prepCloudFileProps();
@@ -119,7 +119,7 @@ export async function showOrgFolders() {
     }
     const folderDecision = await askMultipleChoiceQuestionSearch('For which folder would you like to see the contents ?', chFolder);
     if (folderDecision != 'NONE') {
-        await getOrgFolderFiles(folderT, folderDecision, true);
+        await getOrgFolderFiles(folderDecision, true);
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
@@ -173,7 +173,7 @@ export async function uploadFileToOrgFolder() {
 }
 
 // Function to upload a zip to the LiveApps ContentManagment API
-export async function uploadFile(fileLocation, cloudFolder, cloudFileName) {
+export async function uploadFile(fileLocation: string, cloudFolder: string, cloudFileName: string) {
     const uploadFileURI = '/webresource/v1/orgFolders/' + cloudFolder + '/artifacts/' + cloudFileName + '/upload/';
     await CCOM.uploadToCloud('artifactContents', fileLocation, uploadFileURI);
 }
@@ -188,7 +188,7 @@ export async function downloadFileFromOrgFolder() {
     }
     const folderDecision = await askMultipleChoiceQuestionSearch('From which folder would you like to download a file ?', chFolder);
     if (folderDecision.toLowerCase() !== 'none') {
-        const orgFFiles = await getOrgFolderFiles(folderT, folderDecision, true);
+        const orgFFiles = await getOrgFolderFiles(folderDecision, true);
         const chContent = ['NONE', 'ALL'];
         for (let fil of iterateTable(orgFFiles)) {
             chContent.push(fil.Name);
@@ -199,7 +199,7 @@ export async function downloadFileFromOrgFolder() {
             log(INFO, 'Files to Download: ' + fArray.length);
             for (let fN in fArray) {
                 log(INFO, 'Downloading file: ' + (Number(fN) + 1));
-                await downLoadOrgFolderFile(folderDecision, fArray[fN]);
+                await downLoadOrgFolderFile(folderDecision, fArray[fN]!);
             }
         } else if (fileDecision.toLowerCase() !== 'none') {
             await downLoadOrgFolderFile(folderDecision, fileDecision);

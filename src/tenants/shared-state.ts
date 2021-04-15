@@ -60,12 +60,12 @@ async function prepSharedStateProps() {
 }
 
 // Function to return a JSON with the shared state entries from a set filter
-export async function getSharedState(showTable) {
+export async function getSharedState(showTable?: boolean) {
     await prepSharedStateProps();
     // const lCookie = cLogin();
     // log(DEBUG, 'Login Cookie: ', lCookie);
     //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
-    let ALLsState = [];
+    let ALLsState: any[] = [];
     let i = 0;
     let moreStates = true;
     let filterType = 'PUBLIC';
@@ -111,10 +111,10 @@ export async function getSharedState(showTable) {
         b = new Date(b.createdDate);
         return a > b ? 1 : a < b ? -1 : 0;
     });
-    const states = {};
-    const statesDisplay = {};
+    const states:any = {};
+    const statesDisplay:any = {};
     for (const state in sState) {
-        const sTemp = {};
+        const sTemp:any = {};
         const appN = parseInt(state) + 1;
         sTemp['ID'] = sState[state].id;
         sTemp['NAME'] = sState[state].name;
@@ -141,7 +141,7 @@ export async function getSharedState(showTable) {
 }
 
 
-async function selectSharedState(sharedStateEntries, question) {
+async function selectSharedState(sharedStateEntries: any[], question: string) {
     // console.log('Shared State Entries: ' , sharedStateEntries);
     const stateNames = [];
     for (const state of sharedStateEntries) {
@@ -160,7 +160,7 @@ async function selectSharedState(sharedStateEntries, question) {
 }
 
 // Function to delete a shared state based on it's ID
-async function deleteSharedState(sharedStateID) {
+async function deleteSharedState(sharedStateID: string) {
     const response = await CCOM.callTCA(CCOM.clURI.shared_state + '/' + sharedStateID, false, {method: 'DELETE'});
     let ok = true;
     if (response != null) {
@@ -283,7 +283,7 @@ export async function clearSharedState() {
 
 
 // Export the Shared state filter to a folder
-export async function exportSharedState(verbose?) {
+export async function exportSharedState(verbose?: boolean) {
     let reNumberOfStates = 0;
     let doVerbose = verbose || false;
     // Show Shared State List
@@ -339,7 +339,7 @@ export async function exportSharedState(verbose?) {
 }
 
 // Load shared state contents from a file
-async function importSharedStateFile(ssFile) {
+async function importSharedStateFile(ssFile: string) {
     await prepSharedStateProps();
     log(DEBUG, 'Importing: ' + ssFile);
     const fs = require('fs');
@@ -379,7 +379,7 @@ async function importSharedStateFile(ssFile) {
     return ssObject;
 }
 
-async function putSharedState(sharedStateObject) {
+async function putSharedState(sharedStateObject: any | string) {
     await prepSharedStateProps();
     if (sharedStateObject != null && sharedStateObject !== '' && sharedStateObject !== {}) {
         log(DEBUG, 'POSTING Shared State', sharedStateObject);
@@ -394,15 +394,15 @@ async function putSharedState(sharedStateObject) {
 export async function importSharedState() {
     await prepSharedStateProps();
     //console.log('ORG: ', getOrganization());
-    let importOptions = [];
+    let importOptions: string[] = [];
     // Go Over Shared State files
-    const states = {};
+    const states:any = {};
     let it = 1;
     const fs = require('fs');
-    fs.readdirSync(SHARED_STATE_FOLDER).forEach(file => {
+    fs.readdirSync(SHARED_STATE_FOLDER).forEach((file: string) => {
         if (file !== 'CONTENT') {
             importOptions.push(file);
-            const sTemp = {};
+            const sTemp:any = {};
             const appN = it;
             sTemp['FILE'] = file;
             states[appN] = sTemp;
@@ -459,7 +459,7 @@ export function watchSharedState() {
         await prepSharedStateProps();
         await CCOM.cLogin();
         log(INFO, 'Waiting for FILE Changes in: ' + SHARED_STATE_FOLDER)
-        const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', async (event, path) => {
+        const watcher = chokidar.watch(SHARED_STATE_FOLDER).on('all', async (event: string, path: string) => {
             if (event === 'change') {
                 if (ignoreChanges <= 0) {
                     let pS = '/';
@@ -486,7 +486,7 @@ export function watchSharedState() {
         const readline = require('readline');
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
-        process.stdin.on('keypress', async (str, key) => {
+        process.stdin.on('keypress', async (_str, key) => {
             if (key.ctrl && key.name === 'c') {
                 process.exit();
             }

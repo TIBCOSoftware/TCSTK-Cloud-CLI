@@ -191,6 +191,7 @@ function getNameForSFType(type: SFType): string {
             return ReadableName;
         }
     }
+    return '';
 }
 
 async function askTypes(question: string, doAll?: boolean, doFolders?: boolean): Promise<SFType> {
@@ -231,15 +232,15 @@ export async function copySpotfire() {
         // 3: Ask which element to copy
         if (libTypes) {
             const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', libTypes.map(v => v.DisplayPath));
-            itemToCopy = libTypes.find(v => v.DisplayPath === itemNameToCopy);
+            itemToCopy = libTypes.find(v => v.DisplayPath === itemNameToCopy)!;
             // 4: List all folders
             log(INFO, 'Getting all library folders that the item can be copied to...');
             const sfFolders = await listOnType('spotfire.folder', true);
             // 5: Ask what folder to copy to
             log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
-            const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
+            const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders!.map(v => v.DisplayPath));
             // 6: Get the folder ID
-            folderIdToCopyTo = sfFolders.find(v => v.DisplayPath === folderToCopyTo).Id;
+            folderIdToCopyTo = sfFolders!.find(v => v.DisplayPath === folderToCopyTo)!.Id;
             const copyRequest: SFCopyRequest = {
                 itemsToCopy: [itemToCopy.Id],
                 destinationFolderId: folderIdToCopyTo,
@@ -287,7 +288,7 @@ export async function renameSpotfireItem() {
 }*/
 
 
-async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLibObject[]> {
+async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLibObject[] | null> {
     const doFromRoot = fromRoot || false;
     // console.log('doFromRoot: ', doFromRoot)
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
@@ -331,6 +332,7 @@ async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLib
             log(INFO, 'No ' + col.yellow(getNameForSFType(typeToList)) + ' Found in ' + col.blue(sfFolderToList.DisplayName) + '...');
         }
     }
+    return null;
 }
 
 async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> {

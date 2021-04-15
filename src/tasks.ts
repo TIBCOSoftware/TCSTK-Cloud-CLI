@@ -17,10 +17,9 @@ import {
 } from "./common/common-functions";
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
-import {askMultipleChoiceQuestion, askQuestion} from "./common/user-interaction";
+import {askMultipleChoiceQuestion, askQuestion, searchAnswerF} from "./common/user-interaction";
 import {getProp, getPropFileName, setProperty} from "./common/property-file-management";
 import {DEBUG, ERROR, INFO, log, setLogDebug} from "./common/logging";
-import {changeOrganization} from "./common/organization-management";
 
 declare var global: Global;
 // require('./tenants/common-functions');
@@ -34,8 +33,8 @@ const CAT_QUESTION = 'From which category would you like to select a task ?';
 const cliTaskConfig = require('./config/config-cli-task.json');
 const cTsks = cliTaskConfig.cliTasks as TCLITask[];
 // Comes from prop file
-let gTasksDescr = [];
-let gTasksNames = [];
+let gTasksDescr: string[] = [];
+let gTasksNames: string[] = [];
 let gCategory = ['ALL'];
 let globalLastCommand = 'help';
 
@@ -65,47 +64,50 @@ export function loadTaskDesc(category?: string) {
     let taskCounter = 0;
     for (let cliTask in cTsks) {
         // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
-        let allowed = false;
-        if (cTsks[cliTask].availableOnOs != null) {
-            for (let allowedOS of cTsks[cliTask].availableOnOs) {
-                // console.log('OS:' + allowedOS);
-                if (allowedOS === process.platform || allowedOS === 'all') {
-                    allowed = true;
-                    // console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
+        if (cTsks[cliTask]) {
+            const task = cTsks[cliTask]!;
+            let allowed = false;
+            if (task.availableOnOs != null) {
+                for (let allowedOS of task.availableOnOs) {
+                    // console.log('OS:' + allowedOS);
+                    if (allowedOS === process.platform || allowedOS === 'all') {
+                        allowed = true;
+                        // console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
+                    }
                 }
             }
-        }
-        if (cTsks[cliTask].enabled && allowed) {
-            // Add to global category (if not exits)
-            if (gCategory.indexOf(cTsks[cliTask].category) === -1) {
-                gCategory.push(cTsks[cliTask].category);
-            }
-            // console.log('Adding: ' + cliTask);
-            // console.log('Adding: ' + cliTask + ' : ' + cliTask.length);
-            if (!cTsks[cliTask].internal && !(cliTask === 'help' || cliTask === 'exit')) {
-                if (cTsks[cliTask].category === catToUse || catToUse === 'ALL') {
-                    taskCounter++;
-                    const tCounterStr = taskCounter + ') ';
-                    const catStr = '[' + cTsks[cliTask].category + '] ';
-                    // Remove the category from the name
-                    let taskName = cliTask.replace(cTsks[cliTask].category, '');
-                    // Special case for cloud starter since the category is called cloud starters
-                    taskName = taskName.replace('cloud-starter', '');
-                    // Replace double --
-                    taskName = taskName.replace('--', '-');
-                    // Remove -'s at the end or beginning
-                    if (taskName.endsWith('-')) {
-                        taskName = taskName.substring(0, taskName.length - 1);
+            if (task.enabled && allowed) {
+                // Add to global category (if not exits)
+                if (gCategory.indexOf(task.category) === -1) {
+                    gCategory.push(task.category);
+                }
+                // console.log('Adding: ' + cliTask);
+                // console.log('Adding: ' + cliTask + ' : ' + cliTask.length);
+                if (!task.internal && !(cliTask === 'help' || cliTask === 'exit')) {
+                    if (task.category === catToUse || catToUse === 'ALL') {
+                        taskCounter++;
+                        const tCounterStr = taskCounter + ') ';
+                        const catStr = '[' + task.category + '] ';
+                        // Remove the category from the name
+                        let taskName = cliTask.replace(task.category, '');
+                        // Special case for cloud starter since the category is called cloud starters
+                        taskName = taskName.replace('cloud-starter', '');
+                        // Replace double --
+                        taskName = taskName.replace('--', '-');
+                        // Remove -'s at the end or beginning
+                        if (taskName.endsWith('-')) {
+                            taskName = taskName.substring(0, taskName.length - 1);
+                        }
+                        if (taskName.startsWith('-')) {
+                            taskName = taskName.substring(1, taskName.length);
+                        }
+                        gTasksDescr.push(tCounterStr.padStart(4) + taskName.padEnd(30) + catStr.padStart(17) + ' - ' + task.description);
+                        gTasksNames.push(cliTask);
                     }
-                    if (taskName.startsWith('-')) {
-                        taskName = taskName.substring(1, taskName.length);
-                    }
-                    gTasksDescr.push(tCounterStr.padStart(4) + taskName.padEnd(30) + catStr.padStart(17) + ' - ' + cTsks[cliTask].description);
+                } else {
+                    gTasksDescr.push(cliTask);
                     gTasksNames.push(cliTask);
                 }
-            } else {
-                gTasksDescr.push(cliTask);
-                gTasksNames.push(cliTask);
             }
         }
     }
@@ -113,7 +115,7 @@ export function loadTaskDesc(category?: string) {
 }
 
 //Main Cloud CLI Questions
-export async function promptTask(stDir, cwdDir) {
+export async function promptTask(stDir: string, cwdDir: string) {
     const inquirer = require('inquirer');
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
@@ -129,9 +131,9 @@ export async function promptTask(stDir, cwdDir) {
             name: 'command',
             suggestOnly: false,
             message: pMes,
-            source: searchAnswer,
+            source: searchAnswerF,
             pageSize: 5
-        }]).then(async function (answers) {
+        }]).then(async function (answers: { command: string; }) {
             let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => answers.command === el)];
             log(INFO, 'Selected task] ' + col.blue(selectedTask));
             let com = selectedTask;
@@ -164,7 +166,7 @@ export async function promptTask(stDir, cwdDir) {
                 log('INFO', 'Repeating Last Task: ' + globalLastCommand);
                 comToInject = globalLastCommand;
             } else {
-                globalLastCommand = comToInject;
+                globalLastCommand = comToInject!;
             }
             let additionalArugments = '';
             for (let arg in process.argv) {
@@ -189,7 +191,8 @@ export async function promptTask(stDir, cwdDir) {
 
 //TODO: Use function from common, and test with test
 //User interaction
-export async function searchAnswer(answers, input) {
+/*
+export async function searchAnswer(answers: any, input: string) {
     const _ = require('lodash');
     const fuzzy = require('fuzzy');
     input = input || '';
@@ -204,7 +207,7 @@ export async function searchAnswer(answers, input) {
             );
         }, _.random(30, 60));
     });
-}
+}*/
 
 // A function to get directly into the browse mode
 export async function browseTasks() {
@@ -218,7 +221,7 @@ export async function testTask() {
     console.log('Test...');
     const PROPM = require('./common/property-file-management');
     // await PROPM.getClientIDforOrg();
-    const LA = require('./tenants/live-apps');
+    // const LA = require('./tenants/live-apps');
     // const PROPM = require('./common/property-file-management');
     const orgs = await PROPM.getCurrentOrganizationInfo();
     console.log(orgs);
@@ -377,7 +380,7 @@ export async function updateGlobalConfig() {
 }
 
 // Function to replace a string in a file
-export function replaceStringInFileOne(prefix) {
+export function replaceStringInFileOne(prefix: string) {
     let rFrom = getProp(prefix + 'Replace_FROM');
     let rTo = getProp(prefix + 'Replace_TO');
     const rPat = getProp(prefix + 'Replace_PATTERN');
@@ -399,8 +402,10 @@ export async function replaceStringInFileWrapper() {
     } else {
         const replaceA = rMul.split(',');
         for (let i = 0; i < replaceA.length; i++) {
-            const currentRep = trim(replaceA[i]);
-            replaceStringInFileOne(currentRep);
+            if(replaceA[i]){
+                const currentRep = trim(replaceA[i]!);
+                replaceStringInFileOne(currentRep);
+            }
         }
     }
 }
