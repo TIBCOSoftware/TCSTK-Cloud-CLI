@@ -370,6 +370,7 @@ export async function askQuestion(question: string, type = 'input') {
             logO(DEBUG, answers);
             re = answers.result;
         });
+        givenAnswers.push(re);
         return re;
     } else {
         return getLastGlobalAnswer(question);
@@ -397,6 +398,7 @@ export async function askMultipleChoiceQuestion(question: string, options: any[]
         }).catch((error: any) => {
             log(ERROR, error);
         });
+        givenAnswers.push(re);
         return re;
     } else {
         return getLastGlobalAnswer(question);
@@ -425,10 +427,11 @@ export async function askMultipleChoiceQuestionSearch(question: string, options:
             logO(DEBUG, answers);
             re = answers.command;
         });
+        givenAnswers.push(re);
+        return re;
     } else {
         return getLastGlobalAnswer(question);
     }
-    return re;
 }
 
 //User interaction
@@ -449,6 +452,14 @@ export function searchAnswerF(_answers: any, input: string) {
 
 let useGlobalAnswers = false;
 let globalAnswers: string[] = [];
+let givenAnswers: string[] = [];
+
+export function getGivenAnswers(){
+    return givenAnswers;
+}
+export function isGlobalAnswersUsed(){
+    return useGlobalAnswers;
+}
 
 export function setGlobalAnswers(answers: string) {
     // console.log('Answers: ' , answers);
@@ -1061,6 +1072,7 @@ export const INFO = 'INFO';
 export const WARNING = 'WARNING';
 export const DEBUG = 'DEBUG';
 export const ERROR = 'ERROR';
+export const RECORDER = 'RECORDER';
 //const useDebug = (propsF.Use_Debug == 'true');
 let useDebug = false;
 
@@ -1075,7 +1087,7 @@ export function setLogDebug(debug: string | boolean) {
 }
 
 // Function moved to TS
-export function log(level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR', ...message: any) {
+export function log(level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR' | 'RECORDER', ...message: any) {
     // console.log('LOG: ' ,useDebug , level, message);
     if (!(level === DEBUG && !useDebug)) {
         // const timeStamp = new Date();
@@ -1093,7 +1105,12 @@ export function log(level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR', ...message: a
             if (level === WARNING) {
                 console.log(colors.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message));
             } else {
-                console.log(colors.magenta('TS TIBCO CLOUD CLI] (' + level + ') '), ...message);
+                if(level === RECORDER){
+                    console.log(colors.bgWhite('[' + level + ']'), ...message);
+                } else {
+                    console.log(colors.magenta('TS TIBCO CLOUD CLI] (' + level + ') '), ...message);
+                }
+
             }
         }
     }

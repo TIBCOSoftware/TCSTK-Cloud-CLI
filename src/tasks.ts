@@ -22,6 +22,7 @@ import {
 } from "./common/common-functions";
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
+
 declare var global: Global;
 // require('./tenants/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common');
@@ -40,7 +41,7 @@ let gCategory = ['ALL'];
 let globalLastCommand = 'help';
 
 // Wrapper to main task
-export async function mainT(cat) {
+export async function mainT(cat?: string) {
     const catToUse = cat || 'ALL';
     loadTaskDesc(catToUse);
     displayOpeningMessage();
@@ -54,7 +55,7 @@ export async function mainT(cat) {
     await promptTask(__dirname, appRoot);
 }
 
-export function loadTaskDesc(category) {
+export function loadTaskDesc(category?: string) {
     gTasksDescr = [];
     gTasksNames = [];
     const catToUse = category || 'ALL';
@@ -100,7 +101,7 @@ export function loadTaskDesc(category) {
                     if (taskName.startsWith('-')) {
                         taskName = taskName.substring(1, taskName.length);
                     }
-                    gTasksDescr.push(tCounterStr.padStart(4) + taskName.padEnd(30) + catStr.padStart(17) +' - ' + cTsks[cliTask].description);
+                    gTasksDescr.push(tCounterStr.padStart(4) + taskName.padEnd(30) + catStr.padStart(17) + ' - ' + cTsks[cliTask].description);
                     gTasksNames.push(cliTask);
                 }
             } else {
@@ -151,7 +152,7 @@ export async function promptTask(stDir, cwdDir) {
                 return promptTask(stDir, cwdDir);
             }
             if (com === 'quit') {
-                if(Math.random() < 0.1){
+                if (Math.random() < 0.1) {
                     //Quit with a quote
                     console.log(colors.bgWhite(QUOTES[Math.floor(Math.random() * QUOTES.length)]));
                 }
@@ -180,6 +181,7 @@ export async function promptTask(stDir, cwdDir) {
                 additionalArugments += ' --org "' + getOrganization(true) + '"';
             }
             let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
+            // TODO: Don't call tcli again but create a CLIRun Class
             run(commandTcli);
             return promptTask(stDir, cwdDir);
         });
@@ -469,7 +471,7 @@ export async function showLiveAppsActionsWrapper() {
 // Function to show liveApps Actions
 export async function showLiveAppsSandboxWrapper() {
     const CCOM = require('./common/cloud-communications');
-    await CCOM.showCloudInfo(true,true);
+    await CCOM.showCloudInfo(true, true);
 }
 
 // Function to export liveApps cases

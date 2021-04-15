@@ -9,9 +9,9 @@ import arg from 'arg';
 import {
     addOrUpdateProperty,
     askMultipleChoiceQuestion,
-    DEBUG, displayOpeningMessage, ERROR, getGlobalConfig, getProp,
-    INFO, isGlobalOauthDefined,
-    log, obfuscatePW, setGlobalAnswers,
+    DEBUG, displayOpeningMessage, ERROR, getGivenAnswers, getGlobalConfig, getProp,
+    INFO, isGlobalAnswersUsed, isGlobalOauthDefined,
+    log, obfuscatePW, RECORDER, setGlobalAnswers,
     setMultipleOptions, setOrganization, setProperty, setPropFileName, updateCloudLogin, updateRegion,
     updateTCLI,
     WARNING
@@ -332,6 +332,21 @@ export async function cli(args) {
                     const tasks = require('./tasks');
                     try {
                         await tasks[directTaskMethod]();
+                        // Task has run, if we haven't specified global answers upfront then display answers for next time
+                        if(!isGlobalAnswersUsed()){
+                            // TODO: add different property file (if used)
+                            let taskCommand = 'tcli ' + options.task + ' ';
+                            let answers = '';
+                            getGivenAnswers().forEach(ans => {
+                                answers += ans + ':';
+                            })
+                            if(answers !== ''){
+                                // Remove last semicolon
+                                answers = answers.substring(0, answers.length - 1);
+                                taskCommand += ' -a "' + answers + '"';
+                            }
+                            log(RECORDER, 'Replay-Command: ' + colors.underline(taskCommand));
+                        }
                     } catch (err) {
                         log(ERROR, 'Task ' + options.task + ' failed: ' + err.message);
                         console.log(err)

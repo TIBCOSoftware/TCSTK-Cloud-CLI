@@ -239,12 +239,8 @@
           "format": "DATE"
         },
         {
-          "header": "Path",
+          "header": "Spotfire Library Item",
           "field": "DisplayPath"
-        },
-        {
-          "header": "Title",
-          "field": "Title"
         }
       ]
     },
