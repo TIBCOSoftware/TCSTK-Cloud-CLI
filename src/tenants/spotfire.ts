@@ -8,7 +8,7 @@ import {
 } from "../common/common-functions";
 import {Global} from "../models/base";
 import {CallConfig} from "../models/tcli-models";
-import {SFCopyRequest, SFFolderInfo, SFLibObject, SFType} from "../models/spotfire";
+import {SFCopyRequest, SFCreateFolderRequest, SFFolderInfo, SFLibObject, SFType} from "../models/spotfire";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {getProp, prepProp} from "../common/property-file-management";
@@ -39,15 +39,6 @@ function prepSpotfireProps() {
         '#  NOTE: You can use ~{ORGANIZATION}, to use the current organization name in library base.\n' +
         '#  NOTE: Do not end this folder with a \'/\' character');
 }
-
-async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {
-    const request = {
-        "folderId": folderId,
-        "types": SF_TYPES
-    }
-    return await callSpotfire(CCOM.clURI.sf_reports, false, {method: 'POST', postRequest: request}) as SFFolderInfo;
-}
-
 
 // Function to browse spotfire reports
 export async function browseSpotfire() {
@@ -132,8 +123,7 @@ export async function browseSpotfire() {
     }
 }
 
-
-// Function to browse spotfire reports
+// Function to browse spotfire library
 export async function listSpotfire() {
     prepSpotfireProps();
     log(INFO, 'Listing the Spotfire Library...');
@@ -154,39 +144,7 @@ export async function listSpotfire() {
     }
 }
 
-
-function getNameForSFType(type: SFType): string {
-    for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
-        if (type === SFTypeName) {
-            return ReadableName;
-        }
-    }
-    return type;
-}
-
-async function askTypes(question: string, doAll?: boolean, doFolders?: boolean): Promise<SFType> {
-    doAll = doAll || false;
-    doFolders = doFolders || false;
-    const questionTypes = ['NONE'];
-    Object.entries(SF_FRIENDLY_TYPES).forEach(([key]) => {
-        if (key === 'Library Folders') {
-            if (doFolders) {
-                questionTypes.push(key);
-            }
-        } else {
-            questionTypes.push(key);
-        }
-    });
-    if (doAll) {
-        questionTypes.push('ALL');
-    }
-    let re = await askMultipleChoiceQuestionSearch(question, questionTypes);
-    if (re.toLowerCase() !== 'none' && re.toLowerCase() !== 'all' && SF_FRIENDLY_TYPES[re]) {
-        re = SF_FRIENDLY_TYPES[re];
-    }
-    return re as SFType;
-}
-
+// Function to copy a library item from one place to another
 export async function copySpotfire() {
     log(INFO, 'Copying Spotfire Library Item...');
     let itemToCopy: SFLibObject;
@@ -236,6 +194,53 @@ export async function copySpotfire() {
     }
 }
 
+// https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/createFolder
+
+// {"description":"Test","keywords":"","parentId":"ae0820f3-1c6a-4564-b02f-0ba0c7210f93","title":"MyFolder"}
+
+export async function createSpotfireLibraryFolder() {
+    prepSpotfireProps();
+    log(INFO, 'Creating Spotfire Library Folder...');
+    // Step 1: List all current folders
+    const folders = await listOnType('spotfire.folder', false);
+    if (folders && folders.length > 0) {
+        // Step 2: Choose a parent folder
+        const parentFolderName = await askMultipleChoiceQuestionSearch('For which folder would you like to create a subfolder ?', folders.map(v => v.DisplayPath));
+        const parentFolder = folders.find(v => v.DisplayPath === parentFolderName)!;
+        // Step 3: Get Id of parent folder
+        const parentFolderId = parentFolder.Id;
+        // Step 4: Ask for a name of the folder
+        const fName = await askQuestion('What is the name of the folder you would like to create ? (use "NONE" or press enter to not create a folder)');
+        if (fName && fName.toLowerCase() !== 'none') {
+            // Step 5: Possibly ask for a description of the folder
+            let fDesc = await askQuestion('What is the description of the folder you would like to create ? (use "NONE" or press enter to leave blank)');
+            if (fDesc.toLowerCase() === 'none') fDesc = '';
+            // Step 6: Create the folder
+            const createFolderRequest:SFCreateFolderRequest = {
+                description: fDesc,
+                keywords: "",
+                parentId: parentFolderId,
+                title: fName
+            }
+            const SFCreateFolder = await callSpotfire(CCOM.clURI.sf_create_folder, false, {
+                method: 'POST',
+                postRequest: createFolderRequest
+            }) as SFLibObject;
+            if(SFCreateFolder.Id) {
+                log(INFO, 'Successfully crated folder with name: ', col.green(fName) + ' and description ' + col.green(fDesc) + ' (new id: ' + SFCreateFolder.Id + ')');
+            } else {
+                log(ERROR, 'Something went wrong while creating a library folder: ', SFCreateFolder);
+            }
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    } else {
+        log(ERROR, 'No parent folders found, adjust your Spotfire_Library_Base property: ' + getProp('Spotfire_Library_Base'));
+    }
+
+
+}
+
 // Function to rename a Spotfire Item
 /* TODO: Implement Function
 export async function renameSpotfireItem() {
@@ -256,6 +261,47 @@ export async function renameSpotfireItem() {
     return SFRename;
 }*/
 
+
+async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {
+    const request = {
+        "folderId": folderId,
+        "types": SF_TYPES
+    }
+    return await callSpotfire(CCOM.clURI.sf_reports, false, {method: 'POST', postRequest: request}) as SFFolderInfo;
+}
+
+
+function getNameForSFType(type: SFType): string {
+    for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
+        if (type === SFTypeName) {
+            return ReadableName;
+        }
+    }
+    return type;
+}
+
+async function askTypes(question: string, doAll?: boolean, doFolders?: boolean): Promise<SFType> {
+    doAll = doAll || false;
+    doFolders = doFolders || false;
+    const questionTypes = ['NONE'];
+    Object.entries(SF_FRIENDLY_TYPES).forEach(([key]) => {
+        if (key === 'Library Folders') {
+            if (doFolders) {
+                questionTypes.push(key);
+            }
+        } else {
+            questionTypes.push(key);
+        }
+    });
+    if (doAll) {
+        questionTypes.push('ALL');
+    }
+    let re = await askMultipleChoiceQuestionSearch(question, questionTypes);
+    if (re.toLowerCase() !== 'none' && re.toLowerCase() !== 'all' && SF_FRIENDLY_TYPES[re]) {
+        re = SF_FRIENDLY_TYPES[re];
+    }
+    return re as SFType;
+}
 
 // This function finds the folder details from Spotfire given a path (recursive)
 async function findFolderFromPath(folderInfo: SFFolderInfo, folderPath: string): Promise<SFLibObject | null> {
@@ -292,7 +338,7 @@ async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLib
     if (!doFromRoot) {
         if (getProp('Spotfire_Library_Base') !== '/Teams/' + getOrganization()) {
             let folderToLookFrom = sfRoot;
-            if (getProp('Spotfire_Library_Base').trim() === ''){
+            if (getProp('Spotfire_Library_Base').trim() === '') {
                 sfFolderToList = sfRoot.CurrentFolder;
             } else {
                 // if it is the teams folder, directly look from there
@@ -344,8 +390,11 @@ async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLib
 async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> {
     let re: any[] = [];
     const iterateFolder = await getSFolderInfo(baseFolderId);
+    if (type === 'spotfire.folder') {
+        re.push(iterateFolder.CurrentFolder);
+    }
     for (let itItem of iterateFolder.Children) {
-        if (itItem.ItemType === type) {
+        if (itItem.ItemType === type && type !== 'spotfire.folder') {
             if (itItem.DisplayPath) {
                 re.push(itItem);
             }

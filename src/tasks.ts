@@ -568,6 +568,12 @@ export async function copySpotfireLibraryWrapper() {
     await SPOTFIRE.copySpotfire();
 }
 
+export async function createSpotfireLibraryFolderWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.createSpotfireLibraryFolder();
+}
+
+
 
 export async function generateOauthTokenWrapper() {
     const OAUTH = require('./common/oauth');

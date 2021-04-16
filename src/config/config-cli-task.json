@@ -896,6 +896,20 @@
       ],
       "category": "spotfire"
     },
+    "create-spotfire-library-folder": {
+      "description": "Creates a new Library Folder.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "createSpotfireLibraryFolderWrapper",
+      "taskAlternativeNames": [
+        "create-sf-folder", "create-library-folder"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
     "show-oauth-tokens": {
       "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
       "enabled": true,

@@ -4,6 +4,13 @@ export interface SFCopyRequest {
     conflictResolution: 'KeepBoth'
 }
 
+export interface SFCreateFolderRequest {
+    description: string;
+    keywords: string;
+    parentId: string;
+    title: string;
+}
+
 export type SFType =
     'spotfire.folder'
     | 'spotfire.dxp'
