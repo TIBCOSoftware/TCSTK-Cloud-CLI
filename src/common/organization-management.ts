@@ -10,7 +10,8 @@ import {askMultipleChoiceQuestionSearch} from "./user-interaction";
 import {SelectedAccount} from "../models/organizations";
 import {getOAUTHDetails} from "./oauth";
 import {addOrUpdateProperty, getProp, getPropFileName} from "./property-file-management";
-import {DEBUG, INFO, log} from "./logging";
+import {DEBUG, ERROR, INFO, log} from "./logging";
+
 const CCOM = require('./cloud-communications');
 const OAUTH = require('./oauth');
 
@@ -66,10 +67,19 @@ export async function changeOrganization(accountId?: string) {
     } else {
         // List all the organizations
         // Ask to which organization you would like to switch
-        orgAccountId = (await displayOrganizations(true, true, 'Which organization would you like to change to ?') ).accountId;
+        const accountChoice = await displayOrganizations(true, true, 'Which organization would you like to change to ?');
+        if (accountChoice) {
+            orgAccountId = accountChoice.accountId;
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+            return;
+        }
     }
-    log(INFO, 'Changing Organization to: ' , col.blue(orgAccountId));
-    if (orgAccountId) {
+    const currentAccount = await getCurrentOrganizationInfo();
+    if (currentAccount.accountId === orgAccountId) {
+        log(ERROR, 'You are already in the organization: ', currentAccount.displayName);
+    } else {
+        log(INFO, 'Changing Organization to: ', col.blue(orgAccountId));
         // Get the clientID for that organization
         const clientID = await getClientIDforOrg(orgAccountId)
         // console.log('Client ID: ' + clientID);
@@ -95,8 +105,6 @@ export async function changeOrganization(accountId?: string) {
             await OAUTH.generateOauthToken(null, true, false);
         }
         log(INFO, col.bold.green('Successfully changed to organization: ' + getOrganization()))
-    } else {
-        log(INFO, 'OK, I won\'t do anything :-)');
     }
 }
 

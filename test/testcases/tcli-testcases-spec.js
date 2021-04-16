@@ -121,7 +121,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud-organizations -a NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud-organizations -a "OOCTO"')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'change-cloud-organization -a "TIBCO LABS DEV"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'change-cloud-organization -a "LABS DEV"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineOrgTest_1')).toBe(true);
 

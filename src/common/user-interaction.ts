@@ -58,7 +58,11 @@ export async function askMultipleChoiceQuestion(question: string, options: any[]
 let gOptions: any[] = [];
 
 // Ask a question to a user, and allow the user to search through a possilbe set of options
-export async function askMultipleChoiceQuestionSearch(question: string, options: any[]) {
+export async function askMultipleChoiceQuestionSearch(question: string, options: string[], pageSize?: number) {
+    let pageSizeToUse = 4;
+    if(pageSize && pageSize > -1){
+        pageSizeToUse = pageSize;
+    }
     let re = '';
     if (!useGlobalAnswers) {
         let inquirerF = require('inquirer');
@@ -70,7 +74,7 @@ export async function askMultipleChoiceQuestionSearch(question: string, options:
             suggestOnly: false,
             message: question,
             source: searchAnswerF,
-            pageSize: 4
+            pageSize: pageSizeToUse
         }]).then((answers: { command: string; }) => {
             // console.log('answers: ' , answers);
             logO(DEBUG, answers);

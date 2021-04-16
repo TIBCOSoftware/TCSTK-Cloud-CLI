@@ -186,12 +186,13 @@ export async function listSpotfire() {
 
 
 function getNameForSFType(type: SFType): string {
+    console.log('Getting name for type: ' , type);
     for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
         if (type === SFTypeName) {
             return ReadableName;
         }
     }
-    return '';
+    return type;
 }
 
 async function askTypes(question: string, doAll?: boolean, doFolders?: boolean): Promise<SFType> {
@@ -211,7 +212,7 @@ async function askTypes(question: string, doAll?: boolean, doFolders?: boolean):
         questionTypes.push('ALL');
     }
     let re = await askMultipleChoiceQuestionSearch(question, questionTypes);
-    if (re.toLowerCase() !== 'none' && re.toLowerCase() !== 'all') {
+    if (re.toLowerCase() !== 'none' && re.toLowerCase() !== 'all' && SF_FRIENDLY_TYPES[re]) {
         re = SF_FRIENDLY_TYPES[re];
     }
     return re as SFType;

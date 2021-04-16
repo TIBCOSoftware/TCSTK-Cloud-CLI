@@ -12,12 +12,12 @@ import {
     replaceInFile,
     run,
     trim, updateCloudPackages,
-    updateGlobalConnectionConfig, updateRegion,
+    updateGlobalConnectionConfig, updateRegion, updateTCLI,
     upgradeToV2
 } from "./common/common-functions";
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
-import {askMultipleChoiceQuestion, askQuestion, searchAnswerF} from "./common/user-interaction";
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./common/user-interaction";
 import {getProp, getPropFileName, setProperty} from "./common/property-file-management";
 import {DEBUG, ERROR, INFO, log, setLogDebug} from "./common/logging";
 
@@ -63,16 +63,13 @@ export function loadTaskDesc(category?: string) {
     }
     let taskCounter = 0;
     for (let cliTask in cTsks) {
-        // console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
         if (cTsks[cliTask]) {
             const task = cTsks[cliTask]!;
             let allowed = false;
             if (task.availableOnOs != null) {
                 for (let allowedOS of task.availableOnOs) {
-                    // console.log('OS:' + allowedOS);
                     if (allowedOS === process.platform || allowedOS === 'all') {
                         allowed = true;
-                        // console.log('CLI TASK: ' + cliTask + ' Is Allowed !!');
                     }
                 }
             }
@@ -81,8 +78,6 @@ export function loadTaskDesc(category?: string) {
                 if (gCategory.indexOf(task.category) === -1) {
                     gCategory.push(task.category);
                 }
-                // console.log('Adding: ' + cliTask);
-                // console.log('Adding: ' + cliTask + ' : ' + cliTask.length);
                 if (!task.internal && !(cliTask === 'help' || cliTask === 'exit')) {
                     if (task.category === catToUse || catToUse === 'ALL') {
                         taskCounter++;
@@ -114,100 +109,77 @@ export function loadTaskDesc(category?: string) {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
 }
 
-//Main Cloud CLI Questions
-export async function promptTask(stDir: string, cwdDir: string) {
+// Main Cloud CLI Questions
+export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
     const inquirer = require('inquirer');
     log(DEBUG, 'PromtTask)           stDir dir: ' + stDir);
     log(DEBUG, 'PromtTask) current working dir: ' + cwdDir);
-    return new Promise<void>(function (resolve) {
+    return new Promise<void>(async function (resolve) {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - ' + col.blue(getRegion(true, true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
         // If there is an org, show it
         if (getOrganization(true) !== '') {
             pMes = '[TCLI - ' + col.blue(getRegion(true, true) + ' - ' + getOrganization(true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
         }
-        inquirer.prompt([{
-            type: 'autocomplete',
-            name: 'command',
-            suggestOnly: false,
-            message: pMes,
-            source: searchAnswerF,
-            pageSize: 5
-        }]).then(async function (answers: { command: string; }) {
-            let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => answers.command === el)];
-            log(INFO, 'Selected task] ' + col.blue(selectedTask));
-            let com = selectedTask;
-            // Special case for help, call the inline help directly
-            if (com === 'help') {
-                await helptcliWrapper();
-                return promptTask(stDir, cwdDir);
-            }
-            // Logic to browse by task
-            if (com === BACK_TO_ALL) {
-                loadTaskDesc('ALL');
-                return promptTask(stDir, cwdDir);
-            }
-            if (com === 'browse-tasks' || com === BACK) {
-                const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory);
-                loadTaskDesc(chosenCat);
-                return promptTask(stDir, cwdDir);
-            }
-            if (com === 'quit') {
-                if (Math.random() < 0.1) {
-                    //Quit with a quote
-                    console.log(col.bgWhite(QUOTES[Math.floor(Math.random() * QUOTES.length)]));
-                }
-                console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
-                return resolve();
-            }
-            // Check if we need to repeat the last task
-            let comToInject = selectedTask;
-            if (com === 'repeat-last-task') {
-                log('INFO', 'Repeating Last Task: ' + globalLastCommand);
-                comToInject = globalLastCommand;
-            } else {
-                globalLastCommand = comToInject!;
-            }
-            let additionalArugments = '';
-            for (let arg in process.argv) {
-                // TODO: Should not all arguments be propagated >?
-                if (process.argv[arg] === '--debug' || process.argv[arg] === '-d') {
-                    additionalArugments += ' -d ';
-                }
-            }
-            if (getProp('CloudLogin.pass').toString() !== '') {
-                additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
-            }
-            if (getOrganization(true) !== '') {
-                additionalArugments += ' --org "' + getOrganization(true) + '"';
-            }
-            let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
-            // TODO: Don't call tcli again but create a CLIRun Class
-            run(commandTcli);
+        const command = await askMultipleChoiceQuestionSearch(pMes, gTasksDescr, 5);
+        let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => command === el)];
+        // In case an answer was injected
+        if(!selectedTask) {
+            selectedTask = command;
+        }
+        log(INFO, 'Selected task] ' + col.blue(selectedTask));
+        let com = selectedTask;
+        // Special case for help, call the inline help directly
+        if (com === 'help') {
+            await helptcliWrapper();
             return promptTask(stDir, cwdDir);
-        });
+        }
+        // Logic to browse by task
+        if (com === BACK_TO_ALL) {
+            loadTaskDesc('ALL');
+            return promptTask(stDir, cwdDir);
+        }
+        if (com === 'browse-tasks' || com === BACK) {
+            const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory);
+            loadTaskDesc(chosenCat);
+            return promptTask(stDir, cwdDir);
+        }
+        if (com === 'quit') {
+            if (Math.random() < 0.1) {
+                //Quit with a quote
+                console.log(col.bgWhite(QUOTES[Math.floor(Math.random() * QUOTES.length)]));
+            }
+            console.log('\x1b[36m%s\x1b[0m', 'Thank you for using the TIBCO Cloud CLI... Goodbye :-) ');
+            return resolve();
+        }
+        // Check if we need to repeat the last task
+        let comToInject = selectedTask;
+        if (com === 'repeat-last-task') {
+            log('INFO', 'Repeating Last Task: ' + globalLastCommand);
+            comToInject = globalLastCommand;
+        } else {
+            globalLastCommand = comToInject!;
+        }
+        let additionalArugments = '';
+        for (let arg in process.argv) {
+            // TODO: Should not all arguments be propagated >?
+            if (process.argv[arg] === '--debug' || process.argv[arg] === '-d') {
+                additionalArugments += ' -d ';
+            }
+        }
+        if (getProp('CloudLogin.pass').toString() !== '') {
+            additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
+        }
+        if (getOrganization(true) !== '') {
+            additionalArugments += ' --org "' + getOrganization(true) + '"';
+        }
+        let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
+        // TODO: Don't call tcli again but create a CLIRun Class
+        run(commandTcli);
+        return promptTask(stDir, cwdDir);
     });
+    // });
 }
-
-//TODO: Use function from common, and test with test
-//User interaction
-/*
-export async function searchAnswer(answers: any, input: string) {
-    const _ = require('lodash');
-    const fuzzy = require('fuzzy');
-    input = input || '';
-    return new Promise(function (resolve) {
-        setTimeout(function () {
-            const fuzzyResult = fuzzy.filter(input, gTasksDescr);
-            // TODO: Check for more exact match
-            resolve(
-                fuzzyResult.map(function (el) {
-                    return el.original;
-                })
-            );
-        }, _.random(30, 60));
-    });
-}*/
 
 // A function to get directly into the browse mode
 export async function browseTasks() {
@@ -402,7 +374,7 @@ export async function replaceStringInFileWrapper() {
     } else {
         const replaceA = rMul.split(',');
         for (let i = 0; i < replaceA.length; i++) {
-            if(replaceA[i]){
+            if (replaceA[i]) {
                 const currentRep = trim(replaceA[i]!);
                 replaceStringInFileOne(currentRep);
             }
@@ -672,6 +644,10 @@ export async function showMessagingSummaryWrapper() {
 export async function showMessagingClientsWrapper() {
     const MESSAGING = require('./tenants/messaging');
     await MESSAGING.showClients();
+}
+
+export async function updateTCLIwrapper() {
+    await updateTCLI();
 }
 
 // Set log debug level from local property
