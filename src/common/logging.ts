@@ -1,11 +1,26 @@
 // Common log function
-import {col} from "./common-functions";
+import {col, sleep} from "./common-functions";
+import ora from "ora";
 export const INFO = 'INFO';
 export const WARNING = 'WARNING';
 export const DEBUG = 'DEBUG';
 export const ERROR = 'ERROR';
 export const RECORDER = 'RECORDER';
 let useDebug = false
+
+export async function throb(message: string, frames: string[], sleepMs: number) {
+    const spinner = {
+        frames: frames,
+        interval: 300, // Optional
+    }
+    const throbber = ora({
+        text: message,
+        spinner
+    })
+    throbber.start();
+    await sleep(sleepMs);
+    throbber.stop();
+}
 
 // Function to set the logDug level
 export function setLogDebug(debug: string | boolean) {

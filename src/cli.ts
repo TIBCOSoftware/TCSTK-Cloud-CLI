@@ -4,7 +4,7 @@ import {
     displayOpeningMessage, getGlobalConfig,
     isGlobalOauthDefined,
     obfuscatePW,
-    setMultipleOptions, setOrganization, updateCloudLogin, updateRegion,
+    setMultipleOptions, setOrganization, trim, updateCloudLogin, updateRegion,
     updateTCLI
 } from "./common/common-functions";
 import {multipleInteraction, processMultipleFile} from "./manage-multiple";
@@ -18,6 +18,7 @@ import {
 } from "./common/user-interaction";
 import {addOrUpdateProperty, getProp, setProperty, setPropFileName} from "./common/property-file-management";
 import {DEBUG, ERROR, INFO, log, RECORDER, WARNING} from "./common/logging";
+
 declare var global: Global;
 
 let propFileName;
@@ -61,6 +62,10 @@ function parseArgumentsIntoOptions(rawArgs: any) {
                 '-e': '--environment',
                 '--browse': Boolean,
                 '-b': '--browse',
+                '--record': String,
+                '-r': '--record',
+                '--showReplay': Boolean,
+                '-l': '--showReplay',
             },
             {
                 argv: rawArgs.slice(2),
@@ -89,7 +94,9 @@ function parseArgumentsIntoOptions(rawArgs: any) {
         answers: args['--answers'] || '',
         job: args['--job'] || '',
         environment: args['--environment'] || '',
-        browse: args['--browse'] || false
+        browse: args['--browse'] || false,
+        record: args['--record'] || '',
+        showReplay: args['--showReplay'] || false
     };
 }
 
@@ -299,7 +306,7 @@ export async function cli(args: any) {
                 }
             }
             for (const cliTask in cTsks) {
-                if(cTsks[cliTask]) {
+                if (cTsks[cliTask]) {
                     const taskTemp = cTsks[cliTask]!;
                     if (taskTemp.taskAlternativeNames) {
                         for (const altName of taskTemp.taskAlternativeNames) {
@@ -335,19 +342,28 @@ export async function cli(args: any) {
                     try {
                         await tasks[directTaskMethod]();
                         // Task has run, if we haven't specified global answers upfront then display answers for next time
-                        if(!isGlobalAnswersUsed()){
-                            // TODO: add different property file (if used)
+                        if (!isGlobalAnswersUsed() && options.showReplay) {
                             let taskCommand = 'tcli ' + options.task + ' ';
                             let answers = '';
                             getGivenAnswers().forEach(ans => {
                                 answers += ans + ':';
                             })
-                            if(answers !== ''){
+                            if (answers !== '') {
                                 // Remove last semicolon
                                 answers = answers.substring(0, answers.length - 1);
-                                taskCommand += ' -a "' + answers + '"';
+                                // TODO: add different property file (if used)
+                                taskCommand += '-a "' + answers + '"';
                             }
-                            log(RECORDER, 'Replay-Command: ' + col.underline(taskCommand));
+                            let rec = col.white('● ');
+                            if (options.record != '') {
+                                rec = col.red('● ');
+                                const recordFile = trim(options.record);
+                                log(RECORDER, rec + 'Adding command to: ' + col.underline(recordFile));
+                                const fs = require('fs');
+                                fs.appendFileSync(recordFile, taskCommand + '\n');
+                                rec += '   ';
+                            }
+                            log(RECORDER, rec + 'Replay command: ' + col.underline(taskCommand));
                         }
                     } catch (err) {
                         log(ERROR, 'Task ' + options.task + ' failed: ' + err.message);

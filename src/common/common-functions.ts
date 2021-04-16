@@ -157,11 +157,9 @@ export function getOrganization(forceRefresh?: boolean) {
         getProp('CloudLogin.OAUTH_Token', true, true);
     }
     if (OrganizationGl === '' && isOauthUsed()) {
-        // if (getOAUTHDetails() != null) {
-        // TODO: Run a test case with just the OAUTH Token
-        if (!getOAUTHDetails().Org) {
+        // It could be that there is just the OAUTH token
+        if (getOAUTHDetails() && !getOAUTHDetails().Org) {
             getProp('CloudLogin.OAUTH_Token', true, true);
-            // It could be that there is just the OAUTH token
         }
         if (getOAUTHDetails() != null && getOAUTHDetails().Org) {
             OrganizationGl = getOAUTHDetails().Org!;
@@ -462,29 +460,6 @@ export function doesFileExist(checkFile: string) {
         log(ERROR, 'Error on checking if file exists: ', err);
     }
 }
-
-// function to deternmine enabled tasks for workspace
-/*
-export function determineEnabledTasks(cliTaskConfig: { cliTasks: any; }) {
-    const cTsks = cliTaskConfig.cliTasks;
-    const re = [];
-    for (const cliTask in cTsks) {
-        console.log(cliTask + ' (' + cTsks[cliTask].description + ')');
-        let allowed = false;
-        if (cTsks[cliTask].availableOnOs != null) {
-            for (const allowedOS of cTsks[cliTask].availableOnOs) {
-                console.log('OS:' + allowedOS);
-                if (allowedOS === process.platform || allowedOS === 'all') {
-                    allowed = true;
-                }
-            }
-        }
-        if (cTsks[cliTask].enabled && allowed) {
-            re.push(cliTask + ' (' + cTsks[cliTask].description + ')');
-        }
-    }
-    return re;
-}*/
 
 export async function isPortAvailable(port: string | number) {
     log(DEBUG, 'Checking Port Availability: ' + port);

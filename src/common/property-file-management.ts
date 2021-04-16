@@ -201,6 +201,13 @@ export function addOrUpdateProperty(location: string, property: string, value: s
     }
 }
 
+// Function to check if a property exist and add a default value if not
+export function prepProp(propName:string, propDefaultValue:string, comment: string){
+    if (getProp(propName) == null) {
+        log(INFO, 'No '+propName+' Property found; Adding '+propDefaultValue+' to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), propName, propDefaultValue,comment);
+    }
+}
 
 // Function to generate other property files next to the existing ones
 export async function generateCloudPropertyFiles() {

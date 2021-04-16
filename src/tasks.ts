@@ -19,7 +19,8 @@ import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./common/user-interaction";
 import {getProp, getPropFileName, setProperty} from "./common/property-file-management";
-import {DEBUG, ERROR, INFO, log, setLogDebug} from "./common/logging";
+import {DEBUG, ERROR, INFO, log, RECORDER, setLogDebug, throb} from "./common/logging";
+import {prepRecorderProps} from "./common/recorder";
 
 declare var global: Global;
 // require('./tenants/common-functions');
@@ -27,6 +28,8 @@ if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.get
 const version = require('../package.json').version;
 
 // Constants
+const START_RECORDING = 'start-recording';
+const STOP_RECORDING = 'stop-recording';
 const BACK = 'BACK';
 const BACK_TO_ALL = 'BACK TO ALL TASKS';
 const CAT_QUESTION = 'From which category would you like to select a task ?';
@@ -42,6 +45,7 @@ let globalLastCommand = 'help';
 export async function mainT(cat?: string) {
     const catToUse = cat || 'ALL';
     loadTaskDesc(catToUse);
+    prepRecorderProps();
     displayOpeningMessage();
     console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)');
     const appRoot = process.cwd();
@@ -61,6 +65,7 @@ export function loadTaskDesc(category?: string) {
         gTasksDescr.push(BACK, BACK_TO_ALL);
         gTasksNames.push(BACK, BACK_TO_ALL);
     }
+
     let taskCounter = 0;
     for (let cliTask in cTsks) {
         if (cTsks[cliTask]) {
@@ -106,8 +111,15 @@ export function loadTaskDesc(category?: string) {
             }
         }
     }
+    if (getProp('Recorder_Use') && getProp('Recorder_Use').toLowerCase() === 'yes') {
+        // TODO: Inject two before end
+        gTasksDescr.splice(gTasksDescr.length - 2, 0, START_RECORDING);
+        gTasksNames.splice(gTasksNames.length - 2,0, START_RECORDING);
+    }
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After task descriptions');
 }
+
+let globalDoRecord = false;
 
 // Main Cloud CLI Questions
 export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
@@ -139,6 +151,23 @@ export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
             loadTaskDesc('ALL');
             return promptTask(stDir, cwdDir);
         }
+        if (com === START_RECORDING) {
+            globalDoRecord = true;
+            await throb(' Starting Recording...', [col.reset.bgWhite('[RECORDER]') + col.red(' ●'), col.reset.bgWhite('[RECORDER]') + '  '], 800);
+            log(RECORDER, col.red('●') + ' Started Recording...');
+            // Change task to stop recording
+            gTasksDescr[gTasksDescr.findIndex( des =>  des === START_RECORDING)] = STOP_RECORDING;
+            gTasksNames[gTasksNames.findIndex( name =>  name === START_RECORDING)] = STOP_RECORDING;
+
+            return promptTask(stDir, cwdDir);
+        }
+        if (com === STOP_RECORDING) {
+            globalDoRecord = false;
+            log(RECORDER, col.white(' ● ') + ' Recording Stopped...');
+            gTasksDescr[gTasksDescr.findIndex( des =>  des === STOP_RECORDING)] = START_RECORDING;
+            gTasksNames[gTasksNames.findIndex( name =>  name === STOP_RECORDING)] = START_RECORDING;
+            return promptTask(stDir, cwdDir);
+        }
         if (com === 'browse-tasks' || com === BACK) {
             const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory);
             loadTaskDesc(chosenCat);
@@ -167,11 +196,20 @@ export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
                 additionalArugments += ' -d ';
             }
         }
-        if (getProp('CloudLogin.pass').toString() !== '') {
+        if (getProp('CloudLogin.pass')) {
             additionalArugments += ' --pass "' + getProp('CloudLogin.pass') + '"';
         }
         if (getOrganization(true) !== '') {
             additionalArugments += ' --org "' + getOrganization(true) + '"';
+        }
+        if (getProp('Recorder_Use') && getProp('Recorder_Use').toLowerCase() === 'yes') {
+            additionalArugments += ' --showReplay';
+        }
+        if (getProp('Recorder_Do_Record_From_Start') && getProp('Recorder_Do_Record_From_Start').toLowerCase() === 'yes') {
+            globalDoRecord = true;
+        }
+        if(globalDoRecord){
+            additionalArugments += ' --record "' + getProp('Recorder_File_To_Record_To') + '"';
         }
         let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
         // TODO: Don't call tcli again but create a CLIRun Class
