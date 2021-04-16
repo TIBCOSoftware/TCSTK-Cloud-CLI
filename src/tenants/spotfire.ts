@@ -11,55 +11,11 @@ import {CallConfig} from "../models/tcli-models";
 import {SFCopyRequest, SFFolderInfo, SFLibObject, SFType} from "../models/spotfire";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
+import {getProp, prepProp} from "../common/property-file-management";
 
 declare var global: Global;
 
 const CCOM = require('../common/cloud-communications');
-
-let jSession: string;
-let xSRF: string;
-
-
-async function callSpotfire(url: string, doLog?: boolean, conf?: CallConfig): Promise<any> {
-    // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
-    if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
-        if (!jSession || !xSRF) {
-            const originalConf = conf;
-            if (conf) {
-                conf['returnResponse'] = true;
-                conf['handleErrorOutside'] = true;
-            } else {
-                conf = {returnResponse: true, handleErrorOutside: true};
-            }
-            const response = await CCOM.callTCA(url, doLog, conf);
-            const loginCookie = response.headers['set-cookie'];
-            //  logO(DEBUG, loginCookie);
-            jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)![1]!;
-            xSRF = /XSRF-TOKEN=(.*?);/g.exec(loginCookie)![1]!;
-            log(DEBUG, 'Got Spotfire Details] jSession: ', jSession);
-            log(DEBUG, 'Got Spotfire Details]     xSRF: ', xSRF);
-            return callSpotfire(url, doLog, originalConf);
-        } else {
-            const header: any = {};
-            header["cookie"] = "JSESSIONID=" + jSession;
-            header["X-XSRF-TOKEN"] = xSRF;
-            header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
-            conf = {...conf, customHeaders: header};
-            /*
-            if (conf) {
-                conf['customHeaders'] = header;
-            } else {
-                conf = {customHeaders: header};
-            }*/
-            return await CCOM.callTCA(url, doLog, conf);
-        }
-    } else {
-        log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.');
-        process.exit(1);
-    }
-}
-
-
 const SF_TYPES = ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"];
 const SF_FRIENDLY_TYPES: any = {
     'Spotfire Reports': 'spotfire.dxp',
@@ -68,6 +24,20 @@ const SF_FRIENDLY_TYPES: any = {
     'Data files': 'spotfire.sbdf',
     'Data connections': 'spotfire.dataconnection',
     'Library Folders': 'spotfire.folder',
+}
+
+let jSession: string;
+let xSRF: string;
+
+
+function prepSpotfireProps() {
+    // Shared state filter (picked up from configuration if exists)
+    prepProp('Spotfire_Library_Base', '/Teams/~{ORGANIZATION}', '------------------------\n' +
+        '#  SPOTFIRE\n' +
+        '# ------------------------\n' +
+        '# The location in the library to search from.\n' +
+        '#  NOTE: You can use ~{ORGANIZATION}, to use the current organization name in library base.\n' +
+        '#  NOTE: Do not end this folder with a \'/\' character');
 }
 
 async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {
@@ -81,14 +51,13 @@ async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {
 
 // Function to browse spotfire reports
 export async function browseSpotfire() {
+    prepSpotfireProps();
     log(INFO, 'Browsing the Spotfire Library...');
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     let currentFolderID = SFSettings.HomeFolderId;
-    // console.log('Initial Folder ID: ' , SFSettings.HomeFolderId);
     let doBrowse = true;
     while (doBrowse) {
         const sfReports = await getSFolderInfo(currentFolderID);
-        // console.log('sfReports ', sfReports);
         let currentFolder = sfReports.CurrentFolder.Title;
         if (sfReports.CurrentFolder.DisplayPath) {
             currentFolder = sfReports.CurrentFolder.DisplayPath;
@@ -166,6 +135,7 @@ export async function browseSpotfire() {
 
 // Function to browse spotfire reports
 export async function listSpotfire() {
+    prepSpotfireProps();
     log(INFO, 'Listing the Spotfire Library...');
     // Ask for type
     const typeForSearch = await askTypes('What Spotfire Library item type would you like to list ?', true, true);
@@ -186,7 +156,6 @@ export async function listSpotfire() {
 
 
 function getNameForSFType(type: SFType): string {
-    console.log('Getting name for type: ' , type);
     for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
         if (type === SFTypeName) {
             return ReadableName;
@@ -220,7 +189,7 @@ async function askTypes(question: string, doAll?: boolean, doFolders?: boolean):
 
 export async function copySpotfire() {
     log(INFO, 'Copying Spotfire Library Item...');
-    let itemToCopy:SFLibObject;
+    let itemToCopy: SFLibObject;
     let folderIdToCopyTo = '';
     // 1: Ask what type to copy
     const typeForCopy = await askTypes('What Spotfire Library item type would you like to copy ?');
@@ -229,7 +198,6 @@ export async function copySpotfire() {
         // TODO: Should we ask here for folder type
         log(INFO, 'Getting all library items that can be copied...');
         const libTypes = await listOnType(typeForCopy);
-        // console.log(libTypes);
         // 3: Ask which element to copy
         if (libTypes) {
             const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', libTypes.map(v => v.DisplayPath));
@@ -256,11 +224,11 @@ export async function copySpotfire() {
             }) as SFLibObject[];
             if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
                 log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
-                if(itemToCopy.Title !== SFCopy[0].Title){
+                if (itemToCopy.Title !== SFCopy[0].Title) {
                     log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
                 }
             } else {
-                log(ERROR, 'Something went wrong while copying: ' , SFCopy);
+                log(ERROR, 'Something went wrong while copying: ', SFCopy);
             }
         }
     } else {
@@ -289,42 +257,79 @@ export async function renameSpotfireItem() {
 }*/
 
 
+// This function finds the folder details from Spotfire given a path (recursive)
+async function findFolderFromPath(folderInfo: SFFolderInfo, folderPath: string): Promise<SFLibObject | null> {
+    for (const folder of folderInfo.Children) {
+        if (folder.IsFolder) {
+            const pathToCompare = folder.DisplayPath || folder.Path;
+            if (process.stdout && process.stdout.columns) {
+                logLine(' '.repeat(process.stdout.columns));
+            }
+            if (folder.DisplayPath) {
+                logLine('Drilling Down into: ' + pathToCompare);
+            }
+            if (pathToCompare === folderPath) {
+                return folder;
+            } else {
+                const subFolder = await findFolderFromPath(await getSFolderInfo(folder.Id), folderPath);
+                if (subFolder) {
+                    return subFolder;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+// A function that searches though the spotfire lib for a specific type
 async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLibObject[] | null> {
     const doFromRoot = fromRoot || false;
-    // console.log('doFromRoot: ', doFromRoot)
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
-    // console.log(SFSettings);
-
     // Go from Root
     const sfRoot = await getSFolderInfo(SFSettings.rootFolderId);
-    // console.log('sfRoot ', sfRoot);
     let searchFolder = sfRoot;
+    let sfFolderToList;
     if (!doFromRoot) {
-        // Look for Teams
-        for (let folder of sfRoot.Children) {
-            if (folder.IsFolder && folder.Path == '/Teams') {
-                const teamFolders = await getSFolderInfo(folder.Id);
-                for (let teamFolder of teamFolders.Children) {
-                    if (teamFolder.IsFolder && teamFolder.DisplayName) {
-                        if (teamFolder.DisplayName === getOrganization()) {
-                            log(INFO, 'Organization Folder: ' + teamFolder.DisplayName + ' found...');
-                            searchFolder = await getSFolderInfo(teamFolder.Id);
+        if (getProp('Spotfire_Library_Base') !== '/Teams/' + getOrganization()) {
+            let folderToLookFrom = sfRoot;
+            if (getProp('Spotfire_Library_Base').trim() === ''){
+                sfFolderToList = sfRoot.CurrentFolder;
+            } else {
+                // if it is the teams folder, directly look from there
+                if (getProp('Spotfire_Library_Base').startsWith('/Teams')) {
+                    for (let folder of sfRoot.Children) {
+                        if (folder.IsFolder && folder.Path == '/Teams') {
+                            folderToLookFrom = await getSFolderInfo(folder.Id);
+                        }
+                    }
+                }
+                sfFolderToList = await findFolderFromPath(folderToLookFrom, getProp('Spotfire_Library_Base'));
+            }
+        } else {
+            // Look for Teams
+            for (let folder of sfRoot.Children) {
+                if (folder.IsFolder && folder.Path == '/Teams') {
+                    const teamFolders = await getSFolderInfo(folder.Id);
+                    for (let teamFolder of teamFolders.Children) {
+                        if (teamFolder.IsFolder && teamFolder.DisplayName) {
+                            if (teamFolder.DisplayName === getOrganization()) {
+                                log(INFO, 'Organization Folder: ' + teamFolder.DisplayName + ' found...');
+                                searchFolder = await getSFolderInfo(teamFolder.Id);
+                            }
                         }
                     }
                 }
             }
-        }
-        if (searchFolder === sfRoot) {
-            log(ERROR, 'Teams folder not found...');
+            if (searchFolder === sfRoot) {
+                log(ERROR, 'Teams folder not found...');
+            } else {
+                sfFolderToList = searchFolder.CurrentFolder;
+            }
         }
     }
-    // console.log('searchFolder: ', searchFolder)
-    const sfFolderToList = searchFolder.CurrentFolder;
-    // console.log('sfFolderToList: ', sfFolderToList)
-    if (sfFolderToList !== null) {
+    if (sfFolderToList) {
         const items = await iterateItems(sfFolderToList.Id, typeToList);
         console.log('');
-        // console.log(items);
         if (items.length > 0) {
             let tObject = createTable(items, CCOM.mappings.sf_reports, false);
             pexTable(tObject, 'list-spotfire', getPEXConfig(), true);
@@ -337,29 +342,58 @@ async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLib
 }
 
 async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> {
-    // console.log('Finding: ' , type , ' in ', baseFolderId);
     let re: any[] = [];
     const iterateFolder = await getSFolderInfo(baseFolderId);
     for (let itItem of iterateFolder.Children) {
-        // console.log(itItem.ItemType);
         if (itItem.ItemType === type) {
-            // console.log('Found: ' + type);
             if (itItem.DisplayPath) {
                 re.push(itItem);
             }
         }
         if (itItem.IsFolder) {
-            // logLine('                                                                                ');
-
+            const path = itItem.DisplayPath || itItem.Path;
             if (process.stdout && process.stdout.columns) {
                 logLine(' '.repeat(process.stdout.columns));
             }
             if (itItem.DisplayPath) {
-                logLine('Drilling Down into: ' + itItem.DisplayPath);
+                logLine('Drilling Down into: ' + path);
             }
             re = re.concat(await iterateItems(itItem.Id, type));
-            // re.push();
         }
     }
     return re;
+}
+
+
+async function callSpotfire(url: string, doLog?: boolean, conf?: CallConfig): Promise<any> {
+    // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
+    if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
+        if (!jSession || !xSRF) {
+            const originalConf = conf;
+            if (conf) {
+                conf['returnResponse'] = true;
+                conf['handleErrorOutside'] = true;
+            } else {
+                conf = {returnResponse: true, handleErrorOutside: true};
+            }
+            const response = await CCOM.callTCA(url, doLog, conf);
+            const loginCookie = response.headers['set-cookie'];
+            //  logO(DEBUG, loginCookie);
+            jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)![1]!;
+            xSRF = /XSRF-TOKEN=(.*?);/g.exec(loginCookie)![1]!;
+            log(DEBUG, 'Got Spotfire Details] jSession: ', jSession);
+            log(DEBUG, 'Got Spotfire Details]     xSRF: ', xSRF);
+            return callSpotfire(url, doLog, originalConf);
+        } else {
+            const header: any = {};
+            header["cookie"] = "JSESSIONID=" + jSession;
+            header["X-XSRF-TOKEN"] = xSRF;
+            header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
+            conf = {...conf, customHeaders: header};
+            return await CCOM.callTCA(url, doLog, conf);
+        }
+    } else {
+        log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.');
+        process.exit(1);
+    }
 }

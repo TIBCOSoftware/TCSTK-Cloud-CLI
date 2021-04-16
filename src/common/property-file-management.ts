@@ -2,7 +2,7 @@ import {
     col,
     copyFile,
     createTableValue,
-    doesFileExist,
+    doesFileExist, getOrganization,
     getPEXConfig,
     isOauthUsed,
     pexTable,
@@ -96,6 +96,14 @@ export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefre
                 setOAUTHDetails(parseOAUTHToken(orgOInfo, false));
             }
         }
+    }
+    // Adding organization name as global
+    if (re && re.toLowerCase().indexOf('~{organization}') > 0) {
+        if (getOrganization()) {
+            // await CCOM.showCloudInfo(false);
+            re = re.replace(/~{organization}/ig, getOrganization());
+        }
+
     }
     log(DEBUG, 'Returning Property [END]: ', re);
     return re;
