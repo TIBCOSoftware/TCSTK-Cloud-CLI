@@ -163,30 +163,34 @@ export async function copySpotfire() {
             // 4: List all folders
             log(INFO, 'Getting all library folders that the item can be copied to...');
             const sfFolders = await listOnType('spotfire.folder', true);
-            // 5: Ask what folder to copy to
-            log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
-            const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders!.map(v => v.DisplayPath));
-            // 6: Get the folder ID
-            folderIdToCopyTo = sfFolders!.find(v => v.DisplayPath === folderToCopyTo)!.Id;
-            const copyRequest: SFCopyRequest = {
-                itemsToCopy: [itemToCopy.Id],
-                destinationFolderId: folderIdToCopyTo,
-                conflictResolution: 'KeepBoth'
-            }
-            if (!copyRequest['conflictResolution']) {
-                copyRequest['conflictResolution'] = 'KeepBoth';
-            }
-            const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
-                method: 'POST',
-                postRequest: copyRequest
-            }) as SFLibObject[];
-            if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
-                log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
-                if (itemToCopy.Title !== SFCopy[0].Title) {
-                    log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
+            if(sfFolders) {
+                // 5: Ask what folder to copy to
+                log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
+                const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
+                // 6: Get the folder ID
+                folderIdToCopyTo = sfFolders!.find(v => v.DisplayPath === folderToCopyTo)!.Id;
+                const copyRequest: SFCopyRequest = {
+                    itemsToCopy: [itemToCopy.Id],
+                    destinationFolderId: folderIdToCopyTo,
+                    conflictResolution: 'KeepBoth'
+                }
+                if (!copyRequest['conflictResolution']) {
+                    copyRequest['conflictResolution'] = 'KeepBoth';
+                }
+                const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
+                    method: 'POST',
+                    postRequest: copyRequest
+                }) as SFLibObject[];
+                if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
+                    log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
+                    if (itemToCopy.Title !== SFCopy[0].Title) {
+                        log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
+                    }
+                } else {
+                    log(ERROR, 'Something went wrong while copying: ', SFCopy);
                 }
             } else {
-                log(ERROR, 'Something went wrong while copying: ', SFCopy);
+                log(ERROR, 'No target folders available for copying, create a folder first');
             }
         }
     } else {
@@ -334,7 +338,7 @@ async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLib
     // Go from Root
     const sfRoot = await getSFolderInfo(SFSettings.rootFolderId);
     let searchFolder = sfRoot;
-    let sfFolderToList;
+    let sfFolderToList: null | SFLibObject = sfRoot.CurrentFolder;
     if (!doFromRoot) {
         if (getProp('Spotfire_Library_Base') !== '/Teams/' + getOrganization()) {
             let folderToLookFrom = sfRoot;

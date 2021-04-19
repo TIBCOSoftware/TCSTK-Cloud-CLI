@@ -1,6 +1,7 @@
 import {col} from "./common-functions";
 import _ from "lodash";
 import {DEBUG, ERROR, INFO, log, logO} from "./logging";
+import {getPropFileName, replaceAtSign, replaceGlobal} from "./property-file-management";
 
 // function to ask a question
 export async function askQuestion(question: string, type = 'input') {
@@ -133,7 +134,8 @@ export function setGlobalAnswers(answers: string) {
 export function getLastGlobalAnswer(question: string) {
     let re = '';
     if (globalAnswers && globalAnswers.length > 0) {
-        re = globalAnswers.shift()!;
+        re = replaceAtSign(globalAnswers.shift()!, getPropFileName());
+        re = replaceGlobal(re);
         log(INFO, 'Injected answer: ', col.blue(re), ' For question: ', question);
     } else {
         log(ERROR, 'No answer left for question: ' + question);

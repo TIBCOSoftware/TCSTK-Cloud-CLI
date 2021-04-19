@@ -168,6 +168,8 @@
 
 [copy-spotfire-library-item](./copy-spotfire-library-item.md) - Copies a Spotfire Library Item (a DXP for example) from one place to another (possibly between organizations).
 
+[create-spotfire-library-folder](./create-spotfire-library-folder.md) - Creates a new Library Folder.
+
 
 ## oauth
 

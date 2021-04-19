@@ -135,25 +135,6 @@ function createNewStarter(name:string, template:Template, doStart:boolean) {
     }
 }
 
-// function to get git repo
-/*
-function getGit(source, target, tag) {
-    log(INFO, 'Getting GIT) Source: ' + source + ' Target: ' + target + ' Tag: ' + tag);
-    if (tag == null || tag === 'LATEST' || tag === '') {
-        run('git clone "' + source + '" "' + target + '" ');
-    } else {
-        run('git clone "' + source + '" "' + target + '" -b ' + tag);
-    }
-}*/
-
-// Function to copy a directory
-/*
-function copyDir(fromDir, toDir) {
-    const fseA = require('fs-extra');
-    log(DEBUG, 'Copying Directory from: ' + fromDir + ' to: ' + toDir);
-    fseA.copySync(fromDir, toDir, {overwrite: true});
-}*/
-
 // Function to manage the global configuration
 export async function manageGlobalConfig() {
     // Set the props to use global

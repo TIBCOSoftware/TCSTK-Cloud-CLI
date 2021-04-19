@@ -35,6 +35,8 @@ export function getPropFileName() {
     return LOCALPropertyFileName;
 }
 
+let MEMORYPass:string;
+
 // Function to set a property (in memory)
 export function setProperty(name: string, value: string) {
     //console.log('BEFORE propsGl: ' , propsGl);
@@ -43,6 +45,9 @@ export function setProperty(name: string, value: string) {
         propsGl = {};
     }
     set(name, value, propsGl);
+    if(name === 'CloudLogin.pass'){
+        MEMORYPass = value;
+    }
     //console.log('AFTER propsGl: ' , propsGl);
 }
 
@@ -97,14 +102,11 @@ export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefre
             }
         }
     }
-    // Adding organization name as global
-    if (re && re.toLowerCase().indexOf('~{organization}') > 0) {
-        if (getOrganization()) {
-            // await CCOM.showCloudInfo(false);
-            re = re.replace(/~{organization}/ig, getOrganization());
-        }
-
+    if(propName === 'CloudLogin.pass' && MEMORYPass) {
+        re = MEMORYPass;
     }
+    // Adding organization name as global
+    re = replaceGlobal(re);
     log(DEBUG, 'Returning Property [END]: ', re);
     return re;
 }
@@ -551,4 +553,43 @@ export function showPropertiesTable() {
         // Print table
         pexTable(nvs, 'tibco-cloud-properties', getPEXConfig(), true);
     }
+}
+
+
+export function replaceAtSign(content: string, propFile: string) {
+    if (content && content.includes('@{') && content.includes('}')) {
+        const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
+        log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
+        content = content.replace(/@{.*?\}/, getPropFromFile(subProp, propFile));
+        log(DEBUG, 'Replaced: ' + content);
+        content = replaceAtSign(content, propFile);
+    }
+    return content;
+}
+
+export function replaceGlobal(content: string) {
+    if (content && content.includes('~{') && content.includes('}')) {
+        const GlobalProp = content.substring(content.indexOf('~{') + 2, content.indexOf('~{') + 2 + content.substring(content.indexOf('~{') + 2).indexOf('}'));
+        log(INFO, 'Looking for Global: |' + GlobalProp + '| on: |' + content );
+        switch(GlobalProp.toLowerCase()) {
+            case 'organization':
+                content = content.replace(/~{.*?\}/, getOrganization());
+                break;
+            // TODO: Add other globals here
+            default:
+                log(WARNING, 'Global: ' + GlobalProp + ' not found');
+        }
+        log(INFO, 'Replaced: ' + content);
+        // content = replaceGlobal(content);
+    }
+    return content;
+}
+
+export function getPropFromFile(property: string, file: string) {
+    log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
+    const PropertiesReader = require('properties-reader');
+    const propsToGet = PropertiesReader(file).path();
+    const re = _.get(propsToGet, property);
+    log(DEBUG, 'Returning Property(' + property + '): ', re);
+    return re;
 }

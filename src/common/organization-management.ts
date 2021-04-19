@@ -79,7 +79,7 @@ export async function changeOrganization(accountId?: string) {
     if (currentAccount.accountId === orgAccountId) {
         log(ERROR, 'You are already in the organization: ', currentAccount.displayName);
     } else {
-        log(INFO, 'Changing Organization to: ', col.blue(orgAccountId));
+        log(DEBUG, 'Changing Organization to: ', col.blue(orgAccountId));
         // Get the clientID for that organization
         const clientID = await getClientIDforOrg(orgAccountId)
         // console.log('Client ID: ' + clientID);

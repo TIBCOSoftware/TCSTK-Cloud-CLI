@@ -8,7 +8,7 @@ import {
 } from "./common/common-functions";
 import {TCLITask} from "./models/tcli-models";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "./common/user-interaction";
-import {addOrUpdateProperty} from "./common/property-file-management";
+import {addOrUpdateProperty, replaceAtSign} from "./common/property-file-management";
 import {parseOAUTHToken} from "./common/oauth";
 import {DEBUG, ERROR, INFO, log, WARNING} from "./common/logging";
 
@@ -370,22 +370,4 @@ function replaceDollar(content: string) {
     return content;
 }
 
-function replaceAtSign(content: string, propFile: string) {
-    if (content.includes('@{') && content.includes('}')) {
-        const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
-        log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
-        content = content.replace(/@{.*?\}/, getPropFromFile(subProp, propFile));
-        log(DEBUG, 'Replaced: ' + content);
-        content = replaceAtSign(content, propFile);
-    }
-    return content;
-}
 
-function getPropFromFile(property: string, file: string) {
-    log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
-    const PropertiesReader = require('properties-reader');
-    const propsToGet = PropertiesReader(file).path();
-    const re = _.get(propsToGet, property);
-    log(DEBUG, 'Returning Property(' + property + '): ', re);
-    return re;
-}

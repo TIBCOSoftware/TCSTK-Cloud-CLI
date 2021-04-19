@@ -125,7 +125,7 @@ export async function cLogin(tenant?: string, customLoginURL?: string, forceClie
                 log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ');
                 isOAUTHValid = false;
                 if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
-                    const tempPass = await askQuestion('Provide your password to Continue: ', 'password');
+                    const tempPass = await askQuestion('Temporary, provide your password to Continue: ', 'password');
                     // console.log('SETTING PASS');
                     setProperty('CloudLogin.pass', obfuscatePW(tempPass));
                 }
@@ -150,7 +150,6 @@ export async function cLogin(tenant?: string, customLoginURL?: string, forceClie
         }
         if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
             const tempPass = await askQuestion('Provide your password to Continue: ', 'password');
-            // console.log('SETTING PASS');
             setProperty('CloudLogin.pass', obfuscatePW(tempPass));
         }
         let setLoginURL = 'https://' + getCurrentRegion() + clURI.login;
