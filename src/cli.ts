@@ -300,6 +300,7 @@ export async function cli(args: any) {
             let taskExist = false;
             let directTask = false;
             let directTaskMethod = '';
+            let directTaskName = options.task;
             for (const cliTask of taskArray) {
                 if (cliTask === options.task) {
                     taskExist = true;
@@ -315,6 +316,7 @@ export async function cli(args: any) {
                                 if (taskTemp.task) {
                                     directTask = true;
                                     directTaskMethod = taskTemp.task;
+                                    directTaskName = cliTask;
                                     log(INFO, 'Task: ' + options.task + ' --> ' + col.blue(cliTask));
                                 }
                             }
@@ -342,7 +344,8 @@ export async function cli(args: any) {
                     try {
                         await tasks[directTaskMethod]();
                         // Task has run, if we haven't specified global answers upfront then display answers for next time
-                        if (!isGlobalAnswersUsed() && options.showReplay) {
+                        // Do not record the obfuscate password task
+                        if (!isGlobalAnswersUsed() && (options.showReplay || options.record) && directTaskName !== 'obfuscate-password') {
                             let taskCommand = 'tcli ' + options.task + ' ';
                             let answers = '';
                             getGivenAnswers().forEach(ans => {

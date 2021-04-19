@@ -141,7 +141,7 @@ export async function getSharedState(showTable?: boolean) {
 }
 
 
-async function selectSharedState(sharedStateEntries: any[], question: string) {
+export async function selectSharedState(sharedStateEntries: any[], question: string) {
     // console.log('Shared State Entries: ' , sharedStateEntries);
     const stateNames = [];
     for (const state of sharedStateEntries) {

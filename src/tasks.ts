@@ -18,7 +18,7 @@ import {
 import {Global} from "./models/base";
 import {TCLITask} from "./models/tcli-models";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./common/user-interaction";
-import {getProp, getPropFileName, setProperty} from "./common/property-file-management";
+import {addOrUpdateProperty, getProp, getPropFileName, setProperty} from "./common/property-file-management";
 import {DEBUG, ERROR, INFO, log, RECORDER, setLogDebug, throb} from "./common/logging";
 import {prepRecorderProps} from "./common/recorder";
 
@@ -375,8 +375,14 @@ export async function showOrganizationWrapper() {
 
 export async function obfuscate() {
     const password = await askQuestion('Please provide the password...', 'password');
-    // Getting this fromo common
-    console.log('\nObfuscated password is is: ' + obfuscatePW(password));
+    // Getting this from common
+    const decision = await askMultipleChoiceQuestion('Do you want to update your cloud property file ?', ['YES', 'NO']);
+    const obPW = obfuscatePW(password);
+    if(decision.toLowerCase() === 'yes'){
+        addOrUpdateProperty(getPropFileName(), 'CloudLogin.pass' , obPW);
+    } else {
+        log(INFO, 'Obfuscated password is: ' + col.blue(obPW));
+    }
 }
 
 export function viewGlobalConfig() {
@@ -399,7 +405,7 @@ export function replaceStringInFileOne(prefix: string) {
     } else {
         rFrom = rFrom.trim();
         rTo = rTo.trim();
-        log(INFO, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ', rPat);
+        log(DEBUG, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ', rPat);
         replaceInFile(rFrom, rTo, rPat);
     }
 }

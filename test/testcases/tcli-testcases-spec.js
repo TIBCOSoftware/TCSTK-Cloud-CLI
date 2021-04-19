@@ -61,7 +61,8 @@ describe("tcli testsuite", function () {
     it("TCLI: Basic Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:YES')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:NO')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
@@ -81,7 +82,8 @@ describe("tcli testsuite", function () {
     it("TCLI: More Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:YES')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:NO')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-live-apps-sandbox')).toBe(true);
 
@@ -288,6 +290,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Shared_State_Type:none:PUBLIC')).toBe(true);
         expect(run(CLI_EXECUTOR + 'create-shared-state-entry -a Jasmine.TEST')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-shared-state-details -a Jasmine.TEST.PUBLIC')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a "DEFAULT:SS_ID:none:SPECIAL:Shared_StateID:Jasmine.TEST.PUBLIC"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'clear-shared-state-entry -a Jasmine.TEST.PUBLIC:YES')).toBe(true);
 
         // ERROR
@@ -392,6 +395,7 @@ describe("tcli testsuite", function () {
     it("TCLI: Add Properties", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:SandboxID')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Org_Name:none:SPECIAL:Organization_Name')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Test:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:AppID:none:SPECIAL:LiveApps_AppID:Discovercompliance')).toBe(true);
         // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:ActionID1:none:SPECIAL:LiveApps_ActionID:none')).toBe(true);

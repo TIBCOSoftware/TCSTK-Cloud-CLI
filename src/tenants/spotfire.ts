@@ -30,7 +30,7 @@ let jSession: string;
 let xSRF: string;
 
 
-function prepSpotfireProps() {
+export function prepSpotfireProps() {
     // Shared state filter (picked up from configuration if exists)
     prepProp('Spotfire_Library_Base', '/Teams/~{ORGANIZATION}', '------------------------\n' +
         '#  SPOTFIRE\n' +
@@ -332,7 +332,7 @@ async function findFolderFromPath(folderInfo: SFFolderInfo, folderPath: string):
 }
 
 // A function that searches though the spotfire lib for a specific type
-async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLibObject[] | null> {
+export async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLibObject[] | null> {
     const doFromRoot = fromRoot || false;
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     // Go from Root

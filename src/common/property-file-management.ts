@@ -13,8 +13,11 @@ import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion}
 import {getClientIDforOrg, getOrganizations} from "./organization-management";
 import {DEBUG, ERROR, INFO, log, WARNING} from "./logging";
 import {getOAUTHDetails, parseOAUTHToken, setOAUTHDetails} from "./oauth";
+import {getSharedState, selectSharedState} from "../tenants/shared-state";
+import {listOnType, prepSpotfireProps} from "../tenants/spotfire";
 const LA = require('../tenants/live-apps');
 const _ = require('lodash');
+const CCOM = require('./cloud-communications');
 
 let globalProperties: any;
 let propsGl:any;
@@ -189,6 +192,14 @@ export function addOrUpdateProperty(location: string, property: string, value: s
                 }
                 if (property === 'CloudLogin.OAUTH_Token') {
                     log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[NEW OAUTH TOKEN]') + ' (in:' + location + ')');
+                    doLog = false;
+                }
+                if (property === 'CloudLogin.pass') {
+                    if(typeof value === "string" && (value.startsWith('@#') || value.startsWith('#'))){
+                        log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[OBFUSCATED PASSWORD]') + ' (in:' + location + ')');
+                    } else {
+                        log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[PLAIN PASSWORD]') + ' (in:' + location + ')');
+                    }
                     doLog = false;
                 }
                 if (doLog){
@@ -386,12 +397,18 @@ export async function updateProperty() {
     let pValue = await askQuestion('What value would you like to add ? (use ' + SPECIAL + ' to select from a list)');
     if (pValue.toUpperCase() === SPECIAL) {
         // TODO: Add Cloud Starter Link, FlogoAppId,
-        const vTChoices = ['SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID'];
+        const vTChoices = ['Organization_Name', 'SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID', 'Shared_StateID', 'Spotfire_FolderPath'];
         const vType = await askMultipleChoiceQuestion('What type of answer would you like to add to the property ?', vTChoices);
-        if (vType === 'SandboxID') {
+        if (vType.toLowerCase() === 'organization_name') {
+            if(!getOrganization()){
+                await CCOM.callTCA(CCOM.clURI.claims);
+            }
+            pValue = getOrganization();
+        }
+        if (vType.toLowerCase() === 'sandboxid') {
             pValue = await LA.getProductionSandbox();
         }
-        if (vType === 'LiveApps_AppID' || vType === 'LiveApps_ActionID') {
+        if (vType.toLowerCase() === 'liveapps_appid' || vType.toLowerCase() === 'liveapps_actionid') {
             const apps = await LA.showLiveApps(true, false);
             let laAppNameA = ['NONE'].concat(apps.map((v: any) => v.name));
             let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA);
@@ -404,10 +421,10 @@ export async function updateProperty() {
                     log(ERROR, 'App not found: ' + laAppD);
                     doUpdate = false;
                 }
-                if (doUpdate && vType === 'LiveApps_AppID') {
+                if (doUpdate && vType.toLowerCase() === 'liveapps_appid') {
                     pValue = laApp.applicationId
                 }
-                if (doUpdate && vType === 'LiveApps_ActionID') {
+                if (doUpdate && vType.toLowerCase() === 'liveapps_actionid') {
                     let laActions = [{name: 'NONE'}].concat(LA.stripLiveAppsActions(laApp));
                     // console.log(laActions);
                     log(INFO, 'Live Apps Actions: ');
@@ -428,6 +445,29 @@ export async function updateProperty() {
                 }
             }
         }
+        if (vType.toLowerCase() === 'spotfire_folderpath') {
+            prepSpotfireProps();
+            const sfFolderList = await listOnType('spotfire.folder', false);
+            if (sfFolderList && sfFolderList.length > 0) {
+                // Pick Item from the list
+                let selectedFolder = await askMultipleChoiceQuestionSearch('For which folder would you like to store the Folder Path ?', sfFolderList.map(v => v.DisplayPath));
+                pValue = sfFolderList.find(v => v.DisplayPath === selectedFolder)!.Path;
+            } else {
+                log(ERROR, 'No shared states to get the ID from, consider looking at your Shared_State_Filter setting...');
+            }
+        }
+
+        if (vType.toLowerCase() === 'shared_stateid') {
+            const sStateList = await getSharedState(true);
+            if (sStateList.length > 0) {
+                // Pick Item from the list
+                let selectedState: any = await selectSharedState(sStateList, 'For which Shared State Entry would you like to store the ID ?');
+                pValue = selectedState.id;
+            } else {
+                log(ERROR, 'No shared states to get the ID from, consider looking at your Shared_State_Filter setting...');
+            }
+        }
+
     }
     if (doUpdate) {
         let checkForGlobal = false;
