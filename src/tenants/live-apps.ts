@@ -1,6 +1,6 @@
 import {
     col,
-    copyFile, createTable, doesFileExist, getOrganization, getPEXConfig,
+    copyFile, createTable, doesFileExist, getCurrentRegion, getOrganization, getPEXConfig,
     mkdirIfNotExist,
     pexTable, sleep
 } from "../common/common-functions";
@@ -88,26 +88,53 @@ export async function showLiveApps(doShowTable: boolean, doCountCases: boolean):
     return caseTypes;
 }
 
-async function getLiveAppsDesignTime() {
-
-    if(getProp('LiveApps_Master_Account_Token')){
-        // TODO: Hier verder
+async function getLiveAppsDesignTime(): Promise<LADesignTimeApp[]> {
+    let re;
+    if (getProp('LiveApps_Master_Account_Token')) {
+        re = await CCOM.callTCA(CCOM.clURI.la_design, false, {
+            forceOAUTH: true,
+            manualOAUTH: getProp('LiveApps_Master_Account_Token')
+        }) as LADesignTimeApp[];
+    } else {
+        re = await CCOM.callTCA(CCOM.clURI.la_design) as LADesignTimeApp[];
     }
+    return re;
+}
 
-    return await CCOM.callTCA(CCOM.clURI.la_design) as LADesignTimeApp[];
+// A function to get the master or name (only if LiveApps_Master_Account_Token is set)
+async function getMasterOrgName() {
+    let re = '';
+    if (getProp('LiveApps_Master_Account_Token')) {
+        const accInfo = await CCOM.callTCA(CCOM.clURI.account_info, false, {
+            forceOAUTH: true,
+            manualOAUTH: getProp('LiveApps_Master_Account_Token'),
+            tenant: 'TSC',
+            customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
+        })
+        if (accInfo && accInfo.selectedAccount && accInfo.selectedAccount.displayName) {
+            re = accInfo.selectedAccount.displayName;
+        }
+    }
+    return re;
 }
 
 // TODO: Add option to show details
 // Function to show and return all the design time apps of LiveApps
 export async function showLiveAppsDesign(doShowTable?: boolean) {
-
-
-
-    const laDesignApps = await getLiveAppsDesignTime();
+    let laDesignApps = await getLiveAppsDesignTime();
+    if (getProp('LiveApps_Master_Account_Token')) {
+        if (doShowTable) {
+            log(INFO, 'MASTER ACCOUNT(' + (await getMasterOrgName()) + ') APPS: ');
+        }
+        const laDesignAppsTable = createTable(laDesignApps, CCOM.mappings.la_design_apps, false)
+        pexTable(laDesignAppsTable, 'live-apps-design-apps-master', getPEXConfig(), true);
+        laDesignApps = await CCOM.callTCA(CCOM.clURI.la_design) as LADesignTimeApp[];
+    }
     if (doShowTable) {
         const laDesignAppsTable = createTable(laDesignApps, CCOM.mappings.la_design_apps, false)
         pexTable(laDesignAppsTable, 'live-apps-design-apps', getPEXConfig(), true);
     }
+    // Always returns the apps of the current org
     return laDesignApps;
 }
 
@@ -174,7 +201,7 @@ const storeOptions = {spaces: 2, EOL: '\r\n'};
 export async function exportLiveAppsCaseType() {
     await checkCaseFolder();
     const cTypes = await showLiveApps(true, false);
-    const cTypeArray = cTypes.map( app => app.name);
+    const cTypeArray = cTypes.map(app => app.name);
     /*
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
@@ -207,7 +234,7 @@ export async function exportLiveAppsData() {
     await checkCaseFolder();
     const cTypes = await showLiveApps(true, true);
     // let cTypeArray = [];
-    const cTypeArray = cTypes.map( app => app.name);
+    const cTypeArray = cTypes.map(app => app.name);
     /*
     for (const curCase in cTypes) {
         cTypeArray.push(cTypes[curCase].name);
@@ -499,7 +526,7 @@ export async function importLiveAppsData() {
                         method: 'POST',
                         postRequest: postRequest
                     });
-                    log(DEBUG, 'Response: ' , response);
+                    log(DEBUG, 'Response: ', response);
                 }
                 if (stepConf.type.toString().toLowerCase() === 'validate') {
                     // TODO: Add this to config: "fail-on-validation-error": true,
@@ -563,55 +590,121 @@ export async function importLiveAppsData() {
 // Function to copy LiveApps application between organizations
 export async function copyLiveApps() {
     log(INFO, 'Copying LiveApps Application between organizations...');
+    let doCopyFromMaster = false;
+    let appQuestion = 'Which LiveApps Application would you like to copy between organizations ?';
+    let masterOrgName;
+    if (getProp('LiveApps_Master_Account_Token')) {
+        doCopyFromMaster = true;
+        masterOrgName = await getMasterOrgName();
+        appQuestion = 'Which LiveApps Application would you like to copy from the MASTER(' + col.blue(masterOrgName) + ') Organization to Your Organization ?';
+
+    }
     // Step 1: Display the current LiveApps Apps
-    const laApps = await showLiveAppsDesign(true);
+    await showLiveAppsDesign(true);
+    const laApps = await getLiveAppsDesignTime();
     // Step 2: Select a LiveApps App (and it's id)
-    const laAppNameToCopy = await askMultipleChoiceQuestionSearch('Which LiveApps Application would you like to copy between organizations?', ['NONE', ...laApps.map((v: { name: string; }) => v.name)]);
+    const laAppNameToCopy = await askMultipleChoiceQuestionSearch(appQuestion, ['NONE', ...laApps.map((v: { name: string; }) => v.name)]);
     if (laAppNameToCopy.toLowerCase() !== 'none') {
         const laAppToCopy = laApps.find(v => v.name === laAppNameToCopy);
         // Step 3: Display all organizations (preferably the ones that have LiveApps)
-        // Step 4: Select a target organization
-        const targetOrgInfo = await displayOrganizations(true, true, 'To which organization would you like to copy ' + laAppToCopy!.name + ' ?')
-        // console.log(targetOrgInfo);
-        if (laAppToCopy && laAppToCopy.latestVersionId && targetOrgInfo && targetOrgInfo.accountDisplayName) {
-            const targetOrgName = targetOrgInfo.accountDisplayName;
-            // Step 5: Send a share command to the current organization
-            const shareReq = {
-                message: "Application shared through tcli",
-                disableEmailNotification: true,
-                recipients: [getProp('CloudLogin.email')]
+        if (!doCopyFromMaster) {
+            // Step 4: Select a target organization
+            const targetOrgInfo = await displayOrganizations(true, true, 'To which organization would you like to copy ' + laAppToCopy!.name + ' ?')
+            // console.log(targetOrgInfo);
+            if (laAppToCopy && laAppToCopy.latestVersionId && targetOrgInfo && targetOrgInfo.accountDisplayName) {
+                const targetOrgName = targetOrgInfo.accountDisplayName;
+                // Step 5: Send a share command to the current organization
+                const shareReq = {
+                    message: "Application shared through tcli",
+                    disableEmailNotification: true,
+                    recipients: [getProp('CloudLogin.email')]
+                }
+                const shareRes = await CCOM.callTCA(CCOM.clURI.la_design_apps + '/' + laAppToCopy.latestVersionId + '/applicationShare', false, {
+                    method: 'POST',
+                    postRequest: shareReq
+                });
+                log(INFO, 'Application shared on current organization with id:', col.blue(shareRes));
+                // Step 6: Switch to the target organization
+                const currentOrgInfo = await getCurrentOrganizationInfo();
+                log(INFO, '    Current Organization: ', col.blue(currentOrgInfo.displayName));
+                log(INFO, 'Changing to Organization: ', col.blue(targetOrgInfo.accountDisplayName));
+                await changeOrganization(targetOrgInfo.accountId);
+
+                // TODO: Check if the app does not exist already
+
+                // Step 7: Receive the LiveApps App
+                const receiveRes = await receiveLApp(shareRes);
+                // Step 8: Switch back to the original organization
+                await changeOrganization(currentOrgInfo.accountId);
+                if (receiveRes) {
+                    await showLiveAppsDesign(true);
+                    log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' + receiveRes + ')');
+                } else {
+                    log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' to ' + targetOrgName);
+                }
             }
-            const shareRes = await CCOM.callTCA(CCOM.clURI.la_design_apps + '/' + laAppToCopy.latestVersionId + '/applicationShare', false, {
-                method: 'POST',
-                postRequest: shareReq
-            });
-            log(INFO, 'Application shared on current organization with id:', col.blue(shareRes));
-            // Step 6: Switch to the target organization
-            const currentOrgInfo = await getCurrentOrganizationInfo();
-            log(INFO, '    Current Organization: ', col.blue(currentOrgInfo.displayName));
-            log(INFO, 'Changing to Organization: ', col.blue(targetOrgInfo.accountDisplayName));
-            await changeOrganization(targetOrgInfo.accountId);
-            // Step 7: Receive the LiveApps App
-            const receiveReq = {
-                shareId: shareRes,
-                governanceState: "PUBLISHED"
+        } else {
+            // Check if the application exists already.
+            const masterApplications = await getLiveAppsDesignTime();
+            const currentOrgApplications = await showLiveAppsDesign(false);
+            let doCopy = true;
+            if (masterApplications && masterApplications.length > 0 && currentOrgApplications && currentOrgApplications.length > 0) {
+                let appExist = false
+                for (const cuApp of currentOrgApplications) {
+                    if (laAppNameToCopy === cuApp.name) {
+                        appExist = true;
+                    }
+                }
+                if(appExist) {
+                    const copyAns = await askMultipleChoiceQuestion('An app with the name ' + col.blue(laAppNameToCopy) + ' already exists in the current organization, are you sure you want to copy (the new app will get different name) ?', ['YES', 'NO']);
+                    if (copyAns.toLowerCase() === 'no') {
+                        doCopy = false;
+                    }
+                }
             }
-            const receiveRes = await CCOM.callTCA(CCOM.clURI.la_design_apps, false, {
-                method: 'POST',
-                postRequest: receiveReq
-            });
-            // Step 8: Switch back to the original organization
-            await changeOrganization(currentOrgInfo.accountId);
-            if (receiveRes) {
-                log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' + receiveRes + ')');
+            if (doCopy) {
+                // Copy from master
+                if (laAppToCopy && laAppToCopy.latestVersionId) {
+                    const shareReq = {
+                        message: "Application shared through tcli",
+                        disableEmailNotification: true,
+                        recipients: [getProp('CloudLogin.email')]
+                    }
+                    const shareRes = await CCOM.callTCA(CCOM.clURI.la_design_apps + '/' + laAppToCopy.latestVersionId + '/applicationShare', false, {
+                        method: 'POST',
+                        postRequest: shareReq,
+                        forceOAUTH: true,
+                        manualOAUTH: getProp('LiveApps_Master_Account_Token')
+                    });
+                    log(INFO, 'Application shared from MASTER(' + col.blue(masterOrgName) + ') with id:', col.blue(shareRes));
+                    const receiveRes = await receiveLApp(shareRes);
+                    if (receiveRes) {
+                        await showLiveAppsDesign(true);
+                        log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' from the MASTER(' + col.blue(masterOrgName) + ') Org (new id: ' + receiveRes + ')');
+                    } else {
+                        log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' from the MASTER(' + col.blue(masterOrgName) + ') Org ');
+                    }
+                } else {
+                    log(ERROR, 'No App to copy: ', laAppToCopy)
+                }
             } else {
-                log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' to ' + targetOrgName);
+                log(INFO, 'OK, I won\'t do anything :-)');
             }
         }
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
+}
 
+async function receiveLApp(shareRes: number) {
+    const receiveReq = {
+        shareId: shareRes,
+        governanceState: "PUBLISHED"
+    }
+    return await CCOM.callTCA(CCOM.clURI.la_design_apps, false, {
+        method: 'POST',
+        postRequest: receiveReq
+    });
 }
 
 // Function to

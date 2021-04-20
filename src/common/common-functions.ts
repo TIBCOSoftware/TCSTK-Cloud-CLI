@@ -233,7 +233,7 @@ export async function updateCloudLogin(propFile: string, forceRefresh?: boolean,
         let oKey = await askQuestion('Provide the initial OAUTH Key:');
         addOrUpdateProperty(propFile, 'CloudLogin.OAUTH_Token', oKey);
         // Get the email from claims
-        const claims = await callTCA(clURI.claims, true, {forceOAUTH: true, manualOAUTH: oKey});
+        const claims = await callTCA(clURI.claims, false, {forceOAUTH: true, manualOAUTH: oKey});
         addOrUpdateProperty(propFile, 'CloudLogin.email', claims.email);
         const email = getProp('CloudLogin.email', true);
         log(INFO, 'Updated email: ' + email);
