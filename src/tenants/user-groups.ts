@@ -1,23 +1,28 @@
 import {
     col,
-    createTable,
+    createTable, doesExist,
     getPEXConfig,
     iterateTable,
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {INFO, log} from "../common/logging";
+import {LAGroup} from "../models/live-apps";
 
 const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
 
+
+export async function getGroups(): Promise<LAGroup[]> {
+    return await CCOM.callTCA(CCOM.clURI.la_groups) as LAGroup[];
+}
 
 export async function getGroupsTable(showTable?:boolean): Promise<any> {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
     }
-    const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups);
+    const oResponse = await getGroups();
     const groupTable = createTable(oResponse, CCOM.mappings.la_groups, false);
     pexTable(groupTable, 'live-apps-groups', getPEXConfig(), doShowTable);
     return groupTable;
@@ -54,15 +59,18 @@ export async function createLiveAppsGroup():Promise<void> {
     log(INFO, 'Creating LiveApps Group...');
     const gName = await askQuestion('What is the name of the group you would like to create ? (use "NONE" or press enter to not create a group)');
     if (gName !== '' || gName.toLowerCase() !== 'none') {
-        const gDescription = await askQuestion('What is the description of the group  ? (press enter to leave blank)');
-        const postGroup = {
-            "name": gName,
-            "description": gDescription,
-            "type": "SubscriptionDefined"
-        };
-        const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups, false ,{method: 'POST',  postRequest: postGroup} );
-        if (oResponse != null) {
-            log(INFO, 'Successfully created group with ID: ', oResponse);
+        const groups = await getGroups();
+        if(!doesExist(groups.map( g => g.name), gName, `The group ${gName} already exists, we will not try to create it again...`)) {
+            const gDescription = await askQuestion('What is the description of the group  ? (press enter to leave blank)');
+            const postGroup = {
+                "name": gName,
+                "description": gDescription,
+                "type": "SubscriptionDefined"
+            };
+            const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups, false, {method: 'POST', postRequest: postGroup});
+            if (oResponse != null) {
+                log(INFO, 'Successfully created group with ID: ', col.green(oResponse));
+            }
         }
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');

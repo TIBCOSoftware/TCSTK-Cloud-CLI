@@ -461,6 +461,15 @@ export function doesFileExist(checkFile: string) {
     }
 }
 
+// Function that checks if something exists in an array and return false if so and displays a warning message
+export function doesExist(array: string[], item:string, message:string ):boolean {
+    const re = array.indexOf(item) >= 0;
+    if(re){
+        log(WARNING, message);
+    }
+    return re;
+}
+
 export async function isPortAvailable(port: string | number) {
     log(DEBUG, 'Checking Port Availability: ' + port);
     const tcpPortUsed = require('tcp-port-used');

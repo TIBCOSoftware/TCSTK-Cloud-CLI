@@ -1,12 +1,12 @@
 import {
     col,
-    createTable, getOrganization, getPEXConfig,
+    createTable, doesExist, getOrganization, getPEXConfig,
     iterateTable,
     mkdirIfNotExist,
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
-import {ERROR, INFO, log, logLine, WARNING} from "../common/logging";
+import {ERROR, INFO, log, logLine} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
@@ -78,8 +78,6 @@ export async function getOrgFolderTable(showFolders: boolean, countItems: boolea
     return folderTable;
 }
 
-
-
 // Function to get org folders
 export async function getOrgFolderFiles(folder: string, showFiles: boolean) {
     const folderResp = await CCOM.callTCA(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/');
@@ -114,11 +112,11 @@ async function downLoadOrgFolderFile(folder: string, file: string) {
     await CCOM.downloadFromCloud(fileName, CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true');
 }
 
+// Function to display all the org folders
 export async function showOrgFolders() {
     await prepCloudFileProps();
     const folderT = await getOrgFolderTable(true, true);
     let chFolder = ['NONE'];
-    // TODO: Use mapping
     for (let fol of iterateTable(folderT)) {
         if (fol['Number of Items'] > 0) {
             chFolder.push(fol.Name);
@@ -155,15 +153,6 @@ export async function createOrgFolder() {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
 }
-
-function doesExist(array: string[], item:string, message:string ):boolean {
-    const re = array.indexOf(item) >= 0;
-    if(re){
-        log(WARNING, message);
-    }
-    return re;
-}
-
 
 // Function to upload a file to an org folder
 export async function uploadFileToOrgFolder() {

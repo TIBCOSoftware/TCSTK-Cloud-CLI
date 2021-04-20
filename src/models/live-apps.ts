@@ -6,7 +6,7 @@ export interface LApp {
     applicationVersion: number;
     attributes: CaseAttribute[];
     creators: Process[];
-    id:  string;
+    id: string;
     isCase: boolean
     label: any;
     name: string;
@@ -47,4 +47,11 @@ export interface JsonSchema {
     properties: any[];
     type: string;
     required: string[];
+}
+
+export interface LAGroup {
+    id: string;
+    name: string;
+    description?: string;
+    type?: 'AllUsers' | 'Administrator' | 'ApplicationDeveloper' | 'UIDeveloper' | 'SubscriptionDefined';
 }
