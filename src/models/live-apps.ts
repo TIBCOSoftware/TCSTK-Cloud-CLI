@@ -55,3 +55,60 @@ export interface LAGroup {
     description?: string;
     type?: 'AllUsers' | 'Administrator' | 'ApplicationDeveloper' | 'UIDeveloper' | 'SubscriptionDefined';
 }
+
+
+export interface Content {
+    json: any;
+}
+
+export interface Attribute {
+    name: string;
+    value: string;
+    id: string;
+    stateId: string;
+}
+
+export interface Role {
+    entityId: string;
+    role: string;
+    id: string;
+    stateId: string;
+    entityName: string;
+    entityType: string;
+}
+
+export interface LinkAttribute {
+    name: string;
+    value: string;
+    id: string;
+    linkedId: string;
+    stateId: string;
+}
+
+export interface Link {
+    linkedStateId: string;
+    attributes: LinkAttribute[];
+    id: string;
+    stateId: string;
+}
+
+export interface SharedStateINFO {
+    id: string;
+    name: string;
+    content: Content;
+    type: 'PRIVATE' | 'SHARED' | 'PUBLIC' ;
+    description: string;
+    sandboxId: string;
+    scope: string;
+    attributes: Attribute[];
+    roles: Role[];
+    links: Link[];
+    createdById?: string;
+    createdByName?: string;
+    createdDate?: Date;
+    modifiedById?: string;
+    modifiedByName?: string;
+    modifiedDate?: Date;
+    isOrphaned?: boolean;
+    isAbandoned?: boolean;
+}

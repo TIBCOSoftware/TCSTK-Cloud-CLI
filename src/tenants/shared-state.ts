@@ -1,5 +1,5 @@
 import {
-    col,
+    col, doesExist,
     doesFileExist, getOrganization, getPEXConfig,
     mkdirIfNotExist,
     pexTable,
@@ -9,6 +9,7 @@ import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
+import {SharedStateINFO} from "../models/live-apps";
 
 const CCOM = require('../common/cloud-communications');
 const LA = require('./live-apps');
@@ -59,13 +60,9 @@ async function prepSharedStateProps() {
     }
 }
 
-// Function to return a JSON with the shared state entries from a set filter
-export async function getSharedState(showTable?: boolean) {
+async function getAllSharedStates(): Promise<SharedStateINFO[]> {
     await prepSharedStateProps();
-    // const lCookie = cLogin();
-    // log(DEBUG, 'Login Cookie: ', lCookie);
-    //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
-    let ALLsState: any[] = [];
+    let ALLsState: SharedStateINFO[] = [];
     let i = 0;
     let moreStates = true;
     let filterType = 'PUBLIC';
@@ -75,11 +72,8 @@ export async function getSharedState(showTable?: boolean) {
     log(INFO, 'Type of Shared State: ' + col.blue(filterType));
     while (moreStates && i < SHARED_STATE_MAX_CALLS) {
         let start = i * SHARED_STATE_STEP_SIZE;
-        // let end = (i + 1) * SHARED_STATE_STEP_SIZE;
-        // log(INFO, 'Getting shared state entries from ' + start + ' till ' + end);
-        // TODO: Also get Shared shared states (+ '&filter=type = SHARED')
         let filter = '&$filter=type=' + filterType;
-        let sStateTemp = await CCOM.callTCA(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter);
+        let sStateTemp = await CCOM.callTCA(CCOM.clURI.shared_state + '?$top=' + SHARED_STATE_STEP_SIZE + '&$skip=' + start + filter) as SharedStateINFO[];
         if (sStateTemp.length < 1) {
             moreStates = false;
         }
@@ -89,16 +83,26 @@ export async function getSharedState(showTable?: boolean) {
         logLine('Got Shared States: ' + ALLsState.length);
     }
     console.log('');
+    return ALLsState;
+}
+
+
+// Function to return a JSON with the shared state entries from a set filter
+export async function getSharedState(showTable?: boolean) {
+    //TODO: Think about applying a filter when getting the entries (instead of client side filtering)
+    await prepSharedStateProps();
+    const ALLsState = await getAllSharedStates();
     log(INFO, 'Total Number of Shared State Entries: ' + ALLsState.length);
+
     if (SHARED_STATE_FILTER === 'APPLICATION') {
         SHARED_STATE_FILTER = getProp('App_Name');
     }
-    let sState = [];
+    let sState:SharedStateINFO[] = [];
     log(INFO, 'Applying Shared State Filter: ' + SHARED_STATE_FILTER);
     if (SHARED_STATE_FILTER !== '*') {
         for (const state in ALLsState) {
-            if (ALLsState[state] && ALLsState[state].name && ALLsState[state].name.startsWith(SHARED_STATE_FILTER)) {
-                sState.push(ALLsState[state]);
+            if (ALLsState[state] && ALLsState[state]!.name && ALLsState[state]!.name.startsWith(SHARED_STATE_FILTER)) {
+                sState.push(ALLsState[state]!);
             }
         }
     } else {
@@ -107,24 +111,25 @@ export async function getSharedState(showTable?: boolean) {
     log(INFO, 'Filtered Shared State Entries: ' + sState.length);
     //Sort shared state by old date till new
     sState.sort(function (a, b) {
-        a = new Date(a.createdDate);
-        b = new Date(b.createdDate);
-        return a > b ? 1 : a < b ? -1 : 0;
+        const comp1 = new Date(a.createdDate!);
+        const comp2 = new Date(b.createdDate!);
+        return comp1 > comp2 ? 1 : comp1 < comp2 ? -1 : 0;
     });
     const states:any = {};
     const statesDisplay:any = {};
-    for (const state in sState) {
+    let appN = 0
+    for (const state of sState) {
         const sTemp:any = {};
-        const appN = parseInt(state) + 1;
-        sTemp['ID'] = sState[state].id;
-        sTemp['NAME'] = sState[state].name;
-        sTemp['SCOPE'] = sState[state].scope;
-        sTemp['CREATED BY'] = sState[state].createdByName;
-        const created = new Date(sState[state].createdDate);
+        appN++;
+        sTemp['ID'] = state.id;
+        sTemp['NAME'] = state.name;
+        sTemp['SCOPE'] = state.scope;
+        sTemp['CREATED BY'] = state.createdByName;
+        const created = new Date(state.createdDate!);
         const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
         sTemp['CREATED ON'] = created.toLocaleDateString("en-US", options);
-        sTemp['MODIFIED BY'] = sState[state].modifiedByName;
-        const modified = new Date(sState[state].modifiedDate);
+        sTemp['MODIFIED BY'] = state.modifiedByName;
+        const modified = new Date(state.modifiedDate!);
         sTemp['MODIFIED ON'] = modified.toLocaleDateString("en-US", options);
         states[appN] = sTemp;
         let sTempDisplay = {...sTemp};
@@ -206,20 +211,25 @@ export async function showSharedStateDetails() {
 
 // Removes a Shared State Entry
 export async function createSharedState() {
+    await prepSharedStateProps();
     const ssType = getProp('Shared_State_Type');
     log(INFO, 'Creating Shared State Entry. Type: ' + col.blue(ssType));
     const ssName = await askQuestion('What is the name of the Shared State entry that you want to create ?');
-    const postSS = {
-        "name": ssName + '.' + ssType,
-        "content": {
-            "json": "{}"
-        },
-        "type": ssType,
-        "sandboxId": await LA.getProductionSandbox()
-    }
-    const result = await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
-    if (result != null) {
-        log(INFO, 'Successfully created ' + col.yellow('EMPTY') + ' shared state entry, with ID: ' + col.green(result) + ' and Name: ' + col.green(ssName) + ' (' + col.blue(ssType) + ')...')
+    const allStates = await getAllSharedStates();
+    const ssNameTyped = ssName + '.' + ssType;
+    if(!doesExist(allStates.map( g => g.name), ssNameTyped, `The shared state ${ssNameTyped} already exists, we will not try to create it again...`)) {
+        const postSS = {
+            "name": ssNameTyped,
+            "content": {
+                "json": "{}"
+            },
+            "type": ssType,
+            "sandboxId": await LA.getProductionSandbox()
+        }
+        const result = await CCOM.callTCA(CCOM.clURI.shared_state, false, {method: 'POST', postRequest: postSS});
+        if (result != null) {
+            log(INFO, 'Successfully created ' + col.yellow('EMPTY') + ' shared state entry, with ID: ' + col.green(result) + ' and Name: ' + col.green(ssName) + ' (' + col.blue(ssType) + ')...')
+        }
     }
 }
 

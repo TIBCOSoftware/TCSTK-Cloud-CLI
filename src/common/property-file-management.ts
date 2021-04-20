@@ -15,30 +15,34 @@ import {DEBUG, ERROR, INFO, log, WARNING} from "./logging";
 import {getOAUTHDetails, parseOAUTHToken, setOAUTHDetails} from "./oauth";
 import {getSharedState, selectSharedState} from "../tenants/shared-state";
 import {listOnType, prepSpotfireProps} from "../tenants/spotfire";
+
 const LA = require('../tenants/live-apps');
 const _ = require('lodash');
 const CCOM = require('./cloud-communications');
 
 let globalProperties: any;
-let propsGl:any;
+let propsGl: any;
 
 // TODO: Move this to home folder (and add migration)
 export const globalTCpropFolder = __dirname + '/../../../common/';
 const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties';
+
 export function getGLOBALPropertyFileName() {
     return GLOBALPropertyFileName;
 }
 
 let LOCALPropertyFileName: string;
+
 export function setPropFileName(propFileName: string) {
     LOCALPropertyFileName = propFileName;
     log(DEBUG, 'Using Property File: ' + LOCALPropertyFileName);
 }
+
 export function getPropFileName() {
     return LOCALPropertyFileName;
 }
 
-let MEMORYPass:string;
+let MEMORYPass: string;
 
 // Function to set a property (in memory)
 export function setProperty(name: string, value: string) {
@@ -48,7 +52,7 @@ export function setProperty(name: string, value: string) {
         propsGl = {};
     }
     set(name, value, propsGl);
-    if(name === 'CloudLogin.pass'){
+    if (name === 'CloudLogin.pass') {
         MEMORYPass = value;
     }
     //console.log('AFTER propsGl: ' , propsGl);
@@ -66,7 +70,7 @@ function set(path: string, value: string, obj: any) {
     schema[pList[len - 1]!] = value;
 }
 
-export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefresh?:boolean): string {
+export function getProp(propName: string, forceRefresh?: boolean, forceGlobalRefresh?: boolean): string {
     log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh, 'Forcing a Global Refresh: ', forceGlobalRefresh);
     if (forceRefresh) {
         propsGl = null;
@@ -88,7 +92,7 @@ export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefre
         log(DEBUG, 'Returning Property: ', re);
         if (re === 'USE-GLOBAL') {
             re = getPropertyFromGlobal(propName, forceGlobalRefresh);
-            if(re === null){
+            if (re === null) {
                 log(WARNING, 'USE-GLOBAL specified for property ' + propName + ' but no GLOBAL property found...');
                 re = '';
             }
@@ -109,7 +113,7 @@ export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefre
             }
         }
     }
-    if(propName === 'CloudLogin.pass' && MEMORYPass) {
+    if (propName === 'CloudLogin.pass' && MEMORYPass) {
         re = MEMORYPass;
     }
     // Adding organization name as global
@@ -118,7 +122,7 @@ export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefre
     return re;
 }
 
-function getPropertyFromGlobal(propName: string, forceGlobalRefresh?:boolean) {
+function getPropertyFromGlobal(propName: string, forceGlobalRefresh?: boolean) {
     let re = null;
     if (doesFileExist(GLOBALPropertyFileName)) {
         if (globalProperties == null || forceGlobalRefresh) {
@@ -199,14 +203,14 @@ export function addOrUpdateProperty(location: string, property: string, value: s
                     doLog = false;
                 }
                 if (property === 'CloudLogin.pass') {
-                    if(typeof value === "string" && (value.startsWith('@#') || value.startsWith('#'))){
+                    if (typeof value === "string" && (value.startsWith('@#') || value.startsWith('#'))) {
                         log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[OBFUSCATED PASSWORD]') + ' (in:' + location + ')');
                     } else {
                         log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow('[PLAIN PASSWORD]') + ' (in:' + location + ')');
                     }
                     doLog = false;
                 }
-                if (doLog){
+                if (doLog) {
                     log(INFO, 'Updated: ' + col.blue(property) + ' to: ' + col.yellow(value) + ' (in:' + location + ')');
                 }
             } else {
@@ -227,10 +231,10 @@ export function addOrUpdateProperty(location: string, property: string, value: s
 }
 
 // Function to check if a property exist and add a default value if not
-export function prepProp(propName:string, propDefaultValue:string, comment: string){
+export function prepProp(propName: string, propDefaultValue: string, comment: string) {
     if (getProp(propName) == null) {
-        log(INFO, 'No '+propName+' Property found; Adding '+propDefaultValue+' to ' + getPropFileName());
-        addOrUpdateProperty(getPropFileName(), propName, propDefaultValue,comment);
+        log(DEBUG, 'No ' + propName + ' Property found; Adding ' + propDefaultValue + ' to ' + getPropFileName());
+        addOrUpdateProperty(getPropFileName(), propName, propDefaultValue, comment);
     }
 }
 
@@ -404,7 +408,7 @@ export async function updateProperty() {
         const vTChoices = ['Organization_Name', 'SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID', 'Shared_StateID', 'Spotfire_FolderPath'];
         const vType = await askMultipleChoiceQuestion('What type of answer would you like to add to the property ?', vTChoices);
         if (vType.toLowerCase() === 'organization_name') {
-            if(!getOrganization()){
+            if (!getOrganization()) {
                 await CCOM.callTCA(CCOM.clURI.claims);
             }
             pValue = getOrganization();
@@ -614,8 +618,8 @@ export function replaceAtSign(content: string, propFile: string) {
 export function replaceGlobal(content: string) {
     if (content && content.includes('~{') && content.includes('}')) {
         const GlobalProp = content.substring(content.indexOf('~{') + 2, content.indexOf('~{') + 2 + content.substring(content.indexOf('~{') + 2).indexOf('}'));
-        log(INFO, 'Looking for Global: |' + GlobalProp + '| on: |' + content );
-        switch(GlobalProp.toLowerCase()) {
+        log(DEBUG, 'Looking for Global: |' + GlobalProp + '| on: |' + content);
+        switch (GlobalProp.toLowerCase()) {
             case 'organization':
                 content = content.replace(/~{.*?\}/, getOrganization());
                 break;
@@ -623,7 +627,7 @@ export function replaceGlobal(content: string) {
             default:
                 log(WARNING, 'Global: ' + GlobalProp + ' not found');
         }
-        log(INFO, 'Replaced: ' + content);
+        log(INFO, 'Injected Global: ' + content);
         // content = replaceGlobal(content);
     }
     return content;

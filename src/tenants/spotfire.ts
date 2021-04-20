@@ -1,6 +1,6 @@
 import {
     col,
-    createTable,
+    createTable, doesExist,
     getCurrentRegion, getOrganization,
     getPEXConfig,
     isOauthUsed,
@@ -38,6 +38,9 @@ export function prepSpotfireProps() {
         '# The location in the library to search from.\n' +
         '#  NOTE: You can use ~{ORGANIZATION}, to use the current organization name in library base.\n' +
         '#  NOTE: Do not end this folder with a \'/\' character');
+    prepProp('Spotfire_Do_Copy_With_New_Name', 'NO', '# This setting indicates when an item is copied in the library and the target location exists, it it needs to be added with a new name.\n' +
+        '# So for example: Analysis_DXP (2), if set to NO the copy action will be ignored and a warning is given. Possible Values (YES | NO)');
+
 }
 
 // Function to browse spotfire reports
@@ -146,6 +149,7 @@ export async function listSpotfire() {
 
 // Function to copy a library item from one place to another
 export async function copySpotfire() {
+    prepSpotfireProps();
     log(INFO, 'Copying Spotfire Library Item...');
     let itemToCopy: SFLibObject;
     let folderIdToCopyTo = '';
@@ -160,37 +164,49 @@ export async function copySpotfire() {
         if (libTypes) {
             const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', libTypes.map(v => v.DisplayPath));
             itemToCopy = libTypes.find(v => v.DisplayPath === itemNameToCopy)!;
-            // 4: List all folders
-            log(INFO, 'Getting all library folders that the item can be copied to...');
-            const sfFolders = await listOnType('spotfire.folder', true);
-            if(sfFolders) {
-                // 5: Ask what folder to copy to
-                log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
-                const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
-                // 6: Get the folder ID
-                folderIdToCopyTo = sfFolders!.find(v => v.DisplayPath === folderToCopyTo)!.Id;
-                const copyRequest: SFCopyRequest = {
-                    itemsToCopy: [itemToCopy.Id],
-                    destinationFolderId: folderIdToCopyTo,
-                    conflictResolution: 'KeepBoth'
-                }
-                if (!copyRequest['conflictResolution']) {
-                    copyRequest['conflictResolution'] = 'KeepBoth';
-                }
-                const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
-                    method: 'POST',
-                    postRequest: copyRequest
-                }) as SFLibObject[];
-                if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
-                    log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
-                    if (itemToCopy.Title !== SFCopy[0].Title) {
-                        log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
+            if(itemToCopy) {
+                // 4: List all folders
+                log(INFO, 'Getting all library folders that the item can be copied to...');
+                const sfFolders = await listOnType('spotfire.folder', true);
+                if (sfFolders) {
+                    // 5: Ask what folder to copy to
+                    log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
+                    const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
+
+                    // 6: Get the folder ID
+                    folderIdToCopyTo = sfFolders!.find(v => v.DisplayPath === folderToCopyTo)!.Id;
+                    let doCopy = true;
+                    if (getProp('Spotfire_Do_Copy_With_New_Name').toLowerCase() !== 'yes') {
+                        const targetFolderInfo = await getSFolderInfo(folderIdToCopyTo);
+                        doCopy = !doesExist(targetFolderInfo.Children.map(g => g.Title), itemToCopy.Title, `The library item ${itemToCopy.Title} already exists, we will not try to create it again (since Spotfire_Do_Copy_With_New_Name is set too NO).`);
+                    }
+                    if (doCopy) {
+                        const copyRequest: SFCopyRequest = {
+                            itemsToCopy: [itemToCopy.Id],
+                            destinationFolderId: folderIdToCopyTo,
+                            conflictResolution: 'KeepBoth'
+                        }
+                        if (!copyRequest['conflictResolution']) {
+                            copyRequest['conflictResolution'] = 'KeepBoth';
+                        }
+                        const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
+                            method: 'POST',
+                            postRequest: copyRequest
+                        }) as SFLibObject[];
+                        if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
+                            log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
+                            if (itemToCopy.Title !== SFCopy[0].Title) {
+                                log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
+                            }
+                        } else {
+                            log(ERROR, 'Something went wrong while copying: ', SFCopy);
+                        }
                     }
                 } else {
-                    log(ERROR, 'Something went wrong while copying: ', SFCopy);
+                    log(ERROR, 'No target folders available for copying, create a folder first');
                 }
             } else {
-                log(ERROR, 'No target folders available for copying, create a folder first');
+                log(ERROR, `We could not find your item to copy (${itemNameToCopy}), consider changing your Spotfire_Library_Base`);
             }
         }
     } else {
@@ -216,24 +232,27 @@ export async function createSpotfireLibraryFolder() {
         // Step 4: Ask for a name of the folder
         const fName = await askQuestion('What is the name of the folder you would like to create ? (use "NONE" or press enter to not create a folder)');
         if (fName && fName.toLowerCase() !== 'none') {
-            // Step 5: Possibly ask for a description of the folder
-            let fDesc = await askQuestion('What is the description of the folder you would like to create ? (use "NONE" or press enter to leave blank)');
-            if (fDesc.toLowerCase() === 'none') fDesc = '';
-            // Step 6: Create the folder
-            const createFolderRequest:SFCreateFolderRequest = {
-                description: fDesc,
-                keywords: "",
-                parentId: parentFolderId,
-                title: fName
-            }
-            const SFCreateFolder = await callSpotfire(CCOM.clURI.sf_create_folder, false, {
-                method: 'POST',
-                postRequest: createFolderRequest
-            }) as SFLibObject;
-            if(SFCreateFolder.Id) {
-                log(INFO, 'Successfully crated folder with name: ', col.green(fName) + ' and description ' + col.green(fDesc) + ' (new id: ' + SFCreateFolder.Id + ')');
-            } else {
-                log(ERROR, 'Something went wrong while creating a library folder: ', SFCreateFolder);
+            const newFolderPath = parentFolder.DisplayPath + '/' + fName;
+            if (!doesExist(folders.map(g => g.DisplayPath), newFolderPath, `The spotfire folder ${newFolderPath} already exists, we will not try to create it again...`)) {
+                // Step 5: Possibly ask for a description of the folder
+                let fDesc = await askQuestion('What is the description of the folder you would like to create ? (use "NONE" or press enter to leave blank)');
+                if (fDesc.toLowerCase() === 'none') fDesc = '';
+                // Step 6: Create the folder
+                const createFolderRequest: SFCreateFolderRequest = {
+                    description: fDesc,
+                    keywords: "",
+                    parentId: parentFolderId,
+                    title: fName
+                }
+                const SFCreateFolder = await callSpotfire(CCOM.clURI.sf_create_folder, false, {
+                    method: 'POST',
+                    postRequest: createFolderRequest
+                }) as SFLibObject;
+                if (SFCreateFolder.Id) {
+                    log(INFO, 'Successfully crated folder with name: ', col.green(fName) + ' and description ' + col.green(fDesc) + ' (new id: ' + SFCreateFolder.Id + ')');
+                } else {
+                    log(ERROR, 'Something went wrong while creating a library folder: ', SFCreateFolder);
+                }
             }
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
@@ -241,8 +260,6 @@ export async function createSpotfireLibraryFolder() {
     } else {
         log(ERROR, 'No parent folders found, adjust your Spotfire_Library_Base property: ' + getProp('Spotfire_Library_Base'));
     }
-
-
 }
 
 // Function to rename a Spotfire Item
