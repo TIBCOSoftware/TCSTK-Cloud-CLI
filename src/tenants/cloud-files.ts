@@ -6,7 +6,7 @@ import {
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
-import {ERROR, INFO, log, logLine} from "../common/logging";
+import {ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
@@ -41,7 +41,7 @@ async function prepCloudFileProps() {
 }
 
 // Get a list of Cloud folders
-export async function getOrgFolders(showFolders: boolean, countItems: boolean) {
+async function getOrgFoldersBase() {
     const folderStepSize = 200;
     let hasMoreFolders = true;
     let allFolders: any[] = [];
@@ -61,6 +61,11 @@ export async function getOrgFolders(showFolders: boolean, countItems: boolean) {
             hasMoreFolders = false;
         }
     }
+    return allFolders;
+}
+
+export async function getOrgFolderTable(showFolders: boolean, countItems: boolean) {
+    const allFolders = await getOrgFoldersBase();
     const folderTable = createTable(allFolders, CCOM.mappings.la_org_folders, false);
     if (countItems) {
         for (let fNr in folderTable) {
@@ -72,6 +77,8 @@ export async function getOrgFolders(showFolders: boolean, countItems: boolean) {
     pexTable(folderTable, 'cloud-folders', getPEXConfig(), showFolders);
     return folderTable;
 }
+
+
 
 // Function to get org folders
 export async function getOrgFolderFiles(folder: string, showFiles: boolean) {
@@ -109,7 +116,7 @@ async function downLoadOrgFolderFile(folder: string, file: string) {
 
 export async function showOrgFolders() {
     await prepCloudFileProps();
-    const folderT = await getOrgFolders(true, true);
+    const folderT = await getOrgFolderTable(true, true);
     let chFolder = ['NONE'];
     // TODO: Use mapping
     for (let fol of iterateTable(folderT)) {
@@ -130,25 +137,38 @@ export async function createOrgFolder() {
     await prepCloudFileProps();
     const fName = await askQuestion('What is the name of the organization folder you would like to create (use "NONE" or press enter to not create a folder) ?');
     if (fName !== '' || fName.toLowerCase() !== 'none') {
-        const postFolder = {
-            "name": fName
-        };
-        const oResponse = await CCOM.callTCA(CCOM.clURI.la_org_folders, false, {
-            method: 'POST',
-            postRequest: postFolder
-        });
-        if (oResponse != null) {
-            log(INFO, 'Successfully created folder: ', oResponse);
+        // Check if the folder does not already exist.
+        const folders = await getOrgFoldersBase();
+        if(!doesExist(folders.map((f:any) => f.name), fName, `The folder ${fName} already exists, we will not try to create it again...`)){
+            const postFolder = {
+                "name": fName
+            };
+            const oResponse = await CCOM.callTCA(CCOM.clURI.la_org_folders, false, {
+                method: 'POST',
+                postRequest: postFolder
+            });
+            if (oResponse != null) {
+                log(INFO, 'Successfully created folder: ', oResponse);
+            }
         }
     } else {
         log(INFO, 'OK, I won\'t do anything :-)');
     }
 }
 
+function doesExist(array: string[], item:string, message:string ):boolean {
+    const re = array.indexOf(item) >= 0;
+    if(re){
+        log(WARNING, message);
+    }
+    return re;
+}
+
+
 // Function to upload a file to an org folder
 export async function uploadFileToOrgFolder() {
     await prepCloudFileProps();
-    const folderT = await getOrgFolders(true, false);
+    const folderT = await getOrgFolderTable(true, false);
     let chFolder = ['NONE'];
     for (let fol of iterateTable(folderT)) {
         chFolder.push(fol.Name);
@@ -181,7 +201,7 @@ export async function uploadFile(fileLocation: string, cloudFolder: string, clou
 // Download a file from an organization flder
 export async function downloadFileFromOrgFolder() {
     await prepCloudFileProps();
-    const folderT = await getOrgFolders(true, false);
+    const folderT = await getOrgFolderTable(true, false);
     let chFolder = ['NONE'];
     for (let fol of iterateTable(folderT)) {
         chFolder.push(fol.Name);

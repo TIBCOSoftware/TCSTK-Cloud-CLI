@@ -88,7 +88,7 @@ export async function validate() {
 
     // Validate if an org folder exist (and possibly contains file)
     if (valD === 'org_folder_exist' || valD === 'org_folder_and_file_exist') {
-        const folders = await CFILES.getOrgFolders(false, false);
+        const folders = await CFILES.getOrgFolderTable(false, false);
         // console.log(folders);
         const chosenFolder = await validationItemHelper(iterateTable(folders), 'Org Folder', 'Name');
         if (valD === 'org_folder_and_file_exist') {

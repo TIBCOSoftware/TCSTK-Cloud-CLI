@@ -88,6 +88,10 @@ export function getProp(propName:string, forceRefresh?:boolean, forceGlobalRefre
         log(DEBUG, 'Returning Property: ', re);
         if (re === 'USE-GLOBAL') {
             re = getPropertyFromGlobal(propName, forceGlobalRefresh);
+            if(re === null){
+                log(WARNING, 'USE-GLOBAL specified for property ' + propName + ' but no GLOBAL property found...');
+                re = '';
+            }
         }
     } else {
         log(DEBUG, 'Local Property file not set yet, trying to get it from global');
@@ -129,7 +133,7 @@ function getPropertyFromGlobal(propName: string, forceGlobalRefresh?:boolean) {
         log(DEBUG, 'Got Property From Global: ', re);
     } else {
         log(DEBUG, 'No Global Configuration Set...');
-        return false;
+        return null;
     }
     return re;
 }
