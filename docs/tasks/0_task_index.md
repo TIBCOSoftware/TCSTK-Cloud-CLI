@@ -76,6 +76,8 @@
 
 [show-live-apps-cases](./show-live-apps-cases.md) - Show Live Apps Cases
 
+[show-live-apps-design-time-apps](./show-live-apps-design-time-apps.md) - Show Live Apps Applications in Development (can be copied)
+
 [show-live-apps-users](./show-live-apps-users.md) - Shows the users in LiveApps (which can be added to groups).
 
 [show-live-apps-groups](./show-live-apps-groups.md) - Displays the LiveApps groups and their users.

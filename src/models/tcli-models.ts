@@ -67,6 +67,7 @@ export interface CallConfig {
     forceCLIENTID?: boolean;
     handleErrorOutside?: boolean;
     customHeaders?: any;
+    manualOAUTH?: string;
 }
 
 export interface OAUTHConfig {

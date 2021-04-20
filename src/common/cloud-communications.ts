@@ -86,9 +86,6 @@ export function doManualRequest(url: string, options: any, data: any) {
             reject(err);
         });
         if (data) {
-            // console.log('Writing:' , data);
-            // req.setEncoding('utf8');
-            // req.write(data, 'utf-8');
             req.write(data);
         }
         req.end();
@@ -102,7 +99,7 @@ export function invalidateLogin() {
     isOAUTHValid = null;
 }
 
-export async function cLogin(tenant?: string, customLoginURL?: string, forceClientID?: boolean) {
+export async function cLogin(tenant?: string, customLoginURL?: string, forceClientID?: boolean, manualOAUTH?: string) {
     const fClientID = forceClientID || false;
     if (isOauthUsed() && !fClientID) {
         log(DEBUG, 'Using OAUTH for Authentication...');
@@ -118,7 +115,8 @@ export async function cLogin(tenant?: string, customLoginURL?: string, forceClie
             const response = await callTCA(clURI.account_info, false, {
                 forceOAUTH: true,
                 forceCLIENTID: false,
-                handleErrorOutside: true
+                handleErrorOutside: true,
+                manualOAUTH: manualOAUTH
             });
             log(DEBUG, 'Got Account info: ', response);
             if (response == 'Unauthorized') {
@@ -227,118 +225,6 @@ async function cloudLoginV3(tenantID: string, clientID: string, email: string, p
     return re;
 }
 
-// Function to call the Tibco Cloud
-// TODO: Accept, URL, doLog and possible config
-/*
-async function callURLA(url:string, method?, postRequest?, contentType?, doLog?, tenant?, customLoginURL?, returnResponse?, forceOAUTH?, forceCLIENTID?, handleErrorOutside?, customHeaders?) {
-    const doErrorOutside = handleErrorOutside || false;
-    const fOAUTH = forceOAUTH || false;
-    const fCLIENTID = forceCLIENTID || false;
-    const reResponse = returnResponse || false;
-    let lCookie:any = {};
-    if (!fOAUTH) {
-        lCookie = await cLogin(tenant, customLoginURL);
-    }
-    if (fCLIENTID) {
-        lCookie = await cLogin(tenant, customLoginURL, true);
-    }
-    const cMethod = method || 'GET';
-    let cdoLog = false;
-    if (doLog != null) {
-        cdoLog = doLog;
-    }
-    const cType = contentType || 'application/json';
-    let body = '';
-    if (cMethod.toLowerCase() !== 'get') {
-        if (cType === 'application/json') {
-            body = JSON.stringify(postRequest);
-        } else {
-            body = postRequest;
-        }
-    }
-    let header:any = {};
-    if (customHeaders) {
-        header = customHeaders;
-    }
-    if (!header["accept"]) {
-        header["accept"] = 'application/json';
-    }
-
-    header["Content-Type"] = cType;
-    // Check if we need to provide the OAUTH token
-    if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
-        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
-    } else {
-        if (header["cookie"]) {
-            header["cookie"] += "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-        } else {
-            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-        }
-    }
-    if (fCLIENTID) {
-        header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
-        delete header.Authorization;
-    }
-
-    if (cdoLog) {
-        log(INFO, '--- CALLING SERVICE ---');
-        log(INFO, '- URL(' + cMethod + '): ' + url);
-        log(DEBUG, '-  METHOD: ' + cMethod);
-        log(INFO, '- CONTENT: ' + cType);
-        log(DEBUG, '-  HEADER: ', header);
-    }
-    if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'delete')) {
-        if (cdoLog) {
-            log(INFO, '-    BODY: ' + body);
-        }
-    }
-    let response:any = {};
-    if (cMethod.toLowerCase() === 'get') {
-        response = await doRequest(encodeURI(url), {
-            headers: header
-        })
-    } else {
-        if (body != null) {
-            header['Content-Length'] = body.length;
-        }
-        response = await doRequest(encodeURI(url), {
-            headers: header,
-            method: cMethod.toUpperCase()
-        }, body)
-    }
-    if (response.statusCode != 200 && !doErrorOutside) {
-        if (response.body != null) {
-            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode + ' \n Message: ', response.body);
-        } else {
-            log(ERROR, 'Error Calling URL: ' + url + ' Status: ' + response.statusCode);
-        }
-        process.exit(1);
-    }
-    if (response.body != null) {
-        if (response.body.errorMsg != null) {
-            if (doErrorOutside) {
-                return response.body;
-            } else {
-                log(ERROR, response.body.errorMsg);
-                // log(ERROR, response.body);
-            }
-            return null;
-        } else {
-            if (reResponse) {
-                return response;
-            }
-            // log(INFO, '-  RESPONSE: ', response.body);
-            return response.body;
-        }
-    } else {
-        if (reResponse) {
-            return response;
-        } else {
-            log(ERROR, 'No Body Returned, Status: ', response.statusCode);
-        }
-    }
-} */
-
 // Function that calls the TIBCO Cloud and takes a config object
 export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     if (conf == null) {
@@ -357,10 +243,10 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     const reResponse = conf.returnResponse || false;
     let lCookie: any = {};
     if (!fOAUTH) {
-        lCookie = await cLogin(conf.tenant, conf.customLoginURL);
+        lCookie = await cLogin(conf.tenant, conf.customLoginURL, false, conf.manualOAUTH);
     }
     if (fCLIENTID) {
-        lCookie = await cLogin(conf.tenant, conf.customLoginURL, true);
+        lCookie = await cLogin(conf.tenant, conf.customLoginURL, true, conf.manualOAUTH);
     }
     const cMethod = conf.method || 'GET';
     let cdoLog = false;
@@ -383,11 +269,14 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     if (!header["accept"]) {
         header["accept"] = 'application/json';
     }
-
     header["Content-Type"] = cType;
     // Check if we need to provide the OAUTH token
     if ((isOauthUsed() && isOAUTHValid) || fOAUTH) {
-        header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
+        if (conf.manualOAUTH) {
+            header["Authorization"] = 'Bearer ' + conf.manualOAUTH;
+        } else {
+            header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
+        }
     } else {
         if (header["cookie"]) {
             header["cookie"] += "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
@@ -403,9 +292,9 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     if (cdoLog) {
         log(INFO, '--- CALLING SERVICE ---');
         log(INFO, '- URL(' + cMethod + '): ' + urlToCall);
-        log(DEBUG, '-  METHOD: ' + cMethod);
+        log(INFO, '-  METHOD: ' + cMethod);
         log(INFO, '- CONTENT: ' + cType);
-        log(DEBUG, '-  HEADER: ', header);
+        log(INFO, '-  HEADER: ', header);
     }
     if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'delete')) {
         if (cdoLog) {
@@ -576,7 +465,7 @@ function readableSize(sizeBytes: number) {
 }
 
 // Function to show claims for the configured user
-export async function showCloudInfo(showTable:boolean, showSandbox: boolean) {
+export async function showCloudInfo(showTable: boolean, showSandbox: boolean) {
     const doShowSandbox = showSandbox || false;
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud');
     let doShowTable = true;

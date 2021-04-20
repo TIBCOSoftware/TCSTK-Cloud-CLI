@@ -10,7 +10,9 @@ import {
     getProp, getPropFileName, globalTCpropFolder,
     setProperty
 } from "./property-file-management";
-import {getOAUTHDetails, parseOAUTHToken} from "./oauth";
+import {getOAUTHDetails, parseOAUTHToken, rotateOauthToken} from "./oauth";
+import {callTCA, clURI} from "./cloud-communications";
+
 declare var global: Global;
 
 const _ = require('lodash');
@@ -89,7 +91,7 @@ export function isGlobalOauthDefined(): boolean {
 }
 
 // Function to replace string in file
-export function replaceInFile(from: string, to: string, filePattern:string):any {
+export function replaceInFile(from: string, to: string, filePattern: string): any {
     const patternToUse = filePattern || './**';
     const regex = new RegExp(from, 'g');
     const options = {
@@ -150,6 +152,7 @@ let globalMultipleOptions = {};
 
 // Function to get and set the Organization (after login)
 let OrganizationGl = '';
+
 export function getOrganization(forceRefresh?: boolean) {
     if (forceRefresh) {
         OrganizationGl = '';
@@ -224,44 +227,60 @@ export function copyFile(fromFile: string, toFile: string) {
 
 // Update the cloud login properties
 export async function updateCloudLogin(propFile: string, forceRefresh?: boolean, forceGlobalRefresh?: boolean, defaultClientID?: string, defaultEmail?: string) {
-    // Client ID
-    let cidQuestion = 'What is your Client ID ?';
-    let useCID = '';
-    if (defaultClientID != null) {
-        useCID = defaultClientID;
-        cidQuestion += ' (Press enter to use: ' + useCID + ')';
-    }
-    log('INFO', 'Get your client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
-    let cid = await askQuestion(cidQuestion);
-    if (useCID !== '' && cid === '') {
-        cid = useCID;
-    }
-    addOrUpdateProperty(propFile, 'CloudLogin.clientID', cid);
-    let emailQuestion = 'What is your User Name (Email) ?'
-    let useEMAIL = '';
-    if (defaultEmail != null) {
-        useEMAIL = defaultEmail;
-        emailQuestion += ' (Press enter to use: ' + useEMAIL + ')';
-    }
-    // Username & Password (obfuscate)
-    let email = await askQuestion(emailQuestion);
-    if (useEMAIL !== '' && email === '') {
-        email = useEMAIL;
-    }
-    addOrUpdateProperty(propFile, 'CloudLogin.email', email);
-    // Force a refresh on the tibco-cloud property file
-    getRegion(forceRefresh, forceGlobalRefresh);
-    const pass = await askQuestion('Provide your password to Generate an OAUTH Token: ', 'password');
-    setProperty('CloudLogin.pass', obfuscatePW(pass));
-    const OAUTH = require('./oauth');
-    const token = await OAUTH.generateOauthToken(null, true, true);
-    addOrUpdateProperty(propFile, 'CloudLogin.OAUTH_Token', token);
-    log('INFO', 'Your password will be obfuscated locally, but this is not unbreakable.');
-    const storePW = await askMultipleChoiceQuestionSearch('Do you want to store your password (as a fallback mechanism) ? ', ['YES', 'NO']);
-    if (pass !== '' && storePW === 'YES') {
-        addOrUpdateProperty(propFile, 'CloudLogin.pass', obfuscatePW(pass));
+    const oKeyAns = await askMultipleChoiceQuestion('Do you want to provide an initial OAUTH Key ? ', ['YES', 'NO']);
+    if (oKeyAns.toLowerCase() === 'yes') {
+        // Store the OAUTH Key
+        let oKey = await askQuestion('Provide the initial OAUTH Key:');
+        addOrUpdateProperty(propFile, 'CloudLogin.OAUTH_Token', oKey);
+        // Get the email from claims
+        const claims = await callTCA(clURI.claims, true, {forceOAUTH: true, manualOAUTH: oKey});
+        addOrUpdateProperty(propFile, 'CloudLogin.email', claims.email);
+        const email = getProp('CloudLogin.email', true);
+        log(INFO, 'Updated email: ' + email);
+        await rotateOauthToken();
+        // TODO: See if we can get the client ID
+        addOrUpdateProperty(propFile, 'CloudLogin.clientID', '');
+
     } else {
-        addOrUpdateProperty(propFile, 'CloudLogin.pass', '');
+        // Client ID
+        let cidQuestion = 'What is your Client ID ?';
+        let useCID = '';
+        if (defaultClientID != null) {
+            useCID = defaultClientID;
+            cidQuestion += ' (Press enter to use: ' + useCID + ')';
+        }
+        log('INFO', 'Get your client ID from https://cloud.tibco.com/ --> Settings --> Advanced Settings --> Display Client ID (See Tutorial)');
+        let cid = await askQuestion(cidQuestion);
+        if (useCID !== '' && cid === '') {
+            cid = useCID;
+        }
+        addOrUpdateProperty(propFile, 'CloudLogin.clientID', cid);
+        let emailQuestion = 'What is your User Name (Email) ?'
+        let useEMAIL = '';
+        if (defaultEmail != null) {
+            useEMAIL = defaultEmail;
+            emailQuestion += ' (Press enter to use: ' + useEMAIL + ')';
+        }
+        // Username & Password (obfuscate)
+        let email = await askQuestion(emailQuestion);
+        if (useEMAIL !== '' && email === '') {
+            email = useEMAIL;
+        }
+        addOrUpdateProperty(propFile, 'CloudLogin.email', email);
+        // Force a refresh on the tibco-cloud property file
+        getRegion(forceRefresh, forceGlobalRefresh);
+        const pass = await askQuestion('Provide your password to Generate an OAUTH Token: ', 'password');
+        setProperty('CloudLogin.pass', obfuscatePW(pass));
+        const OAUTH = require('./oauth');
+        const token = await OAUTH.generateOauthToken(null, true, true);
+        addOrUpdateProperty(propFile, 'CloudLogin.OAUTH_Token', token);
+        log('INFO', 'Your password will be obfuscated locally, but this is not unbreakable.');
+        const storePW = await askMultipleChoiceQuestion('Do you want to store your password (as a fallback mechanism) ? ', ['YES', 'NO']);
+        if (pass !== '' && storePW.toLowerCase() === 'yes') {
+            addOrUpdateProperty(propFile, 'CloudLogin.pass', obfuscatePW(pass));
+        } else {
+            addOrUpdateProperty(propFile, 'CloudLogin.pass', '');
+        }
     }
 }
 
@@ -350,7 +369,7 @@ export function translateAWSRegion(awsRegion: string) {
 // Gets region (in Capitals)
 export function getRegion(forceRefresh?: boolean, forceGlobalRefresh?: boolean) {
     const re = getProp('CloudLogin.Region', forceRefresh, forceGlobalRefresh);
-    if(re){
+    if (re) {
         return re.toString().toUpperCase();
     } else {
         log(ERROR, 'Region not specified, please set the CloudLogin.Region property...');
@@ -462,9 +481,9 @@ export function doesFileExist(checkFile: string) {
 }
 
 // Function that checks if something exists in an array and return false if so and displays a warning message
-export function doesExist(array: string[], item:string, message:string ):boolean {
+export function doesExist(array: string[], item: string, message: string): boolean {
     const re = array.indexOf(item) >= 0;
-    if(re){
+    if (re) {
         log(WARNING, message);
     }
     return re;
@@ -485,16 +504,21 @@ export async function sleep(ms: number) {
     });
 }
 
-export function createTable(arrayObject:any[], config: Mapping, doShowTable:boolean):any {
-    const tableObject:any = {};
+export function createTable(arrayObject: any[], config: Mapping, doShowTable: boolean): any {
+    const tableObject: any = {};
     for (const element in arrayObject) {
-        const tableRow:any = {};
+        const tableRow: any = {};
         const rowNumber = parseInt(element) + 1;
         // TODO: Change to debug
         //log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
         for (let conf of config.entries) {
             if (conf.format && conf.format.toLowerCase() === 'date') {
-                const options:DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+                const options: DateTimeFormatOptions = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
                 tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString("en-US", options);
             } else {
                 tableRow[conf.header] = _.get(arrayObject[element], conf.field);
@@ -507,7 +531,7 @@ export function createTable(arrayObject:any[], config: Mapping, doShowTable:bool
     return tableObject;
 }
 
-export function iterateTable(tObject:any): any[] {
+export function iterateTable(tObject: any): any[] {
     const re = [];
     for (const property in tObject) {
         re.push(tObject[property]);
@@ -516,11 +540,11 @@ export function iterateTable(tObject:any): any[] {
 }
 
 // Creates a flat table with names and values
-export function createTableValue(name:string, value:any, table?:any, headerName?:string, headerValue?:string) {
+export function createTableValue(name: string, value: any, table?: any, headerName?: string, headerValue?: string) {
     let hName = headerName || 'NAME';
     let hValue = headerValue || 'VALUE';
     table = table || [];
-    let entry:any = {};
+    let entry: any = {};
     entry[hName] = name;
     entry[hValue] = value;
     table[table.length] = entry;
@@ -566,9 +590,9 @@ export function pexTable(tObject: any, tName: string, config: PEXConfig, doPrint
                 headerForFile = 'ORGANIZATION, EXPORT TIME';
                 let lineForFile = getOrganization() + ',' + now;
                 for (let [key, value] of Object.entries(line)) {
-                    let myValue:any = value;
+                    let myValue: any = value;
                     // console.log(`${key}: ${value}`);
-                    if(myValue) {
+                    if (myValue) {
                         if ((key && key.indexOf && key.indexOf(',') > 0) || (myValue && myValue.indexOf && myValue.indexOf(',') > 0)) {
                             log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${myValue}); we are removing it...`);
                             additionalMessage = col.yellow(' (We have removed some comma\'s from the data...)');
@@ -657,7 +681,7 @@ export function isOauthUsed() {
     return re;
 }
 
-export function isIterable(obj:any) {
+export function isIterable(obj: any) {
     // checks for null and undefined
     if (obj == null) {
         return false;

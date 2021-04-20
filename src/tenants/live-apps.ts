@@ -9,7 +9,7 @@ import {changeOrganization, displayOrganizations, getCurrentOrganizationInfo} fr
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
-import {LApp} from "../models/live-apps";
+import {LADesignTimeApp, LApp} from "../models/live-apps";
 
 declare var global: Global;
 
@@ -88,10 +88,22 @@ export async function showLiveApps(doShowTable: boolean, doCountCases: boolean):
     return caseTypes;
 }
 
+async function getLiveAppsDesignTime() {
+
+    if(getProp('LiveApps_Master_Account_Token')){
+        // TODO: Hier verder
+    }
+
+    return await CCOM.callTCA(CCOM.clURI.la_design) as LADesignTimeApp[];
+}
+
+// TODO: Add option to show details
 // Function to show and return all the design time apps of LiveApps
 export async function showLiveAppsDesign(doShowTable?: boolean) {
-    // la_design
-    const laDesignApps = await CCOM.callTCA(CCOM.clURI.la_design);
+
+
+
+    const laDesignApps = await getLiveAppsDesignTime();
     if (doShowTable) {
         const laDesignAppsTable = createTable(laDesignApps, CCOM.mappings.la_design_apps, false)
         pexTable(laDesignAppsTable, 'live-apps-design-apps', getPEXConfig(), true);
@@ -556,10 +568,10 @@ export async function copyLiveApps() {
     // Step 2: Select a LiveApps App (and it's id)
     const laAppNameToCopy = await askMultipleChoiceQuestionSearch('Which LiveApps Application would you like to copy between organizations?', ['NONE', ...laApps.map((v: { name: string; }) => v.name)]);
     if (laAppNameToCopy.toLowerCase() !== 'none') {
-        const laAppToCopy = laApps.find((v: { name: string; }) => v.name === laAppNameToCopy);
+        const laAppToCopy = laApps.find(v => v.name === laAppNameToCopy);
         // Step 3: Display all organizations (preferably the ones that have LiveApps)
         // Step 4: Select a target organization
-        const targetOrgInfo = await displayOrganizations(true, true, 'To which organization would you like to copy ' + laAppToCopy.name + ' ?')
+        const targetOrgInfo = await displayOrganizations(true, true, 'To which organization would you like to copy ' + laAppToCopy!.name + ' ?')
         // console.log(targetOrgInfo);
         if (laAppToCopy && laAppToCopy.latestVersionId && targetOrgInfo && targetOrgInfo.accountDisplayName) {
             const targetOrgName = targetOrgInfo.accountDisplayName;

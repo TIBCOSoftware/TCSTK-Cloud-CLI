@@ -112,3 +112,31 @@ export interface SharedStateINFO {
     isOrphaned?: boolean;
     isAbandoned?: boolean;
 }
+
+export interface LastPublished {
+    applicationVersion: number;
+    dateChanged: any;
+    changedBy: string;
+    rascId: string;
+}
+
+export interface LADesignTimeApp {
+    id: string;
+    name: string;
+    owner: string;
+    creationDate: any;
+    modificationDate: any;
+    latestVersion: number;
+    latestClientValidationState: string;
+    latestServerValidationState: string;
+    latestValidationState: string;
+    latestGovernanceState: string;
+    adminState: string;
+    adminStateVersionId: string;
+    latestVersionId: string;
+    lastModifiedBy: string;
+    lastFinalized?: any;
+    lastPublished: LastPublished;
+    lastWithdrawn?: any;
+    inBin: boolean;
+}

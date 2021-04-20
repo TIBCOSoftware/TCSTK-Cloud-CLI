@@ -486,6 +486,12 @@ export async function showLiveAppsWrapper() {
     await LA.showLiveApps(true, true);
 }
 
+// Function to show liveApps Design time Apps
+export async function showLiveAppsDesignTimeAppsWrapper() {
+    const LA = require('./tenants/live-apps');
+    await LA.showLiveAppsDesign(true);
+}
+
 // Function to show liveApps Actions
 export async function showLiveAppsActionsWrapper() {
     const LA = require('./tenants/live-apps');

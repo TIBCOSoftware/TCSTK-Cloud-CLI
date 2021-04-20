@@ -399,6 +399,20 @@
       ],
       "category": "live-apps"
     },
+    "show-live-apps-design-time-apps": {
+      "description": "Show Live Apps Applications in Development (can be copied)",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showLiveAppsDesignTimeAppsWrapper",
+      "taskAlternativeNames": [
+        "show-design-time-apps"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "live-apps"
+    },
     "show-live-apps-users": {
       "description": "Shows the users in LiveApps (which can be added to groups).",
       "enabled": true,
