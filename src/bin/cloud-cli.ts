@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node --project /Users/hpeters@tibco.com/WebstormProjects/TCSTK-Cloud-CLI/tsconfig.json
+// #!/usr/bin/env ts-node --project /Users/hpeters@tibco.com/WebstormProjects/TCSTK-Cloud-CLI/tsconfig.json
 import {Global} from "../models/base";
 declare var global: Global;
 global.TIME = new Date();
