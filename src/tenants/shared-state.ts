@@ -253,7 +253,7 @@ export async function removeSharedStateEntry() {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
         }
     } else {
-        log(ERROR, 'No Shared States available to remove in the filter: ' + getProp('Shared_State_Filter'))
+        log(WARNING, 'No Shared States available to remove in the filter: ' + getProp('Shared_State_Filter'))
     }
 }
 
@@ -287,7 +287,7 @@ export async function clearSharedState() {
             log(INFO, 'Don\'t worry I have not removed anything :-) ... ');
         }
     } else {
-        log(ERROR, 'No Shared States available to remove in the filter: ' + getProp('Shared_State_Filter'))
+        log(WARNING, 'No Shared States available to remove in the filter: ' + getProp('Shared_State_Filter'))
     }
 }
 
