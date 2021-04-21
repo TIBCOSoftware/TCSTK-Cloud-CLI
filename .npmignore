@@ -44,3 +44,8 @@
 
 /ts-out/**
 /src/**
+
+/generateHelpFiles.js
+/webpack.config.js
+/tsconfig.json
+/blinkingTest.js

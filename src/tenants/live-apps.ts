@@ -93,7 +93,7 @@ async function getLiveAppsDesignTime(): Promise<LADesignTimeApp[]> {
     if (getProp('LiveApps_Master_Account_Token')) {
         re = await CCOM.callTCA(CCOM.clURI.la_design, false, {
             forceOAUTH: true,
-            manualOAUTH: getProp('LiveApps_Master_Account_Token')
+            manualOAUTH: getMasterToken()
         }) as LADesignTimeApp[];
     } else {
         re = await CCOM.callTCA(CCOM.clURI.la_design) as LADesignTimeApp[];
@@ -107,13 +107,24 @@ async function getMasterOrgName() {
     if (getProp('LiveApps_Master_Account_Token')) {
         const accInfo = await CCOM.callTCA(CCOM.clURI.account_info, false, {
             forceOAUTH: true,
-            manualOAUTH: getProp('LiveApps_Master_Account_Token'),
+            manualOAUTH: getMasterToken(),
             tenant: 'TSC',
             customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
         })
         if (accInfo && accInfo.selectedAccount && accInfo.selectedAccount.displayName) {
             re = accInfo.selectedAccount.displayName;
         }
+    }
+    return re;
+}
+
+// Function to get the master token (also if it is stored as a token standard)
+function getMasterToken(){
+    let re = getProp('LiveApps_Master_Account_Token');
+    const key = 'Token:';
+    if (re.indexOf(key) > 0) {
+        // parseOAUTHToken(re, false);
+        re = re.substring(re.indexOf(key) + key.length);
     }
     return re;
 }
@@ -674,7 +685,7 @@ export async function copyLiveApps() {
                         method: 'POST',
                         postRequest: shareReq,
                         forceOAUTH: true,
-                        manualOAUTH: getProp('LiveApps_Master_Account_Token')
+                        manualOAUTH: getMasterToken()
                     });
                     log(INFO, 'Application shared from MASTER(' + col.blue(masterOrgName) + ') with id:', col.blue(shareRes));
                     const receiveRes = await receiveLApp(shareRes);
