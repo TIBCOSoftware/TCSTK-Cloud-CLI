@@ -61,13 +61,14 @@ export async function showOrganization() {
 
 // Function to change to another organization
 export async function changeOrganization(accountId?: string) {
+    const currentAccount = await getCurrentOrganizationInfo();
     let orgAccountId;
     if (accountId) {
         orgAccountId = accountId;
     } else {
         // List all the organizations
         // Ask to which organization you would like to switch
-        const accountChoice = await displayOrganizations(true, true, 'Which organization would you like to change to ?');
+        const accountChoice = await displayOrganizations(true, true, 'Which organization would you like to change to (you are currennly in: ' + col.blue(currentAccount.displayName) + ') ?');
         if (accountChoice) {
             orgAccountId = accountChoice.accountId;
         } else {
@@ -75,7 +76,6 @@ export async function changeOrganization(accountId?: string) {
             return;
         }
     }
-    const currentAccount = await getCurrentOrganizationInfo();
     if (currentAccount.accountId === orgAccountId) {
         log(ERROR, 'You are already in the organization: ', currentAccount.displayName);
     } else {
@@ -104,7 +104,11 @@ export async function changeOrganization(accountId?: string) {
             // Generate a new OAUTH Token
             await OAUTH.generateOauthToken(null, true, false);
         }
-        log(INFO, col.bold.green('Successfully changed to organization: ' + getOrganization()))
+        if(isOauthUsed()) {
+            log(INFO, col.bold.green('Successfully changed to organization: ' + getOrganization(true)))
+        } else {
+            log(INFO, col.bold.green('Successfully changed to organization: ' + (await getCurrentOrganizationInfo()).displayName));
+        }
     }
 }
 

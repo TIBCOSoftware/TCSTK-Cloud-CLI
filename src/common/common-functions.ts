@@ -156,7 +156,6 @@ let OrganizationGl = '';
 export function getOrganization(forceRefresh?: boolean) {
     if (forceRefresh) {
         OrganizationGl = '';
-        // setOAUTHDetails(null);
         getProp('CloudLogin.OAUTH_Token', true, true);
     }
     if (OrganizationGl === '' && isOauthUsed()) {

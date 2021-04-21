@@ -108,9 +108,9 @@ export function getProp(propName: string, forceRefresh?: boolean, forceGlobalRef
             const orgOInfo = re;
             re = re.substring(re.indexOf(key) + key.length);
             // Look for other token parts
-            if (getOAUTHDetails() == null) {
-                setOAUTHDetails(parseOAUTHToken(orgOInfo, false));
-            }
+            // if (getOAUTHDetails() == null || getOAUTHDetails == {}) {
+            setOAUTHDetails(parseOAUTHToken(orgOInfo, false));
+            // }
         }
     }
     if (propName === 'CloudLogin.pass' && MEMORYPass) {
