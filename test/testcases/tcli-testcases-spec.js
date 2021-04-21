@@ -61,10 +61,11 @@ describe("tcli testsuite", function () {
     it("TCLI: Basic Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:YES')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:NO')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.pass:none:USE-LOCAL:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:YES')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true);
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
     });
 
@@ -82,11 +83,9 @@ describe("tcli testsuite", function () {
     it("TCLI: More Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false);
-        expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:YES')).toBe(true);
         expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:NO')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true);
         expect(run(CLI_EXECUTOR + 'show-live-apps-sandbox')).toBe(true);
-
         expect(run(CLI_EXECUTOR + 'view-global-config')).toBe(true);
         // TODO: add test user to US
         // expect(run(CLI_EXECUTOR + 'change-region -a "US - Oregon"')).toBe(true);
@@ -368,7 +367,7 @@ describe("tcli testsuite", function () {
         // Create a folder
         // TODO: Create a function to delete an (empty folder), and delete a cloud file
         // expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(true);
-        expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(true);
 
         expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a jasmine_test_folder:tibco-cloud.properties:SAME')).toBe(true);
         expect(run(CLI_EXECUTOR + 'download-file-from-org-folder -a jasmine_test_folder:tibco-cloud.properties')).toBe(true);
