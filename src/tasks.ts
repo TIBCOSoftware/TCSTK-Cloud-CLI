@@ -130,8 +130,9 @@ export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
         inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
         let pMes = '[TCLI - ' + col.blue(getRegion(true, true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
         // If there is an org, show it
-        if (getOrganization(true) !== '') {
-            pMes = '[TCLI - ' + col.blue(getRegion(true, true) + ' - ' + getOrganization(true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
+        const org = getOrganization(true);
+        if (org) {
+            pMes = '[TCLI - ' + col.blue(getRegion(true, true) + ' - ' + org) + ' - ' + col.yellow(getProp('App_Name')) + ']: ';
         }
         const command = await askMultipleChoiceQuestionSearch(pMes, gTasksDescr, 5);
         let selectedTask = gTasksNames[gTasksDescr.findIndex((el) => command === el)];
@@ -579,6 +580,23 @@ export async function copySpotfireLibraryWrapper() {
     const SPOTFIRE = require('./tenants/spotfire');
     await SPOTFIRE.copySpotfire();
 }
+
+export async function renameSpotfireLibraryItemWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.renameSpotfireLibraryItem();
+}
+
+export async function shareSpotfireLibraryItemWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.shareSpotfireLibraryItem();
+}
+
+export async function deleteSpotfireLibraryWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.deleteSpotfireLibraryItem();
+}
+
+
 
 export async function createSpotfireLibraryFolderWrapper() {
     const SPOTFIRE = require('./tenants/spotfire');

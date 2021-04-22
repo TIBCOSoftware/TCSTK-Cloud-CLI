@@ -163,7 +163,7 @@ export function getOrganization(forceRefresh?: boolean) {
         if (getOAUTHDetails() && !getOAUTHDetails().Org) {
             getProp('CloudLogin.OAUTH_Token', true, true);
         }
-        if (getOAUTHDetails() != null && getOAUTHDetails().Org) {
+        if (getOAUTHDetails() && getOAUTHDetails() != null && getOAUTHDetails().Org) {
             OrganizationGl = getOAUTHDetails().Org!;
         }
     }

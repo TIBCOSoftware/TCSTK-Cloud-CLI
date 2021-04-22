@@ -46,7 +46,7 @@ export function prepSpotfireProps() {
 // Function to browse spotfire reports
 export async function browseSpotfire() {
     prepSpotfireProps();
-    log(INFO, 'Browsing the Spotfire Library...');
+    log(DEBUG, 'Browsing the Spotfire Library...');
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     let currentFolderID = SFSettings.HomeFolderId;
     let doBrowse = true;
@@ -129,7 +129,7 @@ export async function browseSpotfire() {
 // Function to browse spotfire library
 export async function listSpotfire() {
     prepSpotfireProps();
-    log(INFO, 'Listing the Spotfire Library...');
+    log(DEBUG, 'Listing the Spotfire Library...');
     // Ask for type
     const typeForSearch = await askTypes('What Spotfire Library item type would you like to list ?', true, true);
     if (typeForSearch.toLowerCase() !== 'none') {
@@ -164,7 +164,7 @@ export async function copySpotfire() {
         if (libTypes) {
             const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', libTypes.map(v => v.DisplayPath));
             itemToCopy = libTypes.find(v => v.DisplayPath === itemNameToCopy)!;
-            if(itemToCopy) {
+            if (itemToCopy) {
                 // 4: List all folders
                 log(INFO, 'Getting all library folders that the item can be copied to...');
                 const sfFolders = await listOnType('spotfire.folder', true);
@@ -263,24 +263,68 @@ export async function createSpotfireLibraryFolder() {
 }
 
 // Function to rename a Spotfire Item
-/* TODO: Implement Function
-export async function renameSpotfireItem() {
-
-    let SFRename = {};
-    log(INFO, 'Renaming with: ' , renameRequest)
-    renameRequest['title'] = renameRequest['newName'];
-    delete renameRequest['newName'];
-    try {
-        // Do a settings call first not to rename twice...
-        const SFSettings = await callSpotfire(clURI.sf_settings, false, {manualOAUTH: oauthKey});
-        SFRename = await callSpotfire(clURI.sf_rename, false, {method: 'POST', postRequest: renameRequest, manualOAUTH: oauthKey});
-        // Catch Error
-    } catch (e) {
-        console.log('Got Error: ' + e);
-        throw e;
+export async function renameSpotfireLibraryItem() {
+    prepSpotfireProps();
+    log(DEBUG, 'Renaming a spotfire library item...');
+    const typeForSearch = await askTypes('What Spotfire Library item type would you like to rename ?', false, true);
+    if (typeForSearch.toLowerCase() !== 'none') {
+        // Step 1: List all the Spotfire Library Items
+        const itemsToRename = await listOnType(typeForSearch);
+        // Step 2: Choose an item to rename
+        if (itemsToRename) {
+            const itemNameToRename = await askMultipleChoiceQuestionSearch('Which item would you like to rename ?', itemsToRename.map(v => v.DisplayPath));
+            const itemToRename = itemsToRename.find(v => v.DisplayPath === itemNameToRename)!;
+            // Step 3: Provide the new name
+            const sfNewName = await askQuestion('What is the new name(Title) you want to rename ' + col.blue(itemToRename.Title) + ' to ? (use "NONE" or press enter to not rename)');
+            if(sfNewName && sfNewName !== '' && sfNewName.toLowerCase() !== 'none' ){
+                // Step 4: Call the rename service
+                const SFRename = await callSpotfire(CCOM.clURI.sf_rename, false, {
+                    method: 'POST',
+                    postRequest: {
+                        itemId: itemToRename.Id,
+                        title: sfNewName
+                    }
+                }) as SFLibObject;
+                if(SFRename && SFRename.Title === sfNewName) {
+                    log(INFO, 'Successfully renamed: ', col.blue(itemNameToRename) + ' to ' + col.green(sfNewName));
+                } else {
+                    log(ERROR, 'An error occurred renaming ', SFRename)
+                }
+            } else {
+                log(INFO, 'OK, I won\'t do anything :-)');
+            }
+        } else {
+            log(WARNING, 'No items found to rename...');
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
     }
-    return SFRename;
-}*/
+}
+
+/* TODO: Implement Function */
+export async function shareSpotfireLibraryItem() {
+    prepSpotfireProps();
+    log(DEBUG, 'Sharing a spotfire library item...');
+
+    /* POST:
+    https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/share/setShareSettings
+    {"itemId":"4d3ddab0-f406-4d95-8d35-80d1aff64b0c","inherit":false,"recursive":true,"sharing":"shared","users":[{"email":"sa_discover@tibco.com","status":"new"}],"message":"Share Disco"}
+
+     */
+
+}
+
+/* TODO: Implement Function */
+export async function deleteSpotfireLibraryItem() {
+    prepSpotfireProps();
+    log(DEBUG, 'Deleting a spotfire library item...');
+    // POST:
+    // https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/delete
+
+    // {"itemsToDelete":["feccd70b-1c36-4968-b1f3-49bbb3bcf4be"],"force":false}
+
+
+}
 
 
 async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {

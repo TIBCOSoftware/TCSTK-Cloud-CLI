@@ -910,6 +910,48 @@
       ],
       "category": "spotfire"
     },
+    "rename-spotfire-library-item": {
+      "description": "Renames a Spotfire Library Item (a DXP for example).",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "renameSpotfireLibraryItemWrapper",
+      "taskAlternativeNames": [
+        "rename-sf", "rename-library-item"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
+    "share-spotfire-libary-item": {
+      "description": "Shares a Spotfire Library Item with a Specific User.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "shareSpotfireLibraryItemWrapper",
+      "taskAlternativeNames": [
+        "share-sf", "share-library-item"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
+    "delete-spotfire-library-item": {
+      "description": "Deletes a Spotfire Library Item (a DXP for example).",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "deleteSpotfireLibraryWrapper",
+      "taskAlternativeNames": [
+        "delete-sf", "delete-library-item"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
     "create-spotfire-library-folder": {
       "description": "Creates a new Library Folder.",
       "enabled": true,
