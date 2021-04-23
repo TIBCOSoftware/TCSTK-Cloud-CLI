@@ -586,9 +586,9 @@ export async function renameSpotfireLibraryItemWrapper() {
     await SPOTFIRE.renameSpotfireLibraryItem();
 }
 
-export async function shareSpotfireLibraryItemWrapper() {
+export async function shareSpotfireLibraryFolderWrapper() {
     const SPOTFIRE = require('./tenants/spotfire');
-    await SPOTFIRE.shareSpotfireLibraryItem();
+    await SPOTFIRE.shareSpotfireLibraryFolder();
 }
 
 export async function deleteSpotfireLibraryWrapper() {

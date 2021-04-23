@@ -31,6 +31,9 @@
     "sf_create_folder" : "spotfire-next.cloud.tibco.com/spotfire/rest/library/createFolder",
     "sf_copy": "spotfire-next.cloud.tibco.com/spotfire/rest/library/copy",
     "sf_rename": "spotfire-next.cloud.tibco.com/spotfire/rest/library/modifyTitle",
+    "sf_delete": "spotfire-next.cloud.tibco.com/spotfire/rest/library/delete",
+    "sf_share": "spotfire-next.cloud.tibco.com/spotfire/rest/library/share/setShareSettings",
+    "sf_shared_with_me": "spotfire-next.cloud.tibco.com/spotfire/rest/library/sharedWithMe",
     "mes_system": "messaging.cloud.tibco.com/tcm/v1/system",
     "mes_sum": "messaging.cloud.tibco.com/tcm/v1/system/summary",
     "mes_durables": "messaging.cloud.tibco.com/tcm/v1/system/durables",
@@ -227,7 +230,7 @@
       ]
     },
     "sf_reports": {
-      "entries": [
+      "old_entries": [
         {
           "header": "Type",
           "field": "ItemType"
@@ -244,6 +247,20 @@
         {
           "header": "Spotfire Library Item",
           "field": "DisplayPath"
+        }
+      ],
+      "entries": [
+        {
+          "header": "Type",
+          "field": "ItemType"
+        },
+        {
+          "header": "Created By",
+          "field": "CreatedByName"
+        },
+        {
+          "header": "Spotfire Library Item",
+          "field": "TCLIPath"
         }
       ]
     },

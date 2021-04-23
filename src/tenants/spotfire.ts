@@ -9,7 +9,7 @@ import {
 import {Global} from "../models/base";
 import {CallConfig} from "../models/tcli-models";
 import {SFCopyRequest, SFCreateFolderRequest, SFFolderInfo, SFLibObject, SFType} from "../models/spotfire";
-import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {getProp, prepProp} from "../common/property-file-management";
 
@@ -53,8 +53,8 @@ export async function browseSpotfire() {
     while (doBrowse) {
         const sfReports = await getSFolderInfo(currentFolderID);
         let currentFolder = sfReports.CurrentFolder.Title;
-        if (sfReports.CurrentFolder.DisplayPath) {
-            currentFolder = sfReports.CurrentFolder.DisplayPath;
+        if (sfReports.CurrentFolder.TCLIPath) {
+            currentFolder = sfReports.CurrentFolder.TCLIPath;
         }
         log(INFO, 'Current folder: ', col.blue(currentFolder));
         let items = [];
@@ -136,10 +136,10 @@ export async function listSpotfire() {
         if (typeForSearch.toLowerCase() === 'all') {
             for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
                 log(INFO, 'Looking for: ' + col.blue(ReadableName) + ' in library:');
-                await listOnType(SFTypeName as SFType);
+                await listOnType(SFTypeName as SFType, false, true);
             }
         } else {
-            await listOnType(typeForSearch);
+            await listOnType(typeForSearch, false, true);
         }
         if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List');
     } else {
@@ -156,25 +156,30 @@ export async function copySpotfire() {
     // 1: Ask what type to copy
     const typeForCopy = await askTypes('What Spotfire Library item type would you like to copy ?');
     if (typeForCopy.toLowerCase() !== 'none') {
-        // 2: List those types (of your org)
-        // TODO: Should we ask here for folder type
+        // 2: Get everything that can be copied
         log(INFO, 'Getting all library items that can be copied...');
-        const libTypes = await listOnType(typeForCopy);
+        const itemsAvailableForCopy = await listOnType(typeForCopy, false, true);
         // 3: Ask which element to copy
-        if (libTypes) {
-            const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', libTypes.map(v => v.DisplayPath));
-            itemToCopy = libTypes.find(v => v.DisplayPath === itemNameToCopy)!;
+        if (itemsAvailableForCopy && itemsAvailableForCopy.length > 0) {
+            const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', itemsAvailableForCopy.map(v => v.TCLIPath));
+            itemToCopy = itemsAvailableForCopy.find(v => v.TCLIPath === itemNameToCopy)!;
             if (itemToCopy) {
                 // 4: List all folders
                 log(INFO, 'Getting all library folders that the item can be copied to...');
-                const sfFolders = await listOnType('spotfire.folder', true);
+                const sfFolders = await listOnType('spotfire.folder', false, false);
                 if (sfFolders) {
                     // 5: Ask what folder to copy to
-                    log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization()));
-                    const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', sfFolders.map(v => v.DisplayPath));
+                    log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization() + ' '));
+                    const foldersToCopyTo = [];
+                    for (const folder of sfFolders) {
+                        if (folder && folder.TCLIPath) {
+                            foldersToCopyTo.push(folder.TCLIPath);
+                        }
+                    }
+                    const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', foldersToCopyTo);
 
                     // 6: Get the folder ID
-                    folderIdToCopyTo = sfFolders!.find(v => v.DisplayPath === folderToCopyTo)!.Id;
+                    folderIdToCopyTo = sfFolders!.find(v => v.TCLIPath === folderToCopyTo)!.Id;
                     let doCopy = true;
                     if (getProp('Spotfire_Do_Copy_With_New_Name').toLowerCase() !== 'yes') {
                         const targetFolderInfo = await getSFolderInfo(folderIdToCopyTo);
@@ -222,18 +227,18 @@ export async function createSpotfireLibraryFolder() {
     prepSpotfireProps();
     log(INFO, 'Creating Spotfire Library Folder...');
     // Step 1: List all current folders
-    const folders = await listOnType('spotfire.folder', false);
+    const folders = await listOnType('spotfire.folder', false, false);
     if (folders && folders.length > 0) {
         // Step 2: Choose a parent folder
-        const parentFolderName = await askMultipleChoiceQuestionSearch('For which folder would you like to create a subfolder ?', folders.map(v => v.DisplayPath));
-        const parentFolder = folders.find(v => v.DisplayPath === parentFolderName)!;
+        const parentFolderName = await askMultipleChoiceQuestionSearch('For which folder would you like to create a subfolder ?', folders.map(v => v.TCLIPath));
+        const parentFolder = folders.find(v => v.TCLIPath === parentFolderName)!;
         // Step 3: Get Id of parent folder
         const parentFolderId = parentFolder.Id;
         // Step 4: Ask for a name of the folder
         const fName = await askQuestion('What is the name of the folder you would like to create ? (use "NONE" or press enter to not create a folder)');
         if (fName && fName.toLowerCase() !== 'none') {
-            const newFolderPath = parentFolder.DisplayPath + '/' + fName;
-            if (!doesExist(folders.map(g => g.DisplayPath), newFolderPath, `The spotfire folder ${newFolderPath} already exists, we will not try to create it again...`)) {
+            const newFolderPath = parentFolder.TCLIPath + '/' + fName;
+            if (!doesExist(folders.map(g => g.TCLIPath), newFolderPath, `The spotfire folder ${newFolderPath} already exists, we will not try to create it again...`)) {
                 // Step 5: Possibly ask for a description of the folder
                 let fDesc = await askQuestion('What is the description of the folder you would like to create ? (use "NONE" or press enter to leave blank)');
                 if (fDesc.toLowerCase() === 'none') fDesc = '';
@@ -269,14 +274,14 @@ export async function renameSpotfireLibraryItem() {
     const typeForSearch = await askTypes('What Spotfire Library item type would you like to rename ?', false, true);
     if (typeForSearch.toLowerCase() !== 'none') {
         // Step 1: List all the Spotfire Library Items
-        const itemsToRename = await listOnType(typeForSearch);
+        const itemsToRename = await listOnType(typeForSearch, false, false);
         // Step 2: Choose an item to rename
         if (itemsToRename) {
-            const itemNameToRename = await askMultipleChoiceQuestionSearch('Which item would you like to rename ?', itemsToRename.map(v => v.DisplayPath));
-            const itemToRename = itemsToRename.find(v => v.DisplayPath === itemNameToRename)!;
+            const itemNameToRename = await askMultipleChoiceQuestionSearch('Which item would you like to rename ?', itemsToRename.map(v => v.TCLIPath));
+            const itemToRename = itemsToRename.find(v => v.TCLIPath === itemNameToRename)!;
             // Step 3: Provide the new name
             const sfNewName = await askQuestion('What is the new name(Title) you want to rename ' + col.blue(itemToRename.Title) + ' to ? (use "NONE" or press enter to not rename)');
-            if(sfNewName && sfNewName !== '' && sfNewName.toLowerCase() !== 'none' ){
+            if (sfNewName && sfNewName !== '' && sfNewName.toLowerCase() !== 'none') {
                 // Step 4: Call the rename service
                 const SFRename = await callSpotfire(CCOM.clURI.sf_rename, false, {
                     method: 'POST',
@@ -285,7 +290,8 @@ export async function renameSpotfireLibraryItem() {
                         title: sfNewName
                     }
                 }) as SFLibObject;
-                if(SFRename && SFRename.Title === sfNewName) {
+                if (SFRename && SFRename.Title === sfNewName) {
+                    console.table(SFRename);
                     log(INFO, 'Successfully renamed: ', col.blue(itemNameToRename) + ' to ' + col.green(sfNewName));
                 } else {
                     log(ERROR, 'An error occurred renaming ', SFRename)
@@ -301,29 +307,85 @@ export async function renameSpotfireLibraryItem() {
     }
 }
 
-/* TODO: Implement Function */
-export async function shareSpotfireLibraryItem() {
+// Function to share a library folder
+export async function shareSpotfireLibraryFolder() {
     prepSpotfireProps();
     log(DEBUG, 'Sharing a spotfire library item...');
-
-    /* POST:
-    https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/share/setShareSettings
-    {"itemId":"4d3ddab0-f406-4d95-8d35-80d1aff64b0c","inherit":false,"recursive":true,"sharing":"shared","users":[{"email":"sa_discover@tibco.com","status":"new"}],"message":"Share Disco"}
-
-     */
-
+    // Step 1: Show all folders that can be shared
+    const itemsToShare = await listOnType("spotfire.folder", false, false);
+    // Step 2: Choose a folder to share
+    if (itemsToShare) {
+        const itemNameToShare = await askMultipleChoiceQuestionSearch('Which item would you like to share ?', itemsToShare.map(v => v.TCLIPath));
+        const itemToShare = itemsToShare.find(v => v.TCLIPath === itemNameToShare)!;
+        // Step 3: Ask the email of the person to share it with
+        const sfShareWith = await askQuestion('Provide the email address of the person you want to share ' + col.blue(itemToShare.Title) + ' with ? (use "NONE" or press enter to not share)');
+        // TODO: Check for valid email
+        if (sfShareWith && sfShareWith !== '' && sfShareWith.toLowerCase() !== 'none') {
+            // TODO: Step 4: Optionally ask for a message
+            // Step 5: Call the share API
+            const SFShare = await callSpotfire(CCOM.clURI.sf_share, false, {
+                method: 'POST',
+                postRequest: {
+                    itemId: itemToShare.Id,
+                    inherit: false,
+                    recursive: true,
+                    sharing: "shared",
+                    users: [{email: sfShareWith, status: "new"}],
+                    "message": "Shared through TCLI"
+                }
+            });
+            if (SFShare && SFShare.success) {
+                log(INFO, 'Successfully shared: ', col.green(itemNameToShare) + ' with ' + col.green(sfShareWith));
+            } else {
+                log(ERROR, 'An error occurred while sharing ', SFShare)
+            }
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    } else {
+        log(WARNING, 'No folders found to share...');
+    }
 }
 
-/* TODO: Implement Function */
+
+// Function to delete a library item
 export async function deleteSpotfireLibraryItem() {
     prepSpotfireProps();
     log(DEBUG, 'Deleting a spotfire library item...');
-    // POST:
-    // https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/delete
-
-    // {"itemsToDelete":["feccd70b-1c36-4968-b1f3-49bbb3bcf4be"],"force":false}
-
-
+    const typeForSearch = await askTypes('What Spotfire Library item type would you like to delete ?', false, true);
+    if (typeForSearch.toLowerCase() !== 'none') {
+        // Step 1: List all the Spotfire Library Items
+        const itemsToDelete = await listOnType(typeForSearch, false, false);
+        // Step 2: Choose an item to delete
+        if (itemsToDelete) {
+            const itemNameToDelete = await askMultipleChoiceQuestionSearch('Which item would you like to delete ?', itemsToDelete.map(v => v.TCLIPath));
+            const itemToDelete = itemsToDelete.find(v => v.TCLIPath === itemNameToDelete)!;
+            console.table(itemToDelete);
+            // Step 3: Make sure the user wants to delete the item
+            const doDelete = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO DELETE ' + col.blue(itemToDelete.Title) + ' ?', ['NO', 'YES']);
+            if (doDelete && doDelete !== '' && doDelete.toLowerCase() === 'yes') {
+                // Step 4: Call the delete service
+                const SFDelete = await callSpotfire(CCOM.clURI.sf_delete, false, {
+                    method: 'POST',
+                    postRequest: {
+                        itemsToDelete: [
+                            itemToDelete.Id], force: false
+                    }
+                });
+                if (SFDelete && SFDelete.Success) {
+                    log(INFO, 'Successfully deleted: ', col.green(itemNameToDelete) + '... ');
+                } else {
+                    log(ERROR, 'An error occurred deleting ', SFDelete)
+                }
+            } else {
+                log(INFO, 'OK, I won\'t do anything :-)');
+            }
+        } else {
+            log(WARNING, 'No items found to delete...');
+        }
+    } else {
+        log(INFO, 'OK, I won\'t do anything :-)');
+    }
 }
 
 
@@ -332,9 +394,39 @@ async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {
         "folderId": folderId,
         "types": SF_TYPES
     }
-    return await callSpotfire(CCOM.clURI.sf_reports, false, {method: 'POST', postRequest: request}) as SFFolderInfo;
+    const folderInfo = await callSpotfire(CCOM.clURI.sf_reports, false, {
+        method: 'POST',
+        postRequest: request
+    }) as SFFolderInfo;
+    // Add the path info from the right place
+    if (folderInfo.Children && folderInfo.Children.length > 0) {
+        folderInfo.Children = folderInfo.Children.map(sf => setTcliPath(sf))
+    }
+    if (folderInfo.Ancestors && folderInfo.Ancestors.length > 0) {
+        folderInfo.Ancestors = folderInfo.Ancestors.map(sf => setTcliPath(sf))
+    }
+    if (folderInfo.CurrentFolder) {
+        folderInfo.CurrentFolder = setTcliPath(folderInfo.CurrentFolder);
+    }
+    return folderInfo;
 }
 
+function setTcliPath(sfLibObject: SFLibObject): SFLibObject {
+    if (sfLibObject) {
+        if (sfLibObject.DisplayPath) {
+            sfLibObject.TCLIPath = sfLibObject.DisplayPath;
+        } else {
+            if (sfLibObject.Path) {
+                sfLibObject.TCLIPath = sfLibObject.Path;
+            }
+        }
+        if (sfLibObject.TCLIPath && sfLibObject.TCLIPath.startsWith('/Users/.../')) {
+            sfLibObject.TCLIPath = sfLibObject.TCLIPath.replace('/Users/.../', 'SHARED_WITH_ME/')
+        }
+
+    }
+    return sfLibObject;
+}
 
 function getNameForSFType(type: SFType): string {
     for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
@@ -372,14 +464,13 @@ async function askTypes(question: string, doAll?: boolean, doFolders?: boolean):
 async function findFolderFromPath(folderInfo: SFFolderInfo, folderPath: string): Promise<SFLibObject | null> {
     for (const folder of folderInfo.Children) {
         if (folder.IsFolder) {
-            const pathToCompare = folder.DisplayPath || folder.Path;
             if (process.stdout && process.stdout.columns) {
                 logLine(' '.repeat(process.stdout.columns));
             }
-            if (folder.DisplayPath) {
-                logLine('Drilling Down into: ' + pathToCompare);
+            if (folder.TCLIPath) {
+                logLine('Drilling Down into: ' + folder.TCLIPath);
             }
-            if (pathToCompare === folderPath) {
+            if (folder.TCLIPath === folderPath) {
                 return folder;
             } else {
                 const subFolder = await findFolderFromPath(await getSFolderInfo(folder.Id), folderPath);
@@ -393,7 +484,7 @@ async function findFolderFromPath(folderInfo: SFFolderInfo, folderPath: string):
 }
 
 // A function that searches though the spotfire lib for a specific type
-export async function listOnType(typeToList: SFType, fromRoot?: boolean): Promise<SFLibObject[] | null> {
+export async function listOnType(typeToList: SFType, fromRoot: boolean, addShared: boolean): Promise<SFLibObject[] | null> {
     const doFromRoot = fromRoot || false;
     const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false);
     // Go from Root
@@ -433,13 +524,28 @@ export async function listOnType(typeToList: SFType, fromRoot?: boolean): Promis
             }
             if (searchFolder === sfRoot) {
                 log(ERROR, 'Teams folder not found...');
+
             } else {
                 sfFolderToList = searchFolder.CurrentFolder;
             }
         }
     }
     if (sfFolderToList) {
-        const items = await iterateItems(sfFolderToList.Id, typeToList);
+        let items = await iterateItems(sfFolderToList.Id, typeToList);
+        if (addShared) {
+            const sharedItems = await callSpotfire(CCOM.clURI.sf_shared_with_me, false, {
+                method: "POST",
+                postRequest: ''
+            }) as SFLibObject[];
+            for (const sharedItem of sharedItems) {
+                if (sharedItem.IsFolder) {
+                    items = items.concat(await iterateItems(sharedItem.Id, typeToList));
+                } else {
+                    items.push(sharedItem);
+                }
+
+            }
+        }
         console.log('');
         if (items.length > 0) {
             let tObject = createTable(items, CCOM.mappings.sf_reports, false);
@@ -452,25 +558,24 @@ export async function listOnType(typeToList: SFType, fromRoot?: boolean): Promis
     return null;
 }
 
-async function iterateItems(baseFolderId: string, type: SFType): Promise<any[]> {
-    let re: any[] = [];
+async function iterateItems(baseFolderId: string, type: SFType): Promise<SFLibObject[]> {
+    let re: SFLibObject[] = [];
     const iterateFolder = await getSFolderInfo(baseFolderId);
     if (type === 'spotfire.folder') {
         re.push(iterateFolder.CurrentFolder);
     }
     for (let itItem of iterateFolder.Children) {
         if (itItem.ItemType === type && type !== 'spotfire.folder') {
-            if (itItem.DisplayPath) {
+            if (itItem.TCLIPath) {
                 re.push(itItem);
             }
         }
         if (itItem.IsFolder) {
-            const path = itItem.DisplayPath || itItem.Path;
             if (process.stdout && process.stdout.columns) {
                 logLine(' '.repeat(process.stdout.columns));
             }
-            if (itItem.DisplayPath) {
-                logLine('Drilling Down into: ' + path);
+            if (itItem.TCLIPath) {
+                logLine('Drilling Down into: ' + itItem.TCLIPath);
             }
             re = re.concat(await iterateItems(itItem.Id, type));
         }

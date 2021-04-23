@@ -41,6 +41,7 @@ export interface SFLibObject {
     HasPreview: boolean;
     DisplayPath: string;
     DisplayName: string;
+    TCLIPath: string;
 }
 
 

@@ -455,7 +455,7 @@ export async function updateProperty() {
         }
         if (vType.toLowerCase() === 'spotfire_folderpath') {
             prepSpotfireProps();
-            const sfFolderList = await listOnType('spotfire.folder', false);
+            const sfFolderList = await listOnType('spotfire.folder', true, true);
             if (sfFolderList && sfFolderList.length > 0) {
                 // Pick Item from the list
                 let selectedFolder = await askMultipleChoiceQuestionSearch('For which folder would you like to store the Folder Path ?', sfFolderList.map(v => v.DisplayPath));
@@ -627,7 +627,7 @@ export function replaceGlobal(content: string) {
             default:
                 log(WARNING, 'Global: ' + GlobalProp + ' not found');
         }
-        log(INFO, 'Injected Global: ' + content);
+        log(DEBUG, 'Injected Global: ' + content);
         // content = replaceGlobal(content);
     }
     return content;

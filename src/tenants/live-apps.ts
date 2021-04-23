@@ -90,7 +90,7 @@ export async function showLiveApps(doShowTable: boolean, doCountCases: boolean):
 
 async function getLiveAppsDesignTime(): Promise<LADesignTimeApp[]> {
     let re;
-    if (getProp('LiveApps_Master_Account_Token')) {
+    if (getProp('Master_Account_Token')) {
         re = await CCOM.callTCA(CCOM.clURI.la_design, false, {
             forceOAUTH: true,
             manualOAUTH: getMasterToken()
@@ -101,10 +101,10 @@ async function getLiveAppsDesignTime(): Promise<LADesignTimeApp[]> {
     return re;
 }
 
-// A function to get the master or name (only if LiveApps_Master_Account_Token is set)
+// A function to get the master or name (only if Master_Account_Token is set)
 async function getMasterOrgName() {
     let re = '';
-    if (getProp('LiveApps_Master_Account_Token')) {
+    if (getProp('Master_Account_Token')) {
         const accInfo = await CCOM.callTCA(CCOM.clURI.account_info, false, {
             forceOAUTH: true,
             manualOAUTH: getMasterToken(),
@@ -120,7 +120,7 @@ async function getMasterOrgName() {
 
 // Function to get the master token (also if it is stored as a token standard)
 function getMasterToken(){
-    let re = getProp('LiveApps_Master_Account_Token');
+    let re = getProp('Master_Account_Token');
     const key = 'Token:';
     if (re.indexOf(key) > 0) {
         // parseOAUTHToken(re, false);
@@ -133,7 +133,7 @@ function getMasterToken(){
 // Function to show and return all the design time apps of LiveApps
 export async function showLiveAppsDesign(doShowTable?: boolean) {
     let laDesignApps = await getLiveAppsDesignTime();
-    if (getProp('LiveApps_Master_Account_Token')) {
+    if (getProp('Master_Account_Token')) {
         if (doShowTable) {
             log(INFO, 'MASTER ACCOUNT(' + (await getMasterOrgName()) + ') APPS: ');
         }
@@ -604,7 +604,7 @@ export async function copyLiveApps() {
     let doCopyFromMaster = false;
     let appQuestion = 'Which LiveApps Application would you like to copy between organizations ?';
     let masterOrgName;
-    if (getProp('LiveApps_Master_Account_Token')) {
+    if (getProp('Master_Account_Token')) {
         doCopyFromMaster = true;
         masterOrgName = await getMasterOrgName();
         appQuestion = 'Which LiveApps Application would you like to copy from the MASTER(' + col.blue(masterOrgName) + ') Organization to Your Organization ?';

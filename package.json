@@ -8,6 +8,9 @@
     "test": "jasmine --config=test/support/jasmine.json",
     "testB": "jasmine --config=test/support/jasmine.json --filter='Basic Operations'",
     "build": "tsc && webpack --config webpack.config.js",
+    "packW": "webpack --config webpack.config.js",
+    "nm": "nodemon -e js --exec 'npm run packW'",
+    "watch": "tsc -w --noEmitOnError",
     "compile": "pkg --output executable/tcli .",
     "generateTaskDocs": "node generateHelpFiles.js",
     "pub": "npm publish"
@@ -42,6 +45,7 @@
     "jasmine": "^3.7.0",
     "jasmine-reporters": "^2.4.0",
     "jasmine-ts-console-reporter": "^3.1.1",
+    "nodemon": "^2.0.7",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4",
     "webpack": "^5.34.0",

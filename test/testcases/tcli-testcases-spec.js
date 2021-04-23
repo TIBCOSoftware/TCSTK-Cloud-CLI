@@ -436,6 +436,37 @@ describe("tcli testsuite", function () {
 
     });
 
+    // Spotfire Library Operations Testcases
+    // jasmine --config=test/support/jasmine.json --filter='TCLI: LibrarySF Operations'
+    it("TCLI: LibrarySF Operations", function () {
+        expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
+
+        // TODO: Create a new folder
+
+        // TODO: Create a new folder Again
+
+        // TODO: Copy a sample report into this folder
+
+        // TODO: Copy a non-existing report
+
+        // TODO: Copy to a non-existing place
+
+        // TODO: Rename the sample report
+
+        // TODO: Rename a non-existing report
+
+        // TODO: Rename the folder
+
+        // TODO: Delete the sample report
+
+        // TODO: Delete the sample report Again
+
+        // TODO: Delete the created folder
+
+
+    });
+
+
     // FS Testcases
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Fuzzy Search'
     it("TCLI: Fuzzy Search", function () {
@@ -446,7 +477,7 @@ describe("tcli testsuite", function () {
         }
     });
 
-    // Spotfire Testcases
+    // Messaging Testcases
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Messaging'
     it("TCLI: Messaging", async function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);

@@ -10,7 +10,7 @@ import {
     getProp, getPropFileName, globalTCpropFolder,
     setProperty
 } from "./property-file-management";
-import {getOAUTHDetails, parseOAUTHToken, rotateOauthToken} from "./oauth";
+import {getOAUTHDetails, parseOAUTHToken} from "./oauth";
 import {callTCA, clURI} from "./cloud-communications";
 
 declare var global: Global;
@@ -236,7 +236,7 @@ export async function updateCloudLogin(propFile: string, forceRefresh?: boolean,
         addOrUpdateProperty(propFile, 'CloudLogin.email', claims.email);
         const email = getProp('CloudLogin.email', true);
         log(INFO, 'Updated email: ' + email);
-        await rotateOauthToken();
+        // await rotateOauthToken();
         // TODO: See if we can get the client ID
         addOrUpdateProperty(propFile, 'CloudLogin.clientID', '');
 
