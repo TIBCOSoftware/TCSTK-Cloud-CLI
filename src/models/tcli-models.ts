@@ -19,6 +19,7 @@ export interface TCLITask {
     taskAlternativeNames: string[];
     availableOnOs: OperatingSystem[];
     category: Category;
+    taskFullName?: string;
 }
 
 export interface Template {

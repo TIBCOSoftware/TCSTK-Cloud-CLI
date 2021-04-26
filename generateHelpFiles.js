@@ -1,9 +1,14 @@
+
+
+
 require('./ts-out/common/common-functions');
 const {replaceInFile} = require("./ts-out/common/common-functions");
 const {copyFile} = require("./ts-out/common/common-functions");
 const {doesFileExist} = require("./ts-out/common/common-functions");
 // ---
 // ### Alternatives
+
+const fs = require('fs');
 
 const ONLY_GENERATE_NEW_FILES = true;
 
@@ -46,7 +51,6 @@ function generateIndex() {
     for (let tn in tasks) {
         if (tasks[tn].enabled == true && tasks[tn].internal == false) {
             if (tn != '') {
-
                 let cat = tasks[tn].category;
                 console.log(cat + ' : ' + tn);
                 if(!tsksCAT[cat]){
@@ -63,9 +67,7 @@ function generateIndex() {
             dataForFile += '\n\n' + tVal;
         }
     }
-    const fs = require('fs');
     fs.writeFileSync('docs/tasks/0_task_index.md', dataForFile, 'utf8');
-
 }
 
 function adjustTasks() {
@@ -74,14 +76,54 @@ function adjustTasks() {
         console.log(tn);
         delete tasks[tn].taskName
     }
-    const fs = require('fs');
     const dataForFile = JSON.stringify({
         cliTasks: tasks
     });
     fs.writeFileSync('./src/config/config-cli-task.json', dataForFile, 'utf8');
 }
 
+function generateReadMeTable() {
+    let dataForFile = '';
+    const cliTasks = require('./src/config/config-cli-task.json').cliTasks;
+    const hTasks = [];
+    const taskCat = {};
+    for (let cliTask in cliTasks) {
+        if (cliTask) {
+            const task = cliTasks[cliTask];
+            if (task.enabled) {
+                hTasks.push(cliTask);
+                if (task.category) {
+                    task.taskFullName = cliTask;
+                    if (!taskCat[task.category]) {
+                        taskCat[task.category] = [task]
+                    } else {
+                        taskCat[task.category].push(task);
+                    }
+                }
+            }
+        }
+    }
+    for (const cat in taskCat){
+        dataForFile += '##' + cat + '\n| TASK | Description |\n|------|:------------|\n';
+        // dataForFile += ' '.padStart(47) + ('[*** ' + cat + ' ***]');
+        for (let tas of taskCat[cat]) {
+            if(tas.internal){
+                dataForFile += '|' + tas.taskFullName + '|' + tas.description + '|\n';
+            } else {
+                dataForFile += '|[' + tas.taskFullName + '](./docs/tasks/'+tas.taskFullName+'.md)|' + tas.description + '|\n';
+            }
+
+        }
+    }
+    // READMETable.md
+
+    fs.writeFileSync('./READMETable.md', dataForFile, 'utf8');
+
+}
+
+
 // console.log('Generating Help Files...');
-main(ONLY_GENERATE_NEW_FILES);
-generateIndex();
+// main(ONLY_GENERATE_NEW_FILES);
+// generateIndex();
 // adjustTasks();
+generateReadMeTable();

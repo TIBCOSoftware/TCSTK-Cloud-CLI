@@ -88,6 +88,7 @@ export async function showHelpOnTask(task: string) {
 function getAndListTasks() {
     const cliTasks = require('../config/config-cli-task.json').cliTasks as TCLITask[];
     const hTasks: string[] = [];
+    const taskCat: any = {};
     for (let cliTask in cliTasks) {
         if (cliTask) {
             const task = cliTasks[cliTask]!;
@@ -102,13 +103,21 @@ function getAndListTasks() {
             }
             if (task.enabled && !task.internal && allowed) {
                 hTasks.push(cliTask);
-                let str = cliTask;
-                const x = 45 - cliTask.length;
-                for (let i = 0; i < x; i++) {
-                    str = ' ' + str;
+                if (task.category) {
+                    task.taskFullName = cliTask;
+                    if (!taskCat[task.category]) {
+                        taskCat[task.category] = [task]
+                    } else {
+                        taskCat[task.category].push(task);
+                    }
                 }
-                console.log(col.cyan(str + ':') + ' ' + task.description);
             }
+        }
+    }
+    for (const cat in taskCat){
+        console.log( ' '.padStart(47) + col.green(  ('[*** ' + cat + ' ***]')));
+        for (let tas of taskCat[cat]) {
+            console.log(col.cyan(tas.taskFullName.padStart(45) + ':') + ' ' + tas.description);
         }
     }
     return hTasks;
