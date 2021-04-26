@@ -8,7 +8,7 @@ Command Line Interface for creating TIBCO Cloud™ Starter Projects [(For more i
 npm install -g @tibco-tcstk/cloud-cli
 ``` 
 
-###TIBCO Cloud™ CLI) Usage: 
+### TIBCO Cloud™ CLI) Usage: 
 ```
 tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]
 ```
@@ -49,7 +49,8 @@ tcli new <name> [--template(-t)] <template-to-use>
     
 These are the available TIBCO Cloud™ CLI Tasks:
 
-##tcli
+
+## tcli
 
 | TASK | Description |
 |------|:------------|
@@ -72,7 +73,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |browse-tasks|Browses the TCLI tasks by category|
 |repeat-last-task|Repeats the last executed task|
 
-##cloud-starters
+## cloud-starters
 
 | TASK | Description |
 |------|:------------|
@@ -91,7 +92,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[undo-lib-sources](./docs/tasks/undo-lib-sources.md)|Undoes the enabling for Cloud Library Debugging|
 |[schematic-add](./docs/tasks/schematic-add.md)|Add a schematic into your project|
 
-##live-apps
+## live-apps
 
 | TASK | Description |
 |------|:------------|
@@ -109,7 +110,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[import-live-apps-cases](./docs/tasks/import-live-apps-cases.md)|Import Cases to Live Apps|
 |[copy-live-apps-between-organizations](./docs/tasks/copy-live-apps-between-organizations.md)|Copies a LiveApps application between organizations.|
 
-##shared-state
+## shared-state
 
 | TASK | Description |
 |------|:------------|
@@ -122,7 +123,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[import-shared-state](./docs/tasks/import-shared-state.md)|Uploads one entry or the configured filter from the local file system to the shared state.|
 |[watch-shared-state](./docs/tasks/watch-shared-state.md)|Monitors the local shared state and when changes are detected it is uploaded to the cloud.|
 
-##cloud-files
+## cloud-files
 
 | TASK | Description |
 |------|:------------|
@@ -131,7 +132,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[upload-file-to-cloud-folder](./docs/tasks/upload-file-to-cloud-folder.md)|Uploads a file to a LiveApps Organization Folder|
 |[download-file-from-cloud-folder](./docs/tasks/download-file-from-cloud-folder.md)|Downloads file(s) from a LiveApps Organization Folder to disk|
 
-##tci
+## tci
 
 | TASK | Description |
 |------|:------------|
@@ -139,14 +140,14 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[monitor-tci-app](./docs/tasks/monitor-tci-app.md)|Monitor the logs of a TIBCO Cloud Integration Flogo Application|
 |[export-tci-app](./docs/tasks/export-tci-app.md)|Exports a TCI-Flogo Application|
 
-##messaging
+## messaging
 
 | TASK | Description |
 |------|:------------|
 |[show-messaging-summary](./docs/tasks/show-messaging-summary.md)|Show summary of cloud messaging|
 |[show-messaging-clients](./docs/tasks/show-messaging-clients.md)|Show clients of cloud messaging|
 
-##spotfire
+## spotfire
 
 | TASK | Description |
 |------|:------------|
@@ -158,7 +159,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[delete-spotfire-library-item](./docs/tasks/delete-spotfire-library-item.md)|Deletes a Spotfire Library Item (a DXP for example).|
 |[create-spotfire-library-folder](./docs/tasks/create-spotfire-library-folder.md)|Creates a new Library Folder.|
 
-##oauth
+## oauth
 
 | TASK | Description |
 |------|:------------|
