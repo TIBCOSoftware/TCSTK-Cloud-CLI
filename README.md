@@ -50,6 +50,7 @@ tcli new <name> [--template(-t)] <template-to-use>
 These are the available TIBCO Cloud™ CLI Tasks:
 
 ##tcli
+
 | TASK | Description |
 |------|:------------|
 |[show-cloud](./docs/tasks/show-cloud.md)|Show Cloud Details|
@@ -70,7 +71,9 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |help|Display's help message|
 |browse-tasks|Browses the TCLI tasks by category|
 |repeat-last-task|Repeats the last executed task|
+
 ##cloud-starters
+
 | TASK | Description |
 |------|:------------|
 |[show-cloud-starters](./docs/tasks/show-cloud-starters.md)|Show a Table of all the deployed Cloud Starters|
@@ -87,7 +90,9 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[inject-lib-sources](./docs/tasks/inject-lib-sources.md)|Enables your project for Cloud Library Debugging|
 |[undo-lib-sources](./docs/tasks/undo-lib-sources.md)|Undoes the enabling for Cloud Library Debugging|
 |[schematic-add](./docs/tasks/schematic-add.md)|Add a schematic into your project|
+
 ##live-apps
+
 | TASK | Description |
 |------|:------------|
 |[show-live-apps-cases](./docs/tasks/show-live-apps-cases.md)|Show Live Apps Cases|
@@ -103,7 +108,9 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[generate-live-apps-import-configuration](./docs/tasks/generate-live-apps-import-configuration.md)|Generate the Live Apps Import configuration file|
 |[import-live-apps-cases](./docs/tasks/import-live-apps-cases.md)|Import Cases to Live Apps|
 |[copy-live-apps-between-organizations](./docs/tasks/copy-live-apps-between-organizations.md)|Copies a LiveApps application between organizations.|
+
 ##shared-state
+
 | TASK | Description |
 |------|:------------|
 |[show-shared-state](./docs/tasks/show-shared-state.md)|Show the shared state contents|
@@ -114,25 +121,33 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[export-shared-state](./docs/tasks/export-shared-state.md)|Downloads all shared state entries from the configured filter to the local file system.|
 |[import-shared-state](./docs/tasks/import-shared-state.md)|Uploads one entry or the configured filter from the local file system to the shared state.|
 |[watch-shared-state](./docs/tasks/watch-shared-state.md)|Monitors the local shared state and when changes are detected it is uploaded to the cloud.|
+
 ##cloud-files
+
 | TASK | Description |
 |------|:------------|
 |[show-cloud-folders](./docs/tasks/show-cloud-folders.md)|Displays the content of the LiveApps Organization Folders.|
 |[create-cloud-folder](./docs/tasks/create-cloud-folder.md)|Creates a new LiveApps Organization Folder.|
 |[upload-file-to-cloud-folder](./docs/tasks/upload-file-to-cloud-folder.md)|Uploads a file to a LiveApps Organization Folder|
 |[download-file-from-cloud-folder](./docs/tasks/download-file-from-cloud-folder.md)|Downloads file(s) from a LiveApps Organization Folder to disk|
+
 ##tci
+
 | TASK | Description |
 |------|:------------|
 |[show-tci-apps](./docs/tasks/show-tci-apps.md)|List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).|
 |[monitor-tci-app](./docs/tasks/monitor-tci-app.md)|Monitor the logs of a TIBCO Cloud Integration Flogo Application|
 |[export-tci-app](./docs/tasks/export-tci-app.md)|Exports a TCI-Flogo Application|
+
 ##messaging
+
 | TASK | Description |
 |------|:------------|
 |[show-messaging-summary](./docs/tasks/show-messaging-summary.md)|Show summary of cloud messaging|
 |[show-messaging-clients](./docs/tasks/show-messaging-clients.md)|Show clients of cloud messaging|
+
 ##spotfire
+
 | TASK | Description |
 |------|:------------|
 |[browse-spotfire-library](./docs/tasks/browse-spotfire-library.md)|List Spotfire Analytical Reports and browse through folders on the Spotfire Library.|
@@ -142,7 +157,9 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[share-spotfire-library-folder](./docs/tasks/share-spotfire-library-folder.md)|Shares a Spotfire Library Folder with a Specific User.|
 |[delete-spotfire-library-item](./docs/tasks/delete-spotfire-library-item.md)|Deletes a Spotfire Library Item (a DXP for example).|
 |[create-spotfire-library-folder](./docs/tasks/create-spotfire-library-folder.md)|Creates a new Library Folder.|
+
 ##oauth
+
 | TASK | Description |
 |------|:------------|
 |[show-oauth-tokens](./docs/tasks/show-oauth-tokens.md)|Displays OAUTH tokens to authenticate to the TIBCO Cloud.|

@@ -104,7 +104,7 @@ function generateReadMeTable() {
         }
     }
     for (const cat in taskCat){
-        dataForFile += '##' + cat + '\n| TASK | Description |\n|------|:------------|\n';
+        dataForFile += '\n##' + cat + '\n\n| TASK | Description |\n|------|:------------|\n';
         // dataForFile += ' '.padStart(47) + ('[*** ' + cat + ' ***]');
         for (let tas of taskCat[cat]) {
             if(tas.internal){
