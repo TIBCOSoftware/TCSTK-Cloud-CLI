@@ -6,7 +6,7 @@ import {
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
-import {ERROR, INFO, log, logLine} from "../common/logging";
+import {ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 
 const CCOM = require('../common/cloud-communications');
@@ -47,18 +47,26 @@ async function getOrgFoldersBase() {
     let allFolders: any[] = [];
     for (let i = 0; hasMoreFolders; i = i + folderStepSize) {
         // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
+        hasMoreFolders = false;
         let skip = '';
         if (i != 0) {
             skip = '&$skip=' + i
         }
-        const folderDet = await CCOM.callTCA(CCOM.clURI.la_org_folders + '?$top=' + folderStepSize + skip);
+        const folderDet = await CCOM.callTCA(CCOM.clURI.la_org_folders + '?$top=' + folderStepSize + skip, false, {handleErrorOutside: true});
         if (folderDet) {
-            if (folderDet.length < folderStepSize) {
-                hasMoreFolders = false;
+            if(folderDet.errorCode) {
+                if(folderDet.errorCode == 'WR_FOLDER_DOES_NOT_EXIST') {
+                    log(WARNING, 'No org folders exist yet...');
+                    return [];
+                } else {
+                    log(ERROR, 'Something went wrong: ', folderDet);
+                }
+            } else {
+                if (folderDet.length == folderStepSize) {
+                    hasMoreFolders = true;
+                }
+                allFolders = allFolders.concat(folderDet);
             }
-            allFolders = allFolders.concat(folderDet);
-        } else {
-            hasMoreFolders = false;
         }
     }
     return allFolders;
@@ -74,7 +82,9 @@ export async function getOrgFolderTable(showFolders: boolean, countItems: boolea
             folderTable[fNr]['Number of Items'] = noItems;
         }
     }
-    pexTable(folderTable, 'cloud-folders', getPEXConfig(), showFolders);
+    if(allFolders.length > 0) {
+        pexTable(folderTable, 'cloud-folders', getPEXConfig(), showFolders);
+    }
     return folderTable;
 }
 

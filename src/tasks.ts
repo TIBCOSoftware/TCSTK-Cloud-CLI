@@ -214,7 +214,7 @@ export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
         }
         let commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments;
         // TODO: Don't call tcli again but create a CLIRun Class
-        run(commandTcli);
+        run(commandTcli, false);
         return promptTask(stDir, cwdDir);
     });
     // });

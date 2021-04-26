@@ -354,8 +354,11 @@ export async function cli(args: any) {
                             if (answers !== '') {
                                 // Remove last semicolon
                                 answers = answers.substring(0, answers.length - 1);
-                                // TODO: add different property file (if used)
                                 taskCommand += '-a "' + answers + '"';
+                            }
+                            // Add different property file (if used)
+                            if(options.propfile != 'tibco-cloud.properties'){
+                                taskCommand += ' -p "' + options.propfile + '"';
                             }
                             let rec = col.white('● ');
                             if (options.record != '') {

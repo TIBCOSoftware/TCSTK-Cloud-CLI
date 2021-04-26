@@ -441,31 +441,39 @@ describe("tcli testsuite", function () {
     it("TCLI: LibrarySF Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
 
-        // TODO: Create a new folder
-
-        // TODO: Create a new folder Again
-
-        // TODO: Copy a sample report into this folder
-
-        // TODO: Copy a non-existing report
-
-        // TODO: Copy to a non-existing place
-
-        // TODO: Rename the sample report
-
-        // TODO: Rename a non-existing report
-
-        // TODO: Rename the folder
-
-        // TODO: Delete the sample report
-
-        // TODO: Delete the sample report Again
-
-        // TODO: Delete the created folder
-
-
+        // Create a new folder
+        expect(run(CLI_EXECUTOR + 'create-spotfire-library-folder -a "/Teams/~{ORGANIZATION}:Jasmine_Test:Test Folder"')).toBe(true);
+        // Create a new folder Again
+        expect(run(CLI_EXECUTOR + 'create-spotfire-library-folder -a "/Teams/~{ORGANIZATION}:Jasmine_Test:Test Folder"')).toBe(true);
+        // Validate that this folder is created
+        expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test"')).toBe(true);
+        // Copy a sample report into this folder
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Spotfire_Library_Base:none:')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'copy-spotfire-library-item -a "Spotfire Reports:/Samples/Introduction to Spotfire:/Teams/~{ORGANIZATION}/Jasmine_Test"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test/Introduction to Spotfire"')).toBe(true);
+        // Copy a non-existing report
+        expect(run(CLI_EXECUTOR + 'copy-spotfire-library-item -a "Spotfire Reports:/Samples/NOT_EXISTS:/Teams/~{ORGANIZATION}/Jasmine_Test"')).toBe(false);
+        // Copy to a non-existing place TODO: Proper error message
+        expect(run(CLI_EXECUTOR + 'copy-spotfire-library-item -a "Spotfire Reports:/Samples/Introduction to Spotfire:/Teams/~{ORGANIZATION}/Jasmine_Test_NOT_EXISTS"')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Spotfire_Library_Base:none:/Teams/~{ORGANIZATION}')).toBe(true);
+        // Rename the sample report
+        expect(run(CLI_EXECUTOR + 'rename-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test/Introduction to Spotfire:NEW_NAME"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test/NEW_NAME"')).toBe(true);
+        // Rename a non-existing report
+        expect(run(CLI_EXECUTOR + 'rename-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test/NOT_EXISTS:NEW_NAME"')).toBe(false);
+        // Rename the folder
+        expect(run(CLI_EXECUTOR + 'rename-spotfire-library-item -a "Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test:Jasmine_Test_Changed"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed"')).toBe(true);
+        // Delete the sample report
+        expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME:YES"')).toBe(true);
+        // Delete the sample report Again TODO: Proper error message
+        expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME:YES"')).toBe(false);
+        // Delete the created folder
+        expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed:YES"')).toBe(true);
+        // Validate that the report and the folder are not there anymore
+        expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME"')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed"')).toBe(false);
     });
-
 
     // FS Testcases
     // jasmine --config=test/support/jasmine.json --filter='TCLI: Fuzzy Search'

@@ -7,7 +7,7 @@ import {
 import {Global} from "../models/base";
 import {changeOrganization, displayOrganizations, getCurrentOrganizationInfo} from "../common/organization-management";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
-import {DEBUG, ERROR, INFO, log, logLine} from "../common/logging";
+import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
 import {LADesignTimeApp, LApp} from "../models/live-apps";
 
@@ -119,7 +119,7 @@ async function getMasterOrgName() {
 }
 
 // Function to get the master token (also if it is stored as a token standard)
-function getMasterToken(){
+function getMasterToken() {
     let re = getProp('Master_Account_Token');
     const key = 'Token:';
     if (re.indexOf(key) > 0) {
@@ -201,22 +201,13 @@ export async function showLiveAppsActions() {
     }
 }
 
-/*
-let laAppNameA = ['NONE'].concat(apps.map(v => v.name));
-            let laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA);
- */
-
-
 const storeOptions = {spaces: 2, EOL: '\r\n'};
 
+// Function to export a LiveApps Case Definition
 export async function exportLiveAppsCaseType() {
     await checkCaseFolder();
     const cTypes = await showLiveApps(true, false);
     const cTypeArray = cTypes.map(app => app.name);
-    /*
-    for (const curCase in cTypes) {
-        cTypeArray.push(cTypes[curCase].name);
-    }*/
     const typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
     const fName = await askQuestion('What file name would you like to export to ? (press enter or use DEFAULT for default):');
     let appFound = false;
@@ -244,12 +235,7 @@ const exportCaseStepSize = 30;
 export async function exportLiveAppsData() {
     await checkCaseFolder();
     const cTypes = await showLiveApps(true, true);
-    // let cTypeArray = [];
     const cTypeArray = cTypes.map(app => app.name);
-    /*
-    for (const curCase in cTypes) {
-        cTypeArray.push(cTypes[curCase].name);
-    }*/
     const typeForExport = await askMultipleChoiceQuestionSearch('Which Case-Type would you like to export ?', cTypeArray);
     const fName = await askQuestion('What Folder like to export to ? (press enter or use default, date get\'s added...)');
     // let oneFileStore = await askMultipleChoiceQuestion('Do you also want to store all contents in one file ? (this is used for import)', ['YES', 'NO']);
@@ -266,7 +252,6 @@ export async function exportLiveAppsData() {
             // get cases in batch sizes
             for (let i = 0; i <= numberOfCasesForExport; i = i + exportCaseStepSize) {
                 let exportBatch = await CCOM.callTCA(CCOM.clURI.la_cases + '?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + laApp.applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i);
-                // console.log('Export Batch', exportBatch);
                 logLine('Exporting Case: (' + i + '/' + numberOfCasesForExport + ')...');
                 allCases = allCases.concat(exportBatch);
             }
@@ -289,7 +274,6 @@ export async function exportLiveAppsData() {
                 let contextFileName = cfName + typeForExport + '-' + exCase.caseReference + '.json';
                 let writeContentSeparate = false;
                 let contentObject = {};
-                //let contextFileName = CASE_FOLDER + sSEntry.name + '.json';
                 let contentFileName = cfName + 'CONTENT/' + typeForExport + '-' + exCase.caseReference + '.CONTENT.json';
                 if (exCase.casedata != null) {
                     try {
@@ -300,7 +284,7 @@ export async function exportLiveAppsData() {
                         // And store them in a file / folder
                         require('jsonfile').writeFileSync(contentFileName, contentObject, storeOptions);
                         writeContentSeparate = true;
-                        //log(INFO, '[STORED CONTENT]: ' + contentFileName);
+                        log(DEBUG, '[STORED CONTENT]: ' + contentFileName);
                     } catch (e) {
                         log(ERROR, 'Parse Error on: ' + exCase.name + 'Writing directly...');
                     }
@@ -314,10 +298,8 @@ export async function exportLiveAppsData() {
                     }
                 }
             }
-            //if(oneFileStore == 'YES'){
             let AllCaseFileName = cfName + 'CONTENT/' + typeForExport + '-ALL.CONTENT.json';
             //TODO: Put the app name around the AllCaseArray
-
             require('jsonfile').writeFileSync(AllCaseFileName, AllCaseArray, storeOptions);
             log(INFO, '[STORED ALL CONTENT]: ' + AllCaseFileName);
             //}
@@ -608,7 +590,6 @@ export async function copyLiveApps() {
         doCopyFromMaster = true;
         masterOrgName = await getMasterOrgName();
         appQuestion = 'Which LiveApps Application would you like to copy from the MASTER(' + col.blue(masterOrgName) + ') Organization to Your Organization ?';
-
     }
     // Step 1: Display the current LiveApps Apps
     await showLiveAppsDesign(true);
@@ -640,18 +621,39 @@ export async function copyLiveApps() {
                 log(INFO, '    Current Organization: ', col.blue(currentOrgInfo.displayName));
                 log(INFO, 'Changing to Organization: ', col.blue(targetOrgInfo.accountDisplayName));
                 await changeOrganization(targetOrgInfo.accountId);
-
-                // TODO: Check if the app does not exist already
-
-                // Step 7: Receive the LiveApps App
-                const receiveRes = await receiveLApp(shareRes);
-                // Step 8: Switch back to the original organization
-                await changeOrganization(currentOrgInfo.accountId);
-                if (receiveRes) {
+                // Check if the app does not exist already
+                const targetOrgApplications = await getLiveAppsDesignTime();
+                let doCopy = true;
+                if (targetOrgApplications && targetOrgApplications.length > 0) {
+                    let appExist = false;
+                    for (const cuApp of targetOrgApplications) {
+                        if (laAppNameToCopy === cuApp.name) {
+                            appExist = true;
+                        }
+                    }
+                    if (appExist) {
+                        const copyAns = await askMultipleChoiceQuestion('An app with the name ' + col.blue(laAppNameToCopy) + ' already exists in the target organization, are you sure you want to copy (the new app will get different name) ?', ['YES', 'NO']);
+                        if (copyAns.toLowerCase() === 'no') {
+                            doCopy = false;
+                        }
+                    }
+                }
+                if (doCopy) {
+                    // Step 7: Receive the LiveApps App
+                    const receiveRes = await receiveLApp(shareRes);
+                    log(INFO, 'LiveApps Applications on TARGET Organization:');
                     await showLiveAppsDesign(true);
-                    log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' + receiveRes + ')');
+                    // Step 8: Switch back to the original organization
+                    await changeOrganization(currentOrgInfo.accountId);
+                    if (receiveRes) {
+                        // await showLiveAppsDesign(true);
+                        log(INFO, 'Successfully copied: ', col.green(laAppNameToCopy) + ' to ' + col.green(targetOrgName) + ' (new id: ' + receiveRes + ')');
+                    } else {
+                        log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' to ' + targetOrgName);
+                    }
                 } else {
-                    log(ERROR, 'Something went wrong while copying; ' + laAppNameToCopy + ' to ' + targetOrgName);
+                    await changeOrganization(currentOrgInfo.accountId);
+                    log(WARNING, 'Application ' + laAppToCopy.name + ' not copied, since it already existed...');
                 }
             }
         } else {
@@ -666,7 +668,7 @@ export async function copyLiveApps() {
                         appExist = true;
                     }
                 }
-                if(appExist) {
+                if (appExist) {
                     const copyAns = await askMultipleChoiceQuestion('An app with the name ' + col.blue(laAppNameToCopy) + ' already exists in the current organization, are you sure you want to copy (the new app will get different name) ?', ['YES', 'NO']);
                     if (copyAns.toLowerCase() === 'no') {
                         doCopy = false;
@@ -699,7 +701,7 @@ export async function copyLiveApps() {
                     log(ERROR, 'No App to copy: ', laAppToCopy)
                 }
             } else {
-                log(INFO, 'OK, I won\'t do anything :-)');
+                log(WARNING, 'Application ' + laAppToCopy!.name + ' not copied, since it already existed...');
             }
         }
     } else {

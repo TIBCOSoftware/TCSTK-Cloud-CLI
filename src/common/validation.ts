@@ -7,6 +7,8 @@ import {Global} from "../models/base";
 import {askMultipleChoiceQuestion, askQuestion} from "./user-interaction";
 import {ERROR, INFO, log} from "./logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "./property-file-management";
+import {askTypes, getNameForSFType, listOnType} from "../tenants/spotfire";
+
 declare var global: Global;
 
 
@@ -22,7 +24,7 @@ export async function validate() {
     //console.log('Validate ',new Date());
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate');
     // TODO: Add; case_folder_exist,
-    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_Exist', 'Case_Not_Exist', 'Case_In_State'];
+    const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_exist', 'Case_not_exist', 'Case_in_state', 'Spotfire_Library_Item_exists'];
     const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase();
     log(INFO, 'Validating: ', valD);
     if (valD === 'property_exist' || valD === 'property_is_set' || valD === 'property_is_set_ask') {
@@ -109,6 +111,15 @@ export async function validate() {
         const caseState = await askQuestion('For state would you like to validate ?');
         await validateLACaseState(caseRef, caseState)
     }
+
+    if (valD === 'spotfire_library_item_exists') {
+        const libType = await askTypes('What Spotfire Library item type would you like to validate ?', false, true);
+        let typeList = await listOnType(libType, true, true);
+        if (!typeList) {
+            typeList = [];
+        }
+        await validationItemHelper(typeList, 'Spotfire Library Item (' + getNameForSFType(libType) + ')', 'TCLIPath');
+    }
 }
 
 // Validate the state of a case
@@ -157,12 +168,12 @@ export async function validateLACase(casesToValidate: string, valType: string) {
 async function validationItemHelper(items: any[], type: string, search: string) {
     let itemsToValidate = await askQuestion('Which ' + type + ' would you like to validate (Use plus character to validate multiple ' + type + 's, for example: item1+item2) ?');
     let itemArray = itemsToValidate.split('+');
-    for (let app of itemArray) {
-        let laApp = items.find(e => e[search] === app.trim());
-        if (laApp != null) {
-            validationOk(type + ' ' + col.blue(app) + '\x1b[0m exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
+    for (let item of itemArray) {
+        let itemToFind = items.find(e => e[search] === item.trim());
+        if (itemToFind != null) {
+            validationOk(type + ' ' + col.blue(item) + '\x1b[0m exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         } else {
-            validationFailed(type + ' ' + col.blue(app) + '\x1b[0m does not exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
+            validationFailed(type + ' ' + col.blue(item) + '\x1b[0m does not exist on organization: ' + col.blue(getOrganization()) + '\x1b[0m...');
         }
     }
     return itemsToValidate;

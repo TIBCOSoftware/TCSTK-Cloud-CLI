@@ -428,7 +428,7 @@ function setTcliPath(sfLibObject: SFLibObject): SFLibObject {
     return sfLibObject;
 }
 
-function getNameForSFType(type: SFType): string {
+export function getNameForSFType(type: SFType): string {
     for (const [ReadableName, SFTypeName] of Object.entries(SF_FRIENDLY_TYPES)) {
         if (type === SFTypeName) {
             return ReadableName;
@@ -437,7 +437,7 @@ function getNameForSFType(type: SFType): string {
     return type;
 }
 
-async function askTypes(question: string, doAll?: boolean, doFolders?: boolean): Promise<SFType> {
+export async function askTypes(question: string, doAll?: boolean, doFolders?: boolean): Promise<SFType> {
     doAll = doAll || false;
     doFolders = doFolders || false;
     const questionTypes = ['NONE'];
