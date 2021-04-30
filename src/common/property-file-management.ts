@@ -477,10 +477,10 @@ export async function updateProperty() {
         }
         if (vType.toLowerCase() === 'spotfire_folderpath') {
             prepSpotfireProps();
-            const sfFolderList = await listOnType('spotfire.folder', true, true);
+            const sfFolderList = await listOnType('spotfire.folder', false, true);
             if (sfFolderList && sfFolderList.length > 0) {
                 // Pick Item from the list
-                let selectedFolder = await askMultipleChoiceQuestionSearch('For which folder would you like to store the Folder Path ?', sfFolderList.map(v => v.DisplayPath));
+                let selectedFolder = await askMultipleChoiceQuestionSearch('For which folder would you like to store the Folder Path ?', sfFolderList.map(v => v.TCLIPath));
                 pValue = sfFolderList.find(v => v.DisplayPath === selectedFolder)!.Path;
             } else {
                 log(ERROR, 'No shared states to get the ID from, consider looking at your Shared_State_Filter setting...');
