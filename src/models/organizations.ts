@@ -14,7 +14,7 @@ export interface AccountInfo {
     regions: string[];
     selected: boolean;
     index: string;
-    childAccountsInfo: string[];
+    childAccountsInfo: AccountInfo[];
 }
 
 export type Accounts = AccountInfo[];

@@ -6,7 +6,7 @@ import {
     pexTable
 } from "../common/common-functions";
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
-import {INFO, log} from "../common/logging";
+import {ERROR, INFO, log, WARNING} from "../common/logging";
 import {LAGroup} from "../models/live-apps";
 
 const CCOM = require('../common/cloud-communications');
@@ -17,7 +17,7 @@ export async function getGroups(): Promise<LAGroup[]> {
     return await CCOM.callTCA(CCOM.clURI.la_groups) as LAGroup[];
 }
 
-export async function getGroupsTable(showTable?:boolean): Promise<any> {
+export async function getGroupsTable(showTable?: boolean): Promise<any> {
     let doShowTable = true;
     if (showTable != null) {
         doShowTable = showTable;
@@ -55,12 +55,12 @@ export async function showLiveAppsGroups(): Promise<void> {
 }
 
 // Function to create LiveApps Group
-export async function createLiveAppsGroup():Promise<void> {
+export async function createLiveAppsGroup(): Promise<void> {
     log(INFO, 'Creating LiveApps Group...');
     const gName = await askQuestion('What is the name of the group you would like to create ? (use "NONE" or press enter to not create a group)');
     if (gName !== '' || gName.toLowerCase() !== 'none') {
         const groups = await getGroups();
-        if(!doesExist(groups.map( g => g.name), gName, `The group ${gName} already exists, we will not try to create it again...`)) {
+        if (!doesExist(groups.map(g => g.name), gName, `The group ${gName} already exists, we will not try to create it again...`)) {
             const gDescription = await askQuestion('What is the description of the group  ? (press enter to leave blank)');
             const postGroup = {
                 "name": gName,
@@ -78,7 +78,7 @@ export async function createLiveAppsGroup():Promise<void> {
 }
 
 // Function that shows the LiveApps Users
-export async function showLiveAppsUsers(showTable:boolean, hideTestUsers:boolean) {
+export async function showLiveAppsUsers(showTable: boolean, hideTestUsers: boolean) {
     const oResponse = await CCOM.callTCA(CCOM.clURI.la_users);
     const usersTable = createTable(oResponse, CCOM.mappings.la_users, false);
     if (hideTestUsers) {
@@ -106,11 +106,11 @@ export async function addUserToGroup() {
     }
     const groupDecision = await askMultipleChoiceQuestionSearch('For which group would you like to ADD a user ?', selectGroup);
     if (groupDecision !== 'NONE') {
-        let currentUsersInGroupT:any = [];
+        let currentUsersInGroupT: any = [];
         for (let gr of iterateTable(groupT)) {
             if (groupDecision === gr.Name) {
                 groupIdToAdd = gr.Id;
-                const oResponse =  await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await LA.getProductionSandbox());
+                const oResponse = await CCOM.callTCA(CCOM.clURI.la_groups + '/' + gr.Id + '/users?$sandbox=' + await LA.getProductionSandbox());
                 log(INFO, 'CURRENT USERS IN GROUP: ' + groupDecision);
                 currentUsersInGroupT = createTable(oResponse, CCOM.mappings.la_groups_users, true)
             }
@@ -130,7 +130,8 @@ export async function addUserToGroup() {
             }
             if (add) {
                 allowedUsersTable.push(usr);
-                selectedUser.push(usr['First Name'] + ' ' + usr['Last Name']);
+                // selectedUser.push(usr['First Name'] + ' ' + usr['Last Name']);
+                selectedUser.push(usr['User Name']);
             }
         }
         log(INFO, 'Users that can be added to ' + groupDecision);
@@ -144,7 +145,8 @@ export async function addUserToGroup() {
                 groupIdToAdd = userDecision.substr(3);
             }
             for (let usr of iterateTable(userT)) {
-                if (userDecision === usr['First Name'] + ' ' + usr['Last Name']) {
+                // if (userDecision === usr['First Name'] + ' ' + usr['Last Name']) {
+                if (userDecision === usr['User Name']) {
                     userIdToAdd = usr.Id;
                 }
             }
@@ -154,10 +156,23 @@ export async function addUserToGroup() {
                 groupId: groupIdToAdd,
                 userId: userIdToAdd
             }
-            const oResponse =  await CCOM.callTCA( CCOM.clURI.la_user_group_mapping, false, {method: 'POST',  postRequest: postGroupMapping});
-            if (oResponse != null) {
-                log(INFO, 'Successfully added user: ' + col.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + col.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
-
+            const oResponse = await CCOM.callTCA(CCOM.clURI.la_user_group_mapping, false, {
+                method: 'POST',
+                postRequest: postGroupMapping,
+                handleErrorOutside: true
+            });
+            if (oResponse) {
+                if (oResponse.errorCode) {
+                    if (oResponse.errorCode === 'AE_USERGROUPMAPPING_CREATE_ERROR_ALREADY_EXISTS') {
+                        log(WARNING, 'The user is already part of the group, not doing anything...')
+                    } else {
+                        log(ERROR, oResponse);
+                    }
+                } else {
+                    log(INFO, 'Successfully added user: ' + col.green(userDecision) + '[ID:' + userIdToAdd + '] to ' + col.green(groupDecision) + '[ID:' + groupIdToAdd + '] User Mapping ID: ' + oResponse);
+                }
+            } else {
+                log(ERROR, 'No response...');
             }
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');

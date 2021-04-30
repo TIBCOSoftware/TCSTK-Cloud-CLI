@@ -15,6 +15,7 @@ import {DEBUG, ERROR, INFO, log, WARNING} from "./logging";
 import {getOAUTHDetails, parseOAUTHToken, setOAUTHDetails} from "./oauth";
 import {getSharedState, selectSharedState} from "../tenants/shared-state";
 import {listOnType, prepSpotfireProps} from "../tenants/spotfire";
+import {Accounts} from "../models/organizations";
 
 const LA = require('../tenants/live-apps');
 const _ = require('lodash');
@@ -404,8 +405,9 @@ export async function updateProperty() {
     // Ask prop value
     let pValue = await askQuestion('What value would you like to add ? (use ' + SPECIAL + ' to select from a list)');
     if (pValue.toUpperCase() === SPECIAL) {
-        // TODO: Add Cloud Starter Link, FlogoAppId,
-        const vTChoices = ['Organization_Name', 'SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID', 'Shared_StateID', 'Spotfire_FolderPath'];
+        // TODO: Add Cloud Starter Link, FlogoAppId
+        // TODO: Move this to a special function (getSpecialProperty, that takes for example LiveApps_AppID;MyApp. And then re-use these props as globals)
+        const vTChoices = ['Organization_Name', 'Organization_ID', 'SandboxID', 'LiveApps_AppID', 'LiveApps_ActionID', 'Shared_StateID', 'Spotfire_FolderPath'];
         const vType = await askMultipleChoiceQuestion('What type of answer would you like to add to the property ?', vTChoices);
         if (vType.toLowerCase() === 'organization_name') {
             if (!getOrganization()) {
@@ -413,6 +415,26 @@ export async function updateProperty() {
             }
             pValue = getOrganization();
         }
+        // Organization_ID
+        if (vType.toLowerCase() === 'organization_id') {
+            pValue = '';
+            const organizations = await getOrganizations() as Accounts;
+            const currentOrgName = await getOrganization();
+            console.log(currentOrgName);
+            for(const org of organizations) {
+                if(org.childAccountsInfo && org.childAccountsInfo.length > 0){
+                    for(const childOrg of org.childAccountsInfo){
+                        if(childOrg.accountDisplayName === currentOrgName){
+                            pValue = childOrg.subscriptionId;
+                        }
+                    }
+                }
+                if(org.accountDisplayName === currentOrgName){
+                    pValue = org.subscriptionId;
+                }
+            }
+        }
+
         if (vType.toLowerCase() === 'sandboxid') {
             pValue = await LA.getProductionSandbox();
         }
@@ -506,38 +528,39 @@ export function disableProperty(location: string, property: string, comment: str
             // const data = fs.readFileSync(location, 'utf8');
             const dataLines = fs.readFileSync(location, 'utf8').split('\n');
             let propFound = false;
-            for (let lineNumber in dataLines) {
-                if (dataLines[lineNumber].startsWith(property)) {
-                    propFound = true;
-                    log(DEBUG, `Property found: ${property} We are disabeling it...`);
-                    if (comment && comment !== '') {
-                        dataLines[lineNumber] = '#' + comment + '\n#' + dataLines[lineNumber];
-                    } else {
-                        dataLines[lineNumber] = '#' + dataLines[lineNumber];
+            if (dataLines) {
+                for (let lineNumber in dataLines) {
+                    if (dataLines[lineNumber].startsWith(property)) {
+                        propFound = true;
+                        log(INFO, `Property found: ${property} We are disabling it...`);
+                        if (comment && comment !== '') {
+                            dataLines[lineNumber] = '#' + comment + '\n#' + dataLines[lineNumber];
+                        } else {
+                            dataLines[lineNumber] = '#' + dataLines[lineNumber];
+                        }
                     }
                 }
-            }
-            let dataForFile = '';
-            for (let lineN = 0; dataLines < dataLines.length; lineN++) {
-                if (lineN !== (dataLines.length - 1)) {
-                    dataForFile += dataLines[lineN] + '\n';
-                } else {
-                    // The last one:
-                    dataForFile += dataLines[lineN];
+                let dataForFile = '';
+                for (let lineN = 0; lineN < dataLines.length; lineN++) {
+                    if (lineN !== (dataLines.length - 1)) {
+                        dataForFile += dataLines[lineN] + '\n';
+                    } else {
+                        // The last one:
+                        dataForFile += dataLines[lineN];
+                    }
                 }
-            }
-            if (propFound) {
-                fs.writeFileSync(location, dataForFile, 'utf8');
-                log(INFO, 'Disabled Property: ' + col.blue(property) + ' (in:' + location + ')');
-            } else {
-                // append prop to the end.
-                log(WARNING, 'Property NOT found: ' + col.blue(property) + ' to disable... (in:' + location + ')');
+                if (propFound) {
+                    fs.writeFileSync(location, dataForFile, 'utf8');
+                    log(INFO, 'Disabled Property: ' + col.blue(property) + ' (in:' + location + ')');
+                } else {
+                    log(WARNING, 'Property NOT found: ' + col.blue(property) + ' to disable... (in:' + location + ')');
+                }
             }
         } else {
             log(ERROR, 'Property File does not exist: ' + location);
         }
     } catch (err) {
-        console.error(err)
+        console.error(err);
     }
 }
 
