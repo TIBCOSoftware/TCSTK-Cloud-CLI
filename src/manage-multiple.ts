@@ -34,13 +34,13 @@ export function processMultipleFile() {
     if (mOpts.environment && mOpts.environment.trim() !== '') {
         environmentOverride = mOpts.environment;
     }
-    if (csJobs == null) {
+    if (!csJobs) {
         //Try to get from old definition for backwards compatibility.
         csJobs = getMProp('Cloud_Starters');
         if (csJobs != null) {
             log(WARNING, "Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...");
         } else {
-            log(ERROR, "Please specify the Cloud_Starter_JOBS property in: " + mFile + ' (or the common file if used...)');
+            log(ERROR, "Please specify JOBS in the Cloud_Starter_JOBS property in: " + mFile + ' (or the common file if used...)');
             process.exit(1);
         }
     }
@@ -198,6 +198,10 @@ export async function multipleInteraction() {
     while (true) {
         let miPropFolder = getMProp('Multiple_Interaction_Property_File_Folder');
         let miPropFiles = getMProp('Multiple_Interaction_Property_Files');
+        if(!miPropFiles){
+            log(ERROR, 'Please specify environment property files in the Multiple_Interaction_Property_Files property in ' + mFile);
+            process.exit(1);
+        }
         if (!taskOverRide) {
             miTask = getMProp('Multiple_Interaction_CLITask');
         }

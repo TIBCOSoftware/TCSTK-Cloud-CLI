@@ -161,57 +161,65 @@ export async function copySpotfire() {
         const itemsAvailableForCopy = await listOnType(typeForCopy, false, true);
         // 3: Ask which element to copy
         if (itemsAvailableForCopy && itemsAvailableForCopy.length > 0) {
-            const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', itemsAvailableForCopy.map(v => v.TCLIPath));
-            itemToCopy = itemsAvailableForCopy.find(v => v.TCLIPath === itemNameToCopy)!;
-            if (itemToCopy) {
-                // 4: List all folders
-                log(INFO, 'Getting all library folders that the item can be copied to...');
-                const sfFolders = await listOnType('spotfire.folder', false, false);
-                if (sfFolders) {
-                    // 5: Ask what folder to copy to
-                    log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization() + ' '));
-                    const foldersToCopyTo = [];
-                    for (const folder of sfFolders) {
-                        if (folder && folder.TCLIPath) {
-                            foldersToCopyTo.push(folder.TCLIPath);
+            const itemNameToCopy = await askMultipleChoiceQuestionSearch('Which item would you like to copy ?', ['NONE', ...itemsAvailableForCopy.map(v => v.TCLIPath)]);
+            if (itemNameToCopy.toLowerCase() !== 'none') {
+                itemToCopy = itemsAvailableForCopy.find(v => v.TCLIPath === itemNameToCopy)!;
+                if (itemToCopy) {
+                    // 4: List all folders
+                    log(INFO, 'Getting all library folders that the item can be copied to...');
+                    const sfFolders = await listOnType('spotfire.folder', false, false);
+                    if (sfFolders) {
+                        // 5: Ask what folder to copy to
+                        log(INFO, 'Specify the target folder, you are currently in: ' + col.blue(getOrganization() + ' '));
+                        const foldersToCopyTo = [];
+                        for (const folder of sfFolders) {
+                            if (folder && folder.TCLIPath) {
+                                foldersToCopyTo.push(folder.TCLIPath);
+                            }
                         }
-                    }
-                    const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', foldersToCopyTo);
-
-                    // 6: Get the folder ID
-                    folderIdToCopyTo = sfFolders!.find(v => v.TCLIPath === folderToCopyTo)!.Id;
-                    let doCopy = true;
-                    if (getProp('Spotfire_Do_Copy_With_New_Name').toLowerCase() !== 'yes') {
-                        const targetFolderInfo = await getSFolderInfo(folderIdToCopyTo);
-                        doCopy = !doesExist(targetFolderInfo.Children.map(g => g.Title), itemToCopy.Title, `The library item ${itemToCopy.Title} already exists, we will not try to create it again (since Spotfire_Do_Copy_With_New_Name is set too NO).`);
-                    }
-                    if (doCopy) {
-                        const copyRequest: SFCopyRequest = {
-                            itemsToCopy: [itemToCopy.Id],
-                            destinationFolderId: folderIdToCopyTo,
-                            conflictResolution: 'KeepBoth'
-                        }
-                        if (!copyRequest['conflictResolution']) {
-                            copyRequest['conflictResolution'] = 'KeepBoth';
-                        }
-                        const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
-                            method: 'POST',
-                            postRequest: copyRequest
-                        }) as SFLibObject[];
-                        if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
-                            log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
-                            if (itemToCopy.Title !== SFCopy[0].Title) {
-                                log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
+                        const folderToCopyTo = await askMultipleChoiceQuestionSearch('To which folder would you like to copy ' + col.blue(itemNameToCopy) + ' ?', foldersToCopyTo);
+                        // 6: Get the folder ID
+                        const folderDetailsToCopyTo = sfFolders!.find(v => v.TCLIPath === folderToCopyTo);
+                        if (folderDetailsToCopyTo) {
+                            folderIdToCopyTo = folderDetailsToCopyTo.Id;
+                            let doCopy = true;
+                            if (getProp('Spotfire_Do_Copy_With_New_Name').toLowerCase() !== 'yes') {
+                                const targetFolderInfo = await getSFolderInfo(folderIdToCopyTo);
+                                doCopy = !doesExist(targetFolderInfo.Children.map(g => g.Title), itemToCopy.Title, `The library item ${itemToCopy.Title} already exists, we will not try to create it again (since Spotfire_Do_Copy_With_New_Name is set too NO).`);
+                            }
+                            if (doCopy) {
+                                const copyRequest: SFCopyRequest = {
+                                    itemsToCopy: [itemToCopy.Id],
+                                    destinationFolderId: folderIdToCopyTo,
+                                    conflictResolution: 'KeepBoth'
+                                }
+                                if (!copyRequest['conflictResolution']) {
+                                    copyRequest['conflictResolution'] = 'KeepBoth';
+                                }
+                                const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
+                                    method: 'POST',
+                                    postRequest: copyRequest
+                                }) as SFLibObject[];
+                                if (SFCopy && SFCopy.length > 0 && SFCopy[0] && SFCopy[0].Id) {
+                                    log(INFO, 'Successfully copied: ', col.green(itemNameToCopy) + ' to ' + col.green(folderToCopyTo) + ' (new id: ' + SFCopy[0].Id + ')');
+                                    if (itemToCopy.Title !== SFCopy[0].Title) {
+                                        log(WARNING, 'Item was renamed to: ' + SFCopy[0].Title);
+                                    }
+                                } else {
+                                    log(ERROR, 'Something went wrong while copying: ', SFCopy);
+                                }
                             }
                         } else {
-                            log(ERROR, 'Something went wrong while copying: ', SFCopy);
+                            log(ERROR, 'The folder that you are trying to copy to (' + folderToCopyTo + ') does not exist; create it first...');
                         }
+                    } else {
+                        log(ERROR, 'No target folders available for copying, create a folder first');
                     }
                 } else {
-                    log(ERROR, 'No target folders available for copying, create a folder first');
+                    log(ERROR, `We could not find your item to copy (${itemNameToCopy}), consider changing your Spotfire_Library_Base`);
                 }
             } else {
-                log(ERROR, `We could not find your item to copy (${itemNameToCopy}), consider changing your Spotfire_Library_Base`);
+                log(INFO, 'OK, I won\'t do anything :-)');
             }
         }
     } else {
@@ -315,29 +323,37 @@ export async function shareSpotfireLibraryFolder() {
     const itemsToShare = await listOnType("spotfire.folder", false, false);
     // Step 2: Choose a folder to share
     if (itemsToShare) {
-        const itemNameToShare = await askMultipleChoiceQuestionSearch('Which item would you like to share ?', itemsToShare.map(v => v.TCLIPath));
-        const itemToShare = itemsToShare.find(v => v.TCLIPath === itemNameToShare)!;
-        // Step 3: Ask the email of the person to share it with
-        const sfShareWith = await askQuestion('Provide the email address of the person you want to share ' + col.blue(itemToShare.Title) + ' with ? (use "NONE" or press enter to not share)');
-        // TODO: Check for valid email
-        if (sfShareWith && sfShareWith !== '' && sfShareWith.toLowerCase() !== 'none') {
-            // TODO: Step 4: Optionally ask for a message
-            // Step 5: Call the share API
-            const SFShare = await callSpotfire(CCOM.clURI.sf_share, false, {
-                method: 'POST',
-                postRequest: {
-                    itemId: itemToShare.Id,
-                    inherit: false,
-                    recursive: true,
-                    sharing: "shared",
-                    users: [{email: sfShareWith, status: "new"}],
-                    "message": "Shared through TCLI"
+        const itemNameToShare = await askMultipleChoiceQuestionSearch('Which item would you like to share ?', ['NONE', ...itemsToShare.map(v => v.TCLIPath)]);
+        if (itemNameToShare.toLowerCase() !== 'none') {
+            const itemToShare = itemsToShare.find(v => v.TCLIPath === itemNameToShare)!;
+            if (itemToShare) {
+                // Step 3: Ask the email of the person to share it with
+                const sfShareWith = await askQuestion('Provide the email address of the person you want to share ' + col.blue(itemToShare.Title) + ' with ? (use "NONE" or press enter to not share)');
+                // TODO: Check for valid email
+                if (sfShareWith && sfShareWith !== '' && sfShareWith.toLowerCase() !== 'none') {
+                    // TODO: Step 4: Optionally ask for a message
+                    // Step 5: Call the share API
+                    const SFShare = await callSpotfire(CCOM.clURI.sf_share, false, {
+                        method: 'POST',
+                        postRequest: {
+                            itemId: itemToShare.Id,
+                            inherit: false,
+                            recursive: true,
+                            sharing: "shared",
+                            users: [{email: sfShareWith, status: "new"}],
+                            "message": "Shared through TCLI"
+                        }
+                    });
+                    if (SFShare && SFShare.success) {
+                        log(INFO, 'Successfully shared: ', col.green(itemNameToShare) + ' with ' + col.green(sfShareWith));
+                    } else {
+                        log(ERROR, 'An error occurred while sharing ', SFShare)
+                    }
+                } else {
+                    log(INFO, 'OK, I won\'t do anything :-)');
                 }
-            });
-            if (SFShare && SFShare.success) {
-                log(INFO, 'Successfully shared: ', col.green(itemNameToShare) + ' with ' + col.green(sfShareWith));
             } else {
-                log(ERROR, 'An error occurred while sharing ', SFShare)
+                log(WARNING, 'Can\'t find ' + itemNameToShare + ' to share, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)');
             }
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
@@ -358,24 +374,32 @@ export async function deleteSpotfireLibraryItem() {
         const itemsToDelete = await listOnType(typeForSearch, false, false);
         // Step 2: Choose an item to delete
         if (itemsToDelete) {
-            const itemNameToDelete = await askMultipleChoiceQuestionSearch('Which item would you like to delete ?', itemsToDelete.map(v => v.TCLIPath));
-            const itemToDelete = itemsToDelete.find(v => v.TCLIPath === itemNameToDelete)!;
-            console.table(itemToDelete);
-            // Step 3: Make sure the user wants to delete the item
-            const doDelete = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO DELETE ' + col.blue(itemToDelete.Title) + ' ?', ['NO', 'YES']);
-            if (doDelete && doDelete !== '' && doDelete.toLowerCase() === 'yes') {
-                // Step 4: Call the delete service
-                const SFDelete = await callSpotfire(CCOM.clURI.sf_delete, false, {
-                    method: 'POST',
-                    postRequest: {
-                        itemsToDelete: [
-                            itemToDelete.Id], force: false
+            const itemNameToDelete = await askMultipleChoiceQuestionSearch('Which item would you like to delete ?', ['NONE', ...itemsToDelete.map(v => v.TCLIPath)]);
+            if (itemNameToDelete.toLowerCase() !== 'none') {
+                const itemToDelete = itemsToDelete.find(v => v.TCLIPath === itemNameToDelete)!;
+                if (itemToDelete) {
+                    console.table(itemToDelete);
+                    // Step 3: Make sure the user wants to delete the item
+                    const doDelete = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO DELETE ' + col.blue(itemToDelete.Title) + ' ?', ['NO', 'YES']);
+                    if (doDelete && doDelete !== '' && doDelete.toLowerCase() === 'yes') {
+                        // Step 4: Call the delete service
+                        const SFDelete = await callSpotfire(CCOM.clURI.sf_delete, false, {
+                            method: 'POST',
+                            postRequest: {
+                                itemsToDelete: [
+                                    itemToDelete.Id], force: false
+                            }
+                        });
+                        if (SFDelete && SFDelete.Success) {
+                            log(INFO, 'Successfully deleted: ', col.green(itemNameToDelete) + '... ');
+                        } else {
+                            log(ERROR, 'An error occurred deleting ', SFDelete)
+                        }
+                    } else {
+                        log(INFO, 'OK, I won\'t do anything :-)');
                     }
-                });
-                if (SFDelete && SFDelete.Success) {
-                    log(INFO, 'Successfully deleted: ', col.green(itemNameToDelete) + '... ');
                 } else {
-                    log(ERROR, 'An error occurred deleting ', SFDelete)
+                    log(WARNING, 'Can\'t find ' + itemNameToDelete + ' to delete, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)');
                 }
             } else {
                 log(INFO, 'OK, I won\'t do anything :-)');
@@ -552,7 +576,7 @@ export async function listOnType(typeToList: SFType, fromRoot: boolean, addShare
             pexTable(tObject, 'list-spotfire', getPEXConfig(), true);
             return items;
         } else {
-            log(INFO, 'No ' + col.yellow(getNameForSFType(typeToList)) + ' Found in ' + col.blue(sfFolderToList.DisplayName) + '...');
+            log(INFO, 'No ' + col.yellow(getNameForSFType(typeToList)) + ' Found in ' + col.blue(sfFolderToList.TCLIPath) + '...');
         }
     }
     return null;
