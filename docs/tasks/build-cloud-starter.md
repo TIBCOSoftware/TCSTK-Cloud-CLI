@@ -32,7 +32,6 @@ Add a timestamp to the version in the descriptor (for example 1.0.01591605316). 
 
 Location of the descriptor file; For example: (./src/assets/cloudstarter.json)
 
-
 ---
 ### Example Usage
 > tcli build-cloud-starter

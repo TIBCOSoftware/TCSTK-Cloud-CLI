@@ -123,7 +123,7 @@ function generateReadMeTable() {
 
 
 // console.log('Generating Help Files...');
-// main(ONLY_GENERATE_NEW_FILES);
-// generateIndex();
+main(ONLY_GENERATE_NEW_FILES);
+generateIndex();
 // adjustTasks();
 generateReadMeTable();
