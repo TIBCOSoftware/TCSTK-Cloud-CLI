@@ -453,7 +453,7 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test/Introduction to Spotfire"')).toBe(true);
         // Copy a non-existing report
         expect(run(CLI_EXECUTOR + 'copy-spotfire-library-item -a "Spotfire Reports:/Samples/NOT_EXISTS:/Teams/~{ORGANIZATION}/Jasmine_Test"')).toBe(false);
-        // Copy to a non-existing place TODO: Proper error message
+        // Copy to a non-existing place
         expect(run(CLI_EXECUTOR + 'copy-spotfire-library-item -a "Spotfire Reports:/Samples/Introduction to Spotfire:/Teams/~{ORGANIZATION}/Jasmine_Test_NOT_EXISTS"')).toBe(false);
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Spotfire_Library_Base:none:/Teams/~{ORGANIZATION}')).toBe(true);
         // Rename the sample report
@@ -466,8 +466,8 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed"')).toBe(true);
         // Delete the sample report
         expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME:YES"')).toBe(true);
-        // Delete the sample report Again TODO: Proper error message
-        expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME:YES"')).toBe(false);
+        // Delete the sample report Again (Gives a Warning)
+        expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME:YES"')).toBe(true);
         // Delete the created folder
         expect(run(CLI_EXECUTOR + 'delete-spotfire-library-item -a "Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed:YES"')).toBe(true);
         // Validate that the report and the folder are not there anymore

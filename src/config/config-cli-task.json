@@ -120,6 +120,7 @@
       "description": "Deploy your local cloud starter project",
       "enabled": true,
       "internal": false,
+      "multipleInteraction": true,
       "task": "deploy",
       "taskAlternativeNames": [
         "d",
