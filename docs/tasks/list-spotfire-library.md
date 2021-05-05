@@ -50,10 +50,6 @@ TIBCO CLOUD CLI] (INFO)  TABLE] list-spotfire
 │    3    │ 'spotfire.dxp' │       '-'        │           '/Samples/Expense Analyzer Dashboard'            │
 │    4    │ 'spotfire.dxp' │       '-'        │            '/Samples/Introduction to Spotfire'             │
 │    5    │ 'spotfire.dxp' │       '-'        │               '/Samples/Sales and Marketing'               │
-│    6    │ 'spotfire.dxp' │ 'Bruno Souleres' │   'SHARED_WITH_ME/Sharing/project_discover_latest_v131'    │
 │    7    │ 'spotfire.dxp' │       '-'        │            'SHARED_WITH_ME/ToShare/ForSharing'             │
-│    8    │ 'spotfire.dxp' │ 'Bruno Souleres' │   'SHARED_WITH_ME/ToShare/project_discover_latest_v132'    │
-│    9    │ 'spotfire.dxp' │ 'Bruno Souleres' │     'SHARED_WITH_ME/Invitalia/project_discover_latest'     │
-│   10    │ 'spotfire.dxp' │ 'Bruno Souleres' │ 'SHARED_WITH_ME/Invitalia/project_discover_preview_latest' │
 └─────────┴────────────────┴──────────────────┴────────────────────────────────────────────────────────────┘
 ```
