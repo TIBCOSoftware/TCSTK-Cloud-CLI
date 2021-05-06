@@ -440,7 +440,9 @@ describe("tcli testsuite", function () {
     // jasmine --config=test/support/jasmine.json --filter='TCLI: LibrarySF Operations'
     it("TCLI: LibrarySF Operations", function () {
         expect(run(CLI_EXECUTOR + '--createCP')).toBe(true);
-
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_Token_Name:none:JasmineSpotfireSFOPTest_1:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_For_Tenants:none:TSC,BPM,SPOTFIRE:LOCAL')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'generate-oauth-token -a YES:YES:YES')).toBe(true);
         // Create a new folder
         expect(run(CLI_EXECUTOR + 'create-spotfire-library-folder -a "/Teams/~{ORGANIZATION}:Jasmine_Test:Test Folder"')).toBe(true);
         // Create a new folder Again
@@ -473,6 +475,7 @@ describe("tcli testsuite", function () {
         // Validate that the report and the folder are not there anymore
         expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed/NEW_NAME"')).toBe(false);
         expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test_Changed"')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineSpotfireSFOPTest_1')).toBe(true);
     });
 
     // FS Testcases

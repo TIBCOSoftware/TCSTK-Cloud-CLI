@@ -644,7 +644,7 @@ export function replaceGlobal(content: string) {
         log(DEBUG, 'Looking for Global: |' + GlobalProp + '| on: |' + content);
         switch (GlobalProp.toLowerCase()) {
             case 'organization':
-                content = content.replace(/~{.*?\}/, getOrganization());
+                content = content.replace(/~{.*?\}/ig, getOrganization());
                 break;
             // TODO: Add other globals here
             default:
