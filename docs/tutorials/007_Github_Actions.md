@@ -3,8 +3,7 @@
 ![TCLI_Show_Links](imgs/007_GitHubActions.png)
 
 ---
-
-##Description
+## Description
 In this section we will discuss how you can run tcli tasks automatically after committing some cloud starter code into GitHub. On GitHub you will find this Actions section:
 
 ![TCLI_Show_Links](imgs/007_GitHubActions_Repo.png)
@@ -18,8 +17,7 @@ For example you can run the TCLI in a GitHub Action:
 ![TCLI_Show_Links](imgs/007_GitHubActions_TCLI.png)
 
 ---
-
-##Setting up GitHub Actions
+## Setting up GitHub Actions
 
 We will set up GitHub actions in the following steps
 
@@ -104,7 +102,7 @@ The import part is this:
 
 This part basically describes to update the connection settings in the property file and then run a build & deploy command. The connection settings are stored as secrets which we will set in GitHub in the next section.
 
-###Set up the Secrets on GitHub
+### Set up the Secrets on GitHub
 
 You can set up the secrets in the secrets area under settings:
 
@@ -118,7 +116,7 @@ It is important to realize that you can only enter the secrets, you cannot retri
 
 ![TCLI_Show_Links](imgs/007_Secrets.png#zoom)
 
-###Deploy by Committing
+### Deploy by Committing
 
 Now when you do a commit, you will see your cloud starter getting build and deployed through the action:
 
