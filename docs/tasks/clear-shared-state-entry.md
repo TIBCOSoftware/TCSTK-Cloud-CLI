@@ -1,7 +1,7 @@
 # TCLI TASK: clear-shared-state-entry
 
 ---
-### Description
+### Description:
 > Removes one Shared State entry.
 
 This is useful to get rid of a shared state entry based on your shared state filter.
@@ -31,7 +31,7 @@ Double check actions on shared state (YES | NO)
 * Are you sure ?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli clear-shared-state-entry
 
 > tcli clear-shared-state-entry -a TestEntry:YES

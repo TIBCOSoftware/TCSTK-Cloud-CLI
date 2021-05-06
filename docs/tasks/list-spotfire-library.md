@@ -1,7 +1,7 @@
 # TCLI TASK: list-spotfire-library
 
 ---
-### Description
+### Description:
 > Make a list of all specific components in your Spotfire Library (DXP's, Mods, Information links, Data files or Data connections)
 
 This is useful when you want to know what items exist in your library of a certain type.
@@ -31,7 +31,7 @@ Use one of the following:
 * Library Folders
   
 ---
-### Example Usage
+### Example Usage:
 
 > tcli list-spotfire-library
 

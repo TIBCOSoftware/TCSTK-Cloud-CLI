@@ -1,15 +1,15 @@
 # TCLI TASK: generate-oauth-token
 
 ---
-### Description
+### Description:
 > Generate a new OAUTH token to authenticate to the TIBCO Cloud.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli generate-oauth-token
 
 ---
-### Alternatives
+### Alternatives:
 > tcli go
 
 

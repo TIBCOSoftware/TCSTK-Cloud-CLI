@@ -1,11 +1,11 @@
 # TCLI TASK: schematic-add
 
 ---
-### Description
+### Description:
 > Add a schematic into your project
 
 ---
-### Example Usage
+### Example Usage:
 > tcli schematic-add
 
 

@@ -1,15 +1,15 @@
 # TCLI TASK: revoke-oauth-token
 
 ---
-### Description
+### Description:
 > Revokes an existing OAUTH token.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli revoke-oauth-token
 
 ---
-### Alternatives
+### Alternatives:
 > tcli reo
 
 

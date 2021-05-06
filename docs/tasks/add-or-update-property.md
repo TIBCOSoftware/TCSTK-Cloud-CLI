@@ -1,7 +1,7 @@
 # TCLI TASK: add-or-update-property
 
 ---
-### Description
+### Description:
 > Adds or Updates a property in a file.
 
 This can be useful to update property in your tibco-cloud.properties file or any other file. Also certain pre-defined values can be set.

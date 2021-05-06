@@ -1,15 +1,15 @@
 # TCLI TASK: show-properties
 
 ---
-### Description
+### Description:
 > Show the properties in your properties file (and possibly the global values)
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-properties
 
 ---
-### Alternatives
+### Alternatives:
 > tcli sp
 
 

@@ -1,7 +1,7 @@
 # TCLI TASK: add-user-to-group
 
 ---
-### Description
+### Description:
 
 > Adds a user to a LiveApps group.
 
@@ -14,7 +14,7 @@ For which group would you like to ADD a user ?
 Which user would you like to add to the group ?
 
 ---
-### Example Usage
+### Example Usage:
 
 > tcli add-user-to-group
 

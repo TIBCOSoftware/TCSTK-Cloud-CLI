@@ -1,15 +1,15 @@
 # TCLI TASK: rotate-oauth-token
 
 ---
-### Description
+### Description:
 > Revokes your existing OAUTH token and then generates a new one.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli rotate-oauth-token
 
 ---
-### Alternatives
+### Alternatives:
 > tcli ro
 
 

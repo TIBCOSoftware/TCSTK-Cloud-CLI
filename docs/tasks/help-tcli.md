@@ -1,11 +1,11 @@
 # TCLI TASK: help-tcli
 
 ---
-### Description
+### Description:
 > Display's help message
 
 ---
-### Example Usage
+### Example Usage:
 > tcli help-tcli
 
 

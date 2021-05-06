@@ -1,11 +1,11 @@
 # TCLI TASK: update-cloud-packages
 
 ---
-### Description
+### Description:
 > Updates the NPM packges in the @tibco-tcstk scope in your project.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli update-cloud-packages
 
 

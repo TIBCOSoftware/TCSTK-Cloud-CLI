@@ -1,11 +1,11 @@
 # TCLI TASK: show-tci-apps
 
 ---
-### Description
+### Description:
 > List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-tci-apps
 
 

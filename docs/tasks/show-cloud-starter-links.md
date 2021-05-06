@@ -1,15 +1,15 @@
 # TCLI TASK: show-cloud-starter-links
 
 ---
-### Description
+### Description:
 > Show Links to Applications of LiveApps WebApps
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-cloud-starter-links
 
 ---
-### Alternatives
+### Alternatives:
 > tcli sl
 
 

@@ -1,7 +1,7 @@
 # TCLI TASK: export-live-apps-case-type
 
 ---
-### Description
+### Description:
 > Export the details of a Live Apps Case Type
 
 This task lists the LiveApp cases and allows to export the description file of one of the cases in JSON. This is useful for development in your cloud starter and create Typescript models from them for example.
@@ -22,7 +22,7 @@ What file name would you like to export to ? (press enter or use DEFAULT for def
 NOTE: Default uses the following name structure:  <Case_Folder>/<APP_NAME>.<APP_VERSION>.type.json
 
 ---
-### Example Usage
+### Example Usage:
 > tcli export-live-apps-case-type
 
 > tcli export-live-apps-case-type --answers MyApp:DEFAULT

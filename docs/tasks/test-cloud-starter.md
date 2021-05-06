@@ -1,15 +1,15 @@
 # TCLI TASK: test-cloud-starter
 
 ---
-### Description
+### Description:
 > Run Test cases for your cloud starter
 
 ---
-### Example Usage
+### Example Usage:
 > tcli test-cloud-starter
 
 ---
-### Alternatives
+### Alternatives:
 > tcli t,test
 
 

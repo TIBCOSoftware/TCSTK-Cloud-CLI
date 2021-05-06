@@ -1,11 +1,11 @@
 # TCLI TASK: inject-lib-sources
 
 ---
-### Description
+### Description:
 > Enables your project for Cloud Library Debugging
 
 ---
-### Example Usage
+### Example Usage:
 > tcli inject-lib-sources
 
 

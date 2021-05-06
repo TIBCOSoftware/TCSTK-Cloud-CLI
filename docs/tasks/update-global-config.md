@@ -1,11 +1,11 @@
 # TCLI TASK: update-global-config
 
 ---
-### Description
+### Description:
 > Update the global cloud connection configuration
 
 ---
-### Example Usage
+### Example Usage:
 > tcli update-global-config
 
 

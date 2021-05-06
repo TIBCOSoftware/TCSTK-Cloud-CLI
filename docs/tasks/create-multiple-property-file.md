@@ -1,7 +1,7 @@
 # TCLI TASK: create-multiple-property-file
 
 ---
-### Description
+### Description:
 > Creating an initial property file to manage multiple cloud starters and environments.
 
 ---
@@ -13,7 +13,7 @@ If the file exists:
 The property file: <FILE>.properties already exists, do you want to Overwrite it ?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli create-multiple-property-file
 
 > tcli create-multiple-property-file --answers MyMultipleFile.properties

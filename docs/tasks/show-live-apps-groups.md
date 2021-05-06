@@ -1,11 +1,11 @@
 # TCLI TASK: show-live-apps-groups
 
 ---
-### Description
+### Description:
 > Displays the LiveApps groups and their users.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-live-apps-groups
 
 

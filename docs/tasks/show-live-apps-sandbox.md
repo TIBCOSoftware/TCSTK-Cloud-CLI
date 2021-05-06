@@ -1,17 +1,17 @@
 # TCLI TASK: show-live-apps-sandbox
 
 ---
-### Description
+### Description:
 > Displays the LiveApps Sandbox ID's for Production and Development
 
 This is useful to get the sandbox ID for LiveApps.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-live-apps-sandbox
 
 ---
-### Alternatives
+### Alternatives:
 > tcli show-sandbox
 
 ---

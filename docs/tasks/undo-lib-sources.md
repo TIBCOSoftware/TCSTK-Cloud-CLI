@@ -1,11 +1,11 @@
 # TCLI TASK: undo-lib-sources
 
 ---
-### Description
+### Description:
 > Undo's the enabling for Cloud Library Debugging
 
 ---
-### Example Usage
+### Example Usage:
 > tcli undo-lib-sources
 
 

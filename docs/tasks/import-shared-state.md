@@ -1,15 +1,15 @@
 # TCLI TASK: import-shared-state
 
 ---
-### Description
+### Description:
 > Uploads one entry or the configured filter from the local file system to the shared state.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli import-shared-state
 
 ---
-### Alternatives
+### Alternatives:
 > tcli import-shared-state-scope
 
 

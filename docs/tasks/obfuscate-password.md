@@ -1,15 +1,15 @@
 # TCLI TASK: obfuscate-password
 
 ---
-### Description
+### Description:
 > Obfuscate a password and put it in the cloud-properties file
 
 ---
-### Example Usage
+### Example Usage:
 > tcli obfuscate-password
 
 ---
-### Alternatives
+### Alternatives:
 > tcli obfuscate
 
 > tcli ob

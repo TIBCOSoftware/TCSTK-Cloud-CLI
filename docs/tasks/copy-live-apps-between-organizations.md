@@ -1,7 +1,7 @@
 # TCLI TASK: copy-live-apps-between-organizations
 
 ---
-### Description
+### Description:
 > Copies a LiveApps application between organizations.
 
 This is useful when you want to move a Live Apps application between two organizations in your subscription. 
@@ -30,13 +30,13 @@ An app with the name <The LiveApps Application> already exists in the target org
 Note: The application will not be overridden but gets a new name; for example MyApp(2)
 
 ---
-### Example Usage
+### Example Usage:
 > tcli copy-live-apps-between-organizations
 
 > tcli copy-live-apps-between-organizations -a "MyApp:MyOrganization:NO"
 
 ---
-### Alternatives
+### Alternatives:
 > tcli copy-live-apps
 
 ---

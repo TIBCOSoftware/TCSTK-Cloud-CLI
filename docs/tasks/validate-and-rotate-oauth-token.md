@@ -1,15 +1,15 @@
 # TCLI TASK: validate-and-rotate-oauth-token
 
 ---
-### Description
+### Description:
 > Checks if OAUTH token is valid for more than a configured time (1 week for example) and if not, it will rotate it.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli validate-and-rotate-oauth-token
 
 ---
-### Alternatives
+### Alternatives:
 > tcli vo
 
 

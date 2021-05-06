@@ -1,15 +1,15 @@
 # TCLI TASK: show-cloud-starters
 
 ---
-### Description
+### Description:
 > Show Applications of LiveApps WebApps
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-cloud-starters
 
 ---
-### Alternatives
+### Alternatives:
 > tcli scs
 
 

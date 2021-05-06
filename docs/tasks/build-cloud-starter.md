@@ -1,7 +1,7 @@
 # TCLI TASK: build-cloud-starter
 
 ---
-### Description
+### Description:
 
 > Build your local cloud starter project
 
@@ -33,11 +33,11 @@ Add a timestamp to the version in the descriptor (for example 1.0.01591605316). 
 Location of the descriptor file; For example: (./src/assets/cloudstarter.json)
 
 ---
-### Example Usage
+### Example Usage:
 > tcli build-cloud-starter
 
 ---
-### Alternatives
+### Alternatives:
 > tcli b
 
 > tcli build

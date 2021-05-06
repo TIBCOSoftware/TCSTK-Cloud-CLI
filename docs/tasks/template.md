@@ -1,14 +1,23 @@
 # TCLI TASK: @@TASK@@
 
 ---
-### Description
+### Description:
+
 > @@DESCRIPTION@@
 
 ---
-### Example Usage
+### Questions:
+
+---
+### Example Usage:
+
 > tcli @@TASK@@
 
 @@ALT@@
 @@ALTS@@
+
 ---
 ### Example Result:
+
+```console
+```

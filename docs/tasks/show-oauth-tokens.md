@@ -1,15 +1,15 @@
 # TCLI TASK: show-oauth-tokens
 
 ---
-### Description
+### Description:
 > Displays OAUTH tokens to authenticate to the TIBCO Cloud.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-oauth-tokens
 
 ---
-### Alternatives
+### Alternatives:
 > tcli so
 
 

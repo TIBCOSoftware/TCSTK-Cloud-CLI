@@ -1,11 +1,11 @@
 # TCLI TASK: generate-live-apps-import-configuration
 
 ---
-### Description
+### Description:
 > Generate the Live Apps Import configuration file
 
 ---
-### Example Usage
+### Example Usage:
 > tcli generate-live-apps-import-configuration
 
 

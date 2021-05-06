@@ -1,7 +1,7 @@
 # TCLI TASK: create-shared-state-entry
 
 ---
-### Description
+### Description:
 > Create a new shared state entry
 
 This is useful to create shared state entries to store configuration for your cloud starter.
@@ -18,7 +18,7 @@ The type of shared state to look at (PUBLIC | SHARED | PRIVATE)
 * What is the name of the Shared State entry that you want to create ?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli create-shared-state-entry
 
 > tcli create-shared-state-entry -a TestEntry

@@ -1,7 +1,7 @@
 # TCLI TASK: export-tci-app
 
 ---
-### Description
+### Description:
 > Exports a TCI-Flogo Application, into the Flogo JSON and it's Manifest file.
 
 This is usefull to make backup of flogo apps and commit them into a source repository.
@@ -14,7 +14,7 @@ This is usefull to make backup of flogo apps and commit them into a source repos
 * Which filename would you like to use for the Flogo JSON export ? (press enter or use DEFAULT to use flogo.json, or use NONE to not export the Flogo JSON)
 
 ---
-### Example Usage
+### Example Usage:
 > tcli export-tci-app
 
 > tcli export-tci-app --answers my_flogo_app,DEFAULT,DEFAULT

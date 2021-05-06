@@ -1,7 +1,7 @@
 # TCLI TASK: export-live-apps-cases
 
 ---
-### Description
+### Description:
 > Export Data from Live Apps
 
 This task will export Live Apps case data to JSON files, this can be useful for backups or to use them for imports into other organizations or into other Versions of the LiveApps app. Since the data is exported you can manipulate it for other versions.
@@ -28,7 +28,7 @@ NOTE: If you enter a folder manually, always end it with a '/' character.
 NOTE: Default uses the following name structure:  <Case_Folder>/Export-<APP_NAME>(<DATE>)/<APP_NAMW>-<CASE_NUMBER>.json
 
 ---
-### Example Usage
+### Example Usage:
 > tcli export-live-apps-cases
 
 > tcli export-live-apps-cases --answers MyApp:DEFAULT

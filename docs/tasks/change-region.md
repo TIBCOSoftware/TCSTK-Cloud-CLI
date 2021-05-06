@@ -1,7 +1,7 @@
 # TCLI TASK: change-region
 
 ---
-### Description
+### Description:
 > Change the Region in the cloud-properties file
 
 ---
@@ -25,7 +25,7 @@ If you don't want this to happen you can always run:
 Before you run the command to change the region.
 
 ---
-### Example Usage
+### Example Usage:
 
 > tcli change-region
 
@@ -36,7 +36,7 @@ Before you run the command to change the region.
 > tcli cr -a 'AU - Sydney'
 
 ---
-### Alternatives
+### Alternatives:
 > tcli cr
 
 

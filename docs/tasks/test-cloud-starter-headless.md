@@ -1,15 +1,15 @@
 # TCLI TASK: test-cloud-starter-headless
 
 ---
-### Description
+### Description:
 > Run Test cases for your cloud starter, headless (without opening the browser)
 
 ---
-### Example Usage
+### Example Usage:
 > tcli test-cloud-starter-headless
 
 ---
-### Alternatives
+### Alternatives:
 > tcli th
 
 > tcli test-headless 

@@ -1,11 +1,11 @@
 # TCLI TASK: monitor-tci-app
 
 ---
-### Description
+### Description:
 > Monitor the logs of a TIBCO Cloud Integration Flogo Application
 
 ---
-### Example Usage
+### Example Usage:
 > tcli monitor-tci-app
 
 

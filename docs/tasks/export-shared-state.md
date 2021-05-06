@@ -1,7 +1,7 @@
 # TCLI TASK: export-shared-state
 
 ---
-### Description
+### Description:
 > Downloads all shared state entries from the configured filter to the local file system.
 
 This is useful to manage shared state on your local machine, the contents of the shared state will be stored in a separate JSON file.
@@ -40,13 +40,13 @@ If Shared_State_Double_Check is set to NO;
 Are you sure you want to export all the states above ?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli export-shared-state
 
 > tcli export-shared-state -a YES
 
 ---
-### Alternatives
+### Alternatives:
 > tcli export-shared-state-scope
 
 ---

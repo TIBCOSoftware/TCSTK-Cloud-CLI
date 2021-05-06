@@ -1,17 +1,17 @@
 # TCLI TASK: deploy-cloud-starter
 
 ---
-### Description
+### Description:
 > Deploy your local cloud starter project
 
 This task first shows the current organization connected to and then deploys the Cloud Starter, finally it will show the link to the Cloud Starter and (possibly) a link to the Cloud Descriptor location.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli deploy-cloud-starter
 
 ---
-### Alternatives
+### Alternatives:
 > tcli d
 
 > tcli deploy

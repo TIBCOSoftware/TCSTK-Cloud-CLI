@@ -1,7 +1,7 @@
 # TCLI TASK: clear-shared-state-filter
 
 ---
-### Description
+### Description:
 > Removes all shared state entries in the configured filter.
 
 This is useful if you want to remove multiple shared state entries at once.
@@ -33,11 +33,11 @@ A special case is created if the filter is set to '*' (even if Shared_State_Doub
 * YOU ARE ABOUT TO REMOVE THE ENTIRE SHARED STATE ARE YOU REALLY REALLY SURE ?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli clear-shared-state-filter
 
 ---
-### Alternatives
+### Alternatives:
 > tcli clear-shared-state-scope
 
 ---

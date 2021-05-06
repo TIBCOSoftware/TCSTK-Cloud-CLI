@@ -1,15 +1,15 @@
 # TCLI TASK: start-cloud-starter
 
 ---
-### Description
+### Description:
 > Start your local cloud starter project
 
 ---
-### Example Usage
+### Example Usage:
 > tcli start-cloud-starter
 
 ---
-### Alternatives
+### Alternatives:
 > tcli s
 
 > tcli start

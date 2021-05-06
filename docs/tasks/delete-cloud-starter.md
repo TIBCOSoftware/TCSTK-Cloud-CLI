@@ -1,7 +1,7 @@
 # TCLI TASK: delete-cloud-starter
 
 ---
-### Description
+### Description:
 > Delete a Cloud Starter 
 
 This command will first list all the Cloud Starters (LiveApps WebApps) and then ask which one you want to delete and aks if you are sure and then delete the app.
@@ -14,7 +14,7 @@ Which APP Would you like to delete ?
 Are you sure you want to delete <APP>?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli delete-cloud-starter
 
 > tcli delete-cloud-starter -a MyCloudStarter:YES

@@ -1,11 +1,11 @@
 # TCLI TASK: show-org-folders
 
 ---
-### Description
+### Description:
 > Displays the content of the LiveApps Organization Folders.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-org-folders
 
 

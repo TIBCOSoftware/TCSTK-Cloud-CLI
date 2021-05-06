@@ -1,15 +1,15 @@
 # TCLI TASK: create-cloud-folder
 
 ---
-### Description
+### Description:
 > Creates a new LiveApps Organization Folder.
 
 This task creates a new cloud folder that you can use to upload files.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli create-cloud-folder
 
 ---
-### Alternatives
+### Alternatives:
 > tcli create-org-folder

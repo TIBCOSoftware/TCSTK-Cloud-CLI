@@ -1,7 +1,7 @@
 # TCLI TASK: show-shared-state
 
 ---
-### Description
+### Description:
 > Show the shared state contents
 
 This is useful to see which shared states are available in your shared state filter.
@@ -20,7 +20,7 @@ The type of shared state to look at.
 Possible values: (PUBLIC | SHARED | PRIVATE)
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-shared-state
 
 ---

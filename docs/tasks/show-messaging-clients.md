@@ -1,15 +1,15 @@
 # TCLI TASK: show-messaging-clients
 
 ---
-### Description
+### Description:
 > Show clients of cloud messaging
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-messaging-clients
 
 ---
-### Alternatives
+### Alternatives:
 > tcli show-clients
 
 > tcli messaging-show-clients

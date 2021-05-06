@@ -1,7 +1,7 @@
 # TCLI TASK: generate-cloud-descriptor
 
 ---
-### Description
+### Description:
 > Generates the configured Public Cloud Descriptor
 
 This generates a descriptor for your cloud starter. This descriptor contains the name, version and description from your package.json file. Optionally the build date can be added.
@@ -19,11 +19,11 @@ Add a timestamp to the version in the descriptor (for example 1.0.01591605316). 
 Location of the descriptor file
 
 ---
-### Example Usage
+### Example Usage:
 > tcli generate-descriptor
 
 ---
-### Alternatives
+### Alternatives:
 > tcli generate-cloud-descriptor
 
 ---

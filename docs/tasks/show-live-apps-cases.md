@@ -1,11 +1,11 @@
 # TCLI TASK: show-live-apps-cases
 
 ---
-### Description
+### Description:
 > Show Live Apps Cases
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-live-apps-cases
 
 

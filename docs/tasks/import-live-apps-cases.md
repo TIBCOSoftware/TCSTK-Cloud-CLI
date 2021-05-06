@@ -1,11 +1,11 @@
 # TCLI TASK: import-live-apps-cases
 
 ---
-### Description
+### Description:
 > Import Cases to Live Apps
 
 ---
-### Example Usage
+### Example Usage:
 > tcli import-live-apps-cases
 
 

@@ -1,11 +1,11 @@
 # TCLI TASK: generate-cloud-property-files
 
 ---
-### Description
+### Description:
 > Generates a list of cloud property files.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli generate-cloud-property-files
 
 

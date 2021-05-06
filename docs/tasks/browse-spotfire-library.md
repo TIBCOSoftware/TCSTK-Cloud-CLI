@@ -1,7 +1,7 @@
 # TCLI TASK: browse-spotfire-library
 
 ---
-### Description
+### Description:
 > List Spotfire Analytical Reports and browse through folders on the Spotfire Library.
 
 This task let's you browse the Spotfire Library and display different items, here are the types that are identified:
@@ -19,7 +19,7 @@ On a folder you can request the sub-folder and on a DXP and a MOD you can reques
 On which Item would you like more details ?
 
 ---
-### Example Usage
+### Example Usage:
 > tcli browse-spotfire-library
 
 

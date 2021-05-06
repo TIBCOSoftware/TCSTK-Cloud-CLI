@@ -1,11 +1,11 @@
 # TCLI TASK: update-tcli
 
 ---
-### Description
+### Description:
 > Update the Cloud CLI
 
 ---
-### Example Usage
+### Example Usage:
 > tcli update-tcli
 
 

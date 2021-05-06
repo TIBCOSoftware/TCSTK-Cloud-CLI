@@ -1,17 +1,17 @@
 # TCLI TASK: show-cloud
 
 ---
-### Description
+### Description:
 > Show Cloud Details
 
 This is useful to test the connection with a specific cloud organization.
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-cloud
 
 ---
-### Alternatives
+### Alternatives:
 > tcli sc
 
 ---

@@ -1,15 +1,15 @@
 # TCLI TASK: show-messaging-summary
 
 ---
-### Description
+### Description:
 > Show summary of cloud messaging
 
 ---
-### Example Usage
+### Example Usage:
 > tcli show-messaging-summary
 
 ---
-### Alternatives
+### Alternatives:
 > tcli show-summary
 
 > tcli messaging-show-summary
