@@ -96,7 +96,7 @@ jobs:
 
 And commit this to GitHub.
 
-The import part is this:
+The important part is this:
 
 ![TCLI_Show_Links](imgs/007_Yaml_Deploy.png#zoom)
 
@@ -110,8 +110,8 @@ You can set up the secrets in the secrets area under settings:
 
 It is important to realize that you can only enter the secrets, you cannot retrieve them. Setup the following secrets, to connect to the TIBCO Cloud:
 
+* TCLI_CLIENTID
 * TCLI_EMAIL
-* TCLI_CLIENTID 
 * TCLI_PASS
 
 ![TCLI_Show_Links](imgs/007_Secrets.png#zoom)
