@@ -69,6 +69,26 @@ And will be saved in the configured file:
 
 > NOTE: The given anwsers are also recorded, and if you use a different property file than tibco-cloud.properties this is also stored.
 
+### Record from the Commandline
+
+You can also create a recording directly from command line by using:
+
+```console
+tcli --record <recording-file>
+```
+
+or:
+
+```console
+tcli -r <recording-file>
+```
+
+So for example:
+
+```console
+tcli show cloud -r tcli-recordings.sh 
+```
+
 ### Stop Recording
 
 You can stop the recording by closing the interaction (quit), or run the stop-recording command:
@@ -96,26 +116,6 @@ And then you can run:
 ```
 
 > NOTE: On windows record to a .bat file and run that file.
-
-## Record from the Commandline
-
-You can also run a recording directly by using:
-
-```console
-tcli --record <recording-file>
-```
-
-or:
-
-```console
-tcli -r <recording-file>
-```
-
-So for example:
-
-```console
-tcli show cloud -r tcli-recordings.sh 
-```
 
 ## Use replacements for scripting
 
