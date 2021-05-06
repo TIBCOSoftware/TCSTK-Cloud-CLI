@@ -19,7 +19,7 @@ This displays a list of design time apps for LiveApps. This is useful for the co
 
 ```console
 TIBCO CLOUD CLI] (INFO)  Selected task] show-live-apps-design-time-apps
-TIBCO CLOUD CLI] (INFO)  Using OAUTH Authentication, ORGANIZATION: Discover MVP Customer X
+TIBCO CLOUD CLI] (INFO)  Using OAUTH Authentication, ORGANIZATION: Organization X
 TIBCO CLOUD CLI] (INFO)  TABLE] live-apps-design-apps
 ┌─────────┬────────────────────────┬────────┬───────────────────┬────────────────────────────┬─────────────────────────────┬────────────┬───────────────┬───────────────────┐
 │ (index) │          Name          │   Id   │ Latest Version ID │           Owner            │      Last Published On      │ Validation │ Runtime State │ Design-time State │

@@ -47,7 +47,7 @@ Use one of the following:
 ### Example Result:
 
 ```console
-? What is the new name(Title) you want to rename project_discover_latest to ? (use "NONE" or press enter to not rename) NewName
+? What is the new name(Title) you want to rename MyReport to ? (use "NONE" or press enter to not rename) NewName
 ┌───────────────────┬─────────────────────────────────────────────┐
 │      (index)      │                   Values                    │
 ├───────────────────┼─────────────────────────────────────────────┤
