@@ -47,44 +47,21 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 * answers: a comma(,) or column(:) separated list of answers to interactive questions. This is useful to run the tcli completely verbose; useful in a build-pipeline. 
 
-
+# Available Tutorials
 These are the available TIBCO Cloud™ CLI Tutorials:
-
-## Available Tutorials
 
 | TUTORIAL | Description |
 |------|:------------|
-|1. [TCLI Overview](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/001_TCLI_Overview/)|Provides an overview of the TCLI and a getting started guide|
-|2. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/002_Global_Configuration/)|Provides |
-|3. [Get Started With Cloud Starters](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)|Provides |
-|3. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/004_Multiple_Organizations /)|Provides |
-|3. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/002_Global_Configuration/)|Provides |
-|3. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/002_Global_Configuration/)|Provides |
-|3. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/002_Global_Configuration/)|Provides |
-|3. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/002_Global_Configuration/)|Provides |
+|1. [TCLI Overview](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/001_TCLI_Overview/)|Provides an overview of the Archtiecture and Concepts of the TCLI|
+|2. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/002_Global_Configuration/)|This guide explains the concept of properties and global properties |
+|3. [Get Started With Cloud Starters](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)|This guide provides step by step instructions on how to create, adjust and deploy a cloud starter to the TIBCO Cloud|
+|4. [Managing multiple TIBCO Cloud Organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/004_Multiple_Organizations/)|This guide explains how to manage multiple organizations in the TIBCO Cloud with the TCLI  |
+|5. [Setting Up A Buildpipeline](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/005_Setting_Up_A_Buildpipeline/)|This guide explains how to setup a build pipeline with for example Jenkins or TeamCity|
+|6. [Passing In Answers](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/006_Passing_In_Answers/)|This guide explains the concept of passing in answers to a TCLI task |
+|7. [Github Actions](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/007_Github_Actions/)|This guide explains how to run TCLI task on commits to github with github actions |
+|8. [TCLI Recorder](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/008_TCLI_Recorder/)|This guide explains the concept of recording tasks for replay in scripts|
 
-
-
-[Managing multiple TIBCO Cloud Organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/004_Multiple_Organizations/)
-
-
-                
-
-
- 
-005_Setting_Up_A_Buildpipeline
-006_Passing_In_Answers    
-007_Github_Actions             
-008_TCLI_Recorder        
-
-     
-
-       
-
-
-
-
-
+# Available TCLI Tasks
 These are the available TIBCO Cloud™ CLI Tasks:
 
 ## tcli
