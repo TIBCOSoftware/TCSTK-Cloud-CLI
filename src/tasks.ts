@@ -154,12 +154,11 @@ export async function promptTask(stDir: string, cwdDir: string): Promise<void> {
         }
         if (com === START_RECORDING) {
             globalDoRecord = true;
-            await throb(' Starting Recording...', [col.reset.bgWhite('[RECORDER]') + col.red(' ●'), col.reset.bgWhite('[RECORDER]') + '  '], 800);
+            await throb(' Starting Recording...', [col.reset.bgWhite('[RECORDER]') + col.red(' ●'), col.reset.bgWhite('[RECORDER]') + '  '], 3);
             log(RECORDER, col.red('●') + ' Started Recording...');
             // Change task to stop recording
             gTasksDescr[gTasksDescr.findIndex( des =>  des === START_RECORDING)] = STOP_RECORDING;
             gTasksNames[gTasksNames.findIndex( name =>  name === START_RECORDING)] = STOP_RECORDING;
-
             return promptTask(stDir, cwdDir);
         }
         if (com === STOP_RECORDING) {

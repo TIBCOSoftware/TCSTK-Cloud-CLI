@@ -345,7 +345,7 @@ export async function cli(args: any) {
                         await tasks[directTaskMethod]();
                         // Task has run, if we haven't specified global answers upfront then display answers for next time
                         // Do not record the obfuscate password task
-                        if (!isGlobalAnswersUsed() && (options.showReplay || options.record) && directTaskName !== 'obfuscate-password') {
+                        if (!isGlobalAnswersUsed() && (options.showReplay || options.record) && directTaskName !== 'obfuscate-password' && directTaskName !== 'update-global-config') {
                             let taskCommand = 'tcli ' + options.task + ' ';
                             let answers = '';
                             getGivenAnswers().forEach(ans => {
