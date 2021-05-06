@@ -44,6 +44,6 @@ Note: The application will not be overridden but gets a new name; for example My
 
 ```console
 TIBCO CLOUD CLI] (INFO)  Updated: CloudLogin.OAUTH_Token to: [NEW OAUTH TOKEN] (in:tibco-cloud.properties)
-TIBCO CLOUD CLI] (INFO)  Successfully changed to organization: OOCTO
+TIBCO CLOUD CLI] (INFO)  Successfully changed to organization: Organization X
 TIBCO CLOUD CLI] (INFO)  Successfully copied:  MyApp to MyOrganization (new id: 1234)
 ```

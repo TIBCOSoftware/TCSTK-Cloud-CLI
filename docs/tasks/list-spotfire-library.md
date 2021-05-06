@@ -14,7 +14,7 @@ The location in the library to search from; this form the base from which you do
 
 NOTE: You can use \~{ORGANIZATION}, to use the current organization name in library base. (For example: /Teams/\~{ORGANIZATION} ).
 
-NOTE: Do not end this folder with a '/' character
+NOTE: Do not end this folder with a '/' character.
 
 ---
 ### Questions:
@@ -22,14 +22,14 @@ NOTE: Do not end this folder with a '/' character
 What Spotfire Library item type would you like to list ?
 
 Use one of the following:
-* ALL
-* Spotfire Reports
-* Spotfire Mods
-* Information links
-* Data files
-* Data connections
-* Library Folders
-  
+1. ALL
+2. Spotfire Reports
+3. Spotfire Mods
+4. Information links
+5. Data files
+6. Data connections
+7. Library Folders
+
 ---
 ### Example Usage:
 
