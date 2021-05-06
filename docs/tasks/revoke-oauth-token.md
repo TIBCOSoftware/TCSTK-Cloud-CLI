@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli reo
-
-
----
-### Example Result:

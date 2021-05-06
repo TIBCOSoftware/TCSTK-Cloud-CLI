@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli show-live-apps-users
-
-
-
----
-### Example Result:

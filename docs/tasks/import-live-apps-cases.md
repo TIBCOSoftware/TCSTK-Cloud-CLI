@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli import-live-apps-cases
-
-
-
----
-### Example Result:

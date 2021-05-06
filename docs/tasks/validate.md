@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli validate
-
-
-
----
-### Example Result:

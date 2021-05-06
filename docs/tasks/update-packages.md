@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli update-cloud-packages
-
-
----
-### Example Result:

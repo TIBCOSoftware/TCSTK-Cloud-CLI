@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli update-cloud-packages
-
-
-
----
-### Example Result:

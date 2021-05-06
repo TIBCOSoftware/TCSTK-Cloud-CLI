@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli monitor-tci-app
-
-
-
----
-### Example Result:

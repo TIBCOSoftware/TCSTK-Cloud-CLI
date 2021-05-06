@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli vo
-
-
----
-### Example Result:

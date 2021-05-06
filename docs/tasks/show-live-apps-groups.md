@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli show-live-apps-groups
-
-
-
----
-### Example Result:

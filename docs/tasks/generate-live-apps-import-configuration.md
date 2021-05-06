@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli generate-live-apps-import-configuration
-
-
-
----
-### Example Result:

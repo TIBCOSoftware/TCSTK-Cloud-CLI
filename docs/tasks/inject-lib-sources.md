@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli inject-lib-sources
-
-
-
----
-### Example Result:

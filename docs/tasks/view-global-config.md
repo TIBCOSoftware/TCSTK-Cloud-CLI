@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli view-global-config
-
-
-
----
-### Example Result:

@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli ro
-
-
----
-### Example Result:

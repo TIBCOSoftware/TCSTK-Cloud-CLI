@@ -21,6 +21,3 @@ On which Item would you like more details ?
 ---
 ### Example Usage:
 > tcli browse-spotfire-library
-
-
-

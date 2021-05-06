@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli generate-cloud-property-files
-
-
-
----
-### Example Result:

@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli scs
-
-
----
-### Example Result:

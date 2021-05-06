@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli watch-shared-state-scope
-
-
----
-### Example Result:

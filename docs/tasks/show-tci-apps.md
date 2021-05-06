@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli show-tci-apps
-
-
-
----
-### Example Result:

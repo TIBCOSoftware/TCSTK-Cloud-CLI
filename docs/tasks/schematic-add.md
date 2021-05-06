@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli schematic-add
-
-
-
----
-### Example Result:

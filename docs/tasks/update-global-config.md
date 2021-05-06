@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli update-global-config
-
-
-
----
-### Example Result:

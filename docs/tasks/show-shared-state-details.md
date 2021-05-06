@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli show-shared-state-details
-
-
-
----
-### Example Result:

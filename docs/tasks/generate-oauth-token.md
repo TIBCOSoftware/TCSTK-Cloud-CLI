@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli go
-
-
----
-### Example Result:

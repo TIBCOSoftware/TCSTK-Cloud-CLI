@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli help-tcli
-
-
-
----
-### Example Result:

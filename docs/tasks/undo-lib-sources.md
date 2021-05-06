@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli undo-lib-sources
-
-
-
----
-### Example Result:

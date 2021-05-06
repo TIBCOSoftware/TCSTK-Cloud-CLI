@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli t,test
-
-
----
-### Example Result:

@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli show-org-folders
-
-
-
----
-### Example Result:

@@ -13,7 +13,3 @@
 > tcli s
 
 > tcli start
-
-
----
-### Example Result:

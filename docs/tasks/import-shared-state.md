@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli import-shared-state-scope
-
-
----
-### Example Result:

@@ -7,8 +7,3 @@
 ---
 ### Example Usage:
 > tcli replace-string-in-file
-
-
-
----
-### Example Result:

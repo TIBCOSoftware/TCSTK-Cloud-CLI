@@ -13,7 +13,3 @@
 > tcli obfuscate
 
 > tcli ob
-
-
----
-### Example Result:

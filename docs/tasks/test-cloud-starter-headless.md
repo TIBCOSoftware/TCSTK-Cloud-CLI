@@ -13,7 +13,3 @@
 > tcli th
 
 > tcli test-headless 
-
-
----
-### Example Result:

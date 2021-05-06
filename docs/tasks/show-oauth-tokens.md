@@ -11,7 +11,3 @@
 ---
 ### Alternatives:
 > tcli so
-
-
----
-### Example Result:
