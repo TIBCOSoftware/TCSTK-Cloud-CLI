@@ -897,6 +897,34 @@
       ],
       "category": "spotfire"
     },
+    "create-spotfire-library-folder": {
+      "description": "Creates a new Library Folder.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "createSpotfireLibraryFolderWrapper",
+      "taskAlternativeNames": [
+        "create-sf-folder", "create-library-folder"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
+    "share-spotfire-library-folder": {
+      "description": "Shares a Spotfire Library Folder with a Specific User.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "shareSpotfireLibraryFolderWrapper",
+      "taskAlternativeNames": [
+        "share-sf", "share-library-folder"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
     "copy-spotfire-library-item": {
       "description": "Copies a Spotfire Library Item (a DXP for example) from one place to another (possibly between organizations).",
       "enabled": true,
@@ -925,20 +953,6 @@
       ],
       "category": "spotfire"
     },
-    "share-spotfire-library-folder": {
-      "description": "Shares a Spotfire Library Folder with a Specific User.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "shareSpotfireLibraryFolderWrapper",
-      "taskAlternativeNames": [
-        "share-sf", "share-library-folder"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "spotfire"
-    },
     "delete-spotfire-library-item": {
       "description": "Deletes a Spotfire Library Item (a DXP for example).",
       "enabled": true,
@@ -947,20 +961,6 @@
       "task": "deleteSpotfireLibraryWrapper",
       "taskAlternativeNames": [
         "delete-sf", "delete-library-item"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "spotfire"
-    },
-    "create-spotfire-library-folder": {
-      "description": "Creates a new Library Folder.",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "createSpotfireLibraryFolderWrapper",
-      "taskAlternativeNames": [
-        "create-sf-folder", "create-library-folder"
       ],
       "availableOnOs": [
         "all"

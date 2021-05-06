@@ -318,12 +318,12 @@ export async function renameSpotfireLibraryItem() {
 // Function to share a library folder
 export async function shareSpotfireLibraryFolder() {
     prepSpotfireProps();
-    log(DEBUG, 'Sharing a spotfire library item...');
+    log(DEBUG, 'Sharing a spotfire library folder...');
     // Step 1: Show all folders that can be shared
     const itemsToShare = await listOnType("spotfire.folder", false, false);
     // Step 2: Choose a folder to share
     if (itemsToShare) {
-        const itemNameToShare = await askMultipleChoiceQuestionSearch('Which item would you like to share ?', ['NONE', ...itemsToShare.map(v => v.TCLIPath)]);
+        const itemNameToShare = await askMultipleChoiceQuestionSearch('Which folder would you like to share ?', ['NONE', ...itemsToShare.map(v => v.TCLIPath)]);
         if (itemNameToShare.toLowerCase() !== 'none') {
             const itemToShare = itemsToShare.find(v => v.TCLIPath === itemNameToShare)!;
             if (itemToShare) {
