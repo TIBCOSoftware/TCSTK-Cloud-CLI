@@ -3,6 +3,7 @@
 ![TCLI_Show_Links](imgs/007_GitHubActions.png)
 
 ---
+
 ##Description
 In this section we will discuss how you can run tcli tasks automatically after committing some cloud starter code into GitHub. On GitHub you will find this Actions section:
 
@@ -17,6 +18,7 @@ For example you can run the TCLI in a GitHub Action:
 ![TCLI_Show_Links](imgs/007_GitHubActions_TCLI.png)
 
 ---
+
 ##Setting up GitHub Actions
 
 We will set up GitHub actions in the following steps
