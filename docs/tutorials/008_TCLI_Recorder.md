@@ -86,7 +86,7 @@ tcli -r <recording-file>
 So for example:
 
 ```console
-tcli show cloud -r tcli-recordings.sh 
+tcli show-cloud -r tcli-recordings.sh 
 ```
 
 ### Stop Recording
