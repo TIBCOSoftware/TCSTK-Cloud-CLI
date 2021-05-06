@@ -16,7 +16,7 @@ For example you can run the TCLI in a GitHub Action:
 
 ![TCLI_Show_Links](imgs/007_GitHubActions_TCLI.png)
 
---
+---
 ##Setting up GitHub Actions
 
 We will set up GitHub actions in the following steps
