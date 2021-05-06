@@ -10,7 +10,7 @@ npm install -g @tibco-tcstk/cloud-cli
 
 ### TIBCO Cloud™ CLI) Usage: 
 ```
-tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>]
+tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>] [--record(-r) <file-name>]
 ```
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
@@ -45,7 +45,9 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 * surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.
 
-* answers: a comma(,) or column(:) separated list of answers to interactive questions. This is useful to run the tcli completely verbose; useful in a build-pipeline. 
+* answers: A comma(,) or column(:) separated list of answers to interactive questions. This is useful to run the tcli completely verbose; useful in a build-pipeline. 
+
+* record: A filename in which a replay for the executed command will be recorded.
 
 # Available Tutorials
 These are the available TIBCO Cloud™ CLI Tutorials:
