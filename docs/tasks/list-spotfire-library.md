@@ -12,7 +12,7 @@ The following properties in the cloud properties file are being used:
 
 The location in the library to search from; this form the base from which you do your operations in your library (for example /Users, /Teams or /Samples etc.)
 
-NOTE: You can use ~{ORGANIZATION}, to use the current organization name in library base. (For example: /Teams/~{ORGANIZATION} ).
+NOTE: You can use \~{ORGANIZATION}, to use the current organization name in library base. (For example: /Teams/\~{ORGANIZATION} ).
 
 NOTE: Do not end this folder with a '/' character
 
