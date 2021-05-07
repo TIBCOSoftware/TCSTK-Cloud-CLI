@@ -224,6 +224,27 @@ export function copyFile(fromFile: string, toFile: string) {
     fs.copyFileSync(fromFile, toFile);
 }
 
+// Function to copy a file if not exist, and ask about it
+export async function copyFileInteractiveIfNotExists(source: string, destination: string, fileName: string): Promise<boolean> {
+    let doCopy = true;
+    if(doesFileExist(destination)) {
+        const decision = await askMultipleChoiceQuestion('The file ' + fileName + ' exists, do you want to override it', ['YES', 'NO']);
+        if(decision.toLowerCase() !== 'yes'){
+            doCopy = false;
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    }
+    if(doCopy) {
+        log(DEBUG, 'Copying File from: ' + source + ' to: ' + destination);
+        const fs = require('fs');
+        fs.copyFileSync(source, destination);
+    }
+    return doCopy;
+}
+// fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
+
+
+
 // Update the cloud login properties
 export async function updateCloudLogin(propFile: string, forceRefresh?: boolean, forceGlobalRefresh?: boolean, defaultClientID?: string, defaultEmail?: string) {
     const oKeyAns = await askMultipleChoiceQuestion('Do you want to provide an initial OAUTH Key ? ', ['YES', 'NO']);

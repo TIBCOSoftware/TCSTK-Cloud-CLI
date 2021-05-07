@@ -1,6 +1,6 @@
 import arg from 'arg';
 import {
-    col,
+    col, copyFileInteractiveIfNotExists,
     displayOpeningMessage, getGlobalConfig,
     isGlobalOauthDefined,
     obfuscatePW,
@@ -213,41 +213,49 @@ export async function cli(args: any) {
                 }
                 switch (cif) {
                     case tCProp:
+                        let copiedFile = true;
                         // if we use a global config
                         if (getGlobalConfig()) {
                             log(DEBUG, 'Using Global Connection Configuration...');
                             // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
-                            fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
-                            if (!isGlobalOauthDefined()) {
-                                const PROPM = require('./common/property-file-management');
-                                PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
+                            copiedFile = await copyFileInteractiveIfNotExists(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName, propFileName)
+                            // fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
+                            if (copiedFile) {
+                                if (!isGlobalOauthDefined()) {
+                                    const PROPM = require('./common/property-file-management');
+                                    PROPM.disableProperty(cwdir + '/' + propFileName, 'CloudLogin.OAUTH_Token', ' --> Automatically Disabled; No Global OAUTH Token Defined Yet...');
+                                }
+                                log(INFO, 'Created New TIBCO Cloud Property file ' + col.green('(Using GLOBAL configuration)') + ': ' + col.blue(cwdir + '/' + propFileName));
                             }
-                            log(INFO, 'Created New TIBCO Cloud Property file ' + col.green('(Using GLOBAL configuration)') + ': ' + col.blue(cwdir + '/' + propFileName));
-
                         } else {
                             log(DEBUG, 'Using Local Connection Configuration...');
-                            fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
-                            log(INFO, 'Created New TIBCO Cloud Property file ' + col.green('(Using LOCAL configuration)') + ': ' + col.blue(cwdir + '/' + propFileName));
-                            await updateRegion(propFileName);
-                            await updateCloudLogin(propFileName, true);
-                        }
-                        // Get the AppName Automatically from the package.json
-                        try {
-                            if (fs.existsSync('package.json')) {
-                                let rawdata = fs.readFileSync('package.json');
-                                let jsonp = JSON.parse(rawdata);
-                                // console.log(jsonp);
-                                // console.log(jsonp.name);
-                                addOrUpdateProperty(propFileName, 'App_Name', jsonp.name);
-                            } else {
-                                log(WARNING, 'No Package.json file found to insert the application name. You can update: App_Name=<YOUR APP NAME>');
+                            copiedFile = await copyFileInteractiveIfNotExists(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName, propFileName)
+                            // fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud.properties', cwdir + '/' + propFileName);
+                            if (copiedFile) {
+                                log(INFO, 'Created New TIBCO Cloud Property file ' + col.green('(Using LOCAL configuration)') + ': ' + col.blue(cwdir + '/' + propFileName));
+                                await updateRegion(propFileName);
+                                await updateCloudLogin(propFileName, true);
                             }
-                        } catch (e) {
-                            log(ERROR, e);
                         }
-                        //Add used template to property file
-                        if (options.template) {
-                            addOrUpdateProperty(propFileName, 'App_Type', options.template);
+                        if (copiedFile) {
+                            // Get the AppName Automatically from the package.json
+                            try {
+                                if (fs.existsSync('package.json')) {
+                                    let rawdata = fs.readFileSync('package.json');
+                                    let jsonp = JSON.parse(rawdata);
+                                    // console.log(jsonp);
+                                    // console.log(jsonp.name);
+                                    addOrUpdateProperty(propFileName, 'App_Name', jsonp.name);
+                                } else {
+                                    log(WARNING, 'No Package.json file found to insert the application name. You can update: App_Name=<YOUR APP NAME>');
+                                }
+                            } catch (e) {
+                                log(ERROR, e);
+                            }
+                            //Add used template to property file
+                            if (options.template) {
+                                addOrUpdateProperty(propFileName, 'App_Type', options.template);
+                            }
                         }
                         break;
                     case tMultiple:
@@ -357,7 +365,7 @@ export async function cli(args: any) {
                                 taskCommand += '-a "' + answers + '"';
                             }
                             // Add different property file (if used)
-                            if(options.propfile != 'tibco-cloud.properties'){
+                            if (options.propfile != 'tibco-cloud.properties') {
                                 taskCommand += ' -p "' + options.propfile + '"';
                             }
                             let rec = col.white('● ');
