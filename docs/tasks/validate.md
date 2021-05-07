@@ -20,7 +20,7 @@ These are the things you can validate
 * TCI_App_exist: Validates if a TCI Application exists.
 * Cloud_Starter_exist: Validates if a Cloud Starter exists.
 * Org_Folder_exist: Validates if an Organization Folder exists.
-* Org_Folder_And_File_exist: : Validates if an Organization Folder exists, and if it has a specific file.
+* Org_Folder_And_File_exist: Validates if an Organization Folder exists, and if it has a specific file.
 * Case_exist: Validates if a specific LiveApps Case exists.
 * Case_not_exist: Validates if a specific LiveApps Case Does Not exist (in other words; is removed).
 * Case_in_state: Validates if a specific LiveApps Case is in a specific state.
