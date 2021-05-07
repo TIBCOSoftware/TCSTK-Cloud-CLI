@@ -24,9 +24,15 @@ This can be useful to update property in your tibco-cloud.properties file or any
 
 For SPECIAL you can use:
 
-* SandboxID
-* LiveApps_AppID
-* LiveApps_ActionID
+* Organization_Name: The display name of your current cloud organization
+* Organization_ID: The ID of your current organization.
+* SandboxID: The LiveApps Sandbox ID.
+* LiveApps_AppID: The appId of a specific LiveApp application.
+* LiveApps_ActionID: The actionId (creator or action) of a specific LiveApps action.
+* Shared_StateID: The Id of a specific shared state entry.
+* Spotfire_FolderPath: The path (including Organization ID) of a spotfire folder. (this is needed if you want to display a spotfire report in your cloud starter) 
+
+NOTE: For specifics (LiveApp applications, SharedState or Spotfire Folders) additional questions are asked.
 
 ---
 ### Example Usages:
