@@ -43,7 +43,7 @@ If we answer ***CloudLogin.Region***, we will get the following result:
 * Case_In_State
 * Spotfire_Library_Item_exists
 
-For more information on Validation, see the [validation task](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/validate/)
+Note: for more information on Validation, see the [validation task](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/validate/)
 
 ---
 ## Run TCLI with the -a command
@@ -133,9 +133,15 @@ Will result in the following error:
 
 > ***Note:*** These are the special values that can be added:
 
+* Organization_Name
+* Organization_ID
 * SandboxID
 * LiveApps_AppID
-* LiveApps_ActionID 
+* LiveApps_ActionID
+* Shared_StateID
+* Spotfire_FolderPath
+
+Note: for more information adding properties, see the [add-or-update-property task](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/add-or-update-property/)
 
 And should be, for example:
 
