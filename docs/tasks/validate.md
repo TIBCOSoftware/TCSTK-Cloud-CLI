@@ -11,7 +11,8 @@ This is useful when you want to validate certain things on the TIBCO Cloud befor
 
 What would you like to validate ?
 
-These are the things you can validate
+These are the things you can validate:
+
 * Property_exist: Validates if a property exists in your tibco cloud property file.
 * Property_is_set: Validates if a property exists and has a value.
 * Property_is_set_ask: Does the same as Property_is_set, but if not set it will ask for a value(interactively).

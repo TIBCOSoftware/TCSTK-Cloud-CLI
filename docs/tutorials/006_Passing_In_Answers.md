@@ -41,7 +41,9 @@ If we answer ***CloudLogin.Region***, we will get the following result:
 * Case_Exist
 * Case_Not_Exist
 * Case_In_State
+* Spotfire_Library_Item_exists
 
+For more information on Validation, see the [validation task](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/validate/)
 
 ---
 ## Run TCLI with the -a command
