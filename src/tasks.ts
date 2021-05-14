@@ -595,6 +595,16 @@ export async function deleteSpotfireLibraryWrapper() {
     await SPOTFIRE.deleteSpotfireLibraryItem();
 }
 
+export async function uploadDXPWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.uploadSpotfireDXP();
+}
+
+export async function downloadDXPWrapper() {
+    const SPOTFIRE = require('./tenants/spotfire');
+    await SPOTFIRE.downloadSpotfireDXP();
+}
+
 
 
 export async function createSpotfireLibraryFolderWrapper() {

@@ -352,7 +352,7 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function uploadToCloud(formDataType: string, localFileLocation: string, uploadFileURI: string) {
+export async function uploadToCloud(formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host ) {
     return new Promise<void>(async function (resolve, reject) {
         const fd = require('form-data');
         let formData = new fd();
@@ -371,7 +371,7 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
             header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
         }
         let query = require('https').request({
-            hostname: getCurrentRegion() + clURI.la_host,   //cloudHost,*/
+            hostname: getCurrentRegion() + customHost,   //cloudHost,*/
             path: uploadFileURI,
             method: 'POST',
             headers: header
@@ -445,7 +445,7 @@ export async function downloadFromCloud(localFileLocation: string, downloadFileU
     });
 }
 
-function readableSize(sizeBytes: number) {
+export function readableSize(sizeBytes: number) {
     if (sizeBytes < 1024) {
         return sizeBytes + ' Bytes';
     } else {

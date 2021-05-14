@@ -967,6 +967,34 @@
       ],
       "category": "spotfire"
     },
+    "upload-spotfire-dxp": {
+      "description": "Uploads a Spotfire DXP into a specific library folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "uploadDXPWrapper",
+      "taskAlternativeNames": [
+        "upload-dxp"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
+    "download-spotfire-dxp": {
+      "description": "Downloads a Spotfire DXP from a library folder.",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "downloadDXPWrapper",
+      "taskAlternativeNames": [
+        "download-dxp"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "spotfire"
+    },
     "show-oauth-tokens": {
       "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
       "enabled": true,

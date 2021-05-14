@@ -52,3 +52,8 @@ export interface SFFolderInfo {
 }
 
 
+export interface UploadDXP {
+    result: number;
+    waid: string;
+    wavid: string;
+}
