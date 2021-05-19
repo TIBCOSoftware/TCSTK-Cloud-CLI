@@ -1,3 +1,4 @@
+
 export type Category =
     "tcli"
     | "cloud-starters"
@@ -108,3 +109,9 @@ export interface ORGInfo {
     [x: string]: any;
 }
 
+export interface LCookie {
+    domain: string
+    tsc: string;
+}
+
+export type LoginCookie = LCookie | 'ERROR' | null;

@@ -12,6 +12,7 @@ import {SFCopyRequest, SFCreateFolderRequest, SFFolderInfo, SFLibObject, SFType,
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {getProp, prepProp} from "../common/property-file-management";
+import {Client} from "soap";
 import {readableSize} from "../common/cloud-communications";
 
 declare var global: Global;
@@ -429,44 +430,65 @@ export async function uploadSpotfireDXP() {
                 console.log('folderIdToUpload: ' + folderIdToUpload);
                 // Step 2: Get the location of the dxp file to upload
                 const dxpLocation = await askQuestion('What is the location of the DXP you would like to upload ?');
-                if(dxpLocation.toLowerCase() !== '' && dxpLocation.toLowerCase() !== 'none'){
+                if (dxpLocation.toLowerCase() !== '' && dxpLocation.toLowerCase() !== 'none') {
                     console.log('dxpLocation: ' + dxpLocation);
-                    // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/Upload.xhr
 
-                    const dxpIds = await uploadDXP( dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/wp/Upload.xhr');
-                    console.log('Waid: ' , dxpIds.waid);
-                    //await uploadDXP(dxpLocation, '/spotfire/attachment?c=1&alg=sha-256', 'spotfire-next.cloud.tibco.com' )
-/*
-                    const SFRename = await callSpotfire(CCOM.clURI.sf_rename, false, {
+                    const attachmentID = await uploadDXP(dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/attachment');
+
+                    console.log('attachmentID ', attachmentID);
+
+                    log(INFO, 'DXP Uploaded successfully....');
+                    // Getting the info
+
+                    /*
+                    const axios = require('axios');
+                    const header: any = {};
+                    header["cookie"] = "JSESSIONID=" + jSession;
+                    header["X-XSRF-TOKEN"] = xSRF;
+                    header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
+                    header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
+                    const res = await axios.post('https://eu.spotfire-next.cloud.tibco.com/spotfire/attachment?aid=' + attachmentID + '&cmd=finish&c=1&b=123&sha-256=3d975595a9c36d2983394091bfe37cbd23f54fd240295dac5308860fff08675d', null, {
+                        headers: header
+                    });
+                    console.log(res.status);*/
+
+                    /*
+                    const saveResponse = await callSpotfire('spotfire-next.cloud.tibco.com/spotfire/attachment?aid=' + attachmentID + '&cmd=finish', true, {
                         method: 'POST',
-                        postRequest: {
-                            itemId: dxpIds.waid,
-                            title: 'AWESOME'
-                        }
-                    }) as SFLibObject;
-                    console.log(SFRename);
+                        postRequest: ''
+                    })
+                    console.log(saveResponse);*/
 
-                    const copyRequest: SFCopyRequest = {
-                        itemsToCopy: [dxpIds.waid],
-                        destinationFolderId: folderIdToUpload,
-                        conflictResolution: 'KeepBoth'
-                    }
-                    const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
-                        method: 'POST',
-                        postRequest: copyRequest
-                    }) as SFLibObject[];
-                    console.log(SFCopy);
 
- */
+                    // https://eu.spotfire-next.cloud.tibco.com/spotfire/attachment
+
+                    // if(res.status === 200) {
+                        const args = {
+                            item: {
+                                title: 'MyNewReport55',
+                                type: {
+                                    id: '4f83cd47-71b5-11dd-050e-00100a64217d',
+                                    label: 'dxp',
+                                    labelPrefix: 'spotfire',
+                                    displayName: 'dxp',
+                                    container: 'true',
+                                    fileSuffix: 'dxp',
+                                    mimeType: 'application/vnd.spotfire.dxp'
+                                },
+                                parentId: folderIdToUpload,
+                                size: 0,
+                                hidden: false
+                            }, attachmentID: attachmentID
+                        };
+                        const result = await callSFSOAP('saveItem', args);
+                        console.log(result);
+                   // }
+
 
                 } else {
                     log(INFO, 'OK, I won\'t do anything :-)');
                 }
-
-
-
             }
-
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
         }
@@ -482,10 +504,46 @@ export async function uploadSpotfireDXP() {
     // Step 5: Call the save operation: /spotfire/ws/LibraryService (a raw SOAP Message)
 
 
-
-
 }
 
+
+// Function to call the Spotfire SOAP API
+async function callSFSOAP(action: string, request: any) {
+    return new Promise<any>(async (resolve, reject) => {
+        const soap = require('soap');
+        const SF_WSDL = global.PROJECT_ROOT + '/SpotfireSOAPAPI/LibServiceOperations.wsdl';
+        if (!xSRF || !jSession) {
+            await callSpotfire(CCOM.clURI.sf_settings);
+        }
+        soap.createClient(SF_WSDL, async (err: any, client: Client) => {
+            if (err) {
+                log(ERROR, err);
+                reject(err);
+            }
+            // TODO: Is needed ?
+            //const security = new soap.BearerSecurity(getProp('CloudLogin.OAUTH_Token'));
+            //client.setSecurity(security);
+            //console.log('security: ', security);
+            client.addHttpHeader("X-XSRF-TOKEN", xSRF);
+            client.addHttpHeader("cookie", "JSESSIONID=" + jSession);
+            client[action](request, function (err: any, result: any, _rawResponse: any, _soapHeader: any, _rawRequest: any) {
+                // console.log('SOAP Response:         err]' , err);
+                // console.log('SOAP Response:      result]' , result);
+                // console.log('SOAP Response: rawResponse]' , _rawResponse);
+                // console.log('SOAP Response:  soapHeader]' , _soapHeader);
+                // console.log('SOAP Response:  rawRequest]' , _rawRequest);
+                if (err) {
+                    log(ERROR, err.response.statusCode);
+                    reject(err)
+                } else {
+                    console.log('RESULT: ', result);
+                    resolve(result);
+                }
+            });
+            console.log('Client Services: ', client.describe());
+        });
+    });
+}
 
 
 /*
@@ -553,7 +611,6 @@ export async function uploadSpotfireDXP() {
  */
 
 
-
 // TODO: Implement
 // Function to Download a Spotfire DXP
 export async function downloadSpotfireDXP() {
@@ -563,9 +620,9 @@ export async function downloadSpotfireDXP() {
 }
 
 
-
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-async function uploadDXP(localFileLocation: string,  host: string, uploadFileURI: string) {
+
+async function uploadDXP(localFileLocation: string, host: string, uploadFileURI: string) {
     return new Promise<UploadDXP>(async function (resolve) {
         const fd = require('form-data');
         const axios = require('axios');
@@ -580,20 +637,20 @@ async function uploadDXP(localFileLocation: string,  host: string, uploadFileURI
         header["X-XSRF-TOKEN"] = xSRF;
         header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
-
         formData.append(localFileLocation, fs.createReadStream(localFileLocation));
-        const uploadURL = 'https://' + getCurrentRegion() + host + uploadFileURI;
+        const uploadURL = 'https://' + getCurrentRegion() + host + uploadFileURI + '?c=1&finish=true';
         console.log(uploadURL);
-        console.log( 'Headers:' , formData.getHeaders());
+        console.log('Headers:', formData.getHeaders());
         header['content-type'] = formData.getHeaders()['content-type'];
+        // console.log('Headers:', header);
+
         const res = await axios.post(uploadURL, formData, {
             headers: header
         });
-        console.log(res.data);
+        console.log(res);
         resolve(res.data);
     });
 }
-
 
 
 async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {

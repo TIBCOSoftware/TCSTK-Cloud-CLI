@@ -7,7 +7,7 @@ import {
     setOrganization,
 } from "./common-functions";
 import {Global} from "../models/base";
-import {CallConfig, MappingGroup} from "../models/tcli-models";
+import {CallConfig, LoginCookie, MappingGroup} from "../models/tcli-models";
 import {askQuestion} from "./user-interaction";
 import {DEBUG, ERROR, INFO, log, logO, WARNING} from "./logging";
 import {getProp, setProperty} from "./property-file-management";
@@ -22,7 +22,7 @@ const cloudConfig = require('../config/config-cloud.json');
 export const clURI = cloudConfig.endpoints;
 export const mappings = cloudConfig.mappings as MappingGroup;
 
-let loginC: any = null;
+let loginC: LoginCookie = null;
 let doOAuthNotify = true;
 let isOAUTHValid: boolean | null;
 let toldClientID = false;
@@ -190,6 +190,10 @@ export async function cLogin(tenant?: string, customLoginURL?: string, forceClie
     return loginC;
 }
 
+export function getCookie() {
+    return loginC;
+}
+
 // Function that logs into the cloud and returns a cookie
 async function cloudLoginV3(tenantID: string, clientID: string, email: string, pass: string, TCbaseURL: string) {
     const postForm = 'TenantId=' + tenantID + '&ClientID=' + clientID + '&Email=' + email + '&Password=' + encodeURIComponent(pass);
@@ -352,8 +356,8 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function uploadToCloud(formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host ) {
-    return new Promise<void>(async function (resolve, reject) {
+export async function uploadToCloud(formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host) {
+    return new Promise<void>(async (resolve, reject) => {
         const fd = require('form-data');
         let formData = new fd();
         const fs = require('fs');
@@ -368,7 +372,11 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
         } else {
             const lCookie = await cLogin();
             // console.log(lCookie);
-            header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+            if (lCookie && lCookie !== 'ERROR') {
+                header["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+            } else {
+                log(ERROR, 'Could not get login cookie...');
+            }
         }
         let query = require('https').request({
             hostname: getCurrentRegion() + customHost,   //cloudHost,*/
@@ -408,7 +416,7 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
 export async function downloadFromCloud(localFileLocation: string, downloadFileURI: string) {
-    return new Promise<void>(async function (resolve, reject) {
+    return new Promise<void>(async (resolve, reject) => {
         const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
         log(INFO, '     DOWNLOADING: ' + col.blue(downloadURL));
         log(INFO, '              TO: ' + col.blue(localFileLocation));
@@ -418,7 +426,11 @@ export async function downloadFromCloud(localFileLocation: string, downloadFileU
         } else {
             const lCookie = await cLogin();
             // console.log(lCookie);
-            headers["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+            if (lCookie && lCookie !== 'ERROR') {
+                headers["cookie"] = "tsc=" + lCookie.tsc + "; domain=" + lCookie.domain;
+            } else {
+                log(ERROR, 'Could not get login cookie...');
+            }
         }
         const axios = require('axios').default;
         axios.get(downloadURL, {
