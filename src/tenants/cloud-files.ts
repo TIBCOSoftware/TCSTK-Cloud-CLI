@@ -8,13 +8,11 @@ import {
 import {askMultipleChoiceQuestionSearch, askQuestion} from "../common/user-interaction";
 import {ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {addOrUpdateProperty, getProp, getPropFileName} from "../common/property-file-management";
+import {Global} from "../models/base";
+declare var global: Global;
 
 const CCOM = require('../common/cloud-communications');
 const USERGROUPS = require('./user-groups');
-
-
-const isWindows = process.platform === 'win32';
-const dirDelimiter = isWindows ? '\\' : '/';
 
 let CLOUD_FILES_FOLDER = './Cloud_Files/';
 let cfInformed = false;
@@ -177,8 +175,8 @@ export async function uploadFileToOrgFolder() {
         const localFileLocation = await askQuestion('Specify to location of the local file you want to upload ?');
         let cloudFileName = await askQuestion('Specify the fileName as which you would like to upload it (Or press enter or use "SAME" to use the same name)?');
         if (cloudFileName === '' || cloudFileName.toLowerCase() === 'same') {
-            if (localFileLocation.indexOf(dirDelimiter) > 0) {
-                cloudFileName = localFileLocation.substring(localFileLocation.lastIndexOf(dirDelimiter) + 1, localFileLocation.length);
+            if (localFileLocation.indexOf(global.DIR_DELIMITER) > 0) {
+                cloudFileName = localFileLocation.substring(localFileLocation.lastIndexOf(global.DIR_DELIMITER) + 1, localFileLocation.length);
             } else {
                 cloudFileName = localFileLocation;
             }

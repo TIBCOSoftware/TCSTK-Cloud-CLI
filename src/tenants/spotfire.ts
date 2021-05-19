@@ -1,9 +1,9 @@
 import {
     col,
-    createTable, doesExist,
+    createTable, doesExist, doesFileExist,
     getCurrentRegion, getOrganization,
     getPEXConfig,
-    isOauthUsed,
+    isOauthUsed, mkdirIfNotExist,
     pexTable
 } from "../common/common-functions";
 import {Global} from "../models/base";
@@ -13,7 +13,7 @@ import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion}
 import {DEBUG, ERROR, INFO, log, logLine, WARNING} from "../common/logging";
 import {getProp, prepProp} from "../common/property-file-management";
 import {Client} from "soap";
-import {readableSize} from "../common/cloud-communications";
+import {downloadFromCloud, readableSize} from "../common/cloud-communications";
 
 declare var global: Global;
 
@@ -40,8 +40,9 @@ export function prepSpotfireProps() {
         '# The location in the library to search from.\n' +
         '#  NOTE: You can use ~{ORGANIZATION}, to use the current organization name in library base.\n' +
         '#  NOTE: Do not end this folder with a \'/\' character');
-    prepProp('Spotfire_Do_Copy_With_New_Name', 'NO', '# This setting indicates when an item is copied in the library and the target location exists, it it needs to be added with a new name.\n' +
+    prepProp('Spotfire_Do_Copy_With_New_Name', 'NO', 'This setting indicates when an item is copied in the library and the target location exists, it it needs to be added with a new name.\n' +
         '# So for example: Analysis_DXP (2), if set to NO the copy action will be ignored and a warning is given. Possible Values (YES | NO)');
+    prepProp('Spotfire_DXP_Folder', './Spotfire_DXPs/', 'Folder used for Spotfire DXP downloads\n# NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder. For Example:\n#Spotfire_DXP_Folder=./Spotfire_DXPs (~{ORGANIZATION})/');
 
 }
 
@@ -431,27 +432,42 @@ export async function uploadSpotfireDXP() {
                 // Step 2: Get the location of the dxp file to upload
                 const dxpLocation = await askQuestion('What is the location of the DXP you would like to upload ?');
                 if (dxpLocation.toLowerCase() !== '' && dxpLocation.toLowerCase() !== 'none') {
-                    // Step 3: Call upload on /spotfire/attachment?c=1&alg=sha-256
-                    const attachmentID = await uploadDXP(dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/attachment');
-                    log(INFO, 'DXP Uploaded successfully.... (Attachment ID: ' + col.blue(attachmentID) + ')');
-                    // Getting the info
-                    const argsL = {labels: 'dxp'};
-                    const resultLT = await callSFSOAP('loadTypes', argsL);
-                    const dxpType = resultLT.return[0];
-                    const args = {
-                        item: {
-                            title: 'MyNewReport',
-                            type: dxpType,
-                            parentId: folderIdToUpload,
-                            size: 0,
-                            hidden: false
-                        }, attachmentID: attachmentID
-                    };
-                    // console.log('Args: ' , args);
-                    // Step 5: Call the save operation: /spotfire/ws/LibraryService (a raw SOAP Message)
-                    await callSFSOAP('saveItem', args);
-                    log(INFO, col.green('Item Saved Successfully '));
-                    // TODO: Print URL to open item
+                    if (doesFileExist(dxpLocation)) {
+                        let dxpLibName = await askQuestion('What is the name in the library that you want to give the dxp (use default or press enter to give it the same nasm as on disk) ?');
+                        if (dxpLibName.toLowerCase() === 'default' || dxpLibName === '') {
+                            if (dxpLocation.indexOf(global.DIR_DELIMITER) > 0) {
+                                dxpLibName = dxpLocation.substring(dxpLocation.lastIndexOf(global.DIR_DELIMITER) + 1, dxpLocation.length);
+                            } else {
+                                dxpLibName = dxpLocation;
+                            }
+                            dxpLibName = dxpLibName.replace('.dxp', '');
+                        }
+                        log(INFO, 'Library Item Name: ' + dxpLibName)
+                        // Step 3: Call upload on /spotfire/attachment?c=1&alg=sha-256
+                        const attachmentID = await uploadDXP(dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/attachment');
+                        log(INFO, 'DXP Uploaded successfully.... (Attachment ID: ' + col.blue(attachmentID) + ')');
+                        // Getting the info
+                        const argsL = {labels: 'dxp'};
+                        const resultLT = await callSFSOAP('loadTypes', argsL);
+                        const dxpType = resultLT.return[0];
+                        const args = {
+                            item: {
+                                // TODO: Provide name
+                                title: dxpLibName,
+                                type: dxpType,
+                                parentId: folderIdToUpload,
+                                size: 0,
+                                hidden: false
+                            }, attachmentID: attachmentID
+                        };
+                        // console.log('Args: ' , args);
+                        // Step 5: Call the save operation: /spotfire/ws/LibraryService (a raw SOAP Message)
+                        await callSFSOAP('saveItem', args);
+                        log(INFO, col.green('Item Saved Successfully '));
+                        // TODO: Print URL to open item
+                    } else {
+                        log(ERROR, 'Can\'t find the file: ' + dxpLocation);
+                    }
 
                 } else {
                     log(INFO, 'OK, I won\'t do anything :-)');
@@ -463,15 +479,7 @@ export async function uploadSpotfireDXP() {
     } else {
         log(WARNING, 'No folders found to upload to...');
     }
-
-
-
-
-    // Step 4: Call upload again: /spotfire/attachment?aid=<response from Upload Part - 1/2>&cmd=finish&c=1&b=1933490&sha-256=1493af2e7f7a32450b6f791f29be8f54a39c97dc6a083ba3fda31e5b72f17807
-
-
-
-
+    // (if upload too lager) Call upload again: /spotfire/attachment?aid=<response from Upload Part - 1/2>&cmd=finish&c=1&b=1933490&sha-256=1493af2e7f7a32450b6f791f29be8f54a39c97dc6a083ba3fda31e5b72f17807
 }
 
 
@@ -485,99 +493,44 @@ async function callSFSOAP(action: string, request: any) {
         }
         soap.createClient(SF_WSDL, async (err: any, client: Client) => {
             if (err) {
-                // log(ERROR, err);
-                // reject(err);
+                log(ERROR, err);
+                reject(err);
             }
             // TODO: Is needed ?
             //const security = new soap.BearerSecurity(getProp('CloudLogin.OAUTH_Token'));
             //client.setSecurity(security);
             //console.log('security: ', security);
-            client.addHttpHeader("X-XSRF-TOKEN", xSRF);
-            client.addHttpHeader("cookie", "JSESSIONID=" + jSession);
+            if (AWSALB && AWSALBCORS) {
+                client.addHttpHeader("cookie", "JSESSIONID=" + jSession + '; AWSALB=' + AWSALB + '; AWSALBCORS=' + AWSALBCORS);
+            } else {
+                client.addHttpHeader("cookie", "JSESSIONID=" + jSession);
+            }
+            if (xSRF) {
+                client.addHttpHeader("X-XSRF-TOKEN", xSRF);
+            }
             client[action](request, function (err: any, result: any, _rawResponse: any, _soapHeader: any, _rawRequest: any) {
-                // console.log('SOAP Response:         err]' , err);
-                // console.log('SOAP Response:      result]' , result);
-                // console.log('SOAP Response: rawResponse]' , _rawResponse);
-                // console.log('SOAP Response:  soapHeader]' , _soapHeader);
-                // console.log('SOAP Response:  rawRequest]' , _rawRequest);
+                /* console.log('SOAP Response:         err]' , err);
+                console.log('SOAP Response:      result]' , result);
+                console.log('SOAP Response: rawResponse]' , _rawResponse);
+                console.log('SOAP Response:  soapHeader]' , _soapHeader);
+                console.log('SOAP Response:  rawRequest]' , _rawRequest);*/
                 if (err) {
                     log(ERROR, err.response.statusCode);
                     log(ERROR, err.response.body);
                     reject(err.response.statusMessage)
                 } else {
-                    // console.log('RESULT: ', result);
+                    // console.log('RESULT: ', _rawResponse);
                     resolve(result);
                 }
             });
+            client.on('response', (_body: any, response: any) => {
+                // console.log('Response: ' , response.headers['set-cookie']);
+                setLoadBalanceCookies(response.headers['set-cookie']);
+            })
             // console.log('Client Services: ', client.describe());
         });
     });
 }
-
-
-/*
-
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <soap:Body>
-        <saveItem xmlns="http://spotfire.tibco.com/ws/2008/12/library.xsd">
-            <item xmlns="">
-                <title>GatherStartSmart</title>
-                <type>
-                    <id>4f83cd47-71b5-11dd-050e-00100a64217d</id>
-                    <label>dxp</label>
-                    <labelPrefix>spotfire</labelPrefix>
-                    <displayName>dxp</displayName>
-                    <container>true</container>
-                    <fileSuffix>dxp</fileSuffix>
-                    <mimeType>application/vnd.spotfire.dxp</mimeType>
-                </type>
-                <formatVersion>10.9;10.8;10.3</formatVersion>
-                <parentId>30c4c957-bb32-49eb-a47b-b6baf03e8e43</parentId>
-                <size>0</size>
-                <hidden>false</hidden>
-                <properties>
-                    <key>EmbedAllSourceData</key>
-                    <value>False</value>
-                </properties>
-                <properties>
-                    <key>EmbeddedDataFormatVersion</key>
-                    <value>2</value>
-                </properties>
-                <properties>
-                    <key>spotfire.Comments</key>
-                    <value>RequiresReadAccess</value>
-                </properties>
-                <properties>
-                    <key>spotfire.PrivateBookmarkCreation</key>
-                    <value>RequiresReadAccess</value>
-                </properties>
-                <properties>
-                    <key>Spotfire.Preview.Mode</key>
-                    <value>Automatic</value>
-                </properties>
-                <properties>
-                    <key>Spotfire.Connector</key>
-                    <value>Spotfire.LiveAppsAdapter</value>
-                </properties>
-                <properties>
-                    <key>spotfire.PublicBookmarkCreation</key>
-                    <value>RequiresReadAndWriteAccess</value>
-                </properties>
-                <properties>
-                    <key>AllowWebPlayerResume</key>
-                    <value>True</value>
-                </properties>
-                <fieldsSet>Default</fieldsSet>
-                <fieldsSet>Properties</fieldsSet>
-            </item>
-            <attachmentID xmlns="">bd8c373d-f56d-4447-86b5-4a529b6556b5</attachmentID>
-            <fields xmlns="">Default</fields>
-            <fields xmlns="">Path</fields>
-        </saveItem>
-    </soap:Body>
-</soap:Envelope>
- */
 
 
 // TODO: Implement
@@ -585,21 +538,52 @@ async function callSFSOAP(action: string, request: any) {
 export async function downloadSpotfireDXP() {
     prepSpotfireProps();
     log(INFO, 'Downloading a Spotfire DXP...');
-
+    // Step 1: List all the DXP's
+    log(INFO, 'Getting all the DXP Library Items (from ' + getProp('Spotfire_Library_Base') + ')');
+    const availableDXPsForDownload = await listOnType("spotfire.dxp", false, true);
+    // Step 2: Choose a DXP
+    if (availableDXPsForDownload && availableDXPsForDownload.length > 0) {
+        const itemNameToDownload = await askMultipleChoiceQuestionSearch('Which DXP would you like to download ?', ['NONE', ...availableDXPsForDownload.map(v => v.TCLIPath)]);
+        if (itemNameToDownload.toLowerCase() !== 'none') {
+            const itemToDownload = availableDXPsForDownload.find(v => v.TCLIPath === itemNameToDownload)!;
+            if (itemToDownload) {
+                // Step 3: Get Attachment ID for the DXP
+                const argsLC = {item: itemToDownload.Id};
+                const resultLC = await callSFSOAP('loadContent', argsLC);
+                const downloadFileURI = 'spotfire-next.cloud.tibco.com/spotfire/attachment?cmd=get&aid=' + resultLC.return;
+                const headers = {
+                    cookie: "JSESSIONID=" + jSession + '; AWSALB=' + AWSALB + '; AWSALBCORS=' + AWSALBCORS
+                };
+                // Step 4: GET request to /spotfire/attachment?cmd=get&aid=<attachment id>
+                mkdirIfNotExist(getProp('Spotfire_DXP_Folder'));
+                await downloadFromCloud(getProp('Spotfire_DXP_Folder') + itemToDownload.Title + '.dxp', downloadFileURI, headers);
+            }
+        } else {
+            log(INFO, 'OK, I won\'t do anything :-)');
+        }
+    } else {
+        log(WARNING, 'No dxp found to download');
+    }
 }
 
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
+let AWSALB: string;
+let AWSALBCORS: string;
 
 async function uploadDXP(localFileLocation: string, host: string, uploadFileURI: string) {
+    prepSpotfireProps();
     return new Promise<UploadDXP>(async function (resolve) {
         const fd = require('form-data');
         const axios = require('axios');
         const fs = require('fs');
         let formData = new fd();
         const {size: fileSize} = fs.statSync(localFileLocation);
+        // const sha256File = require('sha256-file');
+        // const checkSum = sha256File(localFileLocation);
+        // console.log('fileSize: ' ,fileSize);
+        // console.log('checkSum: ' ,checkSum);
         log(INFO, 'UPLOADING DXP: ' + col.blue(localFileLocation) + ' (to:' + uploadFileURI + ')' + ' Filesize: ' + readableSize(fileSize));
-        // formData.append(formDataType, fs.createReadStream(localFileLocation));
         const header: any = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         header["cookie"] = "JSESSIONID=" + jSession;
@@ -613,13 +597,23 @@ async function uploadDXP(localFileLocation: string, host: string, uploadFileURI:
         header['content-type'] = formData.getHeaders()['content-type'];
         // console.log('Headers:', header);
         const res = await axios.post(uploadURL, formData, {
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
             headers: header
         });
-        // console.log(res);
+        // Getting the AWSALB & AWSALBCORS headers to force a sticky session over the AWS load balancer
+        setLoadBalanceCookies(res.headers['set-cookie']);
         resolve(res.data);
     });
 }
 
+// Getting the AWSALB & AWSALBCORS headers to force a sticky session over the AWS load balancer
+function setLoadBalanceCookies(loadBalanceCookie: any) {
+    AWSALB = /AWSALB=(.*?);/g.exec(loadBalanceCookie)![1]!;
+    AWSALBCORS = /AWSALBCORS=(.*?);/g.exec(loadBalanceCookie)![1]!;
+    log(DEBUG, 'AWSALB: ', AWSALB);
+    log(DEBUG, 'AWSALBCORS: ', AWSALBCORS);
+}
 
 async function getSFolderInfo(folderId: string): Promise<SFFolderInfo> {
     const request = {
@@ -828,6 +822,7 @@ async function callSpotfire(url: string, doLog?: boolean, conf?: CallConfig): Pr
                 conf = {returnResponse: true, handleErrorOutside: true};
             }
             const response = await CCOM.callTCA(url, doLog, conf);
+            // console.log(response.headers['set-cookie']);
             const loginCookie = response.headers['set-cookie'];
             //  logO(DEBUG, loginCookie);
             jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)![1]!;

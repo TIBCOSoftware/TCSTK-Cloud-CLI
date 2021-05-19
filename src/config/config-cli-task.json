@@ -969,7 +969,7 @@
     },
     "upload-spotfire-dxp": {
       "description": "Uploads a Spotfire DXP into a specific library folder.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": false,
       "task": "uploadDXPWrapper",
@@ -983,7 +983,7 @@
     },
     "download-spotfire-dxp": {
       "description": "Downloads a Spotfire DXP from a library folder.",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": false,
       "task": "downloadDXPWrapper",

@@ -4,6 +4,8 @@ declare var global: Global;
 global.TIME = new Date();
 global.SHOW_START_TIME = false;
 global.PROJECT_ROOT = __dirname + '/../../';
+global.IS_WINDOWS = process.platform === 'win32';
+global.DIR_DELIMITER = global.IS_WINDOWS ? '\\' : '/';
 if(process.argv && process.argv.length > 0){
     global.SHOW_START_TIME = process.argv.includes('--DebugTime');
     process.argv =  process.argv.filter(e => e !== '--DebugTime')

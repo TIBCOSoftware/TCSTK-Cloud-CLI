@@ -414,13 +414,13 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
 }
 
 
-// Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function downloadFromCloud(localFileLocation: string, downloadFileURI: string) {
+// Function to upload something to the TIBCO Cloud (for example files in cloud folders)
+export async function downloadFromCloud(localFileLocation: string, downloadFileURI: string, headers:any = {}) {
     return new Promise<void>(async (resolve, reject) => {
         const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI;
         log(INFO, '     DOWNLOADING: ' + col.blue(downloadURL));
         log(INFO, '              TO: ' + col.blue(localFileLocation));
-        let headers: any = {};
+        // let headers: any = {};
         if (isOauthUsed() && await isOAUTHLoginValid()) {
             headers["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         } else {
