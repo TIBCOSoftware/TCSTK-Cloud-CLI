@@ -1,0 +1,205 @@
+
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.springframework.org/schema/beans" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns3="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://spotfire.tibco.com/ws/2008/12/library.xsd" name="LibraryService" targetNamespace="http://www.springframework.org/schema/beans">
+    <wsdl:import location="LibraryService.wsdl" namespace="http://spotfire.tibco.com/ws/2008/12/library.xsd">
+    </wsdl:import>
+    <wsdl:binding name="LibraryServiceSoapBinding" type="ns1:LibraryService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="copyItems">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="copyItems">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="copyItemsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveItem">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="saveItem">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="saveItemResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="loadItems">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="loadItems">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="loadItemsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="loadTypes">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="loadTypes">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="loadTypesResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listDependentItems">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="listDependentItems">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="listDependentItemsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="search">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="searchResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listRemappedDependencies">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="listRemappedDependencies">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="listRemappedDependenciesResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="moveItems">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="moveItems">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="moveItemsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="loadContent">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="loadContent">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="loadContentResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="loadModified">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="loadModified">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="loadModifiedResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteItems">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="deleteItems">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="deleteItemsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="loadVisibleTypes">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="loadVisibleTypes">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="loadVisibleTypesResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="guidToPath">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="guidToPath">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="guidToPathResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="tryDeleteItems">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="tryDeleteItems">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="tryDeleteItemsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listChildren">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="listChildren">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="listChildrenResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="pathToGuid">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="pathToGuid">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="pathToGuidResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LibraryException">
+                <soap:fault name="LibraryException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="LibraryService">
+        <wsdl:port binding="tns:LibraryServiceSoapBinding" name="LibraryServicePort">
+            <soap:address location="https://eu.spotfire-next.cloud.tibco.com/spotfire/ws/LibraryService"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

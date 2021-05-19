@@ -427,63 +427,31 @@ export async function uploadSpotfireDXP() {
             if (folderToUpload) {
                 // console.log(folderToUpload);
                 const folderIdToUpload = folderToUpload.Id;
-                console.log('folderIdToUpload: ' + folderIdToUpload);
+                log(INFO, 'Uploading DXP to folder with id: ' + col.blue(folderIdToUpload));
                 // Step 2: Get the location of the dxp file to upload
                 const dxpLocation = await askQuestion('What is the location of the DXP you would like to upload ?');
                 if (dxpLocation.toLowerCase() !== '' && dxpLocation.toLowerCase() !== 'none') {
-                    console.log('dxpLocation: ' + dxpLocation);
-
+                    // Step 3: Call upload on /spotfire/attachment?c=1&alg=sha-256
                     const attachmentID = await uploadDXP(dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/attachment');
-
-                    console.log('attachmentID ', attachmentID);
-
-                    log(INFO, 'DXP Uploaded successfully....');
+                    log(INFO, 'DXP Uploaded successfully.... (Attachment ID: ' + col.blue(attachmentID) + ')');
                     // Getting the info
-
-                    /*
-                    const axios = require('axios');
-                    const header: any = {};
-                    header["cookie"] = "JSESSIONID=" + jSession;
-                    header["X-XSRF-TOKEN"] = xSRF;
-                    header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
-                    header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
-                    const res = await axios.post('https://eu.spotfire-next.cloud.tibco.com/spotfire/attachment?aid=' + attachmentID + '&cmd=finish&c=1&b=123&sha-256=3d975595a9c36d2983394091bfe37cbd23f54fd240295dac5308860fff08675d', null, {
-                        headers: header
-                    });
-                    console.log(res.status);*/
-
-                    /*
-                    const saveResponse = await callSpotfire('spotfire-next.cloud.tibco.com/spotfire/attachment?aid=' + attachmentID + '&cmd=finish', true, {
-                        method: 'POST',
-                        postRequest: ''
-                    })
-                    console.log(saveResponse);*/
-
-
-                    // https://eu.spotfire-next.cloud.tibco.com/spotfire/attachment
-
-                    // if(res.status === 200) {
-                        const args = {
-                            item: {
-                                title: 'MyNewReport55',
-                                type: {
-                                    id: '4f83cd47-71b5-11dd-050e-00100a64217d',
-                                    label: 'dxp',
-                                    labelPrefix: 'spotfire',
-                                    displayName: 'dxp',
-                                    container: 'true',
-                                    fileSuffix: 'dxp',
-                                    mimeType: 'application/vnd.spotfire.dxp'
-                                },
-                                parentId: folderIdToUpload,
-                                size: 0,
-                                hidden: false
-                            }, attachmentID: attachmentID
-                        };
-                        const result = await callSFSOAP('saveItem', args);
-                        console.log(result);
-                   // }
-
+                    const argsL = {labels: 'dxp'};
+                    const resultLT = await callSFSOAP('loadTypes', argsL);
+                    const dxpType = resultLT.return[0];
+                    const args = {
+                        item: {
+                            title: 'MyNewReport',
+                            type: dxpType,
+                            parentId: folderIdToUpload,
+                            size: 0,
+                            hidden: false
+                        }, attachmentID: attachmentID
+                    };
+                    // console.log('Args: ' , args);
+                    // Step 5: Call the save operation: /spotfire/ws/LibraryService (a raw SOAP Message)
+                    await callSFSOAP('saveItem', args);
+                    log(INFO, col.green('Item Saved Successfully '));
+                    // TODO: Print URL to open item
 
                 } else {
                     log(INFO, 'OK, I won\'t do anything :-)');
@@ -497,11 +465,11 @@ export async function uploadSpotfireDXP() {
     }
 
 
-    // Step 3: Call upload on /spotfire/attachment?c=1&alg=sha-256
+
 
     // Step 4: Call upload again: /spotfire/attachment?aid=<response from Upload Part - 1/2>&cmd=finish&c=1&b=1933490&sha-256=1493af2e7f7a32450b6f791f29be8f54a39c97dc6a083ba3fda31e5b72f17807
 
-    // Step 5: Call the save operation: /spotfire/ws/LibraryService (a raw SOAP Message)
+
 
 
 }
@@ -517,8 +485,8 @@ async function callSFSOAP(action: string, request: any) {
         }
         soap.createClient(SF_WSDL, async (err: any, client: Client) => {
             if (err) {
-                log(ERROR, err);
-                reject(err);
+                // log(ERROR, err);
+                // reject(err);
             }
             // TODO: Is needed ?
             //const security = new soap.BearerSecurity(getProp('CloudLogin.OAUTH_Token'));
@@ -534,13 +502,14 @@ async function callSFSOAP(action: string, request: any) {
                 // console.log('SOAP Response:  rawRequest]' , _rawRequest);
                 if (err) {
                     log(ERROR, err.response.statusCode);
-                    reject(err)
+                    log(ERROR, err.response.body);
+                    reject(err.response.statusMessage)
                 } else {
-                    console.log('RESULT: ', result);
+                    // console.log('RESULT: ', result);
                     resolve(result);
                 }
             });
-            console.log('Client Services: ', client.describe());
+            // console.log('Client Services: ', client.describe());
         });
     });
 }
@@ -639,15 +608,14 @@ async function uploadDXP(localFileLocation: string, host: string, uploadFileURI:
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         formData.append(localFileLocation, fs.createReadStream(localFileLocation));
         const uploadURL = 'https://' + getCurrentRegion() + host + uploadFileURI + '?c=1&finish=true';
-        console.log(uploadURL);
-        console.log('Headers:', formData.getHeaders());
+        // console.log(uploadURL);
+        // console.log('Headers:', formData.getHeaders());
         header['content-type'] = formData.getHeaders()['content-type'];
         // console.log('Headers:', header);
-
         const res = await axios.post(uploadURL, formData, {
             headers: header
         });
-        console.log(res);
+        // console.log(res);
         resolve(res.data);
     });
 }
