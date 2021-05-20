@@ -17,7 +17,7 @@ import {
     setGlobalAnswers
 } from "./common/user-interaction";
 import {addOrUpdateProperty, getProp, setProperty, setPropFileName} from "./common/property-file-management";
-import {DEBUG, ERROR, INFO, log, RECORDER, WARNING} from "./common/logging";
+import {DEBUG, disableLogging, ERROR, INFO, log, RECORDER, WARNING} from "./common/logging";
 
 declare var global: Global;
 
@@ -66,6 +66,7 @@ function parseArgumentsIntoOptions(rawArgs: any) {
                 '-r': '--record',
                 '--showReplay': Boolean,
                 '-l': '--showReplay',
+                '--noLog': Boolean,
             },
             {
                 argv: rawArgs.slice(2),
@@ -96,7 +97,8 @@ function parseArgumentsIntoOptions(rawArgs: any) {
         environment: args['--environment'] || '',
         browse: args['--browse'] || false,
         record: args['--record'] || '',
-        showReplay: args['--showReplay'] || false
+        showReplay: args['--showReplay'] || false,
+        noLog: args['--noLog'] || false
     };
 }
 
@@ -108,6 +110,9 @@ export async function cli(args: any) {
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' CLI INIT');
     //console.log('start');
     const options = parseArgumentsIntoOptions(args);
+    if(options.noLog){
+        disableLogging();
+    }
     const appRoot = process.env['PWD'];
     const cwdir = process.cwd();
     propFileName = options.propfile;

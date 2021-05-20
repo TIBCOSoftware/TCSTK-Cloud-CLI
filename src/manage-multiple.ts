@@ -108,33 +108,54 @@ export function processMultipleFile() {
             let jvs = [];
             if (jobTasksA.length > 0) {
                 for (let jTask of jobTasksA) {
+                    let verbose = false;
                     let taskType = '';
                     let task = '';
 
                     let tObj: any = {};
                     try {
-                        console.log('Parsing: ', jTask);
+                        // console.log('Parsing: ', jTask);
                         tObj = JSON.parse(jTask);
                     } catch (e) {
                         log(ERROR, 'Parsing error on: |' + jTask + '| (' + e.message + ')');
                         process.exit(1);
                     }
-                    if (tObj.T != null) {
+                    if (tObj.T) {
                         taskType = 'TCLI TASK';
                         task = replaceAtSign(tObj.T, currLoc + propFile);
                     }
-                    if (tObj.O != null) {
+                    if(tObj.TV){
+                        verbose = true;
+                        taskType = 'TCLI TASK (Verbose)';
+                        task = replaceAtSign(tObj.TV, currLoc + propFile);
+                    }
+                    if (tObj.O) {
                         taskType = 'OS TASK';
                         task = replaceAtSign(tObj.O, currLoc + propFile);
                     }
-                    if (tObj.S != null) {
+                    if(tObj.OV){
+                        verbose = true;
+                        taskType = 'OS TASK (Verbose)';
+                        task = replaceAtSign(tObj.OV, currLoc + propFile);
+                    }
+                    if (tObj.S) {
                         taskType = 'SCRIPT TASK';
                         task = replaceAtSign(tObj.S, currLoc + propFile);
                     }
-                    if (task.length > 77) {
+                    if(tObj.SV){
+                        verbose = true;
+                        taskType = 'SCRIPT TASK (Verbose)';
+                        task = replaceAtSign(tObj.SV, currLoc + propFile);
+                    }
+                    console.log('Task: ' , task);
+                    if (task && task.length > 77) {
                         task = task.substr(0, 77) + '...';
                     }
-                    jvs = createTableValue(taskType, task, jvs, 'TYPE', 'TASK');
+                    if(!verbose) {
+                        jvs = createTableValue(taskType, task, jvs, 'TYPE', 'TASK');
+                    } else {
+                        jvs = createTableValue(taskType, '***', jvs, 'TYPE', 'TASK');
+                    }
                 }
             }
             log(INFO, col.blue('TASK SUMMARY]') + ' ENVIRONMENT: ' + currentEnvironment);
@@ -147,31 +168,36 @@ export function processMultipleFile() {
                 // console.log(tObj);
                 let logT = logSE;
                 let command = 'cd ' + currLoc + ' && ';
-                if (tObj.T != null) {
-                    /* TODO: mutliple does not accept comma's (for additional json entries...
-                    let ansCom = '';
-                    if(tObj.ANSWERS != null){
-                        ansCom = ' -a ' + tObj.ANSWERS;
-                    } */
+                let showTask = true;
+                if (tObj.T) {
                     logT += col.brightCyan('[' + (k + 1) + '] [TCLI TASK]\n');
-                    //TODO: USE Absolute path ? We can't for the moment, since -p option only takes relative path.
-                    //const absPropFile = process.env.PWD + '/' + propFile;
-                    //console.log('absPropFile: ' + absPropFile)
-                    //command += 'tcli -p "' + absPropFile + '" ' + tObj.T;
                     command += 'tcli -p "' + propFile + '" ' + tObj.T;
-                    //command += 'tcli -p "' + propFile + '" ' + tObj.T + ansCom;
                 }
-                if (tObj.O != null) {
+                if(tObj.TV){
+                    showTask = false;
+                    command += 'tcli -p "' + propFile + '" ' + tObj.TV;
+                }
+                if (tObj.O){
                     logT += col.brightCyan('[' + (k + 1) + '] [OS TASK]\n');
                     command += tObj.O;
                 }
-                if (tObj.S != null) {
+                if(tObj.OV){
+                    showTask = false;
+                    command += tObj.OV;
+                }
+                if (tObj.S || tObj.SV) {
                     logT += col.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]\n' + tObj.S);
                     command += 'node ' + tObj.S;
                 }
+                if(tObj.SV){
+                    showTask = false;
+                    command += 'node ' + tObj.SV;
+                }
                 log(DEBUG, logT + 'Command (before replacing): ' + command);
                 command = replaceAtSign(command, currLoc + propFile);
-                log(INFO, logT + ' Command: ' + command + ' (Fail on Error: ' + doFailOnError + ')');
+                if(showTask) {
+                    log(INFO, logT + ' Command: ' + command + ' (Fail on Error: ' + doFailOnError + ')');
+                }
                 run(command, doFailOnError);
             }
         }

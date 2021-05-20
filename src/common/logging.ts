@@ -44,11 +44,16 @@ export function setLogDebug(debug: string | boolean) {
         useDebug = debug === 'true';
     }
 }
+let loggingEnabled = true
+
+export function disableLogging(){
+    loggingEnabled = false;
+}
 
 // Function moved to TS
 export function log(level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR' | 'RECORDER', ...message: any) {
     // console.log('LOG: ' ,useDebug , level, message);
-    if (!(level === DEBUG && !useDebug)) {
+    if (!(level === DEBUG && !useDebug) && loggingEnabled) {
         // const timeStamp = new Date();
         // console.log('(' + timeStamp + ')[' + level + ']  ' + message);
         if (level === ERROR) {

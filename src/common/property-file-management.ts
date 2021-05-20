@@ -6,7 +6,7 @@ import {
     getPEXConfig,
     isOauthUsed,
     pexTable,
-    run
+    run, trim
 } from "./common-functions";
 import {ORGFile, ORGInfo} from "../models/tcli-models";
 import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from "./user-interaction";
@@ -421,15 +421,15 @@ export async function updateProperty() {
             const organizations = await getOrganizations() as Accounts;
             const currentOrgName = await getOrganization();
             console.log(currentOrgName);
-            for(const org of organizations) {
-                if(org.childAccountsInfo && org.childAccountsInfo.length > 0){
-                    for(const childOrg of org.childAccountsInfo){
-                        if(childOrg.accountDisplayName === currentOrgName){
+            for (const org of organizations) {
+                if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
+                    for (const childOrg of org.childAccountsInfo) {
+                        if (childOrg.accountDisplayName === currentOrgName) {
                             pValue = childOrg.subscriptionId;
                         }
                     }
                 }
-                if(org.accountDisplayName === currentOrgName){
+                if (org.accountDisplayName === currentOrgName) {
                     pValue = org.subscriptionId;
                 }
             }
@@ -629,10 +629,14 @@ export function showPropertiesTable() {
 
 export function replaceAtSign(content: string, propFile: string) {
     if (content && content.includes('@{') && content.includes('}')) {
-        const subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
+        let subProp = content.substring(content.indexOf('@{') + 2, content.indexOf('@{') + 2 + content.substring(content.indexOf('@{') + 2).indexOf('}'));
+        // Check if subprop contains semicolon for replacements
+        const piped = getPipe(subProp);
+        subProp = piped.prop;
         log(DEBUG, 'Looking for subprop: |' + subProp + '| on: |' + content + '| propFile: ' + propFile);
         content = content.replace(/@{.*?\}/, getPropFromFile(subProp, propFile));
         log(DEBUG, 'Replaced: ' + content);
+        content = applyPipe(content, piped.pipe);
         content = replaceAtSign(content, propFile);
     }
     return content;
@@ -640,21 +644,69 @@ export function replaceAtSign(content: string, propFile: string) {
 
 export function replaceGlobal(content: string) {
     if (content && content.includes('~{') && content.includes('}')) {
-        const GlobalProp = content.substring(content.indexOf('~{') + 2, content.indexOf('~{') + 2 + content.substring(content.indexOf('~{') + 2).indexOf('}'));
+        // TODO: Make sure you can replace consequent globals
+        let GlobalProp = content.substring(content.indexOf('~{') + 2, content.indexOf('~{') + 2 + content.substring(content.indexOf('~{') + 2).indexOf('}'));
         log(DEBUG, 'Looking for Global: |' + GlobalProp + '| on: |' + content);
+        const piped = getPipe(GlobalProp);
+        GlobalProp = piped.prop;
         switch (GlobalProp.toLowerCase()) {
             case 'organization':
                 content = content.replace(/~{.*?\}/ig, getOrganization());
                 break;
             // TODO: Add other globals here
+            case 'date':
+                content = content.replace(/~{.*?\}/ig, new Date().getFullYear() + '_' + new Date().getMonth() + '_' + new Date().getDay());
+                break;
+            case 'time':
+                content = content.replace(/~{.*?\}/ig, new Date().getHours() + '_' + new Date().getMinutes());
+                break;
+            case 'timestamp':
+                content = content.replace(/~{.*?\}/ig, new Date().getTime() + '');
+                break;
             default:
                 log(WARNING, 'Global: ' + GlobalProp + ' not found');
         }
+        content = applyPipe(content, piped.pipe);
         log(DEBUG, 'Injected Global: ' + content);
-        // content = replaceGlobal(content);
+        content = replaceGlobal(content);
     }
     return content;
 }
+
+function getPipe(prop: string): { pipe: string, prop: string } {
+    const re = {
+        pipe: '',
+        prop: prop
+    }
+    if (prop.includes(';')) {
+        re.prop = trim(prop.split(';')[0]!);
+        re.pipe = trim(prop.split(';')[1]!);
+    }
+    return re;
+}
+
+function applyPipe(prop: string, pipe: string) {
+    let re = prop;
+    if (pipe && pipe !== '') {
+        const pipeToApply = pipe.toLowerCase();
+        switch (pipeToApply) {
+            case 'lower':
+                // code block
+                re = re.toLowerCase();
+                log(INFO, 'Applied Pipe (LOWER): ' + re);
+                break;
+            case 'upper':
+                re = re.toUpperCase();
+                log(INFO, 'Applied Pipe (UPPER): ' + re);
+                break;
+            // TODO: Other Pipes: toBase64, fromBase64, obfuscate, deobfuscate(?)
+            default:
+                log(ERROR, 'Pipe Not found: ' + pipe);
+        }
+    }
+    return re;
+}
+
 
 export function getPropFromFile(property: string, file: string) {
     log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file);
