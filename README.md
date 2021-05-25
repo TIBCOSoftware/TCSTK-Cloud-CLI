@@ -174,6 +174,8 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[share-spotfire-library-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/share-spotfire-library-folder/)|Shares a Spotfire Library Folder with a Specific User.|
 |[delete-spotfire-library-item](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/delete-spotfire-library-item/)|Deletes a Spotfire Library Item (a DXP for example).|
 |[create-spotfire-library-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-spotfire-library-folder/)|Creates a new Library Folder.|
+|[upload-spotfire-dxp](./docs/tasks/upload-spotfire-dxp.md)|Uploads a Spotfire DXP into a specific library folder.|
+|[download-spotfire-dxp](./docs/tasks/download-spotfire-dxp.md)|Downloads a Spotfire DXP from a library folder.|
 
 ## oauth
 
