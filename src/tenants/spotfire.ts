@@ -433,7 +433,7 @@ export async function uploadSpotfireDXP() {
                 const dxpLocation = await askQuestion('What is the location of the DXP you would like to upload ?');
                 if (dxpLocation.toLowerCase() !== '' && dxpLocation.toLowerCase() !== 'none') {
                     if (doesFileExist(dxpLocation)) {
-                        let dxpLibName = await askQuestion('What is the name in the library that you want to give the dxp (use default or press enter to give it the same nasm as on disk) ?');
+                        let dxpLibName = await askQuestion('What is the name in the library that you want to give the dxp (use default or press enter to give it the same name as on disk) ?');
                         if (dxpLibName.toLowerCase() === 'default' || dxpLibName === '') {
                             if (dxpLocation.indexOf(global.DIR_DELIMITER) > 0) {
                                 dxpLibName = dxpLocation.substring(dxpLocation.lastIndexOf(global.DIR_DELIMITER) + 1, dxpLocation.length);
@@ -444,7 +444,8 @@ export async function uploadSpotfireDXP() {
                         }
                         log(INFO, 'Library Item Name: ' + dxpLibName)
                         // Step 3: Call upload on /spotfire/attachment?c=1&alg=sha-256
-                        const attachmentID = await uploadDXP(dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/attachment');
+                        // const attachmentID = await uploadDXP(dxpLocation, 'spotfire-next.cloud.tibco.com', '/spotfire/attachment');
+                        const attachmentID = await uploadDXP(dxpLocation, CCOM.clURI.sf_dxp_attachment);
                         log(INFO, 'DXP Uploaded successfully.... (Attachment ID: ' + col.blue(attachmentID) + ')');
                         // Getting the info
                         const argsL = {labels: 'dxp'};
@@ -472,6 +473,9 @@ export async function uploadSpotfireDXP() {
                 } else {
                     log(INFO, 'OK, I won\'t do anything :-)');
                 }
+            } else {
+                log(ERROR, 'Can\'t find the folder ' + folderNameToUpload + ' on the Spotfire Server to upload to, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)');
+                process.exit(1);
             }
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
@@ -532,8 +536,6 @@ async function callSFSOAP(action: string, request: any) {
     });
 }
 
-
-// TODO: Implement
 // Function to Download a Spotfire DXP
 export async function downloadSpotfireDXP() {
     prepSpotfireProps();
@@ -550,13 +552,16 @@ export async function downloadSpotfireDXP() {
                 // Step 3: Get Attachment ID for the DXP
                 const argsLC = {item: itemToDownload.Id};
                 const resultLC = await callSFSOAP('loadContent', argsLC);
-                const downloadFileURI = 'spotfire-next.cloud.tibco.com/spotfire/attachment?cmd=get&aid=' + resultLC.return;
+                const downloadFileURI = CCOM.clURI.sf_dxp_attachment + '?cmd=get&aid=' + resultLC.return;
                 const headers = {
                     cookie: "JSESSIONID=" + jSession + '; AWSALB=' + AWSALB + '; AWSALBCORS=' + AWSALBCORS
                 };
                 // Step 4: GET request to /spotfire/attachment?cmd=get&aid=<attachment id>
                 mkdirIfNotExist(getProp('Spotfire_DXP_Folder'));
                 await downloadFromCloud(getProp('Spotfire_DXP_Folder') + itemToDownload.Title + '.dxp', downloadFileURI, headers);
+            } else {
+                log(ERROR, 'Can\'t find ' + itemNameToDownload + ' to download, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)');
+                process.exit(1);
             }
         } else {
             log(INFO, 'OK, I won\'t do anything :-)');
@@ -571,7 +576,7 @@ export async function downloadSpotfireDXP() {
 let AWSALB: string;
 let AWSALBCORS: string;
 
-async function uploadDXP(localFileLocation: string, host: string, uploadFileURI: string) {
+async function uploadDXP(localFileLocation: string, uploadDxpURI: string) {
     prepSpotfireProps();
     return new Promise<UploadDXP>(async function (resolve) {
         const fd = require('form-data');
@@ -583,7 +588,7 @@ async function uploadDXP(localFileLocation: string, host: string, uploadFileURI:
         // const checkSum = sha256File(localFileLocation);
         // console.log('fileSize: ' ,fileSize);
         // console.log('checkSum: ' ,checkSum);
-        log(INFO, 'UPLOADING DXP: ' + col.blue(localFileLocation) + ' (to:' + uploadFileURI + ')' + ' Filesize: ' + readableSize(fileSize));
+        log(INFO, 'UPLOADING DXP: ' + col.blue(localFileLocation) + ' (to:' + uploadDxpURI + ')' + ' Filesize: ' + readableSize(fileSize));
         const header: any = {};
         header['Content-Type'] = 'multipart/form-data; charset=UTF-8';
         header["cookie"] = "JSESSIONID=" + jSession;
@@ -591,7 +596,7 @@ async function uploadDXP(localFileLocation: string, host: string, uploadFileURI:
         header["referer"] = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage';
         header["Authorization"] = 'Bearer ' + getProp('CloudLogin.OAUTH_Token');
         formData.append(localFileLocation, fs.createReadStream(localFileLocation));
-        const uploadURL = 'https://' + getCurrentRegion() + host + uploadFileURI + '?c=1&finish=true';
+        const uploadURL = 'https://' + getCurrentRegion() + uploadDxpURI + '?c=1&finish=true';
         // console.log(uploadURL);
         // console.log('Headers:', formData.getHeaders());
         header['content-type'] = formData.getHeaders()['content-type'];

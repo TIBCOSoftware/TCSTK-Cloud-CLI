@@ -168,15 +168,19 @@
 
 [list-spotfire-library](./list-spotfire-library.md) - Lists all components(DXP's, Mods, Information links, Data files or Data connections) in your SF Library.
 
+[create-spotfire-library-folder](./create-spotfire-library-folder.md) - Creates a new Library Folder.
+
+[share-spotfire-library-folder](./share-spotfire-library-folder.md) - Shares a Spotfire Library Folder with a Specific User.
+
 [copy-spotfire-library-item](./copy-spotfire-library-item.md) - Copies a Spotfire Library Item (a DXP for example) from one place to another (possibly between organizations).
 
 [rename-spotfire-library-item](./rename-spotfire-library-item.md) - Renames a Spotfire Library Item (a DXP for example).
 
-[share-spotfire-library-folder](./share-spotfire-library-folder.md) - Shares a Spotfire Library Folder with a Specific User.
-
 [delete-spotfire-library-item](./delete-spotfire-library-item.md) - Deletes a Spotfire Library Item (a DXP for example).
 
-[create-spotfire-library-folder](./create-spotfire-library-folder.md) - Creates a new Library Folder.
+[upload-spotfire-dxp](./upload-spotfire-dxp.md) - Uploads a Spotfire DXP into a specific library folder.
+
+[download-spotfire-dxp](./download-spotfire-dxp.md) - Downloads a Spotfire DXP from a library folder.
 
 
 ## oauth

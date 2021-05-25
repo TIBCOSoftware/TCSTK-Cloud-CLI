@@ -449,8 +449,16 @@ describe("tcli testsuite", function () {
         expect(run(CLI_EXECUTOR + 'create-spotfire-library-folder -a "/Teams/~{ORGANIZATION}:Jasmine_Test:Test Folder"')).toBe(true);
         // Validate that this folder is created
         expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Library Folders:/Teams/~{ORGANIZATION}/Jasmine_Test"')).toBe(true);
-        // Copy a sample report into this folder
         expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Spotfire_Library_Base:none:')).toBe(true);
+        // Download a DXP
+        expect(run(CLI_EXECUTOR + 'download-spotfire-dxp -a "/Samples/Introduction to Spotfire"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'download-spotfire-dxp -a "/Samples/Introduction to Spotfire CRAP"')).toBe(false);
+        // Upload a DXP
+        expect(run(CLI_EXECUTOR + 'upload-spotfire-dxp -a "/Teams/~{ORGANIZATION}/Jasmine_Test:./Spotfire_DXPs/Introduction to Spotfire.dxp:default"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'upload-spotfire-dxp -a "/Teams/~{ORGANIZATION}/Jasmine_Test:./Spotfire_DXPs/Introduction to Spotfire.dxp:NewIntroduction"')).toBe(true);
+        expect(run(CLI_EXECUTOR + 'upload-spotfire-dxp -a "/Teams/~{ORGANIZATION}/Jasmine_Test_NOT_EXISTS:./Spotfire_DXPs/Introduction to Spotfire.dxp:default"')).toBe(false);
+        expect(run(CLI_EXECUTOR + 'upload-spotfire-dxp -a "/Teams/~{ORGANIZATION}/Jasmine_Test:./Spotfire_DXPs/Introduction to Spotfire_NOT_EXISTS.dxp:default"')).toBe(false);
+        // Copy a sample report into this folder
         expect(run(CLI_EXECUTOR + 'copy-spotfire-library-item -a "Spotfire Reports:/Samples/Introduction to Spotfire:/Teams/~{ORGANIZATION}/Jasmine_Test"')).toBe(true);
         expect(run(CLI_EXECUTOR + 'validate -a "Spotfire_Library_Item_exists:Spotfire Reports:/Teams/~{ORGANIZATION}/Jasmine_Test/Introduction to Spotfire"')).toBe(true);
         // Copy a non-existing report

@@ -34,6 +34,7 @@
     "sf_delete": "spotfire-next.cloud.tibco.com/spotfire/rest/library/delete",
     "sf_share": "spotfire-next.cloud.tibco.com/spotfire/rest/library/share/setShareSettings",
     "sf_shared_with_me": "spotfire-next.cloud.tibco.com/spotfire/rest/library/sharedWithMe",
+    "sf_dxp_attachment": "spotfire-next.cloud.tibco.com/spotfire/attachment",
     "mes_system": "messaging.cloud.tibco.com/tcm/v1/system",
     "mes_sum": "messaging.cloud.tibco.com/tcm/v1/system/summary",
     "mes_durables": "messaging.cloud.tibco.com/tcm/v1/system/durables",

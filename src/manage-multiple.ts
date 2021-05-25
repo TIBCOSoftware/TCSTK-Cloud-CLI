@@ -1,7 +1,7 @@
 // This file manages the applications
 import {
     col,
-    createTableValue,
+    createTableValue, doesFileExist,
     getMultipleOptions,
     iterateTable,
     run, trim
@@ -62,6 +62,10 @@ export function processMultipleFile() {
     for (let k = 0; k < csJobsA.length; k++) {
         const currentJob = csJobsA[k].trim();
         let environments = getMProp(currentJob + '_Environments');
+        if(!environments){
+            log(ERROR, 'Missing environment specification for JOB: ' + currentJob + '. Please define the ' + currentJob + '_Environments property in ' + mFile);
+            process.exit(1);
+        }
         if (environmentOverride !== '') {
             environments = environmentOverride;
         }
@@ -80,6 +84,10 @@ export function processMultipleFile() {
         // log(INFO, logS);
         // Per Starter Go Over the Configured Environments
         const currLoc = getMProp(currentJob + '_Location');
+        if(!currLoc){
+            log(ERROR, 'Missing Location specification for JOB: ' + currentJob + '. Please define the ' + currentJob + '_Location property in ' + mFile);
+            process.exit(1);
+        }
         log(INFO, logS + ' Location: ' + currLoc);
         let environments = getMProp(currentJob + '_Environments');
         if (environmentOverride !== '') {
@@ -124,7 +132,7 @@ export function processMultipleFile() {
                         taskType = 'TCLI TASK';
                         task = replaceAtSign(tObj.T, currLoc + propFile);
                     }
-                    if(tObj.TV){
+                    if (tObj.TV) {
                         verbose = true;
                         taskType = 'TCLI TASK (Verbose)';
                         task = replaceAtSign(tObj.TV, currLoc + propFile);
@@ -133,7 +141,7 @@ export function processMultipleFile() {
                         taskType = 'OS TASK';
                         task = replaceAtSign(tObj.O, currLoc + propFile);
                     }
-                    if(tObj.OV){
+                    if (tObj.OV) {
                         verbose = true;
                         taskType = 'OS TASK (Verbose)';
                         task = replaceAtSign(tObj.OV, currLoc + propFile);
@@ -142,7 +150,7 @@ export function processMultipleFile() {
                         taskType = 'SCRIPT TASK';
                         task = replaceAtSign(tObj.S, currLoc + propFile);
                     }
-                    if(tObj.SV){
+                    if (tObj.SV) {
                         verbose = true;
                         taskType = 'SCRIPT TASK (Verbose)';
                         task = replaceAtSign(tObj.SV, currLoc + propFile);
@@ -150,7 +158,7 @@ export function processMultipleFile() {
                     if (task && task.length > 77) {
                         task = task.substr(0, 77) + '...';
                     }
-                    if(!verbose) {
+                    if (!verbose) {
                         jvs = createTableValue(taskType, task, jvs, 'TYPE', 'TASK');
                     } else {
                         jvs = createTableValue(taskType, '***', jvs, 'TYPE', 'TASK');
@@ -172,15 +180,15 @@ export function processMultipleFile() {
                     logT += col.brightCyan('[' + (k + 1) + '] [TCLI TASK]\n');
                     command += 'tcli -p "' + propFile + '" ' + tObj.T;
                 }
-                if(tObj.TV){
+                if (tObj.TV) {
                     showTask = false;
                     command += 'tcli -p "' + propFile + '" ' + tObj.TV;
                 }
-                if (tObj.O){
+                if (tObj.O) {
                     logT += col.brightCyan('[' + (k + 1) + '] [OS TASK]\n');
                     command += tObj.O;
                 }
-                if(tObj.OV){
+                if (tObj.OV) {
                     showTask = false;
                     command += tObj.OV;
                 }
@@ -188,13 +196,13 @@ export function processMultipleFile() {
                     logT += col.brightCyan('[' + (k + 1) + '] [SCRIPT TASK]\n' + tObj.S);
                     command += 'node ' + tObj.S;
                 }
-                if(tObj.SV){
+                if (tObj.SV) {
                     showTask = false;
                     command += 'node ' + tObj.SV;
                 }
                 log(DEBUG, logT + 'Command (before replacing): ' + command);
                 command = replaceAtSign(command, currLoc + propFile);
-                if(showTask) {
+                if (showTask) {
                     log(INFO, logT + ' Command: ' + command + ' (Fail on Error: ' + doFailOnError + ')');
                 }
                 run(command, doFailOnError);
@@ -223,7 +231,7 @@ export async function multipleInteraction() {
     while (true) {
         let miPropFolder = getMProp('Multiple_Interaction_Property_File_Folder');
         let miPropFiles = getMProp('Multiple_Interaction_Property_Files');
-        if(!miPropFiles){
+        if (!miPropFiles) {
             log(ERROR, 'Please specify environment property files in the Multiple_Interaction_Property_Files property in ' + mFile);
             process.exit(1);
         }
@@ -237,10 +245,10 @@ export async function multipleInteraction() {
 
         // 1. Get list of property files to use and which task to execute
         const miPropFilesA = miPropFiles.split(',');
-        const environmentsTable:any = {};
+        const environmentsTable: any = {};
         let rowNumber = 0;
         for (let miP in miPropFilesA) {
-            var eRow:any = {};
+            var eRow: any = {};
             rowNumber++;
             // console.log('Prop file: ' + miPropFile);
             // TODO: Check for ALL and Exclude
@@ -251,6 +259,10 @@ export async function multipleInteraction() {
             }
             eRow['NAME'] = miPropFilesA[miP].replace('.properties', '').replace('tibco-cloud-', '').replace('tibco-cloud', '');
             // 2. Open the property files one by one and get the ClientID / OAUTH details
+            if(!doesFileExist(miPropFolder + miPropFilesA[miP])){
+                log(ERROR, 'The configured environment property file ' + miPropFolder + miPropFilesA[miP] + ' is missing...');
+                process.exit(1);
+            }
             const curProps = PropertiesReader(miPropFolder + miPropFilesA[miP]).path();
             eRow['AUTHENTICATION TYPE'] = '';
             if (curProps && curProps.CloudLogin) {
@@ -362,30 +374,35 @@ function getMProp(property: string, propFileName?: string) {
     if (propFileName && propFileName.trim() != null) {
         propFileToUse = propFileName;
     }
-    log(DEBUG, 'Getting Property: |' + property + '|');
-    if (propsM == null) {
-        const PropertiesReader = require('properties-reader');
-        propsM = PropertiesReader(propFileToUse).path();
-        if (propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() !== '') {
-            log(INFO, 'Adding extension to propfile(' + propFileToUse + ') : ' + propsM.PROPERTY_EXTENSION_FILE)
-            let propsTwo = PropertiesReader(propsM.PROPERTY_EXTENSION_FILE).path();
-            fileExtension = propsM.PROPERTY_EXTENSION_FILE;
-            const objectTemp = {...propsTwo, ...propsM};
-            propsM = objectTemp;
+    if (doesFileExist(propFileToUse)) {
+        log(DEBUG, 'Getting Property: |' + property + '|');
+        if (propsM == null) {
+            const PropertiesReader = require('properties-reader');
+            propsM = PropertiesReader(propFileToUse).path();
+            if (propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() !== '') {
+                log(INFO, 'Adding extension to propfile(' + propFileToUse + ') : ' + propsM.PROPERTY_EXTENSION_FILE)
+                let propsTwo = PropertiesReader(propsM.PROPERTY_EXTENSION_FILE).path();
+                fileExtension = propsM.PROPERTY_EXTENSION_FILE;
+                const objectTemp = {...propsTwo, ...propsM};
+                propsM = objectTemp;
+            }
+            //console.log(propsM);
         }
-        //console.log(propsM);
-    }
-    let re;
-    if (propsM != null) {
-        re = _.get(propsM, property);
-        if (re != null) {
-            re = replaceDollar(re);
+        let re;
+        if (propsM != null) {
+            re = _.get(propsM, property);
+            if (re != null) {
+                re = replaceDollar(re);
+            }
+        } else {
+            log(ERROR, 'Property file not set yet...');
         }
+        log(DEBUG, 'Returning Property(' + property + '): ', re);
+        return re;
     } else {
-        log(ERROR, 'Property file not set yet...')
+        log(ERROR, 'The file ' + propFileToUse + ' does not exist, please run the command from a folder where it exist or generate it first (with "tcli create-multiple-property-file")...');
+        process.exit(1);
     }
-    log(DEBUG, 'Returning Property(' + property + '): ', re);
-    return re;
 }
 
 function replaceDollar(content: string) {
