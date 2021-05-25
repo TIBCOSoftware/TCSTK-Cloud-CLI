@@ -147,7 +147,6 @@ export function processMultipleFile() {
                         taskType = 'SCRIPT TASK (Verbose)';
                         task = replaceAtSign(tObj.SV, currLoc + propFile);
                     }
-                    console.log('Task: ' , task);
                     if (task && task.length > 77) {
                         task = task.substr(0, 77) + '...';
                     }
