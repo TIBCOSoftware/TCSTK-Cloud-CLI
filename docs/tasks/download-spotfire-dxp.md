@@ -21,7 +21,7 @@ NOTE: Do not end this folder with a '/' character.
  
 Folder used for Spotfire DXP downloads.
 
-NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder. For Example: Spotfire_DXP_Folder=./Spotfire_DXPs (~{ORGANIZATION})/
+NOTE: You can use \~{ORGANIZATION}, to use the current organization name in your folder. For Example: Spotfire_DXP_Folder=./Spotfire_DXPs (\~{ORGANIZATION})/
 
 ---
 ### Questions:
