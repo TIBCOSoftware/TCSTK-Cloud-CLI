@@ -56,7 +56,6 @@ export interface LAGroup {
     type?: 'AllUsers' | 'Administrator' | 'ApplicationDeveloper' | 'UIDeveloper' | 'SubscriptionDefined';
 }
 
-
 export interface Content {
     json: any;
 }

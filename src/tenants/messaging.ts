@@ -1,43 +1,42 @@
-import {createTable, getPEXConfig, isOauthUsed, pexTable} from "../common/common-functions";
-import {ERROR, INFO, log} from "../common/logging";
+import { createTable, getPEXConfig, isOauthUsed, pexTable } from '../common/common-functions'
+import { ERROR, INFO, log } from '../common/logging'
 
-const CCOM = require('../common/cloud-communications');
+const CCOM = require('../common/cloud-communications')
 
-
-async function connectMes(url: string){
-    if(isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
-       return await CCOM.callTCA(url, false);
-    } else {
-        log(ERROR, 'OAUTH Needs to be enabled for communication with MESSAGING, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as TCM.');
-        process.exit(1);
-    }
+async function connectMes (url: string) {
+  if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
+    return await CCOM.callTCA(url, false)
+  } else {
+    log(ERROR, 'OAUTH Needs to be enabled for communication with MESSAGING, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as TCM.')
+    process.exit(1)
+  }
 }
 
-export async function showSummary() {
-    log(INFO, 'Show Messaging Summary... ');
-    const mesSum = await connectMes(CCOM.clURI.mes_sum);
-    let tObject = createTable([mesSum], CCOM.mappings.mes_sum, false);
-    pexTable(tObject, 'messaging-summary', getPEXConfig(), true);
+export async function showSummary () {
+  log(INFO, 'Show Messaging Summary... ')
+  const mesSum = await connectMes(CCOM.clURI.mes_sum)
+  const tObject = createTable([mesSum], CCOM.mappings.mes_sum, false)
+  pexTable(tObject, 'messaging-summary', getPEXConfig(), true)
 }
 
-export async function showClients() {
-    log(INFO, 'Show Messaging Clients... ');
-    const mesCl = await connectMes(CCOM.clURI.mes_clients);
-    for(let clN in mesCl.clients) {
-        let sub = 0;
-        if(mesCl.clients[clN].subscriptions){
-            sub = mesCl.clients[clN].subscriptions.length;
-        }
-        mesCl.clients[clN]['NOFSubscriptions'] = sub;
+export async function showClients () {
+  log(INFO, 'Show Messaging Clients... ')
+  const mesCl = await connectMes(CCOM.clURI.mes_clients)
+  for (const clN in mesCl.clients) {
+    let sub = 0
+    if (mesCl.clients[clN].subscriptions) {
+      sub = mesCl.clients[clN].subscriptions.length
     }
-    let tObject = createTable(mesCl.clients, CCOM.mappings.mes_clients, false);
-    pexTable(tObject, 'messaging-clients', getPEXConfig(), true);
+    mesCl.clients[clN].NOFSubscriptions = sub
+  }
+  const tObject = createTable(mesCl.clients, CCOM.mappings.mes_clients, false)
+  pexTable(tObject, 'messaging-clients', getPEXConfig(), true)
 
-    // console.log( await CCOM.callTCA(CCOM.clURI.mes_system, true));
-    // console.log( await CCOM.callTCA(CCOM.clURI.mes_durables, true));
-    // const string = JSON.stringify( await CCOM.callTCA(CCOM.clURI.mes_clients, true), null, 4);
-    // console.log(string);
-    // console.log( await CCOM.callTCA(CCOM.clURI.mes_keys, true));
+  // console.log( await CCOM.callTCA(CCOM.clURI.mes_system, true));
+  // console.log( await CCOM.callTCA(CCOM.clURI.mes_durables, true));
+  // const string = JSON.stringify( await CCOM.callTCA(CCOM.clURI.mes_clients, true), null, 4);
+  // console.log(string);
+  // console.log( await CCOM.callTCA(CCOM.clURI.mes_keys, true));
 }
 
 /*

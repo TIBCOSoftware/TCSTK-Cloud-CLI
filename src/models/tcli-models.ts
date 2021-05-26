@@ -1,15 +1,15 @@
 
 export type Category =
-    "tcli"
-    | "cloud-starters"
-    | "live-apps"
-    | "shared-state"
-    | "cloud-files"
-    | "tci"
-    | "messaging"
-    | "spotfire"
-    | "oauth";
-export type OperatingSystem = "all" | "win32" | "darwin";
+    'tcli'
+    | 'cloud-starters'
+    | 'live-apps'
+    | 'shared-state'
+    | 'cloud-files'
+    | 'tci'
+    | 'messaging'
+    | 'spotfire'
+    | 'oauth';
+export type OperatingSystem = 'all' | 'win32' | 'darwin';
 
 export interface TCLITask {
     task: string;
@@ -83,7 +83,6 @@ export interface OAUTHConfig {
     /* added this since the object is parsed */
     [key: string]:any;
 }
-
 
 export interface PEXConfig {
     export: boolean;

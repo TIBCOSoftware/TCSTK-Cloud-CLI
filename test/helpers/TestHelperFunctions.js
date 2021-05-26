@@ -1,74 +1,72 @@
-let TEMP_TEST_FOLDER = '';
-let OS_COMMAND_SEPARATOR = '';
+let TEMP_TEST_FOLDER = ''
+let OS_COMMAND_SEPARATOR = ''
 
-let cObj;
+let cObj
 
 setFolderAndOperator = function (folder, oper, cObjTemp) {
-    TEMP_TEST_FOLDER = folder;
-    OS_COMMAND_SEPARATOR = oper;
-    cObj = cObjTemp;
+  TEMP_TEST_FOLDER = folder
+  OS_COMMAND_SEPARATOR = oper
+  cObj = cObjTemp
 }
 
-const execSync = require('child_process').execSync;
+const execSync = require('child_process').execSync
 run = function (command) {
-    cObj.command = command;
-    let re = true;
-    command = 'cd ' + TEMP_TEST_FOLDER + OS_COMMAND_SEPARATOR + command;
-    console.log('Executing Command: ' + command);
-    try {
-        execSync(
-            command,
-            {stdio: 'inherit'}
-        );
-        // console.log('RESULT: ', result);
-
-    } catch (err) {
-        // console.log('Got Error ' , err);
-        // logO(DEBUG, reason);
-        console.log('Error Running command: ' + err.message);
-        re = false;
-    }
-    return re;
+  cObj.command = command
+  let re = true
+  command = 'cd ' + TEMP_TEST_FOLDER + OS_COMMAND_SEPARATOR + command
+  console.log('Executing Command: ' + command)
+  try {
+    execSync(
+      command,
+      { stdio: 'inherit' }
+    )
+    // console.log('RESULT: ', result);
+  } catch (err) {
+    // console.log('Got Error ' , err);
+    // logO(DEBUG, reason);
+    console.log('Error Running command: ' + err.message)
+    re = false
+  }
+  return re
 }
-
 
 // Delete a folder
 deleteFolder = function (folder) {
-    const del = require('del');
-    del.sync([folder]);
-    console.log('Deleted: ' + folder);
+  const del = require('del')
+  del.sync([folder])
+  console.log('Deleted: ' + folder)
 }
 
 // Create a directory if it does not exists
 mkdirIfNotExist = function (dir) {
-    const fs = require('fs');
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-        console.log('Created: ' + dir);
-    }
+  const fs = require('fs')
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir)
+    console.log('Created: ' + dir)
+  }
 }
 
 generateRandomString = function (length) {
-    const allCapsAlpha = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
-    const allLowerAlpha = [..."abcdefghijklmnopqrstuvwxyz"];
-    const allUniqueChars = [..."~!@#$%^&*()_+-=[]\{}|;:'\",./<>?"];
-    const allNumbers = [..."0123456789"];
-    const base = [...allCapsAlpha, ...allNumbers, ...allLowerAlpha, ...allUniqueChars];
-    const generator = (base, len) => {
-        return [...Array(len)]
-            .map(i => base[Math.random()*base.length|0])
-            .join('');
-    };
-    return generator(base, length);
-    // console.log('OUTPUT: ', generator(base, 28));
+  const allCapsAlpha = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
+  const allLowerAlpha = [...'abcdefghijklmnopqrstuvwxyz']
+  const allUniqueChars = [..."~!@#$%^&*()_+-=[]\{}|;:'\",./<>?"]
+  const allNumbers = [...'0123456789']
+  const base = [...allCapsAlpha, ...allNumbers, ...allLowerAlpha, ...allUniqueChars]
+  const generator = (base, len) => {
+    return [...Array(len)]
+      .map(i => base[Math.random() * base.length | 0])
+      .join('')
+  }
+  return generator(base, length)
+  // console.log('OUTPUT: ', generator(base, 28));
 }
 
 sleep = function (ms) {
-    console.log('Sleeping for ' + ms + ' ms...');
-    //TODO: Add moving dots..
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
+  console.log('Sleeping for ' + ms + ' ms...')
+  // TODO: Add moving dots..
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 }
 
-console.log('Test Helper Functions Loaded...');
+console.log('Test Helper Functions Loaded...')

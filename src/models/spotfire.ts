@@ -44,13 +44,11 @@ export interface SFLibObject {
     TCLIPath: string;
 }
 
-
 export interface SFFolderInfo {
     CurrentFolder: SFLibObject;
     Children: SFLibObject[];
     Ancestors: SFLibObject[];
 }
-
 
 export interface UploadDXP {
     result: number;

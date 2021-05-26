@@ -1,46 +1,45 @@
-import {col, run} from "../common/common-functions";
-import {askMultipleChoiceQuestion, askQuestion} from "../common/user-interaction";
-import {INFO, log} from "../common/logging";
-import {getProp} from "../common/property-file-management";
+import { col, run } from '../common/common-functions'
+import { askMultipleChoiceQuestion, askQuestion } from '../common/user-interaction'
+import { INFO, log } from '../common/logging'
+import { getProp } from '../common/property-file-management'
 
-
-const posSchematics = require('../config/config-schematics.json').schematicConfig;
+const posSchematics = require('../config/config-schematics.json').schematicConfig
 
 // Function to add a schematic (for cloud starters)
-export async function schematicAdd() {
-    log(INFO, 'Adding Schematic...');
-    const LIST_ALL = 'List All Possible Schematics';
-    // Check if schematic is allowed
-    let listing = true;
-    let initialList = true;
-    let sType = '';
-    while (listing) {
-        const appType = getProp('App_Type');
-        let possibleSchematics = posSchematics.descriptions;
-        let question = 'What type of schematic would you like to add ?';
-        if (appType != null && initialList) {
-            possibleSchematics = [LIST_ALL];
-            for (let sNr in posSchematics.AvailableInTemplate) {
-                for (let availableSchematic of posSchematics.AvailableInTemplate[sNr]) {
-                    // console.log('App Type: ', appType, ' availableSchematic: ', availableSchematic);
-                    if (appType === availableSchematic) {
-                        possibleSchematics.unshift(posSchematics.descriptions[sNr]);
-                    }
-                }
-            }
-            question = 'Based on your application type ' + col.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
-            initialList = false;
+export async function schematicAdd () {
+  log(INFO, 'Adding Schematic...')
+  const LIST_ALL = 'List All Possible Schematics'
+  // Check if schematic is allowed
+  let listing = true
+  let initialList = true
+  let sType = ''
+  while (listing) {
+    const appType = getProp('App_Type')
+    let possibleSchematics = posSchematics.descriptions
+    let question = 'What type of schematic would you like to add ?'
+    if (appType != null && initialList) {
+      possibleSchematics = [LIST_ALL]
+      for (const sNr in posSchematics.AvailableInTemplate) {
+        for (const availableSchematic of posSchematics.AvailableInTemplate[sNr]) {
+          // console.log('App Type: ', appType, ' availableSchematic: ', availableSchematic);
+          if (appType === availableSchematic) {
+            possibleSchematics.unshift(posSchematics.descriptions[sNr])
+          }
         }
-        sType = await askMultipleChoiceQuestion(question, possibleSchematics);
-        if (sType !== LIST_ALL) {
-            listing = false;
-        }
+      }
+      question = 'Based on your application type ' + col.blue(appType) + ' you can choose one of the following schematics (or choose list all):'
+      initialList = false
     }
-    const sName = await askQuestion('What is the name of your schematic ?');
-    run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName);
-    // Run npm install only after certain schematics.
-    log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]);
-    if (posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]) {
-        run('npm install');
+    sType = await askMultipleChoiceQuestion(question, possibleSchematics)
+    if (sType !== LIST_ALL) {
+      listing = false
     }
+  }
+  const sName = await askQuestion('What is the name of your schematic ?')
+  run('ng generate @tibco-tcstk/component-template:' + posSchematics.names[posSchematics.descriptions.indexOf(sType)] + ' ' + sName)
+  // Run npm install only after certain schematics.
+  log(INFO, 'DO RUN NPM: ' + posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)])
+  if (posSchematics.doRunNPM[posSchematics.descriptions.indexOf(sType)]) {
+    run('npm install')
+  }
 }

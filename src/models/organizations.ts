@@ -18,4 +18,3 @@ export interface AccountInfo {
 }
 
 export type Accounts = AccountInfo[];
-
