@@ -433,8 +433,13 @@ export async function uploadSpotfireDXP () {
           if (doesFileExist(dxpLocation)) {
             let dxpLibName = await askQuestion('What is the name in the library that you want to give the dxp (use default or press enter to give it the same name as on disk) ?')
             if (dxpLibName.toLowerCase() === 'default' || dxpLibName === '') {
-              if (dxpLocation.indexOf(global.DIR_DELIMITER) > 0) {
-                dxpLibName = dxpLocation.substring(dxpLocation.lastIndexOf(global.DIR_DELIMITER) + 1, dxpLocation.length)
+              // you can use both \ and / as dir delimiters
+              if (dxpLocation.indexOf('/') > 0 || dxpLocation.indexOf('\\') > 0) {
+                let delimiter = '/'
+                if (dxpLocation.indexOf('/') < dxpLocation.indexOf('\\')) {
+                  delimiter = '\\'
+                }
+                dxpLibName = dxpLocation.substring(dxpLocation.lastIndexOf(delimiter) + 1, dxpLocation.length)
               } else {
                 dxpLibName = dxpLocation
               }
@@ -575,10 +580,10 @@ let AWSALBCORS: string
 async function uploadDXP (localFileLocation: string, uploadDxpURI: string) {
   prepSpotfireProps()
   return new Promise<UploadDXP>(async function (resolve) {
-    const fd = require('form-data')
+    const FD = require('form-data')
     const axios = require('axios')
     const fs = require('fs')
-    const formData = new fd()
+    const formData = new FD()
     const { size: fileSize } = fs.statSync(localFileLocation)
     // const sha256File = require('sha256-file');
     // const checkSum = sha256File(localFileLocation);
@@ -726,7 +731,7 @@ export async function listOnType (typeToList: SFType, fromRoot: boolean, addShar
         // if it is the teams folder, directly look from there
         if (getProp('Spotfire_Library_Base').startsWith('/Teams')) {
           for (const folder of sfRoot.Children) {
-            if (folder.IsFolder && folder.Path == '/Teams') {
+            if (folder.IsFolder && folder.Path === '/Teams') {
               folderToLookFrom = await getSFolderInfo(folder.Id)
             }
           }
@@ -736,7 +741,7 @@ export async function listOnType (typeToList: SFType, fromRoot: boolean, addShar
     } else {
       // Look for Teams
       for (const folder of sfRoot.Children) {
-        if (folder.IsFolder && folder.Path == '/Teams') {
+        if (folder.IsFolder && folder.Path === '/Teams') {
           const teamFolders = await getSFolderInfo(folder.Id)
           for (const teamFolder of teamFolders.Children) {
             if (teamFolder.IsFolder && teamFolder.DisplayName) {

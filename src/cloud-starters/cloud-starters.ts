@@ -104,7 +104,7 @@ export function generateCloudDescriptor () {
     let buildOn = ''
     if (ADD_DESCRIPTOR_TIMESTAMP === 'YES') {
       now = (new Date()).getTime().toString()
-      buildOn = (new Date()).toString()
+      buildOn = (new Date()).toUTCString()
     }
     const pJsonObj = require('jsonfile').readFileSync(packageJson)
     let name = ''
