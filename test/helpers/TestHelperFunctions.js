@@ -1,13 +1,17 @@
 let TEMP_TEST_FOLDER = '';
 let OS_COMMAND_SEPARATOR = '';
 
-setFolderAndOperator = function (folder, oper) {
+let cObj;
+
+setFolderAndOperator = function (folder, oper, cObjTemp) {
     TEMP_TEST_FOLDER = folder;
     OS_COMMAND_SEPARATOR = oper;
+    cObj = cObjTemp;
 }
 
 const execSync = require('child_process').execSync;
 run = function (command) {
+    cObj.command = command;
     let re = true;
     command = 'cd ' + TEMP_TEST_FOLDER + OS_COMMAND_SEPARATOR + command;
     console.log('Executing Command: ' + command);
