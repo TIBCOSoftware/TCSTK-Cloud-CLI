@@ -30,6 +30,12 @@ describe("tcli testsuite", function () {
 
     });
     beforeAll(function () {
+        const reporters = require('jasmine-reporters');
+        const junitReporter = new reporters.JUnitXmlReporter({
+            savePath: __dirname + '/../testResults/',
+            consolidateAll: false
+        });
+        jasmine.getEnv().addReporter(junitReporter)
         setFolderAndOperator(TEMP_TEST_FOLDER, OS_COMMAND_SEPARATOR);
     });
     afterAll(function () {
