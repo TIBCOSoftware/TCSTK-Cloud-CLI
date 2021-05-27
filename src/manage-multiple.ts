@@ -61,12 +61,12 @@ export function processMultipleFile () {
   for (let k = 0; k < csJobsA.length; k++) {
     const currentJob = csJobsA[k].trim()
     let environments = getMProp(currentJob + '_Environments')
-    if (!environments) {
-      log(ERROR, 'Missing environment specification for JOB: ' + currentJob + '. Please define the ' + currentJob + '_Environments property in ' + mFile)
-      process.exit(1)
-    }
     if (environmentOverride !== '') {
       environments = environmentOverride
+    }
+    if (!environments) {
+      log(ERROR, 'Missing Environment specification for JOB: ' + currentJob + '. Please define the ' + currentJob + '_Environments property in ' + mFile)
+      process.exit(1)
     }
     const environmentsA = environments.split(',')
     for (let l = 0; l < environmentsA.length; l++) {
