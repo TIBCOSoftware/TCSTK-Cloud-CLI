@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // let CLI_EXECUTOR = 'node ./../../src/bin/cloud-cli.js --DebugTime ';
 // let CLI_EXECUTOR_CS = 'node ./../../../src/bin/cloud-cli.js --DebugTime ';
 let CLI_EXECUTOR = 'tcli --DebugTime '
