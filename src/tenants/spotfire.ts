@@ -197,8 +197,8 @@ export async function copySpotfire () {
                   conflictResolution: 'KeepBoth'
                 }
                 /* if (!copyRequest['conflictResolution']) {
-                                    copyRequest['conflictResolution'] = 'KeepBoth';
-                                } */
+                                                    copyRequest['conflictResolution'] = 'KeepBoth';
+                                                } */
                 const SFCopy = await callSpotfire(CCOM.clURI.sf_copy, false, {
                   method: 'POST',
                   postRequest: copyRequest
@@ -497,7 +497,7 @@ async function callSFSOAP (action: string, request: any) {
   return new Promise<any>(async (resolve, reject) => {
     const soap = require('soap')
     const SF_WSDL = global.PROJECT_ROOT + '/SpotfireSOAPAPI/LibServiceOperations.wsdl'
-    if (!xSRF || !jSession) {
+    if (!jSession || !xSRF || !suid || !tcsid) {
       await callSpotfire(CCOM.clURI.sf_settings)
     }
     soap.createClient(SF_WSDL, async (err: any, client: Client) => {
@@ -505,24 +505,16 @@ async function callSFSOAP (action: string, request: any) {
         log(ERROR, err)
         reject(err)
       }
-      // TODO: Is needed ?
-      // const security = new soap.BearerSecurity(getProp('CloudLogin.OAUTH_Token'));
-      // client.setSecurity(security);
-      // console.log('security: ', security);
-      if (AWSALB && AWSALBCORS) {
-        client.addHttpHeader('cookie', 'JSESSIONID=' + jSession + '; AWSALB=' + AWSALB + '; AWSALBCORS=' + AWSALBCORS)
-      } else {
-        client.addHttpHeader('cookie', 'JSESSIONID=' + jSession)
-      }
+      client.addHttpHeader('cookie', getSFCookie())
       if (xSRF) {
         client.addHttpHeader('X-XSRF-TOKEN', xSRF)
       }
       client[action](request, function (err: any, result: any, _rawResponse: any, _soapHeader: any, _rawRequest: any) {
-        /* console.log('SOAP Response:         err]' , err);
-                console.log('SOAP Response:      result]' , result);
-                console.log('SOAP Response: rawResponse]' , _rawResponse);
-                console.log('SOAP Response:  soapHeader]' , _soapHeader);
-                console.log('SOAP Response:  rawRequest]' , _rawRequest); */
+        log(DEBUG, 'SOAP Response:         err]', err)
+        log(DEBUG, 'SOAP Response:      result]', result)
+        log(DEBUG, 'SOAP Response: rawResponse]', _rawResponse)
+        log(DEBUG, 'SOAP Response:  soapHeader]', _soapHeader)
+        log(DEBUG, 'SOAP Response:  rawRequest]', _rawRequest)
         if (err) {
           log(ERROR, err.response.statusCode)
           log(ERROR, err.response.body)
@@ -534,7 +526,7 @@ async function callSFSOAP (action: string, request: any) {
       })
       client.on('response', (_body: any, response: any) => {
         // console.log('Response: ' , response.headers['set-cookie']);
-        setLoadBalanceCookies(response.headers['set-cookie'])
+        setSFCookies(response.headers['set-cookie'])
       })
       // console.log('Client Services: ', client.describe());
     })
@@ -559,7 +551,7 @@ export async function downloadSpotfireDXP () {
         const resultLC = await callSFSOAP('loadContent', argsLC)
         const downloadFileURI = CCOM.clURI.sf_dxp_attachment + '?cmd=get&aid=' + resultLC.return
         const headers = {
-          cookie: 'JSESSIONID=' + jSession + '; AWSALB=' + AWSALB + '; AWSALBCORS=' + AWSALBCORS
+          cookie: getSFCookie()
         }
         // Step 4: GET request to /spotfire/attachment?cmd=get&aid=<attachment id>
         mkdirIfNotExist(getProp('Spotfire_DXP_Folder'))
@@ -588,40 +580,25 @@ async function uploadDXP (localFileLocation: string, uploadDxpURI: string) {
     const fs = require('fs')
     const formData = new FD()
     const { size: fileSize } = fs.statSync(localFileLocation)
-    // const sha256File = require('sha256-file');
-    // const checkSum = sha256File(localFileLocation);
-    // console.log('fileSize: ' ,fileSize);
-    // console.log('checkSum: ' ,checkSum);
     log(INFO, 'UPLOADING DXP: ' + col.blue(localFileLocation) + ' (to:' + uploadDxpURI + ')' + ' Filesize: ' + readableSize(fileSize))
     const header: any = {}
     header['Content-Type'] = 'multipart/form-data; charset=UTF-8'
-    header.cookie = 'JSESSIONID=' + jSession
+    header.cookie = getSFCookie()
     header['X-XSRF-TOKEN'] = xSRF
     header.referer = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage'
     header.Authorization = 'Bearer ' + getProp('CloudLogin.OAUTH_Token')
     formData.append(localFileLocation, fs.createReadStream(localFileLocation))
     const uploadURL = 'https://' + getCurrentRegion() + uploadDxpURI + '?c=1&finish=true'
-    // console.log(uploadURL);
-    // console.log('Headers:', formData.getHeaders());
     header['content-type'] = formData.getHeaders()['content-type']
-    // console.log('Headers:', header);
     const res = await axios.post(uploadURL, formData, {
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
       headers: header
     })
     // Getting the AWSALB & AWSALBCORS headers to force a sticky session over the AWS load balancer
-    setLoadBalanceCookies(res.headers['set-cookie'])
+    setSFCookies(res.headers['set-cookie'])
     resolve(res.data)
   })
-}
-
-// Getting the AWSALB & AWSALBCORS headers to force a sticky session over the AWS load balancer
-function setLoadBalanceCookies (loadBalanceCookie: any) {
-  AWSALB = /AWSALB=(.*?);/g.exec(loadBalanceCookie)![1]!
-  AWSALBCORS = /AWSALBCORS=(.*?);/g.exec(loadBalanceCookie)![1]!
-  log(DEBUG, 'AWSALB: ', AWSALB)
-  log(DEBUG, 'AWSALBCORS: ', AWSALBCORS)
 }
 
 async function getSFolderInfo (folderId: string): Promise<SFFolderInfo> {
@@ -814,6 +791,7 @@ async function iterateItems (baseFolderId: string, type: SFType): Promise<SFLibO
   }
   return re
 }
+
 let SFLoginCount = 0
 
 async function callSpotfire (url: string, doLog?: boolean, conf?: CallConfig): Promise<any> {
@@ -839,7 +817,7 @@ async function callSpotfire (url: string, doLog?: boolean, conf?: CallConfig): P
         return callSpotfire(url, doLog, originalConf)
       } else {
         const header: any = {}
-        header.cookie = 'JSESSIONID=' + jSession + '; SUID=' + suid + '; TCSID=' + tcsid
+        header.cookie = getSFCookie()
         header['X-XSRF-TOKEN'] = xSRF
         header.referer = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage'
         conf = { ...conf, customHeaders: header, returnResponse: true }
@@ -874,9 +852,37 @@ function setSFCookies (loginCookies: string[]) {
     if (cookie.indexOf('TCSID') > -1) {
       tcsid = /TCSID=(.*?);/g.exec(cookie)![1]!
     }
+    if (cookie.indexOf('TCSID') > -1) {
+      AWSALB = /TCSID=(.*?);/g.exec(cookie)![1]!
+    }
+    if (cookie.indexOf('AWSALBCORS') > -1) {
+      AWSALBCORS = /AWSALBCORS=(.*?);/g.exec(cookie)![1]!
+    }
   }
-  log(DEBUG, 'Got Spotfire Details] jSession: ', jSession)
-  log(DEBUG, 'Got Spotfire Details]     xSRF: ', xSRF)
-  log(DEBUG, 'Got Spotfire Details]     suid: ', suid)
-  log(DEBUG, 'Got Spotfire Details]    tcsid: ', tcsid)
+  log(DEBUG, 'Got Spotfire Cookie]   jSession: ', jSession)
+  log(DEBUG, 'Got Spotfire Cookie]       xSRF: ', xSRF)
+  log(DEBUG, 'Got Spotfire Cookie]       suid: ', suid)
+  log(DEBUG, 'Got Spotfire Cookie]      tcsid: ', tcsid)
+  log(DEBUG, 'Got Spotfire Cookie]     AWSALB: ', AWSALB)
+  log(DEBUG, 'Got Spotfire Cookie] AWSALBCORS: ', AWSALBCORS)
+}
+
+function getSFCookie () {
+  let re = ''
+  if (jSession) {
+    re += 'JSESSIONID=' + jSession + '; '
+  }
+  if (suid) {
+    re += 'SUID=' + suid + '; '
+  }
+  if (tcsid) {
+    re += 'TCSID=' + tcsid + '; '
+  }
+  if (AWSALB) {
+    re += 'AWSALB=' + AWSALB + '; '
+  }
+  if (AWSALBCORS) {
+    re += 'AWSALBCORS=' + AWSALBCORS + '; '
+  }
+  return re
 }
