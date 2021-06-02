@@ -30,6 +30,8 @@ const SF_FRIENDLY_TYPES: any = {
 
 let jSession: string
 let xSRF: string
+let suid: string
+let tcsid: string
 
 export function prepSpotfireProps () {
   // Shared state filter (picked up from configuration if exists)
@@ -491,6 +493,7 @@ export async function uploadSpotfireDXP () {
 
 // Function to call the Spotfire SOAP API
 async function callSFSOAP (action: string, request: any) {
+  // TODO: Use throw new Error(400);
   return new Promise<any>(async (resolve, reject) => {
     const soap = require('soap')
     const SF_WSDL = global.PROJECT_ROOT + '/SpotfireSOAPAPI/LibServiceOperations.wsdl'
@@ -811,37 +814,69 @@ async function iterateItems (baseFolderId: string, type: SFType): Promise<SFLibO
   }
   return re
 }
+let SFLoginCount = 0
 
 async function callSpotfire (url: string, doLog?: boolean, conf?: CallConfig): Promise<any> {
   // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings
-  if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
-    if (!jSession || !xSRF) {
-      const originalConf = conf
-      if (conf) {
-        conf.returnResponse = true
-        conf.handleErrorOutside = true
+  // if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
+  if (SFLoginCount < 2) {
+    if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
+      if (!jSession || !xSRF || !suid || !tcsid) {
+        SFLoginCount++
+        const originalConf = conf
+        if (conf) {
+          conf.returnResponse = true
+          conf.handleErrorOutside = true
+        } else {
+          conf = { returnResponse: true, handleErrorOutside: true }
+        }
+        // conf.forceOAUTH = true
+        // conf.manualOAUTH = 'CIC~SocJsZwQY1I-bsx-zKxCyLpD'
+        // conf.manualOAUTH = 'CIC~GDlXgSrMuE6Q1MIq5DISFbL6'
+        const response = await CCOM.callTCA(url, doLog, conf)
+        log(DEBUG, 'Spotfire First Response: ', response)
+        setSFCookies(response.headers['set-cookie'])
+        return callSpotfire(url, doLog, originalConf)
       } else {
-        conf = { returnResponse: true, handleErrorOutside: true }
+        const header: any = {}
+        header.cookie = 'JSESSIONID=' + jSession + '; SUID=' + suid + '; TCSID=' + tcsid
+        header['X-XSRF-TOKEN'] = xSRF
+        header.referer = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage'
+        conf = { ...conf, customHeaders: header, returnResponse: true }
+        const response = await CCOM.callTCA(url, doLog, conf)
+        log(DEBUG, 'Spotfire Response: ', response)
+        // setSFCookies(response.headers['set-cookie'])
+        const loginCookies = response.headers['set-cookie']
+        setSFCookies(loginCookies)
+        return response.body
       }
-      const response = await CCOM.callTCA(url, doLog, conf)
-      // console.log(response.headers['set-cookie']);
-      const loginCookie = response.headers['set-cookie']
-      //  logO(DEBUG, loginCookie);
-      jSession = /JSESSIONID=(.*?);/g.exec(loginCookie)![1]!
-      xSRF = /XSRF-TOKEN=(.*?);/g.exec(loginCookie)![1]!
-      log(DEBUG, 'Got Spotfire Details] jSession: ', jSession)
-      log(DEBUG, 'Got Spotfire Details]     xSRF: ', xSRF)
-      return callSpotfire(url, doLog, originalConf)
     } else {
-      const header: any = {}
-      header.cookie = 'JSESSIONID=' + jSession
-      header['X-XSRF-TOKEN'] = xSRF
-      header.referer = 'https://' + getCurrentRegion() + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage'
-      conf = { ...conf, customHeaders: header }
-      return await CCOM.callTCA(url, doLog, conf)
+      log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.')
+      process.exit(1)
     }
   } else {
-    log(ERROR, 'OAUTH Needs to be enabled for communication with SPOTFIRE, Please generate an OAUTH Token. Make sure it is enabled for TSC as well as SPOTFIRE.')
-    process.exit(1)
+    log(ERROR, 'Failed to retrieve Spotfire Cookies...')
   }
+}
+
+function setSFCookies (loginCookies: string[]) {
+  for (const cookie of loginCookies) {
+    log(DEBUG, cookie)
+    if (cookie.indexOf('JSESSIONID') > -1) {
+      jSession = /JSESSIONID=(.*?);/g.exec(cookie)![1]!
+    }
+    if (cookie.indexOf('XSRF-TOKEN') > -1) {
+      xSRF = /XSRF-TOKEN=(.*?);/g.exec(cookie)![1]!
+    }
+    if (cookie.indexOf('SUID') > -1) {
+      suid = /SUID=(.*?);/g.exec(cookie)![1]!
+    }
+    if (cookie.indexOf('TCSID') > -1) {
+      tcsid = /TCSID=(.*?);/g.exec(cookie)![1]!
+    }
+  }
+  log(DEBUG, 'Got Spotfire Details] jSession: ', jSession)
+  log(DEBUG, 'Got Spotfire Details]     xSRF: ', xSRF)
+  log(DEBUG, 'Got Spotfire Details]     suid: ', suid)
+  log(DEBUG, 'Got Spotfire Details]    tcsid: ', tcsid)
 }
