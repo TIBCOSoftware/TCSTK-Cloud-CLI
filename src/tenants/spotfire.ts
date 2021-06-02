@@ -51,7 +51,7 @@ export async function browseSpotfire () {
   prepSpotfireProps()
   log(DEBUG, 'Browsing the Spotfire Library...')
   const SFSettings = await callSpotfire(CCOM.clURI.sf_settings, false)
-  let currentFolderID = SFSettings.HomeFolderId
+  let currentFolderID = SFSettings.rootFolderId
   let doBrowse = true
   while (doBrowse) {
     const sfReports = await getSFolderInfo(currentFolderID)
