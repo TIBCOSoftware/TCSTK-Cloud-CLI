@@ -63,19 +63,38 @@ export function log (level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR' | 'RECORDER',
           message[mN] = message[mN].replace(/--pass \".*\"/, '')
         }
       }
-      console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', col.red(...message))
+      if (logCat) {
+        console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] [' + logCat + '] (' + level + ')', col.red(...message))
+      } else {
+        console.log('\x1b[31m%s\x1b[0m', 'TIBCO CLOUD CLI] (' + level + ')', col.red(...message))
+      }
       process.exitCode = 1
     } else {
       if (level === WARNING) {
-        console.log(col.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message))
+        if (logCat) {
+          console.log(col.yellow('TIBCO CLOUD CLI] [' + logCat + '] (' + level + ') ', ...message))
+        } else {
+          console.log(col.yellow('TIBCO CLOUD CLI] (' + level + ') ', ...message))
+        }
       } else {
         if (level === RECORDER) {
           console.log(col.bgWhite('[' + level + ']'), ...message)
         } else {
-          console.log(col.magenta('TIBCO CLOUD CLI] (' + level + ') '), ...message)
+          if (logCat) {
+            console.log(col.magenta('TIBCO CLOUD CLI] ' + col.green('[' + logCat + ']') + ' (' + level + ') '), ...message)
+          } else {
+            console.log(col.magenta('TIBCO CLOUD CLI] (' + level + ') '), ...message)
+          }
         }
       }
     }
+  }
+}
+let logCat:string
+
+export function setLogCategory (cat: string) {
+  if (cat) {
+    logCat = cat.toUpperCase()
   }
 }
 

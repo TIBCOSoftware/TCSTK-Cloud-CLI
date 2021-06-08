@@ -17,7 +17,7 @@ import {
   setGlobalAnswers
 } from './common/user-interaction'
 import { addOrUpdateProperty, getProp, setProperty, setPropFileName } from './common/property-file-management'
-import { DEBUG, disableLogging, ERROR, INFO, log, RECORDER, WARNING } from './common/logging'
+import {DEBUG, disableLogging, ERROR, INFO, log, RECORDER, setLogCategory, WARNING} from './common/logging'
 
 declare let global: Global
 
@@ -267,17 +267,14 @@ export async function cli (args: any) {
           case tMultiple:
             await require('./manage-application').createMultiplePropertyFileWrapper()
             process.exit()
-            break
           case tManageG:
             await require('./manage-application').manageGlobalConfig()
             process.exit()
-            break
           case tCreate:
             log(INFO, 'Creating new Cloud starter...')
             // create a new cloud starter
             await require('./manage-application').newStarter()
             process.exit()
-            break
           default:
             console.log('\x1b[36m%s\x1b[0m', "Ok I won't do anything :-(  ...")
             process.exit()
@@ -341,6 +338,7 @@ export async function cli (args: any) {
             if (taskTemp.task) {
               directTask = true
               // directTaskFile = cTsks[cliTask].taskFile;
+              setLogCategory(taskTemp.category)
               directTaskMethod = taskTemp.task
             }
           }
