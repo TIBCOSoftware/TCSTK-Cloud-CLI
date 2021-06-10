@@ -1,6 +1,5 @@
 // Package Definitions
 import {
-  col,
   copyDir,
   copyFile,
   deleteFile,
@@ -14,7 +13,7 @@ import {
   createTableValue,
   getPEXConfig,
   iterateTable,
-  pexTable
+  pexTable, showTableFromTobject
 } from '../common/tables'
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch } from '../common/user-interaction'
@@ -254,8 +253,9 @@ export async function showAvailableApps (showTable?: boolean) {
     }
     pexTable(apps, 'cloud-starters', getPEXConfig(), false)
     if (doShowTable) {
-      log(INFO, col.blue('TABLE] cloud-starters'))
-      console.table(appsDisplay)
+      // log(INFO, col.blue('TABLE] cloud-starters'))
+      // console.table(appsDisplay)
+      showTableFromTobject(appsDisplay, 'cloud-starters')
     }
     return response
   }
@@ -344,7 +344,8 @@ export async function getAppLinks (showTable?: boolean) {
     for (const app of apps) {
       const appTemp:any = {}
       appTemp['APP NAME'] = app.name
-      nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs)
+      // nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs)
+      nvs = createTableValue('CLOUD STARTER ' + i, '', nvs)
       nvs = createTableValue('NAME', app.name, nvs)
       const appN = i++
       const tempDet:any = await getApplicationDetails(app.name, app.publishedVersion, false)
@@ -380,7 +381,8 @@ export async function getAppLinks (showTable?: boolean) {
     process.stdout.write('\n')
     pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), false)
     if (showTable) {
-      console.table(nvs)
+      // console.table(nvs)
+      showTableFromTobject(nvs, 'cloud-starter-links')
     }
   }
   return appLinkTable

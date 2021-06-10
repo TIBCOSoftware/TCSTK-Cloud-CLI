@@ -10,6 +10,8 @@
 
 [show-cloud](./show-cloud.md) - Show Cloud Details
 
+[show-cloud-roles](./show-cloud-roles.md) - Displays which tenants you have access to, and what roles you have
+
 [show-properties](./show-properties.md) - Shows the properties in your properties file (and possibly the global values)
 
 [add-or-update-property](./add-or-update-property.md) - Adds or Updates a property in a file.

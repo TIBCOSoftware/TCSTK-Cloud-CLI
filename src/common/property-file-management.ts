@@ -8,7 +8,7 @@ import {
 import {
   createTableValue,
   getPEXConfig,
-  pexTable
+  pexTable, showTableFromTobject
 } from '../common/tables'
 import { ORGFile, ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
@@ -267,8 +267,9 @@ export async function generateCloudPropertyFiles () {
       }
     }
   }
-  log(INFO, 'Files that can be created')
-  console.table(propFilesALL)
+  // log(INFO, 'Files that can be created')
+  // console.table(propFilesALL)
+  showTableFromTobject(propFilesALL, 'Files that can be created')
   const propFilesToGenerate = await askMultipleChoiceQuestionSearch('Which property file(s) would you like to generate ?', propOption)
   let doOauth = false
   if (isOauthUsed()) {
@@ -462,7 +463,8 @@ export async function updateProperty () {
           const laActions = [{ name: 'NONE' }].concat(LA.stripLiveAppsActions(laApp))
           // console.log(laActions);
           log(INFO, 'Live Apps Actions: ')
-          console.table(laActions)
+          // console.table(laActions)
+          showTableFromTobject(laActions, 'Live Apps Actions')
           const laActD = await askMultipleChoiceQuestionSearch('For which ACTION would you like to store an Action ID ?', laActions.map(v => v.name))
           if (laActD === 'NONE') {
             log(INFO, 'OK, I won\'t do anything :-)')

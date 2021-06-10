@@ -6,7 +6,7 @@ import {
   setOrganization
 } from './common-functions'
 import {
-  createTableValue
+  createTableValue, showTableFromTobject
 } from '../common/tables'
 import { Global } from '../models/base'
 import { CallConfig, LoginCookie, MappingGroup } from '../models/tcli-models'
@@ -519,7 +519,8 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
     }
   }
   if (doShowTable) {
-    console.table(nvs)
+    // console.table(nvs)
+    showTableFromTobject(nvs, 'Cloud Info')
   }
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud')
 }

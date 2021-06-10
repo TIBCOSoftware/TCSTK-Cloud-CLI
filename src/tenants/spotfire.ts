@@ -122,6 +122,7 @@ export async function browseSpotfire () {
           if (item.type === 'DXP' || item.type === 'MOD') {
             // show more info on DXP
             console.table(item.item)
+            // showTableFromTobject(item.item, item.type + ' Info')
             await askQuestion('Press [enter] to continue...')
           } else {
             currentFolderID = item.id

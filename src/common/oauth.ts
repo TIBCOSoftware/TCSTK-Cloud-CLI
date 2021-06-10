@@ -56,6 +56,8 @@ export function parseOAUTHToken (token:string, doLog: boolean):OAUTHConfig {
     if (showLog) {
       log(INFO, 'OAUTH Details:')
       console.table(re)
+      // TODO: Shows up weird
+      // showTableFromTobject(re, 'OAUTH Details')
     }
   }
   return re

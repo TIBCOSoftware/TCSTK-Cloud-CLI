@@ -71,6 +71,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 | TASK | Description |
 |------|:------------|
 |[show-cloud](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud/)|Show Cloud Details|
+|[show-cloud-roles](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-roles.md)|Displays which tenants you have access to, and what roles you have|
 |[show-properties](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-properties/)|Shows the properties in your properties file (and possibly the global values)|
 |[add-or-update-property](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/add-or-update-property/)|Adds or Updates a property in a file.|
 |[change-cloud-region](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-cloud-region/)|Change the Region in the cloud-properties file|

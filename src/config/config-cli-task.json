@@ -245,7 +245,7 @@
       "category": "cloud-starters"
     },
     "show-cloud-roles": {
-      "description": "Show Cloud Roles, which tenants you have access to",
+      "description": "Displays which tenants you have access to, and what roles you have",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,

@@ -60,6 +60,8 @@ export async function showOrganization () {
     delete orgDetails.regions
     delete orgDetails.childAccountsInfo
     console.table(orgDetails)
+    // TODO: Shows up weird
+    // showTableFromTobject(orgDetails, 'Organization Details')
   }
 }
 

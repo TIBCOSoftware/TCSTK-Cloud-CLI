@@ -35,7 +35,8 @@ export function createTable (arrayObject: any[], config: Mapping, doShowTable: b
     tableObject[rowNumber] = tableRow
   }
   // logO(INFO,tableObject);
-  if (doShowTable) console.table(tableObject)
+  // if (doShowTable) console.table(tableObject)
+  if (doShowTable) showTableFromTobject(tableObject)
   return tableObject
 }
 
@@ -131,53 +132,74 @@ export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrin
     }
   }
   if (printT) {
-    log(INFO, col.blue('TABLE] ' + tName))
+    // log(INFO, col.blue('TABLE] ' + tName))
     // console.table(tObject)
-    const Table = require('cli-table')
-    let headerArray: string[] = []
-    for (const row of Object.keys(tObject)) {
-      headerArray = ['Index']
-      for (const el of Object.keys(tObject[row])) {
-        headerArray.push(el)
-      }
-    }
-    const tab = new Table({
-      chars: {
-        top: '═',
-        'top-mid': '╤',
-        'top-left': '╔',
-        'top-right': '╗',
-        bottom: '═',
-        'bottom-mid': '╧',
-        'bottom-left': '╚',
-        'bottom-right': '╝',
-        left: '║',
-        'left-mid': '',
-        mid: '',
-        'mid-mid': '',
-        right: '║',
-        'right-mid': '',
-        middle: '│'
-      },
-      style: { compact: true, 'padding-left': 0, 'padding-right': 0, head: ['green'] },
-      head: headerArray
-    })
-    let index = 0
-    for (const row of Object.keys(tObject)) {
-      index++
-      const rowArray = [index + '']
-      for (const el of Object.keys(tObject[row])) {
-        if (tObject[row][el]) {
-          rowArray.push(tObject[row][el])
-        } else {
-          rowArray.push('')
-        }
-      }
-      tab.push(rowArray)
-    }
-    console.log(tab.toString())
+    showTableFromTobject(tObject, tName)
     // console.log('Terminal size: ' + process.stdout.columns + 'x' + process.stdout.rows)
   }
+}
+
+export function showTableFromTobject (tObject: any, title?: string) {
+  const Table = require('cli-table')
+  let topLeft = '╔'
+  let topRight = '╗'
+  if (title) {
+    topLeft = '╠'
+    topRight = '╣'
+  }
+
+  let headerArray: string[] = []
+  for (const row of Object.keys(tObject)) {
+    headerArray = ['Index']
+    for (const el of Object.keys(tObject[row])) {
+      headerArray.push(el)
+    }
+  }
+  const tab = new Table({
+    chars: {
+      top: '═',
+      'top-mid': '╤',
+      'top-left': topLeft,
+      'top-right': topRight,
+      bottom: '═',
+      'bottom-mid': '╧',
+      'bottom-left': '╚',
+      'bottom-right': '╝',
+      left: '║',
+      'left-mid': '',
+      mid: '',
+      'mid-mid': '',
+      right: '║',
+      'right-mid': '',
+      middle: '│'
+    },
+    style: { compact: true, 'padding-left': 0, 'padding-right': 0, head: ['green'] },
+    head: headerArray
+  })
+  let index = 0
+  for (const row of Object.keys(tObject)) {
+    index++
+    const rowArray = [index + '']
+    for (const el of Object.keys(tObject[row])) {
+      if (tObject[row][el]) {
+        rowArray.push(tObject[row][el])
+      } else {
+        rowArray.push('')
+      }
+    }
+    tab.push(rowArray)
+  }
+  const tabString = tab.toString()
+  if (title) {
+    // console.log(title)
+    // console.log(tab)
+    const length = tabString.indexOf('\n')
+    if (length > 0) {
+      console.log(col.gray('╔' + '═'.repeat(length - 12) + '╗'))
+      console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + ' '.repeat(length - (title.length + 20)) + col.gray('║'))
+    }
+  }
+  console.log(tabString)
 }
 
 // Provide configuration for exporting table

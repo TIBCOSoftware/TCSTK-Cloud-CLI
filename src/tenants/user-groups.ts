@@ -8,7 +8,7 @@ import {
   createTable,
   getPEXConfig,
   iterateTable,
-  pexTable
+  pexTable, showTableFromTobject
 } from '../common/tables'
 const CCOM = require('../common/cloud-communications')
 const LA = require('./live-apps')
@@ -134,8 +134,9 @@ export async function addUserToGroup () {
         selectedUser.push(usr['User Name'])
       }
     }
-    log(INFO, 'Users that can be added to ' + groupDecision)
-    console.table(allowedUsersTable)
+    // log(INFO, 'Users that can be added to ' + groupDecision)
+    // console.table(allowedUsersTable)
+    showTableFromTobject(allowedUsersTable, 'Users that can be added to ' + groupDecision)
     const userDecision = await askMultipleChoiceQuestionSearch('Which user would you like to add to the group (' + groupDecision + ')', selectedUser)
     if (userDecision !== 'NONE') {
       if (userDecision.startsWith('ID-')) {

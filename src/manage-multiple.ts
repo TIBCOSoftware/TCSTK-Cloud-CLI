@@ -7,7 +7,7 @@ import {
 } from './common/common-functions'
 import {
   createTableValue,
-  iterateTable
+  iterateTable, showTableFromTobject
 } from './common/tables'
 import { TCLITask } from './models/tcli-models'
 import { askMultipleChoiceQuestionSearch, askQuestion } from './common/user-interaction'
@@ -77,8 +77,9 @@ export function processMultipleFile () {
       nvs = createTableValue(currentJob, environmentsA[l].trim(), nvs, 'JOB', 'ENVIRONMENT')
     }
   }
-  log(INFO, col.blue('JOB SUMMARY]') + ' FILE: ' + mFile)
-  console.table(nvs)
+  // log(INFO, col.blue('JOB SUMMARY]') + ' FILE: ' + mFile)
+  // console.table(nvs)
+  showTableFromTobject(nvs, '[JOB SUMMARY] FILE: ' + mFile)
 
   for (let i = 0; i < csJobsA.length; i++) {
     const currentJob = trim(csJobsA[i])
@@ -157,8 +158,9 @@ export function processMultipleFile () {
             taskType = 'SCRIPT TASK (Verbose)'
             task = replaceAtSign(tObj.SV, currLoc + propFile)
           }
-          if (task && task.length > 77) {
-            task = task.substr(0, 77) + '...'
+
+          if (task && task.length > 150) {
+            task = task.substr(0, 150) + '...'
           }
           if (!verbose) {
             jvs = createTableValue(taskType, task, jvs, 'TYPE', 'TASK')
@@ -167,8 +169,9 @@ export function processMultipleFile () {
           }
         }
       }
-      log(INFO, col.blue('TASK SUMMARY]') + ' ENVIRONMENT: ' + currentEnvironment)
-      console.table(jvs)
+      // log(INFO, col.blue('TASK SUMMARY]') + ' ENVIRONMENT: ' + currentEnvironment)
+      // console.table(jvs)
+      showTableFromTobject(jvs, '[TASK SUMMARY] ENVIRONMENT: ' + currentEnvironment)
       for (let k = 0; k < jobTasksA.length; k++) {
         // console.log('Parsing: ' , jobTasksA[k] , '|');
         const currentTask = jobTasksA[k].trim()
@@ -296,7 +299,8 @@ export async function multipleInteraction () {
     // console.log(col.blue('|------------------------------------------------|'));
     // console.log(col.blue('ENVIRONMENTS:'));
     // 3. Display a table of all environments
-    console.table(environmentsTable)
+    // console.table(environmentsTable)
+    showTableFromTobject(environmentsTable, 'Environments')
     // 4. Let the user choose an environment to execute on (include All and None/Quit, or Change the Task)
     const environmentOptions = []
     let i = 0

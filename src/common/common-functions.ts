@@ -53,7 +53,7 @@ export function displayGlobalConnectionConfig (): boolean {
     if (_.get(propsG, 'CloudLogin.pass').charAt(0) === '#' || _.get(propsG, 'CloudLogin.pass').startsWith('@#')) {
       passType = 'OBFUSCATED'
     }
-    log(INFO, 'Global Connection Configuration:')
+    // log(INFO, 'Global Connection Configuration:')
     const globalConfig = {
       'CLOUD REGION': _.get(propsG, 'CloudLogin.Region'),
       EMAIL: _.get(propsG, 'CloudLogin.email'),
@@ -62,6 +62,8 @@ export function displayGlobalConnectionConfig (): boolean {
       'OAUTH TOKEN NAME': _.get(propsG, 'CloudLogin.OAUTH_Generate_Token_Name')
     }
     console.table(globalConfig)
+    // TODO: Use table display (shows up weird)
+    // showTableFromTobject(globalConfig, 'Global Connection Configuration')
     if (isGlobalOauthDefined()) {
       log(INFO, 'Global OAUTH Configuration:')
       parseOAUTHToken(_.get(propsG, 'CloudLogin.OAUTH_Token'), true)

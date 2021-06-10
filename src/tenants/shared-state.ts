@@ -6,7 +6,7 @@ import {
 } from '../common/common-functions'
 import {
   getPEXConfig,
-  pexTable
+  pexTable, showTableFromTobject
 } from '../common/tables'
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
@@ -124,7 +124,8 @@ export async function getSharedState (showTable?: boolean) {
     appN++
     sTemp.ID = state.id
     sTemp.NAME = state.name
-    sTemp.SCOPE = state.scope
+    sTemp.SCOPE = state.type
+    // console.log(state);
     sTemp['CREATED BY'] = state.createdByName
     const created = new Date(state.createdDate!)
     const options:DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
@@ -140,8 +141,9 @@ export async function getSharedState (showTable?: boolean) {
   }
   pexTable(states, 'shared-states', getPEXConfig(), false)
   if (showTable) {
-    log(INFO, col.blue('TABLE] shared-states'))
-    console.table(statesDisplay)
+    // log(INFO, col.blue('TABLE] shared-states'))
+    // console.table(statesDisplay)
+    showTableFromTobject(statesDisplay, 'shared-states')
   }
   return sState
 }
@@ -420,6 +422,8 @@ export async function importSharedState () {
   if (importOptions.length > 0) {
     log(INFO, 'Shared states found in: ' + SHARED_STATE_FOLDER)
     console.table(states)
+    // TODO: Invalid range value
+    // showTableFromTobject(states, 'Shared states found in: ' + SHARED_STATE_FOLDER)
     importOptions.unshift('ALL SHARED STATES')
     // Provide the option to select one or upload all
     const answer = await askMultipleChoiceQuestionSearch('Which shared state would you like to import', importOptions)
