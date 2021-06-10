@@ -70,6 +70,7 @@ describe('tcli testsuite', function () {
     expect(run(CLI_EXECUTOR + 'obfuscated')).toBe(false, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:NO')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'show-cloud')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-cloud-roles')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.pass:none:USE-LOCAL:LOCAL')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'obfuscate -a TEST:YES')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'show-properties')).toBe(true, 'Command: ' + cObj.command)
