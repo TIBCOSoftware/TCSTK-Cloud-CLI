@@ -244,6 +244,20 @@
       ],
       "category": "cloud-starters"
     },
+    "show-cloud-roles": {
+      "description": "Show Cloud Roles, which tenants you have access to",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showCloudRolesWrapper",
+      "taskAlternativeNames": [
+        "sr"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
     "show-properties": {
       "description": "Shows the properties in your properties file (and possibly the global values)",
       "enabled": true,

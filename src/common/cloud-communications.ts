@@ -1,6 +1,6 @@
 import {
   col,
-  getCurrentRegion, getOrganization, getRegion,
+  getCurrentRegion, getOrganization, getRegion, isIterable,
   isOauthUsed,
   obfuscatePW,
   setOrganization
@@ -116,10 +116,10 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
         manualOAUTH: manualOAUTH
       })
       log(DEBUG, 'Got Account info: ', response)
-      if (response == 'Unauthorized') {
+      if (response === 'Unauthorized') {
         log(WARNING, 'OAUTH Token Invalid... Falling back to Normal Authentication. Consider rotating your OAUTH Token or generate a new one... ')
         isOAUTHValid = false
-        if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
+        if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') === '') {
           const tempPass = await askQuestion('Temporary, provide your password to Continue: ', 'password')
           // console.log('SETTING PASS');
           setProperty('CloudLogin.pass', obfuscatePW(tempPass))
@@ -143,7 +143,7 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
       log(INFO, 'Using CLIENT-ID Authentication (consider using OAUTH)...')
       toldClientID = true
     }
-    if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') == '') {
+    if (getProp('CloudLogin.pass') == null || getProp('CloudLogin.pass') === '') {
       const tempPass = await askQuestion('Provide your password to Continue: ', 'password')
       setProperty('CloudLogin.pass', obfuscatePW(tempPass))
     }
@@ -162,11 +162,11 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
     const clientID = getProp('CloudLogin.clientID')
     const email = getProp('CloudLogin.email')
     let pass = getProp('CloudLogin.pass')
-    if (pass == '') {
+    if (pass === '') {
       pass = require('yargs').argv.pass
       // console.log('Pass from args: ' + pass);
     }
-    if (pass && pass.charAt(0) == '#') {
+    if (pass && pass.charAt(0) === '#') {
       pass = Buffer.from(pass, 'base64').toString()
     }
     if (pass && pass.startsWith('@#')) {
@@ -177,7 +177,7 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
     if (loginC == null) {
       loginC = await cloudLoginV3(tenantID, clientID, email, pass, setLoginURL)
     }
-    if (loginC == 'ERROR') {
+    if (loginC === 'ERROR') {
       // TODO: exit the task properly
       log(INFO, 'Error Exiting..')
       process.exit(1)
@@ -297,7 +297,7 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
     log(INFO, '- CONTENT: ' + cType)
     log(INFO, '-  HEADER: ', header)
   }
-  if (!(cMethod.toLowerCase() == 'get' || cMethod.toLowerCase() == 'delete')) {
+  if (!(cMethod.toLowerCase() === 'get' || cMethod.toLowerCase() === 'delete')) {
     if (cdoLog) {
       log(INFO, '-    BODY: ' + body)
     }
@@ -396,7 +396,7 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
             reject()
           }
         } else {
-          log(WARNING, ' UPLOAD RESULT:', data)
+          log(WARNING, ' UPLOAD RESULT: NO-DATA')
           reject()
         }
         resolve()
@@ -473,7 +473,7 @@ export function readableSize (sizeBytes: number) {
 }
 
 // Function to show claims for the configured user
-export async function showCloudInfo (showTable: boolean, showSandbox: boolean) {
+export async function showCloudInfo (showTable: boolean, showSandbox: boolean, showRoles: boolean) {
   const doShowSandbox = showSandbox || false
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud')
   let doShowTable = true
@@ -493,7 +493,31 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean) {
       nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs)
     }
   }
-  // TODO: display groups
+  if (showRoles) {
+    // account_user_roles
+    const userRoles = await callTCA(clURI.account_user_roles)
+    // console.log(userRoles)
+    for (const role of userRoles.userRolesDetailsForTenants) {
+      if (role) {
+        let rDetails = 'ROLES: '
+        if (role.teamAdmin) {
+          rDetails += 'teamAdmin,'
+        }
+        // console.log(role.tenantRolesDetails)
+        if (role.tenantRolesDetails) {
+          if (isIterable(role.tenantRolesDetails)) {
+            for (const rDetail of role.tenantRolesDetails) {
+              rDetails += ' ' + rDetail.roleId + ','
+            }
+          }
+        }
+        if (rDetails.endsWith(',')) {
+          rDetails = rDetails.substring(0, rDetails.length - 1)
+        }
+        nvs = createTableValue('TENANT: ' + role.tenantId, rDetails, nvs)
+      }
+    }
+  }
   if (doShowTable) {
     console.table(nvs)
   }

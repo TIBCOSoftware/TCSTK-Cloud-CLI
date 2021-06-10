@@ -250,6 +250,12 @@ export async function showCloud () {
   await CCOM.showCloudInfo()
 }
 
+// Function to show cloud roles
+export async function showCloudRolesWrapper () {
+  const CCOM = require('./common/cloud-communications')
+  await CCOM.showCloudInfo(true, false, true)
+}
+
 // Start Cloud Starter Locally
 export async function startWrapper () {
   const CS = require('./cloud-starters/cloud-starters')
