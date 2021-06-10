@@ -1,11 +1,14 @@
 // This file manages the applications
 import {
   col,
-  createTableValue, doesFileExist,
+  doesFileExist,
   getMultipleOptions,
-  iterateTable,
   run, trim
 } from './common/common-functions'
+import {
+  createTableValue,
+  iterateTable
+} from './common/tables'
 import { TCLITask } from './models/tcli-models'
 import { askMultipleChoiceQuestionSearch, askQuestion } from './common/user-interaction'
 import { addOrUpdateProperty, replaceAtSign } from './common/property-file-management'

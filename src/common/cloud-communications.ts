@@ -1,11 +1,13 @@
 import {
   col,
-  createTableValue,
   getCurrentRegion, getOrganization, getRegion,
   isOauthUsed,
   obfuscatePW,
   setOrganization
 } from './common-functions'
+import {
+  createTableValue
+} from '../common/tables'
 import { Global } from '../models/base'
 import { CallConfig, LoginCookie, MappingGroup } from '../models/tcli-models'
 import { askQuestion } from './user-interaction'

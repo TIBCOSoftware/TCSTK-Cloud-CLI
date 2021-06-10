@@ -1,9 +1,14 @@
 import {
   col,
-  copyFile, createTable, doesFileExist, getCurrentRegion, getOrganization, getPEXConfig,
+  copyFile, doesFileExist, getCurrentRegion, getOrganization,
   mkdirIfNotExist,
-  pexTable, sleep
+  sleep
 } from '../common/common-functions'
+import {
+  createTable,
+  getPEXConfig,
+  pexTable
+} from '../common/tables'
 import { Global } from '../models/base'
 import { changeOrganization, displayOrganizations, getCurrentOrganizationInfo } from '../common/organization-management'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'

@@ -1,13 +1,15 @@
 import {
   col,
   copyFile,
-  createTableValue,
   doesFileExist, getOrganization,
-  getPEXConfig,
   isOauthUsed,
-  pexTable,
   run, trim
 } from './common-functions'
+import {
+  createTableValue,
+  getPEXConfig,
+  pexTable
+} from '../common/tables'
 import { ORGFile, ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
 import { getClientIDforOrg, getOrganizations } from './organization-management'
@@ -16,21 +18,25 @@ import { getOAUTHDetails, parseOAUTHToken, setOAUTHDetails } from './oauth'
 import { getSharedState, selectSharedState } from '../tenants/shared-state'
 import { listOnType, prepSpotfireProps } from '../tenants/spotfire'
 import { Accounts } from '../models/organizations'
+import path from 'path'
 
 const LA = require('../tenants/live-apps')
 const _ = require('lodash')
 const CCOM = require('./cloud-communications')
+// const os = require('os')
 
 let globalProperties: any
 let propsGl: any
 
 // TODO: Move this to home folder (and add migration)
-export const globalTCpropFolder = __dirname + '/../../../common/'
-const GLOBALPropertyFileName = globalTCpropFolder + 'global-tibco-cloud.properties'
+export const GLOBALTCPropFolder = __dirname + '/../../../common/'
+// export const GLOBALTCPropFolder = path.join(os.homedir(), '.tcli')
+export const GLOBALPropertyFileName = path.join(GLOBALTCPropFolder, 'global-tibco-cloud.properties')
 
+/*
 export function getGLOBALPropertyFileName () {
   return GLOBALPropertyFileName
-}
+} */
 
 let LOCALPropertyFileName: string
 
@@ -393,7 +399,7 @@ export async function updateProperty () {
   if (pName === '') {
     log(ERROR, 'You have to provide a property name')
     process.exit(1)
-    doUpdate = false
+    // doUpdate = false
   }
   // Ask prop comments
   let pComment = await askQuestion('What comment would you like to add ? (use enter on none to not provide a comment)')
@@ -498,7 +504,7 @@ export async function updateProperty () {
   }
   if (doUpdate) {
     let checkForGlobal = false
-    if (doesFileExist(getGLOBALPropertyFileName())) {
+    if (doesFileExist(GLOBALPropertyFileName)) {
       // We are updating the local prop file
       const localProps = require('properties-reader')(getPropFileName()).path()
       if (_.get(localProps, pName) === 'USE-GLOBAL') {
@@ -569,8 +575,8 @@ export function showPropertiesTable () {
     const propLoad = require('properties-reader')(getPropFileName())
     props = propLoad.path()
     log(INFO, ' LOCAL Property File Name: ' + col.blue(getPropFileName()))
-    if (getGLOBALPropertyFileName() && getGLOBALPropertyFileName() !== '') {
-      log(INFO, 'GLOBAL Property File Name: ' + col.blue(getGLOBALPropertyFileName()))
+    if (GLOBALPropertyFileName !== '') {
+      log(INFO, 'GLOBAL Property File Name: ' + col.blue(GLOBALPropertyFileName))
     }
     let nvs = []
     for (const [key, valueP] of Object.entries(props)) {

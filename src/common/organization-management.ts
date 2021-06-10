@@ -1,10 +1,15 @@
 import {
-  col, createTable,
+  col,
   getCurrentRegion, getOrganization,
-  getPEXConfig,
-  isOauthUsed, iterateTable,
-  pexTable, translateAWSRegion
+  isOauthUsed,
+  translateAWSRegion
 } from './common-functions'
+import {
+  createTable,
+  getPEXConfig,
+  iterateTable,
+  pexTable
+} from '../common/tables'
 import { ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestionSearch } from './user-interaction'
 import { SelectedAccount } from '../models/organizations'
@@ -34,8 +39,7 @@ export async function getCurrentOrganizationInfo (): Promise<SelectedAccount> {
 // Function to get the Client ID
 export async function getClientID (headers: any) {
   log(INFO, 'Getting Client ID...')
-  let clientID
-  clientID = (await CCOM.callTCA(CCOM.clURI.get_clientID, true, {
+  const clientID = (await CCOM.callTCA(CCOM.clURI.get_clientID, true, {
     method: 'POST',
     forceCLIENTID: true,
     tenant: 'TSC',
@@ -142,6 +146,7 @@ export async function displayOrganizations (doShow: boolean, doChoose: boolean, 
     org.type = 'Main'
     org = mapOrg(org)
     myOrgs.push(org)
+    // console.log(org)
     const main = org.accountDisplayName
     if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
       for (let child of org.childAccountsInfo) {

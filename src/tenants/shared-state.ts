@@ -1,10 +1,13 @@
 import {
   col, doesExist,
-  doesFileExist, getOrganization, getPEXConfig,
+  doesFileExist, getOrganization,
   mkdirIfNotExist,
-  pexTable,
   run
 } from '../common/common-functions'
+import {
+  getPEXConfig,
+  pexTable
+} from '../common/tables'
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
 import { DEBUG, ERROR, INFO, log, logLine, WARNING } from '../common/logging'

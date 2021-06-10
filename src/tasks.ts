@@ -12,8 +12,7 @@ import {
   replaceInFile,
   run,
   trim, updateCloudPackages,
-  updateGlobalConnectionConfig, updateRegion, updateTCLI,
-  upgradeToV2
+  updateGlobalConnectionConfig, updateRegion, updateTCLI
 } from './common/common-functions'
 import { Global } from './models/base'
 import { TCLITask } from './models/tcli-models'
@@ -21,6 +20,7 @@ import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion
 import { addOrUpdateProperty, getProp, getPropFileName, setProperty } from './common/property-file-management'
 import { DEBUG, ERROR, INFO, log, RECORDER, setLogDebug, throb } from './common/logging'
 import { prepRecorderProps } from './common/recorder'
+import { checkForLocalPropertyFileUpgrades } from './common/upgrades'
 
 declare let global: Global
 // require('./tenants/common-functions');
@@ -728,11 +728,7 @@ export async function updateTCLIwrapper () {
 
 // Set log debug level from local property
 setLogDebug(getProp('Use_Debug'))
-
-// Function to upgrade the prop file to V2
-if (getProp('Cloud_Properties_Version') == null) {
-  upgradeToV2(false, getPropFileName())
-}
+checkForLocalPropertyFileUpgrades()
 
 const QUOTES = [
   "Everyone's a nerd inside. I don't care how cool you are. - Channing Tatum",

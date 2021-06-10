@@ -1,11 +1,14 @@
 import {
   col,
-  createTable, doesExist, doesFileExist,
+  doesExist, doesFileExist,
   getCurrentRegion, getOrganization,
-  getPEXConfig,
-  isOauthUsed, mkdirIfNotExist,
-  pexTable
+  isOauthUsed, mkdirIfNotExist
 } from '../common/common-functions'
+import {
+  createTable,
+  getPEXConfig,
+  pexTable
+} from '../common/tables'
 import { Global } from '../models/base'
 import { CallConfig } from '../models/tcli-models'
 import { SFCopyRequest, SFCreateFolderRequest, SFFolderInfo, SFLibObject, SFType, UploadDXP } from '../models/spotfire'

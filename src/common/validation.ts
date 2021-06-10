@@ -1,8 +1,10 @@
 import {
   col,
-  getOrganization,
-  iterateTable
+  getOrganization
 } from './common-functions'
+import {
+  iterateTable
+} from '../common/tables'
 import { Global } from '../models/base'
 import { askMultipleChoiceQuestion, askQuestion } from './user-interaction'
 import { ERROR, INFO, log } from './logging'

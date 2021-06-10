@@ -1,13 +1,11 @@
 // This file does not depend on any other files
 // All inputs are provided as input to the functions
 import { Global } from '../models/base'
-import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
-import { Mapping, PEXConfig } from '../models/tcli-models'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
 import { DEBUG, ERROR, INFO, log, WARNING } from './logging'
 import {
-  addOrUpdateProperty, getGLOBALPropertyFileName,
-  getProp, getPropFileName, globalTCpropFolder,
+  addOrUpdateProperty, GLOBALPropertyFileName,
+  getProp, GLOBALTCPropFolder,
   setProperty
 } from './property-file-management'
 import { getOAUTHDetails, parseOAUTHToken } from './oauth'
@@ -35,19 +33,19 @@ export function displayOpeningMessage (): void {
 export function displayGlobalConnectionConfig (): boolean {
   // console.log('Global Connection Config: ');
   let re = false
-  log(INFO, 'Global Tibco Cloud Propfile: ' + getGLOBALPropertyFileName())
+  log(INFO, 'Global Tibco Cloud Propfile: ' + GLOBALPropertyFileName)
   // Global Prop file is __dirname (build folder in the global prop)
   // This folder ../../../ --> is the main node modules folder
   //         is: /Users/hpeters@tibco.com/.npm-global/lib
   //             /Users/hpeters@tibco.com/.npm-global/lib/node_modules/@tibco-tcstk/cloud-cli/build
-  // Global: 	/node_modules/@tibco-tcstk/global/
+  //     Global: /node_modules/@tibco-tcstk/global/
   // ../../global/global-tibco-cloud.properties
 
   // Check if global connection file exists
-  if (doesFileExist(getGLOBALPropertyFileName())) {
+  if (doesFileExist(GLOBALPropertyFileName)) {
     re = true
     // file exists
-    const propsG = require('properties-reader')(getGLOBALPropertyFileName()).path()
+    const propsG = require('properties-reader')(GLOBALPropertyFileName).path()
     let passType = 'STORED IN PLAIN TEXT !'
     if (_.get(propsG, 'CloudLogin.pass') === '') {
       passType = 'NOT STORED'
@@ -78,8 +76,8 @@ export function displayGlobalConnectionConfig (): boolean {
 }
 
 export function isGlobalOauthDefined (): boolean {
-  if (doesFileExist(getGLOBALPropertyFileName())) {
-    const propsG = require('properties-reader')(getGLOBALPropertyFileName()).path()
+  if (doesFileExist(GLOBALPropertyFileName)) {
+    const propsG = require('properties-reader')(GLOBALPropertyFileName).path()
     if (_.get(propsG, 'CloudLogin.OAUTH_Token') === undefined) {
       return false
     } else {
@@ -116,18 +114,18 @@ export async function updateGlobalConnectionConfig () {
   // update the config.
   log(INFO, 'Update Connection Config: ')
   // Create the global common package if it does not exist.
-  mkdirIfNotExist(globalTCpropFolder)
+  mkdirIfNotExist(GLOBALTCPropFolder)
   // Check if the global propfile exists, if not create one
-  if (!doesFileExist(getGLOBALPropertyFileName())) {
+  if (!doesFileExist(GLOBALPropertyFileName)) {
     // Create Global config from template
-    copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', getGLOBALPropertyFileName())
+    copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName)
   }
-  if (!doesFileExist(globalTCpropFolder + 'package.json')) {
-    copyFile(global.PROJECT_ROOT + 'templates/package-common.json', globalTCpropFolder + 'package.json')
+  if (!doesFileExist(GLOBALTCPropFolder + 'package.json')) {
+    copyFile(global.PROJECT_ROOT + 'templates/package-common.json', GLOBALTCPropFolder + 'package.json')
     log(INFO, 'Inserted package.json...')
   }
   // Get Cloud Environment
-  await updateRegion(getGLOBALPropertyFileName())
+  await updateRegion(GLOBALPropertyFileName)
   // Get the login details
 
   // Bump up the OAUTH Token
@@ -136,12 +134,12 @@ export async function updateGlobalConnectionConfig () {
   if (!isNaN(tokenNumber)) {
     const newTokenNumber = tokenNumber + 1
     const newTokenName = OTokenName.replace(String(tokenNumber), String(newTokenNumber))
-    addOrUpdateProperty(getGLOBALPropertyFileName(), 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName)
+    addOrUpdateProperty(GLOBALPropertyFileName, 'CloudLogin.OAUTH_Generate_Token_Name', newTokenName)
     log(INFO, 'Updating Global Token Name: ', newTokenName)
   }
   const defEmail = getProp('CloudLogin.email')
   const defClientID = getProp('CloudLogin.clientID')
-  await updateCloudLogin(getGLOBALPropertyFileName(), false, true, defClientID, defEmail)
+  await updateCloudLogin(GLOBALPropertyFileName, false, true, defClientID, defEmail)
 }
 
 let globalMultipleOptions = {}
@@ -370,13 +368,10 @@ export function translateAWSRegion (awsRegion: string) {
   switch (awsRegion) {
     case 'us-west-2':
       return 'US - Oregon'
-      break
     case 'eu-west-1':
       return 'EU - Ireland'
-      break
     case 'ap-southeast-2':
       return 'AU - Sydney'
-      break
   }
   return ''
 }
@@ -409,8 +404,8 @@ export function updateCloudPackages () {
 
 // Get the global configuration
 export function getGlobalConfig () {
-  if (doesFileExist(getGLOBALPropertyFileName())) {
-    return require('properties-reader')(getGLOBALPropertyFileName()).path()
+  if (doesFileExist(GLOBALPropertyFileName)) {
+    return require('properties-reader')(GLOBALPropertyFileName).path()
   } else {
     log(INFO, 'No Global Configuration Set...')
     return false
@@ -517,173 +512,6 @@ export async function sleep (ms: number) {
   })
 }
 
-export function createTable (arrayObject: any[], config: Mapping, doShowTable: boolean): any {
-  const tableObject: any = {}
-  for (const element in arrayObject) {
-    const tableRow: any = {}
-    const rowNumber = parseInt(element) + 1
-    // TODO: Change to debug
-    // log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
-    for (const conf of config.entries) {
-      if (conf.format && conf.format.toLowerCase() === 'date') {
-        const options: DateTimeFormatOptions = {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }
-        tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString('en-US', options)
-      } else {
-        tableRow[conf.header] = _.get(arrayObject[element], conf.field)
-      }
-    }
-    tableObject[rowNumber] = tableRow
-  }
-  // logO(INFO,tableObject);
-  if (doShowTable) console.table(tableObject)
-  return tableObject
-}
-
-export function iterateTable (tObject: any): any[] {
-  const re = []
-  for (const property in tObject) {
-    re.push(tObject[property])
-  }
-  return re
-}
-
-// Creates a flat table with names and values
-export function createTableValue (name: string, value: any, table?: any, headerName?: string, headerValue?: string) {
-  const hName = headerName || 'NAME'
-  const hValue = headerValue || 'VALUE'
-  table = table || []
-  const entry: any = {}
-  entry[hName] = name
-  entry[hValue] = value
-  table[table.length] = entry
-  return table
-}
-
-// Print and possibly export Table to CSV
-export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrint: boolean) {
-  let printT
-  if (doPrint == null) {
-    printT = true
-  } else {
-    printT = doPrint
-  }
-  // console.log(config);
-  if (config.export) {
-    let doExport = false
-    if (config.tables && config.tables.trim() !== '') {
-      if (config.tables.toLowerCase() === 'all') {
-        doExport = true
-      } else {
-        const tableArr = config.tables.split(',')
-        for (const tab of tableArr) {
-          if (tab === tName) {
-            doExport = true
-          }
-        }
-      }
-    }
-    if (doExport) {
-      const fs = require('fs')
-      const fileName = config.folder + config.filePreFix + tName + '.csv'
-      let additionalMessage = ''
-      mkdirIfNotExist(config.folder)
-      // If file does not exist create headerLine
-      const newFile = !doesFileExist(fileName)
-      let dataForFile = ''
-      let headerForFile = ''
-      const now = new Date()
-      for (const line of iterateTable(tObject)) {
-        // console.log(line);
-        // Add organization and Now
-        headerForFile = 'ORGANIZATION, EXPORT TIME'
-        let lineForFile = getOrganization() + ',' + now
-        for (let [key, value] of Object.entries(line)) {
-          let myValue: any = value
-          // console.log(`${key}: ${value}`);
-          if (myValue) {
-            if ((key && key.indexOf && key.indexOf(',') > 0) || (myValue && myValue.indexOf && myValue.indexOf(',') > 0)) {
-              log(DEBUG, `Data for CSV file(${fileName}) contains comma(${key}: ${myValue}); we are removing it...`)
-              additionalMessage = col.yellow(' (We have removed some comma\'s from the data...)')
-              if (key.replaceAll) {
-                key = key.replaceAll(',', '')
-              }
-              if (myValue.replaceAll) {
-                myValue = myValue.replaceAll(',', '')
-              }
-            }
-          }
-          if (newFile) {
-            headerForFile += ',' + key
-          }
-          lineForFile += ',' + value
-        }
-        // Add data to file
-        dataForFile += lineForFile + '\n'
-      }
-      if (newFile) {
-        dataForFile = headerForFile + '\n' + dataForFile
-        fs.writeFileSync(fileName, dataForFile, 'utf8')
-        log(INFO, '--> (New File) Exported table to ' + col.blue(fileName) + additionalMessage)
-      } else {
-        fs.appendFileSync(fileName, dataForFile, 'utf8')
-        log(INFO, '--> (Appended) Exported table data to ' + col.blue(fileName) + additionalMessage)
-      }
-    }
-  }
-  if (printT) {
-    log(INFO, col.blue('TABLE] ' + tName))
-    console.table(tObject)
-  }
-}
-
-// Provide configuration for exporting table
-export function getPEXConfig (): PEXConfig {
-  // table-export-to-csv= YES | NO
-  let table_export_to_csv = 'NO'
-  if (getProp('Table_Export_To_CSV') != null) {
-    table_export_to_csv = getProp('Table_Export_To_CSV')
-  } else {
-    log(INFO, 'No Table_Export_To_CSV property found; We are adding it to: ' + getPropFileName())
-    addOrUpdateProperty(getPropFileName(), 'Table_Export_To_CSV', table_export_to_csv, 'Export tables to CSV files. Possible values YES | NO')
-  }
-  // table-export-folder= ./table-exports
-  let table_export_folder = './table-exports/'
-  if (getProp('Table_Export_Folder') != null) {
-    table_export_folder = getProp('Table_Export_Folder')
-  } else {
-    log(INFO, 'No Table_Export_Folder property found; We are adding it to: ' + getPropFileName())
-    addOrUpdateProperty(getPropFileName(), 'Table_Export_Folder', table_export_folder, 'Folder to export the CSV files to.')
-  }
-
-  // table-export-file-prefix=table-export-
-  let table_export_file_prefix = 'table-export-'
-  if (getProp('Table_Export_File_Prefix') != null) {
-    table_export_file_prefix = getProp('Table_Export_File_Prefix')
-  } else {
-    log(INFO, 'No Table_Export_File_Prefix property found; We are adding it to: ' + getPropFileName())
-    addOrUpdateProperty(getPropFileName(), 'Table_Export_File_Prefix', table_export_file_prefix, 'Prefix to use for the export to table CSV files.')
-  }
-  // table-export-tables=cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
-  let table_export_tables = 'ALL'
-  if (getProp('Table_Export_Tables') != null) {
-    table_export_tables = getProp('Table_Export_Tables')
-  } else {
-    log(INFO, 'No Table_Export_Tables property found; We are adding it to: ' + getPropFileName())
-    addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', table_export_tables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states')
-  }
-  return {
-    export: table_export_to_csv.toLowerCase() === 'yes',
-    folder: table_export_folder,
-    filePreFix: table_export_file_prefix,
-    tables: table_export_tables
-  }
-}
-
 export function isOauthUsed () {
   let re = false
   if (getProp('CloudLogin.OAUTH_Token', true, true)) {
@@ -723,118 +551,3 @@ export function npmInstall (location: string, packageToUse?: string) {
     resolve()
   })
 }
-
-// For future versions: if(getProp('Cloud_Properties_Version') != 'V3'){
-const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)'
-const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)'
-
-export function upgradeToV2 (isGlobal: boolean, propFile: string) {
-  let host = ''
-  let curl = ''
-  let newORG = 'US'
-  let newPW = ''
-  let propsTemp
-  let defaultSharedStateFilter = 'APPLICATION'
-  if (isGlobal) {
-    propsTemp = require('properties-reader')(getGLOBALPropertyFileName()).path()
-    host = propsTemp.cloudHost || ''
-    curl = propsTemp.Cloud_URL || ''
-  } else {
-    host = getProp('cloudHost') || ''
-    curl = getProp('Cloud_URL') || ''
-    // Old Local Props
-    propsTemp = require('properties-reader')(getPropFileName()).path()
-    if (propsTemp.Shared_State_Scope != null) {
-      defaultSharedStateFilter = propsTemp.Shared_State_Scope
-    }
-    if (propsTemp.cloudHost === 'USE-GLOBAL' || propsTemp.Cloud_URL === 'USE-GLOBAL') {
-      newORG = 'USE-GLOBAL'
-    }
-  }
-  const pass = _.get(propsTemp, 'CloudLogin.pass')
-  if (pass && pass !== '' && pass !== 'USE-GLOBAL' && !pass.startsWith('@#')) {
-    const fus = require('./fuzzy-search.js')
-    if (pass.startsWith('#')) {
-      newPW = fus.search(Buffer.from(pass, 'base64').toString())
-    } else {
-      newPW = fus.search(pass)
-    }
-  }
-  if (host.toLowerCase().includes('eu') && curl.toLowerCase().includes('eu')) {
-    newORG = 'EU'
-  }
-  if (host.toLowerCase().includes('au') && curl.toLowerCase().includes('au')) {
-    newORG = 'AU'
-  }
-  // console.log('newORG: ', newORG, 'host',host, 'curl',curl);
-  let initialTokenName = 'MyCLIToken_1'
-  log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'))
-  if (isGlobal) {
-    initialTokenName = 'MyGlobalCLIToken_1'
-    log(INFO, col.rainbow('* AUTOMATICALLY Updating GLOBAL property file to V2.*'))
-  } else {
-    log(INFO, col.rainbow('* AUTOMATICALLY Updating you property file to V2... *'))
-  }
-  log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'))
-  log(INFO, col.rainbow('* * * ') + ' Disabling Properties...')
-  const PROPM = require('./property-file-management')
-  PROPM.disableProperty(propFile, 'CloudLogin.tenantID', DisableMessage)
-  PROPM.disableProperty(propFile, 'cloudHost', DisableMessage)
-  PROPM.disableProperty(propFile, 'Cloud_URL', DisableMessage)
-  PROPM.disableProperty(propFile, 'loginURE', DisableMessage)
-  PROPM.disableProperty(propFile, 'appURE', DisableMessage)
-  PROPM.disableProperty(propFile, 'Claims_URE', DisableMessage)
-  log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'))
-  log(INFO, col.rainbow('* * * ') + ' Adding new Properties...')
-  addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V2', EnableMessage + '\n# Property File Version', false)
-  addOrUpdateProperty(propFile, 'CloudLogin.Region', newORG, EnableMessage + '\n# Use:\n#  US Cloud (Oregon) - US\n#  EU Cloud (Ireland) - EU\n# AUS Cloud (Sydney) - AU\n# Options: US | EU | AU', false)
-  // addOrUpdateProperty(propFile, '# CloudLogin.Cloud_Location', 'cloud.tibco.com', 'Optional, if provided it uses a different cloud URL than cloud.tibco.com', false);
-  createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Generate_Token_Name', initialTokenName, 'Name of the OAUTH token to be generated.')
-  createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Generate_For_Tenants', 'TSC,BPM', 'Comma separated list of tenants for which the OAUTH Token gets generated. (Options: TSC,BPM,TCDS,TCE,TCI,TCM,SPOTFIRE,TCMD)\n#  TSC: General Cloud Authentication\n#  BPM: LiveApps Authentication\n# TCDS: TIBCO Cloud Data Streams Authentication\n#  TCE: TIBCO Cloud Events Authentication\n#  TCI: TIBCO Cloud Integration Authentication\n#  TCM: TIBCO Cloud Messaging Authentication\n#  SPOTFIRE: TIBCO Cloud Spotfire Authentication\n#  TCMD: TIBCO Cloud Meta Data Authentication\n# NOTE: You need to be part of the specified subscription.')
-  createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Generate_Valid_Hours', '336', 'Number of Hours the generated OAUTH token should be valid.')
-  createPropINE(isGlobal, propFile, 'CloudLogin.OAUTH_Required_Hours_Valid', '168', 'Number of hours that the OAUTH Token should be valid for (168 hours is 1 week), Checked on Startup and on with the validate-and-rotate-oauth-token task.')
-  if (newPW !== '') {
-    addOrUpdateProperty(propFile, 'CloudLogin.pass', newPW, '', false)
-  }
-  if (!isGlobal) {
-    // Translate Shared_State_Scope to Shared_State_Filter
-    PROPM.disableProperty(propFile, 'Shared_State_Scope', DisableMessage)
-    createPropINE(isGlobal, propFile, 'Shared_State_Filter', defaultSharedStateFilter, 'Shared_State_Scope was renamed to Shared_State_Filter\n# Filter for the shared state to manage (all shared states starting with this value will be managed)\n' +
-            '#  Use \'\'(empty) or APPLICATION for the current application. Use * for all values, or use a specific value to apply a filter.\n' +
-            '#  ( <Filter> | APPLICATION | * )')
-    createPropINE(isGlobal, propFile, 'TIBCLI_Location', 'tibcli', 'The location of the TIBCLI Executable (including the executable name, for example: /folder/tibcli)')
-    // Force a Refresh (not needed for global)
-    getProp('CloudLogin.Region', true, true)
-  }
-}
-
-// Upgrade Helper: Create Propety If Not Exists
-function createPropINE (isGlobal: boolean, propFile: string, propName: string, value: string, comment: string) {
-  let doUpdate
-  if (isGlobal) {
-    const propsG = require('properties-reader')(getGLOBALPropertyFileName()).path()
-    doUpdate = propsG[propName] === undefined
-  } else {
-    doUpdate = getProp(propName) === undefined
-  }
-  if (doUpdate) {
-    addOrUpdateProperty(propFile, propName, value, EnableMessage + '\n# ' + comment, false)
-  } else {
-    log(INFO, 'Not changed the value of ' + col.green(propName) + '...')
-  }
-}
-
-if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'BEFORE Check for Global Upgrade')
-
-export function checkGlobalForUpgrade () {
-  if (doesFileExist(getGLOBALPropertyFileName())) {
-    const propsG = require('properties-reader')(getGLOBALPropertyFileName()).path()
-    if (propsG.Cloud_Properties_Version == null) {
-      log(WARNING, 'Global file need to be upgraded...')
-      upgradeToV2(true, getGLOBALPropertyFileName())
-    }
-  }
-  if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'AFTER Check for Global Upgrade')
-}
-
-checkGlobalForUpgrade()

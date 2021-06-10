@@ -1,4 +1,9 @@
-import { createTable, getPEXConfig, isOauthUsed, pexTable } from '../common/common-functions'
+import { isOauthUsed } from '../common/common-functions'
+import {
+  createTable,
+  getPEXConfig,
+  pexTable
+} from '../common/tables'
 import { ERROR, INFO, log } from '../common/logging'
 
 const CCOM = require('../common/cloud-communications')

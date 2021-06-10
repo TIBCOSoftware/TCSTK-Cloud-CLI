@@ -3,14 +3,19 @@ import {
   col,
   copyDir,
   copyFile,
-  createTableValue,
   deleteFile,
-  deleteFolder, doesFileExist, getCurrentRegion, getPEXConfig,
+  deleteFolder, doesFileExist, getCurrentRegion,
   isIterable,
-  isOauthUsed, isPortAvailable, iterateTable,
+  isOauthUsed, isPortAvailable,
   mkdirIfNotExist, npmInstall,
-  pexTable, run
+  run
 } from '../common/common-functions'
+import {
+  createTableValue,
+  getPEXConfig,
+  iterateTable,
+  pexTable
+} from '../common/tables'
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch } from '../common/user-interaction'
 import { ERROR, INFO, log, logLine, WARNING } from '../common/logging'
@@ -260,7 +265,7 @@ export async function showAvailableApps (showTable?: boolean) {
 export async function deleteApp () {
   // Get the list of applications
   log(INFO, 'Getting Applications...')
-  const appArray = new Array()
+  const appArray = []
   appArray.push('NONE')
   let deleteApp = false
   const apps = await showAvailableApps(true)
@@ -391,12 +396,9 @@ export async function uploadApp (application: string) {
 
 // Function to publish the application to the cloud
 export async function publishApp (application: string) {
-  return new Promise<void>(async function (resolve) {
-    // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
-    const response = await CCOM.callTCA(CCOM.clURI.app_info + application + '/', false, { method: 'PUT' })
-    log(INFO, 'Publish Result: ', response)
-    resolve()
-  })
+  // const publishLocation = cloudURL + 'webresource/v1/applications/' + application + '/';
+  const response = await CCOM.callTCA(CCOM.clURI.app_info + application + '/', false, { method: 'PUT' })
+  log(INFO, 'Publish Result: ', response)
 }
 
 // Function that injects the sources of the library into this project

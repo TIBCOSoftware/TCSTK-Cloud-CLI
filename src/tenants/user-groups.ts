@@ -1,14 +1,15 @@
 import {
-  col,
-  createTable, doesExist,
-  getPEXConfig,
-  iterateTable,
-  pexTable
+  col, doesExist
 } from '../common/common-functions'
 import { askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
 import { ERROR, INFO, log, WARNING } from '../common/logging'
 import { LAGroup } from '../models/live-apps'
-
+import {
+  createTable,
+  getPEXConfig,
+  iterateTable,
+  pexTable
+} from '../common/tables'
 const CCOM = require('../common/cloud-communications')
 const LA = require('./live-apps')
 

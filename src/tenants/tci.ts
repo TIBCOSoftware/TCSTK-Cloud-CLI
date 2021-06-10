@@ -1,11 +1,14 @@
 import {
   col,
-  createTable,
-  getCurrentAWSRegion, getCurrentRegion, getOrganization, getPEXConfig,
-  iterateTable,
-  pexTable,
+  getCurrentAWSRegion, getCurrentRegion, getOrganization,
   run
 } from '../common/common-functions'
+import {
+  createTable,
+  getPEXConfig,
+  iterateTable,
+  pexTable
+} from '../common/tables'
 import { askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
 import { DEBUG, INFO, log, WARNING } from '../common/logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from '../common/property-file-management'
@@ -60,7 +63,7 @@ export async function monitorTCI () {
       pass = require('yargs').argv.pass
       // console.log('Pass from args: ' + pass);
     }
-    if (pass && pass.charAt(0) == '#') {
+    if (pass && pass.charAt(0) === '#') {
       pass = Buffer.from(pass, 'base64').toString()
     }
     if (pass && pass.startsWith('@#')) {
@@ -98,7 +101,7 @@ export async function exportTCIApp () {
         if (manifestFileName === '' || manifestFileName.toLowerCase() === 'default') {
           manifestFileName = 'manifest.json'
         }
-        if (manifestFileName.toLowerCase() != 'none') {
+        if (manifestFileName.toLowerCase() !== 'none') {
           require('jsonfile').writeFileSync(manifestFileName, flogoAppExport.manifest, storeOptions)
           log(INFO, 'Stored Flogo Manifest: ' + col.blue(manifestFileName))
           log(WARNING, 'Not all components of the manifest are exported in the same way as a manual export...')
@@ -107,7 +110,7 @@ export async function exportTCIApp () {
         if (flogoFileName === '' || flogoFileName.toLowerCase() === 'default') {
           flogoFileName = 'flogo.json'
         }
-        if (flogoFileName.toLowerCase() != 'none') {
+        if (flogoFileName.toLowerCase() !== 'none') {
           require('jsonfile').writeFileSync(flogoFileName, flogoAppExport.flogoJson, storeOptions)
           log(INFO, 'Stored Flogo json: ' + col.blue(flogoFileName))
         }

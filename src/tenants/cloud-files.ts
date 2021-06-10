@@ -1,10 +1,14 @@
 import {
   col,
-  createTable, doesExist, getOrganization, getPEXConfig,
-  iterateTable,
-  mkdirIfNotExist,
-  pexTable
+  doesExist, getOrganization,
+  mkdirIfNotExist
 } from '../common/common-functions'
+import {
+  createTable,
+  getPEXConfig,
+  iterateTable,
+  pexTable
+} from '../common/tables'
 import { askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
 import { ERROR, INFO, log, logLine, WARNING } from '../common/logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from '../common/property-file-management'
