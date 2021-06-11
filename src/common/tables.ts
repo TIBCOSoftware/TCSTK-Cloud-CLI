@@ -180,7 +180,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
       }
     }
   }
-  let tableWidth = 1
+  let tableWidth = 3
   const colWidthsArray: number[] = []
   let highestIndex = 0
   let idX = 0
@@ -193,9 +193,9 @@ export function showTableFromTobject (tObject: any, title?: string) {
     idX++
   }
   let screenOffset = 0
-  if (tableWidth > MAX_TERMINAL_LENGTH) {
+  if (tableWidth >= MAX_TERMINAL_LENGTH) {
     // Screen is smaller than the table
-    screenOffset = (tableWidth - MAX_TERMINAL_LENGTH) + 3
+    screenOffset = (tableWidth - MAX_TERMINAL_LENGTH) + 2
     if (colWidthsArray[highestIndex]! - screenOffset > 8) {
       colWidthsArray[highestIndex] = colWidthsArray[highestIndex]! - screenOffset
     } else {
