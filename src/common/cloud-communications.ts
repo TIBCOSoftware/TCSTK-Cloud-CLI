@@ -495,7 +495,10 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
   }
   if (showRoles) {
     // account_user_roles
-    const userRoles = await callTCA(clURI.account_user_roles)
+    const userRoles = await callTCA(clURI.account_user_roles, false, {
+      tenant: 'TSC',
+      customLoginURL: 'https://' + getCurrentRegion() + clURI.general_login
+    })
     // console.log(userRoles)
     for (const role of userRoles.userRolesDetailsForTenants) {
       if (role) {
