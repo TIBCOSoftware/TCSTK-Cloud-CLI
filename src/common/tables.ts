@@ -193,17 +193,17 @@ export function showTableFromTobject (tObject: any, title?: string) {
   if (title) {
     // console.log(title)
     // console.log(tab)
-    let length = tabString.indexOf('\n')
+    const length = tabString.indexOf('\n')
     if (length > 0) {
       if (length > 12) {
-        length = 13
+        console.log(col.gray('╔' + '═'.repeat(length - 12) + '╗'))
       }
-      console.log(col.gray('╔' + '═'.repeat(length - 12) + '╗'))
-      let nrSpaces = length - (title.length + 20)
-      if (nrSpaces < 1) {
-        nrSpaces = 1
+      const nrSpaces = length - (title.length + 20)
+      let after = ''
+      if (nrSpaces < 0) {
+        after = ' '.repeat(nrSpaces) + col.gray('║')
       }
-      console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + ' '.repeat(nrSpaces) + col.gray('║'))
+      console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + after)
     }
   }
   console.log(tabString)
