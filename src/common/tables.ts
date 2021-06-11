@@ -199,7 +199,11 @@ export function showTableFromTobject (tObject: any, title?: string) {
         length = 13
       }
       console.log(col.gray('╔' + '═'.repeat(length - 12) + '╗'))
-      console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + ' '.repeat(length - (title.length + 20)) + col.gray('║'))
+      let nrSpaces = length - (title.length + 20)
+      if (nrSpaces < 1) {
+        nrSpaces = 1
+      }
+      console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + ' '.repeat(nrSpaces) + col.gray('║'))
     }
   }
   console.log(tabString)
