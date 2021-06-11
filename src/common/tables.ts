@@ -144,6 +144,8 @@ export function showTableFromTobject (tObject: any, title?: string) {
   let MAX_TERMINAL_LENGTH = 250
   if (process.stdout && process.stdout.columns) {
     MAX_TERMINAL_LENGTH = process.stdout.columns
+  } else {
+    log(INFO, 'SERVER MODE')
   }
   const Table = require('cli-table')
   let topLeft = '╔'
