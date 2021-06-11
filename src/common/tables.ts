@@ -168,9 +168,14 @@ export function showTableFromTobject (tObject: any, title?: string) {
         maxColLengthObject.NR = indexLength
       }
       if (tObject[row][col]) {
+        const headLength = (col + '').length
         const tempColLength = (tObject[row][col] + '').length
-        if (!maxColLengthObject[col] || maxColLengthObject[col] < tempColLength) {
-          maxColLengthObject[col] = tempColLength
+        let maxL = headLength
+        if (tempColLength > headLength) {
+          maxL = tempColLength
+        }
+        if (!maxColLengthObject[col] || maxColLengthObject[col] < maxL) {
+          maxColLengthObject[col] = maxL
         }
       }
     }
@@ -217,7 +222,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
     },
     colAligns: colAlignArray,
     colWidths: colWidthsArray,
-    style: { compact: false, 'padding-left': 1, 'padding-right': 1, head: ['green'] },
+    style: { compact: true, 'padding-left': 1, 'padding-right': 1, head: ['green'], border: ['white'] },
     head: headerArray
   })
   let index = 0
@@ -238,15 +243,15 @@ export function showTableFromTobject (tObject: any, title?: string) {
     const length = tabString.indexOf('\n')
     if (length > 0) {
       if (length > 12) {
-        console.log(col.gray('╔' + '═'.repeat(length - 12) + '╗'))
+        console.log(col.white('╔' + '═'.repeat(length - 12) + '╗'))
       }
       const nrSpaces = length - (title.length + 20)
       // console.log(nrSpaces)
       let after = ''
       if (nrSpaces > 0) {
-        after = ' '.repeat(nrSpaces) + col.gray('║')
+        after = ' '.repeat(nrSpaces) + col.white('║')
       }
-      console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + after)
+      console.log(col.white('║') + col.reset(' TABLE: ') + col.blue(title) + after)
     }
   }
   console.log(tabString)
