@@ -140,6 +140,11 @@ export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrin
 }
 
 export function showTableFromTobject (tObject: any, title?: string) {
+  // console.table(tObject)
+  let MAX_TERMINAL_LENGTH = 250
+  if (process.stdout?.columns) {
+    MAX_TERMINAL_LENGTH = process.stdout?.columns
+  }
   const Table = require('cli-table')
   let topLeft = '╔'
   let topRight = '╗'
@@ -147,12 +152,49 @@ export function showTableFromTobject (tObject: any, title?: string) {
     topLeft = '╠'
     topRight = '╣'
   }
-
   let headerArray: string[] = []
+  let colAlignArray: string[] = []
+  const maxColLengthObject:any = {}
+  let ind = 0
   for (const row of Object.keys(tObject)) {
-    headerArray = ['Index']
-    for (const el of Object.keys(tObject[row])) {
-      headerArray.push(el)
+    ind++
+    headerArray = ['NR']
+    colAlignArray = ['middle']
+    for (const col of Object.keys(tObject[row])) {
+      headerArray.push(col)
+      colAlignArray.push('middle')
+      const indexLength = (ind + '').length
+      if (!maxColLengthObject.NR || maxColLengthObject.NR < indexLength) {
+        maxColLengthObject.NR = indexLength
+      }
+      if (tObject[row][col]) {
+        const tempColLength = (tObject[row][col] + '').length
+        if (!maxColLengthObject[col] || maxColLengthObject[col] < tempColLength) {
+          maxColLengthObject[col] = tempColLength
+        }
+      }
+    }
+  }
+  let tableWidth = 1
+  const colWidthsArray: number[] = []
+  let highestIndex = 0
+  let idX = 0
+  for (const colLen of Object.keys(maxColLengthObject)) {
+    colWidthsArray.push(maxColLengthObject[colLen] + 3)
+    tableWidth += maxColLengthObject[colLen] + 3
+    if (maxColLengthObject[colLen] > colWidthsArray[highestIndex]!) {
+      highestIndex = idX
+    }
+    idX++
+  }
+  let screenOffset = 0
+  if (tableWidth > MAX_TERMINAL_LENGTH) {
+    // Screen is smaller than the table
+    screenOffset = (tableWidth - MAX_TERMINAL_LENGTH) + 3
+    if (colWidthsArray[highestIndex]! - screenOffset > 8) {
+      colWidthsArray[highestIndex] = colWidthsArray[highestIndex]! - screenOffset
+    } else {
+      colWidthsArray[highestIndex] = 8
     }
   }
   const tab = new Table({
@@ -173,7 +215,9 @@ export function showTableFromTobject (tObject: any, title?: string) {
       'right-mid': '',
       middle: '│'
     },
-    style: { compact: true, 'padding-left': 0, 'padding-right': 0, head: ['green'] },
+    colAligns: colAlignArray,
+    colWidths: colWidthsArray,
+    style: { compact: false, 'padding-left': 1, 'padding-right': 1, head: ['green'] },
     head: headerArray
   })
   let index = 0
@@ -191,16 +235,15 @@ export function showTableFromTobject (tObject: any, title?: string) {
   }
   const tabString = tab.toString()
   if (title) {
-    // console.log(title)
-    // console.log(tab)
     const length = tabString.indexOf('\n')
     if (length > 0) {
       if (length > 12) {
         console.log(col.gray('╔' + '═'.repeat(length - 12) + '╗'))
       }
       const nrSpaces = length - (title.length + 20)
+      // console.log(nrSpaces)
       let after = ''
-      if (nrSpaces < 0) {
+      if (nrSpaces > 0) {
         after = ' '.repeat(nrSpaces) + col.gray('║')
       }
       console.log(col.gray('║') + col.reset(' TABLE: ') + col.blue(title) + after)
