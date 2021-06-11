@@ -142,8 +142,8 @@ export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrin
 export function showTableFromTobject (tObject: any, title?: string) {
   // console.table(tObject)
   let MAX_TERMINAL_LENGTH = 250
-  if (process.stdout?.columns) {
-    MAX_TERMINAL_LENGTH = process.stdout?.columns
+  if (process.stdout && process.stdout.columns) {
+    MAX_TERMINAL_LENGTH = process.stdout.columns
   }
   const Table = require('cli-table')
   let topLeft = '╔'
