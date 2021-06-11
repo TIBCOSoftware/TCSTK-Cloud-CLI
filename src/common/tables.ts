@@ -162,7 +162,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
     colAlignArray = ['middle']
     for (const col of Object.keys(tObject[row])) {
       headerArray.push(col)
-      colAlignArray.push('middle')
+      colAlignArray.push('left')
       const indexLength = (ind + '').length
       if (!maxColLengthObject.NR || maxColLengthObject.NR < indexLength) {
         maxColLengthObject.NR = indexLength
