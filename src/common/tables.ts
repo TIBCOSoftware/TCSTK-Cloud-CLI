@@ -1,8 +1,8 @@
 import { Mapping, PEXConfig } from '../models/tcli-models'
 import { DEBUG, INFO, log } from './logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
-import { col, doesFileExist, getOrganization, mkdirIfNotExist } from './common-functions'
-import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
+import { col, doesFileExist, getOrganization, getRelativeTime, mkdirIfNotExist } from './common-functions'
+// import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
 const _ = require('lodash')
 
@@ -21,13 +21,15 @@ export function createTable (arrayObject: any[], config: Mapping, doShowTable: b
     // log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
     for (const conf of config.entries) {
       if (conf.format && conf.format.toLowerCase() === 'date') {
+        /*
         const options: DateTimeFormatOptions = {
           weekday: 'long',
           year: 'numeric',
           month: 'long',
           day: 'numeric'
-        }
-        tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString('en-US', options)
+        } */
+        // tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString('en-US', options)
+        tableRow[conf.header] = getRelativeTime(new Date(_.get(arrayObject[element], conf.field)).getTime())
       } else {
         tableRow[conf.header] = _.get(arrayObject[element], conf.field)
       }

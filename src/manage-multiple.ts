@@ -77,9 +77,10 @@ export function processMultipleFile () {
       nvs = createTableValue(currentJob, environmentsA[l].trim(), nvs, 'JOB', 'ENVIRONMENT')
     }
   }
-  // log(INFO, col.blue('JOB SUMMARY]') + ' FILE: ' + mFile)
-  // console.table(nvs)
-  showTableFromTobject(nvs, '[JOB SUMMARY] FILE: ' + mFile)
+  log(INFO, col.blue('JOB SUMMARY]') + ' FILE: ' + mFile)
+  console.table(nvs)
+  // TODO: It does not show the details
+  // showTableFromTobject(nvs, '[JOB SUMMARY] FILE: ' + mFile)
 
   for (let i = 0; i < csJobsA.length; i++) {
     const currentJob = trim(csJobsA[i])

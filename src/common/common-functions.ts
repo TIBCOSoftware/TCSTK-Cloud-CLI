@@ -10,6 +10,7 @@ import {
 } from './property-file-management'
 import { getOAUTHDetails, parseOAUTHToken } from './oauth'
 import { callTCA, clURI } from './cloud-communications'
+import { DateTime } from 'luxon'
 
 declare let global: Global
 
@@ -552,4 +553,12 @@ export function npmInstall (location: string, packageToUse?: string) {
     }
     resolve()
   })
+}
+
+export function getRelativeTime (millisec: number) {
+  const diff = new Date().getTime() - new Date(millisec).getTime()
+  if (diff < 60000 && diff > 0) {
+    return 'Less than a minute ago...'
+  }
+  return millisec ? DateTime.fromMillis(millisec).toRelative() : ''
 }

@@ -73,6 +73,7 @@ export async function showLiveApps (doShowTable: boolean, doCountCases: boolean)
   const cases: any = {}
   let appN = 1
   for (const curApp of caseTypes) {
+    // console.log(curApp)
     const caseTemp: any = {}
     // const appN = parseInt(curCase) + 1;
     // log(INFO, appN + ') APP NAME: ' + response.body[app].name  + ' Published Version: ' +  response.body[app].publishedVersion + ' (Latest:' + response.body[app].publishedVersion + ')') ;
