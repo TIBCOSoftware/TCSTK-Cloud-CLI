@@ -202,7 +202,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
   let screenOffset = 0
   // console.log('tableWidth:', tableWidth)
   // console.log('MAX_TERMINAL_LENGTH:', MAX_TERMINAL_LENGTH)
-  if (tableWidth >= MAX_TERMINAL_LENGTH) {
+  if (tableWidth + 5 >= MAX_TERMINAL_LENGTH) {
     // Screen is smaller than the table
     screenOffset = (tableWidth - MAX_TERMINAL_LENGTH) + (colWidthsArray.length - 2)
     if (colWidthsArray[highestIndex]! - screenOffset > 8) {

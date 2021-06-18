@@ -236,8 +236,10 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
     url = url.replace('cloud.tibco.com', getProp('CloudLogin.Cloud_Location'))
     log(WARNING, 'Using another BASE URL: ', getProp('CloudLogin.Cloud_Location'))
   }
-  const urlToCall = 'https://' + getCurrentRegion() + url
-
+  let urlToCall = 'https://' + getCurrentRegion() + url
+  if (conf.skipInjectingRegion) {
+    urlToCall = 'https://' + url
+  }
   const doErrorOutside = conf.handleErrorOutside || false
   const fOAUTH = conf.forceOAUTH || false
   const fCLIENTID = conf.forceCLIENTID || false

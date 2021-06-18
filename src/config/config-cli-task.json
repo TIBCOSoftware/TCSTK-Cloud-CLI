@@ -1009,6 +1009,48 @@
       ],
       "category": "spotfire"
     },
+    "show-discover-process-analysis": {
+      "description": "Show's the process analysis of Project Discover",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverPAWrapper",
+      "taskAlternativeNames": [
+        "show-process-analysis", "show-pa"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "show-discover-datasets": {
+      "description": "Show's the datasets of Project Discover",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverDSWrapper",
+      "taskAlternativeNames": [
+        "show-datasets", "show-ds"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "show-discover-templates": {
+      "description": "Show's the templates of Project Discover",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverTempWrapper",
+      "taskAlternativeNames": [
+        "show-templates", "show-temp"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
     "show-oauth-tokens": {
       "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
       "enabled": true,

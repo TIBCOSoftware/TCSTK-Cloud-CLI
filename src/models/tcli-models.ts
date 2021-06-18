@@ -70,6 +70,7 @@ export interface CallConfig {
     handleErrorOutside?: boolean;
     customHeaders?: any;
     manualOAUTH?: string;
+    skipInjectingRegion?: boolean;
 }
 
 export interface OAUTHConfig {

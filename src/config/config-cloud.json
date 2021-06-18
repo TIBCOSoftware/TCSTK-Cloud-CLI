@@ -40,7 +40,10 @@
     "mes_sum": "messaging.cloud.tibco.com/tcm/v1/system/summary",
     "mes_durables": "messaging.cloud.tibco.com/tcm/v1/system/durables",
     "mes_clients": "messaging.cloud.tibco.com/tcm/v1/system/eftl/clients",
-    "mes_keys": "messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keysInfo"
+    "mes_keys": "messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keysInfo",
+    "dis_pa": "discover.labs.tibcocloud.com/repository/analysis",
+    "dis_ds": "discover.labs.tibcocloud.com/catalog/datasets",
+    "dis_temp": "discover.labs.tibcocloud.com/visualisation/templates"
   },
   "mappings": {
     "oauth": {
@@ -392,6 +395,93 @@
         {
           "header": "Design-time State",
           "field": "latestGovernanceState"
+        }
+      ]
+    },
+    "dis_pa": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "data.name"
+        },
+        {
+          "header": "Description",
+          "field": "data.description"
+        },
+        {
+          "header": "Last updated by",
+          "field": "metadata.modifiedBy"
+        },
+        {
+          "header": "Last updated",
+          "field": "metadata.modifiedOn",
+          "format": "DATE"
+        },
+        {
+          "header": "Status",
+          "field": "metadata.state"
+        }
+      ]
+    },
+    "dis_ds": {
+      "entries": [
+        {
+          "header": "Id",
+          "field": "datasetid"
+        },
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Description",
+          "field": "description"
+        },
+        {
+          "header": "Created",
+          "field": "createdDate",
+          "format": "DATE"
+        },
+        {
+          "header": "Last previewed",
+          "field": "lastPreviewDate",
+          "format": "DATE"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "File",
+          "field": "fileName"
+        },
+        {
+          "header": "Status",
+          "field": "status"
+        }
+      ]
+    },
+    "dis_temp": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "Description",
+          "field": "description"
+        },
+        {
+          "header": "Analytic Report",
+          "field": "spotfireLocation"
+        },
+        {
+          "header": "Enabled",
+          "field": "enabled"
         }
       ]
     }

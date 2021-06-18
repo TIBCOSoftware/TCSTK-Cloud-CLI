@@ -728,6 +728,21 @@ export async function showMessagingClientsWrapper () {
   await MESSAGING.showClients()
 }
 
+export async function showDiscoverPAWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.getProcessAnalysis(true)
+}
+
+export async function showDiscoverDSWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.getDataSets(true)
+}
+
+export async function showDiscoverTempWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.getTemplates(true)
+}
+
 export async function updateTCLIwrapper () {
   await updateTCLI()
 }
