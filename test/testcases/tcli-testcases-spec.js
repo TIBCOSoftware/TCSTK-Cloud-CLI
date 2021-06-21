@@ -519,6 +519,26 @@ describe('tcli testsuite', function () {
     // expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:Sandbox:none:SPECIAL:LiveApps_AppID:NONE')).toBe(true, 'Command: ' + cObj.command);
   })
 
+  // Discover Testcases
+  // jasmine --config=test/support/jasmine.json --filter='TCLI: Discover'
+  it('TCLI: Discover', async function () {
+    expect(run(CLI_EXECUTOR + '--createCP')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:NOT-GLOBAL:LOCAL')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-discover-process-analysis')).toBe(false, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-discover-datasets')).toBe(false, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-discover-templates')).toBe(false, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_Token_Name:none:JasmineDiscoverTest_1:LOCAL')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_For_Tenants:none:TSC,BPM,TCM:LOCAL')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'generate-oauth-token -a YES:YES:YES')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-discover-process-analysis')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-discover-datasets')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-discover-templates')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineDiscoverTest_1')).toBe(true, 'Command: ' + cObj.command)
+  })
+
+
   // Show cloud with Basic Authentication
   // jasmine --config=test/support/jasmine.json --filter='table testing'
   it('table testing', function () {

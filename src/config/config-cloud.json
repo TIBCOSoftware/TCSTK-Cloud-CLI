@@ -57,17 +57,17 @@
           "field": "tenantId"
         },
         {
-          "header": "Created On",
+          "header": "Created",
           "field": "generatedTime",
           "format": "DATE"
         },
         {
-          "header": "Expires On",
+          "header": "Expires",
           "field": "expirationTime",
           "format": "DATE"
         },
         {
-          "header": "Last Accessed On",
+          "header": "Last Accessed",
           "field": "lastAccessed",
           "format": "DATE"
         }
@@ -219,7 +219,7 @@
           "field": "author"
         },
         {
-          "header": "Created On",
+          "header": "Created",
           "field": "creationDate",
           "format": "DATE"
         },
@@ -228,7 +228,7 @@
           "field": "lastModifiedBy"
         },
         {
-          "header": "Modified On",
+          "header": "Modified",
           "field": "lastModifiedDate",
           "format": "DATE"
         }
@@ -245,7 +245,7 @@
           "field": "CreatedByName"
         },
         {
-          "header": "Created On",
+          "header": "Created",
           "field": "CreatedTimestamp",
           "format": "DATE"
         },
@@ -380,7 +380,7 @@
           "field": "owner"
         },
         {
-          "header": "Last Published On",
+          "header": "Last Published",
           "field": "lastPublished.dateChanged",
           "format": "DATE"
         },
