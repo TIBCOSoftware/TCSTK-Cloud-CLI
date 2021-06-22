@@ -15,12 +15,9 @@ import { DEBUG, ERROR, INFO, log, logO, WARNING } from './logging'
 import { getProp, setProperty } from './property-file-management'
 
 declare let global: Global
-// require('./common-functions');
 
 const cloudConfig = require('../config/config-cloud.json')
 
-// TODO: if Cloud_Location provided replace |cloud.tibco.com|
-// see https://liveapps.tenant-integration.tcie.pro/webresource/apps/GatherSmart/index.html#/starterApp/splash
 export const clURI = cloudConfig.endpoints
 export const mappings = cloudConfig.mappings as MappingGroup
 
@@ -187,9 +184,10 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
   return loginC
 }
 
+/*
 export function getCookie () {
   return loginC
-}
+} */
 
 // Function that logs into the cloud and returns a cookie
 async function cloudLoginV3 (tenantID: string, clientID: string, email: string, pass: string, TCbaseURL: string) {
@@ -349,7 +347,6 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
       log(ERROR, 'No Body Returned, Status: ', response.statusCode)
     }
   }
-
   // url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
   // return await callURLA(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
 }

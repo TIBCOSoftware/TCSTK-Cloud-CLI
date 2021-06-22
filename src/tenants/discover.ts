@@ -34,3 +34,11 @@ export async function getTemplates (showTable: boolean) {
   pexTable(paTable, 'discover-templates', getPEXConfig(), showTable)
   return disTEMP
 }
+
+// To run a test we need
+
+// upload-discover-file
+// create-discover-dataset
+// remove-discover-dataset
+// run-discover-process-analysis
+//

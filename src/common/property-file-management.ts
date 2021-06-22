@@ -23,14 +23,14 @@ import path from 'path'
 const LA = require('../tenants/live-apps')
 const _ = require('lodash')
 const CCOM = require('./cloud-communications')
-// const os = require('os')
+const os = require('os')
 
 let globalProperties: any
 let propsGl: any
 
 // TODO: Move this to home folder (and add migration)
-export const GLOBALTCPropFolder = __dirname + '/../../../common/'
-// export const GLOBALTCPropFolder = path.join(os.homedir(), '.tcli')
+// export const GLOBALTCPropFolder = __dirname + '/../../../common/'
+export const GLOBALTCPropFolder = path.join(os.homedir(), '.tcli')
 export const GLOBALPropertyFileName = path.join(GLOBALTCPropFolder, 'global-tibco-cloud.properties')
 
 /*

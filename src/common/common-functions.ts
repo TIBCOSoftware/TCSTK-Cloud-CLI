@@ -123,14 +123,14 @@ export async function updateGlobalConnectionConfig () {
     // Create Global config from template
     copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName)
   }
+  /*
   if (!doesFileExist(GLOBALTCPropFolder + 'package.json')) {
     copyFile(global.PROJECT_ROOT + 'templates/package-common.json', GLOBALTCPropFolder + 'package.json')
     log(INFO, 'Inserted package.json...')
-  }
+  } */
   // Get Cloud Environment
   await updateRegion(GLOBALPropertyFileName)
   // Get the login details
-
   // Bump up the OAUTH Token
   const OTokenName = getProp('CloudLogin.OAUTH_Generate_Token_Name')
   const tokenNumber = Number(OTokenName.split('_').pop()!.trim())

@@ -1,8 +1,15 @@
 // For future versions: if(getProp('Cloud_Properties_Version') != 'V3'){
-import { addOrUpdateProperty, GLOBALPropertyFileName, getProp, getPropFileName } from './property-file-management'
+import {
+  addOrUpdateProperty,
+  GLOBALPropertyFileName,
+  getProp,
+  getPropFileName,
+  GLOBALTCPropFolder
+} from './property-file-management'
 import { INFO, log, WARNING } from './logging'
-import { col, doesFileExist } from './common-functions'
+import { col, copyFile, doesFileExist, mkdirIfNotExist } from './common-functions'
 import { Global } from '../models/base'
+import path from 'path'
 
 const _ = require('lodash')
 
@@ -10,6 +17,7 @@ declare let global: Global
 
 const DisableMessage = '  --> AUTOMATICALLY DISABLED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)'
 const EnableMessage = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V2 (You can remove this...)'
+const EnableMessageV3 = '  --> AUTOMATICALLY CREATED by Upgrade to TIBCO Cloud Property File V3 (You can remove this...)'
 
 export function checkForGlobalPropertyFileUpgrades () {
   checkGlobalForUpgrade()
@@ -20,26 +28,36 @@ export function checkForLocalPropertyFileUpgrades () {
   if (getProp('Cloud_Properties_Version') == null) {
     upgradeToV2(false, getPropFileName())
   }
-  /* TODO: Upgrade to v3
+  /* TODO: Upgrade to v3 */
   if (getProp('Cloud_Properties_Version') === 'V2') {
     upgradeLocalToV3(getPropFileName())
-  } */
+  }
 }
 
-/*
 function upgradeLocalToV3 (propFile: string) {
   log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'))
   log(INFO, col.rainbow('* AUTOMATICALLY Updating you property file to V3... *'))
   log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'))
+  log(INFO, col.rainbow('* * * ') + ' Property file: ' + col.blue(propFile))
+  log(INFO, col.rainbow('* * * ') + 'Home Directory: ' + col.blue(require('os').homedir()))
   log(INFO, col.rainbow('* * * ') + ' Checking the location of your global property file...')
-  console.log('propfile: ', propFile)
-  console.log('Home: ', require('os').homedir())
-  // Old global file: globalTCpropFolder = __dirname + '/../../../common/'
-
-  // TODO: When a local file get's created; automatically create the global file as well.
-  // TODO: If there is no global file at the new location, automatically copy the file to the new location (or create one).
-  // TODO: Now there is a file at the new location, check the properties of the new global file.
-} */
+  const oldGlobalFile = path.join(__dirname, '/../../../common/global-tibco-cloud.properties')
+  mkdirIfNotExist(GLOBALTCPropFolder)
+  if (doesFileExist(oldGlobalFile) && !doesFileExist(GLOBALPropertyFileName)) {
+    log(INFO, col.rainbow('* * * ') + 'You got a global file on the old location and not yet any on the new location, we will copy it...')
+    log(INFO, col.rainbow('* * * ') + 'Old GLOBAL Properties location: ' + col.blue(oldGlobalFile))
+    log(INFO, col.rainbow('* * * ') + 'New GLOBAL Properties location: ' + col.blue(GLOBALPropertyFileName))
+    copyFile(oldGlobalFile, GLOBALPropertyFileName)
+  } else {
+    if (!doesFileExist(oldGlobalFile)) {
+      log(WARNING, col.rainbow('* * * ') + 'The old global property file(' + oldGlobalFile + ') does not exists ')
+    }
+    if (doesFileExist(GLOBALPropertyFileName)) {
+      log(WARNING, col.rainbow('* * * ') + 'The global property file on the new location (' + GLOBALPropertyFileName + ') already exists...')
+    }
+  }
+  addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V3', EnableMessageV3 + '\n# Property File Version', false)
+}
 
 function upgradeToV2 (isGlobal: boolean, propFile: string) {
   let host = ''
