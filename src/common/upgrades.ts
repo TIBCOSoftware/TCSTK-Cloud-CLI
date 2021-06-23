@@ -49,14 +49,18 @@ function upgradeLocalToV3 (propFile: string) {
     log(INFO, col.rainbow('* * * ') + 'New GLOBAL Properties location: ' + col.blue(GLOBALPropertyFileName))
     copyFile(oldGlobalFile, GLOBALPropertyFileName)
   } else {
-    if (!doesFileExist(oldGlobalFile)) {
-      log(WARNING, col.rainbow('* * * ') + 'The old global property file(' + oldGlobalFile + ') does not exists ')
-    }
     if (doesFileExist(GLOBALPropertyFileName)) {
-      log(WARNING, col.rainbow('* * * ') + 'The global property file on the new location (' + GLOBALPropertyFileName + ') already exists...')
+      log(INFO, col.rainbow('* * * ') + 'The global property file on the new location (' + GLOBALPropertyFileName + ') already exists...')
+    }
+    if (!doesFileExist(oldGlobalFile)) {
+      log(INFO, col.rainbow('* * * ') + col.green('The old global property file(' + oldGlobalFile + ') does not exists...'))
     }
   }
+  if (doesFileExist(oldGlobalFile)) {
+    log(WARNING, col.rainbow('* * * ') + 'You can delete the old global property file: ' + oldGlobalFile)
+  }
   addOrUpdateProperty(propFile, 'Cloud_Properties_Version', 'V3', EnableMessageV3 + '\n# Property File Version', false)
+  log(INFO, col.rainbow('* * * * * * * * * * * * * * * * * * * * * * * * * * *'))
 }
 
 function upgradeToV2 (isGlobal: boolean, propFile: string) {
