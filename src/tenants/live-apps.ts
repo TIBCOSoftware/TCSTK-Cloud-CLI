@@ -12,7 +12,7 @@ import {
 import { Global } from '../models/base'
 import { changeOrganization, displayOrganizations, getCurrentOrganizationInfo } from '../common/organization-management'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
-import { DEBUG, ERROR, INFO, log, logLine, WARNING } from '../common/logging'
+import { DEBUG, ERROR, INFO, log, logCancel, logLine, WARNING } from '../common/logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from '../common/property-file-management'
 import { LADesignTimeApp, LApp } from '../models/live-apps'
 
@@ -202,7 +202,7 @@ export async function showLiveAppsActions () {
       showActions(apps.find((e) => e.name === laAppD.trim())!, laAppD)
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -335,7 +335,7 @@ export async function createLAImportFile () {
     const doOverWrite = await askMultipleChoiceQuestion('The property file: \x1b[34m' + impConfFileName + '\x1b[0m already exists, do you want to Overwrite it ?', ['YES', 'NO'])
     if (doOverWrite === 'NO') {
       doWrite = false
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   }
   if (doWrite) {
@@ -581,7 +581,7 @@ export async function importLiveAppsData () {
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -710,7 +710,7 @@ export async function copyLiveApps () {
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 

@@ -10,9 +10,10 @@ import {
 } from '../common/tables'
 import { Global } from '../models/base'
 import { CallConfig, LoginCookie, MappingGroup } from '../models/tcli-models'
-import { askQuestion } from './user-interaction'
-import { DEBUG, ERROR, INFO, log, logO, WARNING } from './logging'
+import { askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
+import { DEBUG, ERROR, INFO, log, logCancel, logO, WARNING } from './logging'
 import { getProp, setProperty } from './property-file-management'
+import path from 'path'
 
 declare let global: Global
 
@@ -349,6 +350,82 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
   }
   // url, method, postRequest, contentType, doLog, tenant, customLoginURL, returnResponse, forceOAUTH, forceCLIENTID, handleErrorOutside
   // return await callURLA(urlToCall, conf.method, conf.postRequest, conf.contentType, doLog, conf.tenant, conf.customLoginURL, conf.returnResponse, conf.forceOAUTH, conf.forceCLIENTID, conf.handleErrorOutside, conf.customHeaders);
+}
+
+// Function to post to the cloud from a file or pasted message
+export async function postToCloud (endpoint: string, question?: string, fileFolder?: string, folderFilter?: string, customConfig? :CallConfig) {
+  const useQuestion = question || 'What would you like to use for the post message ?'
+  // If the folder is provided Get the files in the folder using the folder filter
+  const optionList = ['NONE', 'MESSAGE', 'FILE']
+  if (fileFolder) {
+    const fs = require('fs')
+    fs.readdirSync(fileFolder).forEach((file: string) => {
+      let doAdd = true
+      if (folderFilter) {
+        if (!(file.indexOf(folderFilter) > -1)) {
+          doAdd = false
+        }
+      }
+      if (doAdd) {
+        log(INFO, 'Found file option for upload: ' + col.blue(file))
+        optionList.push(file)
+      }
+    })
+  }
+  // console.log(optionList)
+  log(INFO, 'Use NONE to cancel, Use MESSAGE to paste a message and use FILE to use a custom file or choose a pre-provided file...')
+  // Ask user if he wants to post a message, get the message from a file or
+  //  list the files from that folder using the filters
+  const typeForPost = await askMultipleChoiceQuestionSearch(useQuestion, optionList)
+  if (typeForPost.toLowerCase() !== 'none') {
+    // if MESSAGE, ask the user to paste the message
+    if (typeForPost.toLowerCase() === 'message') {
+      return await postMessageToCloud(endpoint, await askQuestion('Provide the message:'), customConfig)
+    } else {
+      if (typeForPost.toLowerCase() === 'file') {
+        // if FILE, ask the user for the file location
+        return await postFileToCloud(endpoint, await askQuestion('Provide the location of the file for the message:'), customConfig)
+      } else {
+        // user has provided the file
+        return await postFileToCloud(endpoint, path.join(fileFolder!, typeForPost), customConfig)
+      }
+    }
+  } else {
+    // if NONE, end interaction
+    logCancel(true)
+  }
+}
+
+export async function postFileToCloud (endpoint: string, fileLocation: string, customConfig? :CallConfig) {
+  log(DEBUG, 'Posting file to the cloud: ', fileLocation, ' (endpoint: ' + endpoint + ')')
+  // Load the file and post it to the cloud (if it's a JSON file, parse the json)
+  const fs = require('fs')
+  let fileData = fs.readFileSync(fileLocation)
+  if (fileLocation.indexOf('json') > -1) {
+    try {
+      fileData = JSON.parse(fileData)
+    } catch (error) {
+      log(ERROR, 'JSON Parsing error: ', error.message)
+      process.exit(1)
+    }
+  } else {
+    fileData = fileData.toString()
+  }
+  log(INFO, 'Posting file to the cloud: ', col.blue(fileLocation), ' (endpoint: ' + col.blue(endpoint) + ')')
+  return await postMessageToCloud(endpoint, fileData, customConfig)
+}
+
+export async function postMessageToCloud (endpoint: string, message: any, customConfig? :CallConfig) {
+  log(DEBUG, 'Posting message to the cloud: ', message, ' (endpoint: ' + endpoint + ')')
+  // Take possible config
+  let config: CallConfig = {
+    method: 'POST',
+    postRequest: message
+  }
+  if (customConfig) {
+    config = { ...config, ...customConfig }
+  }
+  return await callTCA(endpoint, false, config)
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)

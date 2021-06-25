@@ -743,6 +743,46 @@ export async function showDiscoverTempWrapper () {
   await DISCOVER.getTemplates(true)
 }
 
+export async function showDiscoverDSFilesWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.getDataSetFiles(true)
+}
+
+export async function uploadDiscoverDSFileWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.uploadDataSetFile()
+}
+
+export async function removeDiscoverDSFileWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.removeDataSetFile()
+}
+
+export async function createDiscoverDSWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.createDataSet()
+}
+
+export async function removeDiscoverDSWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.removeDataSet()
+}
+
+export async function runDiscoverPAWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.runProcessAnalysis()
+}
+
+export async function rerunDiscoverPAWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.rerunProcessAnalysis()
+}
+
+export async function removeDiscoverPAWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.removeProcessAnalysis()
+}
+
 export async function updateTCLIwrapper () {
   await updateTCLI()
 }

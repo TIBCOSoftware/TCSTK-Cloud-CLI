@@ -9,25 +9,24 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { TypeValue } from './typeValue';
-import { Mapping } from './mapping';
 
 
-export interface AnalysisRequest { 
+export interface TemplateFilterConfig { 
     /**
-     * TBD
+     * Exact name of the Spotfire Tab to Use
      */
-    name: string;
+    id: string;
     /**
-     * TBD
+     * Menu Label
      */
-    description: string;
+    label: string;
     /**
-     * TBD
+     * Indicator if this menu item is shown or not
      */
-    datasetId: string;
-    mappings: Mapping;
-    filters?: Array<TypeValue>;
-    groups?: Array<TypeValue>;
+    enabled?: boolean;
+    /**
+     * Set the page as a default when loading a report
+     */
+    isDefault?: boolean;
 }
 

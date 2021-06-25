@@ -10,7 +10,7 @@ import {
   pexTable
 } from '../common/tables'
 import { askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
-import { ERROR, INFO, log, logLine, WARNING } from '../common/logging'
+import { ERROR, INFO, log, logCancel, logLine, WARNING } from '../common/logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from '../common/property-file-management'
 import { Global } from '../models/base'
 declare let global: Global
@@ -51,20 +51,20 @@ async function getOrgFoldersBase () {
     // let exportBatch = callURL(cloudURL + 'case/v1/cases?$sandbox=' + await getProductionSandbox() + '&$filter=applicationId eq ' + cTypes[curCase].applicationId + typeIdString + '&$top=' + exportCaseStepSize + '&$skip=' + i, 'GET', null, null, false);
     hasMoreFolders = false
     let skip = ''
-    if (i != 0) {
+    if (i !== 0) {
       skip = '&$skip=' + i
     }
     const folderDet = await CCOM.callTCA(CCOM.clURI.la_org_folders + '?$top=' + folderStepSize + skip, false, { handleErrorOutside: true })
     if (folderDet) {
       if (folderDet.errorCode) {
-        if (folderDet.errorCode == 'WR_FOLDER_DOES_NOT_EXIST') {
+        if (folderDet.errorCode === 'WR_FOLDER_DOES_NOT_EXIST') {
           log(WARNING, 'No org folders exist yet...')
           return []
         } else {
           log(ERROR, 'Something went wrong: ', folderDet)
         }
       } else {
-        if (folderDet.length == folderStepSize) {
+        if (folderDet.length === folderStepSize) {
           hasMoreFolders = true
         }
         allFolders = allFolders.concat(folderDet)
@@ -97,10 +97,10 @@ export async function getOrgFolderFiles (folder: string, showFiles: boolean) {
   const users = await USERGROUPS.showLiveAppsUsers(false, false)
   for (const cont in folderContentTable) {
     for (const usr of iterateTable(users)) {
-      if (usr.Id == folderContentTable[cont].Author) {
+      if (usr.Id === folderContentTable[cont].Author) {
         folderContentTable[cont].Author = usr['First Name'] + ' ' + usr['Last Name']
       }
-      if (usr.Id == folderContentTable[cont]['Modified By']) {
+      if (usr.Id === folderContentTable[cont]['Modified By']) {
         folderContentTable[cont]['Modified By'] = usr['First Name'] + ' ' + usr['Last Name']
       }
     }
@@ -135,10 +135,10 @@ export async function showOrgFolders () {
     }
   }
   const folderDecision = await askMultipleChoiceQuestionSearch('For which folder would you like to see the contents ?', chFolder)
-  if (folderDecision != 'NONE') {
+  if (folderDecision !== 'NONE') {
     await getOrgFolderFiles(folderDecision, true)
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -162,7 +162,7 @@ export async function createOrgFolder () {
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -175,7 +175,7 @@ export async function uploadFileToOrgFolder () {
     chFolder.push(fol.Name)
   }
   const folderDecision = await askMultipleChoiceQuestionSearch('To which folder would you like to upload a file ?', chFolder)
-  if (folderDecision != 'NONE') {
+  if (folderDecision !== 'NONE') {
     const localFileLocation = await askQuestion('Specify to location of the local file you want to upload ?')
     let cloudFileName = await askQuestion('Specify the fileName as which you would like to upload it (Or press enter or use "SAME" to use the same name)?')
     if (cloudFileName === '' || cloudFileName.toLowerCase() === 'same') {
@@ -188,7 +188,7 @@ export async function uploadFileToOrgFolder () {
     log(INFO, 'Creating ' + col.blue(cloudFileName) + ' in folder: ' + col.blue(folderDecision))
     await uploadFile(localFileLocation, folderDecision, cloudFileName)
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -224,10 +224,10 @@ export async function downloadFileFromOrgFolder () {
     } else if (fileDecision.toLowerCase() !== 'none') {
       await downLoadOrgFolderFile(folderDecision, fileDecision)
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 

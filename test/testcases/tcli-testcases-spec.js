@@ -557,13 +557,14 @@ describe('tcli testsuite', function () {
     const tasks = require('./../../ts-out/config/config-cli-task.json').cliTasks
     const taskNames = []
     for (const task in tasks) {
-      if (taskNames.indexOf(task) > 0) {
+      if (taskNames.indexOf(task) > -1) {
         fail('Duplicate Task Name: ' + task)
       }
       taskNames.push(task)
+      // console.log('Pushed: ', task)
       if (tasks[task].taskAlternativeNames) {
         for (tskA of tasks[task].taskAlternativeNames) {
-          if (taskNames.indexOf(tskA) > 0) {
+          if (taskNames.indexOf(tskA) > -1) {
             fail('Duplicate Alternative Task Name: ' + tskA)
           }
           taskNames.push(tskA)

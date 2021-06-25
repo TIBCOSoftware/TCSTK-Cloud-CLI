@@ -10,7 +10,7 @@ import {
   pexTable
 } from '../common/tables'
 import { askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
-import { DEBUG, INFO, log, WARNING } from '../common/logging'
+import { DEBUG, INFO, log, logCancel, WARNING } from '../common/logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from '../common/property-file-management'
 
 const CCOM = require('../common/cloud-communications')
@@ -75,7 +75,7 @@ export async function monitorTCI () {
     log(INFO, 'Monitoring ' + col.yellow('[' + appToMonitor + ']') + ' in organization ' + col.blue('[' + getOrganization() + ']'))
     run(tibCli + ' monitor applog -s ' + appToMonitor)
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -117,7 +117,7 @@ export async function exportTCIApp () {
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 

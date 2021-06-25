@@ -13,7 +13,7 @@ import { Global } from '../models/base'
 import { CallConfig } from '../models/tcli-models'
 import { SFCopyRequest, SFCreateFolderRequest, SFFolderInfo, SFLibObject, SFType, UploadDXP } from '../models/spotfire'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
-import { DEBUG, ERROR, INFO, log, logLine, WARNING } from '../common/logging'
+import { DEBUG, ERROR, INFO, log, logCancel, logLine, WARNING } from '../common/logging'
 import { getProp, prepProp } from '../common/property-file-management'
 import { Client } from 'soap'
 import { downloadFromCloud, readableSize } from '../common/cloud-communications'
@@ -37,7 +37,7 @@ let suid: string
 let tcsid: string
 
 export function prepSpotfireProps () {
-  // Shared state filter (picked up from configuration if exists)
+  // Checking if properties exist, otherwise create them with default values
   prepProp('Spotfire_Library_Base', '/Teams/~{ORGANIZATION}', '------------------------\n' +
         '#  SPOTFIRE\n' +
         '# ------------------------\n' +
@@ -150,7 +150,7 @@ export async function listSpotfire () {
     }
     if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), 'After SF List')
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -226,11 +226,11 @@ export async function copySpotfire () {
           log(ERROR, `We could not find your item to copy (${itemNameToCopy}), consider changing your Spotfire_Library_Base`)
         }
       } else {
-        log(INFO, 'OK, I won\'t do anything :-)')
+        logCancel(true)
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -275,7 +275,7 @@ export async function createSpotfireLibraryFolder () {
         }
       }
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
     log(ERROR, 'No parent folders found, adjust your Spotfire_Library_Base property: ' + getProp('Spotfire_Library_Base'))
@@ -312,13 +312,13 @@ export async function renameSpotfireLibraryItem () {
           log(ERROR, 'An error occurred renaming ', SFRename)
         }
       } else {
-        log(INFO, 'OK, I won\'t do anything :-)')
+        logCancel(true)
       }
     } else {
       log(WARNING, 'No items found to rename...')
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -357,13 +357,13 @@ export async function shareSpotfireLibraryFolder () {
             log(ERROR, 'An error occurred while sharing ', SFShare)
           }
         } else {
-          log(INFO, 'OK, I won\'t do anything :-)')
+          logCancel(true)
         }
       } else {
         log(WARNING, 'Can\'t find ' + itemNameToShare + ' to share, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)')
       }
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
     log(WARNING, 'No folders found to share...')
@@ -403,19 +403,19 @@ export async function deleteSpotfireLibraryItem () {
               log(ERROR, 'An error occurred deleting ', SFDelete)
             }
           } else {
-            log(INFO, 'OK, I won\'t do anything :-)')
+            logCancel(true)
           }
         } else {
           log(WARNING, 'Can\'t find ' + itemNameToDelete + ' to delete, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)')
         }
       } else {
-        log(INFO, 'OK, I won\'t do anything :-)')
+        logCancel(true)
       }
     } else {
       log(WARNING, 'No items found to delete...')
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -480,14 +480,14 @@ export async function uploadSpotfireDXP () {
             log(ERROR, 'Can\'t find the file: ' + dxpLocation)
           }
         } else {
-          log(INFO, 'OK, I won\'t do anything :-)')
+          logCancel(true)
         }
       } else {
         log(ERROR, 'Can\'t find the folder ' + folderNameToUpload + ' on the Spotfire Server to upload to, does it exist ? (and is your Spotfire_Library_Base property set with the right scope ?)')
         process.exit(1)
       }
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
     log(WARNING, 'No folders found to upload to...')
@@ -565,7 +565,7 @@ export async function downloadSpotfireDXP () {
         process.exit(1)
       }
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
     log(WARNING, 'No dxp found to download')

@@ -9,13 +9,13 @@ import {
   getPEXConfig,
   iterateTable,
   pexTable
-} from '../common/tables'
+} from './tables'
 import { ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestionSearch } from './user-interaction'
 import { SelectedAccount } from '../models/organizations'
 import { getOAUTHDetails } from './oauth'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
-import { DEBUG, ERROR, INFO, log } from './logging'
+import { DEBUG, ERROR, INFO, log, logCancel } from './logging'
 
 const CCOM = require('./cloud-communications')
 const OAUTH = require('./oauth')
@@ -74,11 +74,11 @@ export async function changeOrganization (accountId?: string) {
   } else {
     // List all the organizations
     // Ask to which organization you would like to switch
-    const accountChoice = await displayOrganizations(true, true, 'Which organization would you like to change to (you are currennly in: ' + col.blue(currentAccount.displayName) + ') ?')
+    const accountChoice = await displayOrganizations(true, true, 'Which organization would you like to change to (you are currently in: ' + col.blue(currentAccount.displayName) + ') ?')
     if (accountChoice) {
       orgAccountId = accountChoice.accountId
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
       return
     }
   }
@@ -87,7 +87,7 @@ export async function changeOrganization (accountId?: string) {
   } else {
     log(DEBUG, 'Changing Organization to: ', col.blue(orgAccountId))
     // Get the clientID for that organization
-    const clientID = await getClientIDforOrg(orgAccountId)
+    const clientID = await getClientIdForOrg(orgAccountId)
     // console.log('Client ID: ' + clientID);
     let doOauth = false
     // If Oauth is being used: revoke the Key on the Old Organization
@@ -187,7 +187,7 @@ function getSpecificOrganization (organizations: ORGInfo[], name: any) {
 }
 
 // display current properties in a table
-export async function getClientIDforOrg (accountId: string) {
+export async function getClientIdForOrg (accountId: string) {
   log(DEBUG, 'Getting client ID for organization, with account ID: ' + col.blue(accountId))
   const postRequest = 'account-id=' + accountId + '&opaque-for-tenant=TSC'
   const response = await CCOM.callTCA(CCOM.clURI.reauthorize, false, {

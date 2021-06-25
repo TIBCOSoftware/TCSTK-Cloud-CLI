@@ -1011,7 +1011,7 @@
     },
     "show-discover-process-analysis": {
       "description": "Show's the process analysis of Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverPAWrapper",
@@ -1025,12 +1025,12 @@
     },
     "show-discover-datasets": {
       "description": "Show's the datasets of Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSWrapper",
       "taskAlternativeNames": [
-        "show-datasets", "show-ds"
+        "show-datasets", "show-ds", "sdd"
       ],
       "availableOnOs": [
         "all"
@@ -1039,12 +1039,124 @@
     },
     "show-discover-templates": {
       "description": "Show's the templates of Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverTempWrapper",
       "taskAlternativeNames": [
-        "show-templates", "show-temp"
+        "show-templates", "show-temp", "sdt"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "show-discover-dataset-files": {
+      "description": "Show's a list of dataset files for Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverDSFilesWrapper",
+      "taskAlternativeNames": [
+        "show-dataset-files", "show-discover-files", "sddf"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "upload-discover-dataset-file": {
+      "description": "Uploads a CSV file for analysis in Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "uploadDiscoverDSFileWrapper",
+      "taskAlternativeNames": [
+        "upload-dataset-file", "uddf"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "remove-discover-dataset-file": {
+      "description": "Removes a Dataset file in Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "removeDiscoverDSFileWrapper",
+      "taskAlternativeNames": [
+        "remove-discover-file", "rddf"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "create-discover-dataset": {
+      "description": "Create a Dataset for Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "createDiscoverDSWrapper",
+      "taskAlternativeNames": [
+        "create-dataset", "cdd"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "remove-discover-dataset": {
+      "description": "Removes a Dataset for Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "removeDiscoverDSWrapper",
+      "taskAlternativeNames": [
+        "remove-dataset", "rdd"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "run-discover-process-analysis": {
+      "description": "Runs a Process Analysis for Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "runDiscoverPAWrapper",
+      "taskAlternativeNames": [
+        "run-process-analysis", "do-process-mining", "rdpa"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "rerun-discover-process-analysis": {
+      "description": "Re-Runs a Process Analysis for Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "rerunDiscoverPAWrapper",
+      "taskAlternativeNames": [
+        "rerun-process-analysis", "rerun-process-mining", "rrdpa"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
+    "remove-discover-process-analysis": {
+      "description": "Removes a Process Analysis from Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "removeDiscoverPAWrapper",
+      "taskAlternativeNames": [
+        "remove-process-analysis", "rmdpa"
       ],
       "availableOnOs": [
         "all"

@@ -2,7 +2,7 @@ import {
   col, doesExist
 } from '../common/common-functions'
 import { askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
-import { ERROR, INFO, log, WARNING } from '../common/logging'
+import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
 import { LAGroup } from '../models/live-apps'
 import {
   createTable,
@@ -50,7 +50,7 @@ export async function showLiveAppsGroups (): Promise<void> {
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -73,7 +73,7 @@ export async function createLiveAppsGroup (): Promise<void> {
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -176,10 +176,10 @@ export async function addUserToGroup () {
         log(ERROR, 'No response...')
       }
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
   // Show all the users and add that users to a group.
 }

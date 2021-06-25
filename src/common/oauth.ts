@@ -8,7 +8,7 @@ import {
   iterateTable
 } from '../common/tables'
 import { askMultipleChoiceQuestion } from './user-interaction'
-import { DEBUG, ERROR, INFO, log, WARNING } from './logging'
+import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from './logging'
 import { OAUTHConfig } from '../models/tcli-models'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 
@@ -120,7 +120,7 @@ export async function revokeOauthToken (tokenName: string) {
     })
     log(INFO, 'Result: ', col.blue(response.message))
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -188,7 +188,7 @@ export async function validateAndRotateOauthToken (isInteractive?: boolean) {
       if (decision === 'YES') {
         await rotateOauthToken()
       } else {
-        log(INFO, 'Ok I won\'t do anything...')
+        logCancel(true)
       }
     } else {
       log(INFO, 'OAUTH Key(' + oDetails.Token_Name + ') is valid for more than ' + oauthRequiredHoursValid + ' hours :-)...')
@@ -296,7 +296,7 @@ export async function generateOauthToken (tokenNameOverride: string, verbose: bo
       }
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
   return null
 }

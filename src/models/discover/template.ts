@@ -11,6 +11,7 @@
  */
 import { TemplateMarkingConfig } from './templateMarkingConfig';
 import { TemplateMenuConfig } from './templateMenuConfig';
+import { TemplateFilterConfig } from './templateFilterConfig';
 
 
 export interface Template { 
@@ -42,6 +43,10 @@ export interface Template {
      * Set of menu entries that are shown for this template
      */
     menuConfig?: Array<TemplateMenuConfig>;
+    /**
+     * Set of filters entries that apply to this template
+     */
+    filters?: Array<TemplateFilterConfig>;
     /**
      * Determines if a template is enabled or disabled (No UI implementation for this yet)
      */

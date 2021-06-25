@@ -12,8 +12,8 @@ import {
 } from '../common/tables'
 import { ORGFile, ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
-import { getClientIDforOrg, getOrganizations } from './organization-management'
-import { DEBUG, ERROR, INFO, log, WARNING } from './logging'
+import { getClientIdForOrg, getOrganizations } from './organization-management'
+import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from './logging'
 import { getOAUTHDetails, parseOAUTHToken, setOAUTHDetails } from './oauth'
 import { getSharedState, selectSharedState } from '../tenants/shared-state'
 import { listOnType, prepSpotfireProps } from '../tenants/spotfire'
@@ -329,10 +329,10 @@ export async function generateCloudPropertyFiles () {
       }
       addOrUpdateProperty(fileName, 'Multiple_Interaction_Property_Files', tcliIprop)
     } else {
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   } else {
-    log(INFO, 'OK, I won\'t do anything :-)')
+    logCancel(true)
   }
 }
 
@@ -371,7 +371,7 @@ async function configurePropFile (fileName: string, region: string, accountId: s
   log(INFO, '[' + region + ']: Generating: ' + fileName)
   // let regToAdd = '';
   copyFile(getPropFileName(), fileName)
-  const ClientID = await getClientIDforOrg(accountId)
+  const ClientID = await getClientIdForOrg(accountId)
   addOrUpdateProperty(fileName, 'CloudLogin.clientID', ClientID)
   addOrUpdateProperty(fileName, 'CloudLogin.Region', region)
   // Possibly generate an OAUTH Token, on the new file
@@ -448,7 +448,7 @@ export async function updateProperty () {
       const laAppNameA = ['NONE'].concat(apps.map((v: any) => v.name))
       const laAppD = await askMultipleChoiceQuestionSearch('For which LiveApp would you like to store the ID ?', laAppNameA)
       if (laAppD === 'NONE') {
-        log(INFO, 'OK, I won\'t do anything :-)')
+        logCancel(true)
         doUpdate = false
       } else {
         const laApp = apps.find((e: any) => e.name === laAppD.trim())
@@ -467,7 +467,7 @@ export async function updateProperty () {
           showTableFromTobject(laActions, 'Live Apps Actions')
           const laActD = await askMultipleChoiceQuestionSearch('For which ACTION would you like to store an Action ID ?', laActions.map(v => v.name))
           if (laActD === 'NONE') {
-            log(INFO, 'OK, I won\'t do anything :-)')
+            logCancel(true)
             doUpdate = false
           } else {
             const laAction: any = laActions.find(e => e.name === laActD)

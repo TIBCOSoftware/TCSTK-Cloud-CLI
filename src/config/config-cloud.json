@@ -43,7 +43,11 @@
     "mes_keys": "messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keysInfo",
     "dis_pa": "discover.labs.tibcocloud.com/repository/analysis",
     "dis_ds": "discover.labs.tibcocloud.com/catalog/datasets",
-    "dis_temp": "discover.labs.tibcocloud.com/visualisation/templates"
+    "dis_temp": "discover.labs.tibcocloud.com/visualisation/templates",
+    "dis_files": "discover.labs.tibcocloud.com/catalog/files",
+    "dis_dataset": "discover.labs.tibcocloud.com/catalog/dataset/preview",
+    "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status"
+
   },
   "mappings": {
     "oauth": {
@@ -482,6 +486,34 @@
         {
           "header": "Enabled",
           "field": "enabled"
+        }
+      ]
+    },
+    "dis_files": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "redisFileInfo.OriginalFilename"
+        },
+        {
+          "header": "Encoding",
+          "field": "redisFileInfo.Encoding"
+        },{
+          "header": "In use",
+          "field": "beingUsed"
+        },
+        {
+          "header": "Size",
+          "field": "redisFileInfo.FileSize"
+        },
+        {
+          "header": "Location",
+          "field": "redisFileInfo.FileLocation"
+        },
+        {
+          "header": "Last updated",
+          "field": "redisFileInfo.LastModified",
+          "format": "DATE"
         }
       ]
     }

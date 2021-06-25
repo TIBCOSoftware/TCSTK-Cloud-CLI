@@ -10,14 +10,14 @@ let useDebug = false
 
 export async function throb (message: string, frames: string[], repeats: number) {
   /*
-    const spinner = {
-        frames: frames,
-        interval: 300, // Optional
-    }
-    const throbber = ora({
-        text: message,
-        spinner
-    }) */
+      const spinner = {
+          frames: frames,
+          interval: 300, // Optional
+      }
+      const throbber = ora({
+          text: message,
+          spinner
+      }) */
   // throbber.start();
   // throbber.stop();
   let i = 0
@@ -44,10 +44,18 @@ export function setLogDebug (debug: string | boolean) {
     useDebug = debug === 'true'
   }
 }
+
 let loggingEnabled = true
 
 export function disableLogging () {
   loggingEnabled = false
+}
+
+export function logCancel (doExit: boolean) {
+  log(INFO, 'OK, I won\'t do anything :-)')
+  if (doExit) {
+    process.exit(0)
+  }
 }
 
 // Function moved to TS
@@ -90,7 +98,8 @@ export function log (level: 'INFO' | 'WARNING' | 'DEBUG' | 'ERROR' | 'RECORDER',
     }
   }
 }
-let logCat:string
+
+let logCat: string
 
 export function setLogCategory (cat: string) {
   if (cat) {

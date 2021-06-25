@@ -2,7 +2,7 @@
 // All inputs are provided as input to the functions
 import { Global } from '../models/base'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
-import { DEBUG, ERROR, INFO, log, WARNING } from './logging'
+import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from './logging'
 import {
   addOrUpdateProperty, GLOBALPropertyFileName,
   getProp, GLOBALTCPropFolder,
@@ -204,7 +204,7 @@ export async function createMultiplePropertyFile () {
     const doOverWrite = await askMultipleChoiceQuestion('The property file: ' + col.yellow(mPropFileName) + ' already exists, do you want to Overwrite it ?', ['YES', 'NO'])
     if (doOverWrite === 'NO') {
       doWrite = false
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   }
   if (doWrite) {
@@ -230,7 +230,7 @@ export async function copyFileInteractiveIfNotExists (source: string, destinatio
     const decision = await askMultipleChoiceQuestion('The file ' + fileName + ' exists, do you want to override it', ['YES', 'NO'])
     if (decision.toLowerCase() !== 'yes') {
       doCopy = false
-      log(INFO, 'OK, I won\'t do anything :-)')
+      logCancel(true)
     }
   }
   if (doCopy) {
@@ -476,6 +476,7 @@ export function deleteFolder (folder: string) {
 export function mkdirIfNotExist (dir: string) {
   const fs = require('fs')
   if (!fs.existsSync(dir)) {
+    log(INFO, 'Creating folder: ' + col.blue(dir))
     fs.mkdirSync(dir)
   }
 }

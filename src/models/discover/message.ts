@@ -9,17 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { AnalysisMetadata } from './analysisMetadata';
-import { AnalysisData } from './analysisData';
 
 
-export interface Analysis { 
-    /**
-     * Analysis ID
-     */
+export interface Message { 
     id?: string;
-    data: AnalysisData;
-    metadata: AnalysisMetadata;
-    actions: Array<string>;
+    scope?: string;
+    message?: string;
+    persistClose?: boolean;
 }
 

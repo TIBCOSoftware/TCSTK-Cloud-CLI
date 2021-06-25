@@ -17,7 +17,7 @@ import {
 } from '../common/tables'
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch } from '../common/user-interaction'
-import { ERROR, INFO, log, logLine, WARNING } from '../common/logging'
+import { ERROR, INFO, log, logCancel, logLine, WARNING } from '../common/logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from '../common/property-file-management'
 
 const CCOM = require('../common/cloud-communications')
@@ -292,7 +292,7 @@ export async function deleteApp () {
       log(ERROR, 'No Body Returned on Delete:  ', da)
     }
   } else {
-    log(INFO, 'Ok I won\'t do anything...')
+    logCancel(true)
   }
 }
 
