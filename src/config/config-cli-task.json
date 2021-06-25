@@ -1086,6 +1086,22 @@
       ],
       "category": "discover"
     },
+    "export-discover-datasets": {
+      "description": "Exports the datasets of Project Discover into JSON files",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "exportDiscoverDSWrapper",
+      "taskAlternativeNames": [
+        "export-datasets",
+        "export-ds",
+        "eds"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover"
+    },
     "upload-discover-dataset-file": {
       "description": "Uploads a CSV file for analysis in Project Discover",
       "enabled": false,

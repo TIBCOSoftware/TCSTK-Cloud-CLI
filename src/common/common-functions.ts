@@ -124,10 +124,10 @@ export async function updateGlobalConnectionConfig () {
     copyFile(global.PROJECT_ROOT + 'templates/global-tibco-cloud.properties', GLOBALPropertyFileName)
   }
   /*
-  if (!doesFileExist(GLOBALTCPropFolder + 'package.json')) {
-    copyFile(global.PROJECT_ROOT + 'templates/package-common.json', GLOBALTCPropFolder + 'package.json')
-    log(INFO, 'Inserted package.json...')
-  } */
+    if (!doesFileExist(GLOBALTCPropFolder + 'package.json')) {
+      copyFile(global.PROJECT_ROOT + 'templates/package-common.json', GLOBALTCPropFolder + 'package.json')
+      log(INFO, 'Inserted package.json...')
+    } */
   // Get Cloud Environment
   await updateRegion(GLOBALPropertyFileName)
   // Get the login details
@@ -240,6 +240,7 @@ export async function copyFileInteractiveIfNotExists (source: string, destinatio
   }
   return doCopy
 }
+
 // fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
 
 // Update the cloud login properties
@@ -562,4 +563,14 @@ export function getRelativeTime (millisec: number) {
     return 'Less than a minute ago...'
   }
   return millisec ? DateTime.fromMillis(millisec).toRelative() : ''
+}
+
+// function to store a JSON to a file
+export function storeJsonToFile (contentFileName: string, contentObject: any) {
+  try {
+    require('jsonfile').writeFileSync(contentFileName, contentObject, { spaces: 2, EOL: '\r\n' })
+    log(INFO, 'Stored JSON file: ' + col.blue(contentFileName))
+  } catch (e) {
+    log(ERROR, 'Error storing JSON: ', contentObject, '\n To File: ' + contentFileName, '\n Error: ' + e.message)
+  }
 }

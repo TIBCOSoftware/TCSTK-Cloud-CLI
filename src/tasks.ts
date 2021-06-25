@@ -748,6 +748,11 @@ export async function showDiscoverDSFilesWrapper () {
   await DISCOVER.getDataSetFiles(true)
 }
 
+export async function exportDiscoverDSWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.exportDataSets()
+}
+
 export async function uploadDiscoverDSFileWrapper () {
   const DISCOVER = require('./tenants/discover')
   await DISCOVER.uploadDataSetFile()

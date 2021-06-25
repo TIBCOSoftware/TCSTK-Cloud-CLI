@@ -45,8 +45,10 @@
     "dis_ds": "discover.labs.tibcocloud.com/catalog/datasets",
     "dis_temp": "discover.labs.tibcocloud.com/visualisation/templates",
     "dis_files": "discover.labs.tibcocloud.com/catalog/files",
-    "dis_dataset": "discover.labs.tibcocloud.com/catalog/dataset/preview",
-    "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status"
+    "dis_dataset_preview": "discover.labs.tibcocloud.com/catalog/dataset/preview",
+    "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status",
+    "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis"
+
 
   },
   "mappings": {
