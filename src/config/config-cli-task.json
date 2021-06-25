@@ -34,7 +34,8 @@
       "multipleInteraction": true,
       "task": "showApps",
       "taskAlternativeNames": [
-        "scs", "show"
+        "scs",
+        "show"
       ],
       "availableOnOs": [
         "all"
@@ -48,7 +49,8 @@
       "multipleInteraction": true,
       "task": "showLinks",
       "taskAlternativeNames": [
-        "sl", "show-links"
+        "sl",
+        "show-links"
       ],
       "availableOnOs": [
         "all"
@@ -89,7 +91,8 @@
       "internal": false,
       "task": "testCSWrapper",
       "taskAlternativeNames": [
-        "t","test"
+        "t",
+        "test"
       ],
       "availableOnOs": [
         "all"
@@ -290,7 +293,8 @@
       "multipleInteraction": false,
       "task": "changeRegion",
       "taskAlternativeNames": [
-        "change-region","cr"
+        "change-region",
+        "cr"
       ],
       "availableOnOs": [
         "all"
@@ -304,7 +308,8 @@
       "multipleInteraction": true,
       "task": "showOrganizationWrapper",
       "taskAlternativeNames": [
-        "show-organizations","show-orgs"
+        "show-organizations",
+        "show-orgs"
       ],
       "availableOnOs": [
         "all"
@@ -317,7 +322,8 @@
       "internal": false,
       "task": "changeOrganizationWrapper",
       "taskAlternativeNames": [
-        "change-organization","co"
+        "change-organization",
+        "co"
       ],
       "availableOnOs": [
         "all"
@@ -630,7 +636,8 @@
       "multipleInteraction": true,
       "task": "createSharedStateWrapper",
       "taskAlternativeNames": [
-        "create-ss", "create-ss-entry"
+        "create-ss",
+        "create-ss-entry"
       ],
       "availableOnOs": [
         "all"
@@ -862,7 +869,8 @@
       "multipleInteraction": true,
       "task": "showMessagingSummaryWrapper",
       "taskAlternativeNames": [
-        "show-summary", "messaging-show-summary"
+        "show-summary",
+        "messaging-show-summary"
       ],
       "availableOnOs": [
         "all"
@@ -876,7 +884,8 @@
       "multipleInteraction": true,
       "task": "showMessagingClientsWrapper",
       "taskAlternativeNames": [
-        "show-clients", "messaging-show-clients"
+        "show-clients",
+        "messaging-show-clients"
       ],
       "availableOnOs": [
         "all"
@@ -918,7 +927,8 @@
       "multipleInteraction": false,
       "task": "createSpotfireLibraryFolderWrapper",
       "taskAlternativeNames": [
-        "create-sf-folder", "create-library-folder"
+        "create-sf-folder",
+        "create-library-folder"
       ],
       "availableOnOs": [
         "all"
@@ -932,7 +942,8 @@
       "multipleInteraction": false,
       "task": "shareSpotfireLibraryFolderWrapper",
       "taskAlternativeNames": [
-        "share-sf", "share-library-folder"
+        "share-sf",
+        "share-library-folder"
       ],
       "availableOnOs": [
         "all"
@@ -946,7 +957,8 @@
       "multipleInteraction": false,
       "task": "copySpotfireLibraryWrapper",
       "taskAlternativeNames": [
-        "copy-sf", "copy-library-item"
+        "copy-sf",
+        "copy-library-item"
       ],
       "availableOnOs": [
         "all"
@@ -960,7 +972,8 @@
       "multipleInteraction": false,
       "task": "renameSpotfireLibraryItemWrapper",
       "taskAlternativeNames": [
-        "rename-sf", "rename-library-item"
+        "rename-sf",
+        "rename-library-item"
       ],
       "availableOnOs": [
         "all"
@@ -974,7 +987,8 @@
       "multipleInteraction": false,
       "task": "deleteSpotfireLibraryWrapper",
       "taskAlternativeNames": [
-        "delete-sf", "delete-library-item"
+        "delete-sf",
+        "delete-library-item"
       ],
       "availableOnOs": [
         "all"
@@ -1011,12 +1025,13 @@
     },
     "show-discover-process-analysis": {
       "description": "Show's the process analysis of Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverPAWrapper",
       "taskAlternativeNames": [
-        "show-process-analysis", "show-pa"
+        "show-process-analysis",
+        "show-pa"
       ],
       "availableOnOs": [
         "all"
@@ -1025,12 +1040,14 @@
     },
     "show-discover-datasets": {
       "description": "Show's the datasets of Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSWrapper",
       "taskAlternativeNames": [
-        "show-datasets", "show-ds", "sdd"
+        "show-datasets",
+        "show-ds",
+        "sdd"
       ],
       "availableOnOs": [
         "all"
@@ -1039,12 +1056,14 @@
     },
     "show-discover-templates": {
       "description": "Show's the templates of Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverTempWrapper",
       "taskAlternativeNames": [
-        "show-templates", "show-temp", "sdt"
+        "show-templates",
+        "show-temp",
+        "sdt"
       ],
       "availableOnOs": [
         "all"
@@ -1053,12 +1072,14 @@
     },
     "show-discover-dataset-files": {
       "description": "Show's a list of dataset files for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSFilesWrapper",
       "taskAlternativeNames": [
-        "show-dataset-files", "show-discover-files", "sddf"
+        "show-dataset-files",
+        "show-discover-files",
+        "sddf"
       ],
       "availableOnOs": [
         "all"
@@ -1067,12 +1088,13 @@
     },
     "upload-discover-dataset-file": {
       "description": "Uploads a CSV file for analysis in Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "uploadDiscoverDSFileWrapper",
       "taskAlternativeNames": [
-        "upload-dataset-file", "uddf"
+        "upload-dataset-file",
+        "uddf"
       ],
       "availableOnOs": [
         "all"
@@ -1081,12 +1103,13 @@
     },
     "remove-discover-dataset-file": {
       "description": "Removes a Dataset file in Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverDSFileWrapper",
       "taskAlternativeNames": [
-        "remove-discover-file", "rddf"
+        "remove-discover-file",
+        "rddf"
       ],
       "availableOnOs": [
         "all"
@@ -1095,12 +1118,13 @@
     },
     "create-discover-dataset": {
       "description": "Create a Dataset for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "createDiscoverDSWrapper",
       "taskAlternativeNames": [
-        "create-dataset", "cdd"
+        "create-dataset",
+        "cdd"
       ],
       "availableOnOs": [
         "all"
@@ -1109,12 +1133,13 @@
     },
     "remove-discover-dataset": {
       "description": "Removes a Dataset for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverDSWrapper",
       "taskAlternativeNames": [
-        "remove-dataset", "rdd"
+        "remove-dataset",
+        "rdd"
       ],
       "availableOnOs": [
         "all"
@@ -1123,12 +1148,14 @@
     },
     "run-discover-process-analysis": {
       "description": "Runs a Process Analysis for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "runDiscoverPAWrapper",
       "taskAlternativeNames": [
-        "run-process-analysis", "do-process-mining", "rdpa"
+        "run-process-analysis",
+        "do-process-mining",
+        "rdpa"
       ],
       "availableOnOs": [
         "all"
@@ -1137,12 +1164,14 @@
     },
     "rerun-discover-process-analysis": {
       "description": "Re-Runs a Process Analysis for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "rerunDiscoverPAWrapper",
       "taskAlternativeNames": [
-        "rerun-process-analysis", "rerun-process-mining", "rrdpa"
+        "rerun-process-analysis",
+        "rerun-process-mining",
+        "rrdpa"
       ],
       "availableOnOs": [
         "all"
@@ -1151,12 +1180,13 @@
     },
     "remove-discover-process-analysis": {
       "description": "Removes a Process Analysis from Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverPAWrapper",
       "taskAlternativeNames": [
-        "remove-process-analysis", "rmdpa"
+        "remove-process-analysis",
+        "rmdpa"
       ],
       "availableOnOs": [
         "all"
@@ -1170,7 +1200,8 @@
       "multipleInteraction": true,
       "task": "showOauthTokenWrapper",
       "taskAlternativeNames": [
-        "so", "show-tokens"
+        "so",
+        "show-tokens"
       ],
       "availableOnOs": [
         "all"
@@ -1184,7 +1215,8 @@
       "multipleInteraction": true,
       "task": "generateOauthTokenWrapper",
       "taskAlternativeNames": [
-        "go", "generate-token"
+        "go",
+        "generate-token"
       ],
       "availableOnOs": [
         "all"
@@ -1197,7 +1229,8 @@
       "internal": false,
       "task": "revokeOauthTokenWrapper",
       "taskAlternativeNames": [
-        "reo", "revoke-token"
+        "reo",
+        "revoke-token"
       ],
       "availableOnOs": [
         "all"
@@ -1211,7 +1244,8 @@
       "multipleInteraction": true,
       "task": "rotateOauthTokenWrapper",
       "taskAlternativeNames": [
-        "ro", "rotate-token"
+        "ro",
+        "rotate-token"
       ],
       "availableOnOs": [
         "all"
@@ -1225,7 +1259,8 @@
       "multipleInteraction": true,
       "task": "validateAndRotateOauthTokenWrapper",
       "taskAlternativeNames": [
-        "vo", "validate-and-rotate-token"
+        "vo",
+        "validate-and-rotate-token"
       ],
       "availableOnOs": [
         "all"
