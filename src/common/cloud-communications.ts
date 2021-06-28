@@ -387,7 +387,7 @@ export async function postToCloud (endpoint: string, question?: string, fileFold
         return await postFileToCloud(endpoint, await askQuestion('Provide the location of the file for the message:'), customConfig)
       } else {
         // user has provided the file
-        return await postFileToCloud(endpoint, path.join(fileFolder!, typeForPost), customConfig)
+        return await postFileToCloud(endpoint, path.join('./', fileFolder!, typeForPost), customConfig)
       }
     }
   } else {
@@ -397,7 +397,7 @@ export async function postToCloud (endpoint: string, question?: string, fileFold
 }
 
 export async function postFileToCloud (endpoint: string, fileLocation: string, customConfig? :CallConfig) {
-  log(DEBUG, 'Posting file to the cloud: ', fileLocation, ' (endpoint: ' + endpoint + ')')
+  log(INFO, 'Posting file to the cloud: ', fileLocation, ' (endpoint: ' + endpoint + ')')
   // Load the file and post it to the cloud (if it's a JSON file, parse the json)
   const fs = require('fs')
   let fileData = fs.readFileSync(fileLocation)
