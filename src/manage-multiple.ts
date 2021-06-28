@@ -88,7 +88,7 @@ export function processMultipleFile () {
     // log(INFO, logS);
     // Per Starter Go Over the Configured Environments
     const currLoc = getMProp(currentJob + '_Location')
-    if (!currLoc) {
+    if (!currLoc && currLoc !== '') {
       log(ERROR, 'Missing Location specification for JOB: ' + currentJob + '. Please define the ' + currentJob + '_Location property in ' + mFile)
       process.exit(1)
     }
