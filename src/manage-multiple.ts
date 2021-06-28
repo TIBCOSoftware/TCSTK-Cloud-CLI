@@ -11,7 +11,7 @@ import {
 } from './common/tables'
 import { TCLITask } from './models/tcli-models'
 import { askMultipleChoiceQuestionSearch, askQuestion } from './common/user-interaction'
-import { addOrUpdateProperty, replaceAtSign } from './common/property-file-management'
+import {addOrUpdateProperty, replaceAtSign, replaceGlobal} from './common/property-file-management'
 import { parseOAUTHToken } from './common/oauth'
 import { DEBUG, ERROR, INFO, log, WARNING } from './common/logging'
 
@@ -206,8 +206,8 @@ export function processMultipleFile () {
           showTask = false
           command += 'node ' + tObj.SV
         }
-        log(DEBUG, logT + 'Command (before replacing): ' + command)
-        command = replaceAtSign(command, currLoc + propFile)
+        log(INFO, logT + 'Command (before replacing): ' + command)
+        command = replaceGlobal(replaceAtSign(command, currLoc + propFile))
         if (showTask) {
           log(INFO, logT + ' Command: ' + command + ' (Fail on Error: ' + doFailOnError + ')')
         }

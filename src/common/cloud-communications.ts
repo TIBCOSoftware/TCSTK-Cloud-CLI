@@ -317,7 +317,7 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
       method: cMethod.toUpperCase()
     }, body)
   }
-  if (response.statusCode !== 200 && !doErrorOutside) {
+  if ((response.statusCode < 200 || response.statusCode >= 300) && !doErrorOutside) {
     if (response.body != null) {
       log(ERROR, 'Error Calling URL: ' + urlToCall + ' Status: ' + response.statusCode + ' \n Message: ', response.body)
     } else {

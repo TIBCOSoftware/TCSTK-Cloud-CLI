@@ -1178,31 +1178,15 @@
       ],
       "category": "discover"
     },
-    "rerun-discover-process-analysis": {
-      "description": "Re-Runs a Process Analysis for Project Discover",
+    "action-discover-process-analysis": {
+      "description": "Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover",
       "enabled": false,
       "internal": false,
       "multipleInteraction": true,
-      "task": "rerunDiscoverPAWrapper",
+      "task": "actionDiscoverPAWrapper",
       "taskAlternativeNames": [
-        "rerun-process-analysis",
-        "rerun-process-mining",
-        "rrdpa"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "discover"
-    },
-    "remove-discover-process-analysis": {
-      "description": "Removes a Process Analysis from Project Discover",
-      "enabled": false,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "removeDiscoverPAWrapper",
-      "taskAlternativeNames": [
-        "remove-process-analysis",
-        "rmdpa"
+        "action-process-analysis",
+        "adpa"
       ],
       "availableOnOs": [
         "all"

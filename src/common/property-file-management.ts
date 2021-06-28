@@ -241,6 +241,7 @@ export function prepProp (propName: string, propDefaultValue: string, comment: s
   if (getProp(propName) == null) {
     log(DEBUG, 'No ' + propName + ' Property found; Adding ' + propDefaultValue + ' to ' + getPropFileName())
     addOrUpdateProperty(getPropFileName(), propName, propDefaultValue, comment)
+    setProperty(propName, propDefaultValue)
   }
 }
 

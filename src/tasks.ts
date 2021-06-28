@@ -778,15 +778,16 @@ export async function runDiscoverPAWrapper () {
   await DISCOVER.runProcessAnalysis()
 }
 
-export async function rerunDiscoverPAWrapper () {
+export async function actionDiscoverPAWrapper () {
   const DISCOVER = require('./tenants/discover')
-  await DISCOVER.rerunProcessAnalysis()
+  await DISCOVER.actionProcessAnalysis()
 }
 
+/*
 export async function removeDiscoverPAWrapper () {
   const DISCOVER = require('./tenants/discover')
   await DISCOVER.removeProcessAnalysis()
-}
+} */
 
 export async function updateTCLIwrapper () {
   await updateTCLI()

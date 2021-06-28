@@ -14,6 +14,7 @@ import { AnalysisStatus } from '../models/discover/analysisStatus'
 import { DatasetDetail } from '../models/discover/datasetDetail'
 
 const CCOM = require('../common/cloud-communications')
+const SKIP_REGION = true
 
 export function prepDiscoverProps () {
   // Checking if properties exist, otherwise create them with default values
@@ -28,8 +29,9 @@ export function prepDiscoverProps () {
 // TODO: Show details
 export async function getProcessAnalysis (showTable: boolean): Promise<Analysis[]> {
   log(INFO, 'Getting process analysis...')
+  prepDiscoverProps ()
   // https://discover.labs.tibcocloud.com/repository/analysis
-  const disPA = await callTCA(CCOM.clURI.dis_pa, false, { skipInjectingRegion: true }) as Analysis[]
+  const disPA = await callTCA(CCOM.clURI.dis_pa, false, { skipInjectingRegion: SKIP_REGION }) as Analysis[]
   const paTable = createTable(disPA, CCOM.mappings.dis_pa, false)
   pexTable(paTable, 'discover-process-analysis', getPEXConfig(), showTable)
   return disPA
@@ -38,8 +40,9 @@ export async function getProcessAnalysis (showTable: boolean): Promise<Analysis[
 // TODO: Show details
 export async function getDataSets (showTable: boolean): Promise<Dataset[]> {
   log(INFO, 'Getting datasets...')
+  prepDiscoverProps ()
   // https://discover.labs.tibcocloud.com/catalog/datasets
-  const disDS = await callTCA(CCOM.clURI.dis_ds, false, { skipInjectingRegion: true }) as Dataset[]
+  const disDS = await callTCA(CCOM.clURI.dis_ds, false, { skipInjectingRegion: SKIP_REGION }) as Dataset[]
   // console.log(disDS)
   const paTable = createTable(disDS, CCOM.mappings.dis_ds, false)
   pexTable(paTable, 'discover-datasets', getPEXConfig(), showTable)
@@ -47,14 +50,15 @@ export async function getDataSets (showTable: boolean): Promise<Dataset[]> {
 }
 
 async function getDataSetDetail (dataSetId: string): Promise<DatasetDetail> {
-  return await callTCA(CCOM.clURI.dis_dataset_detail + '/' + dataSetId, false, { skipInjectingRegion: true }) as DatasetDetail
+  return await callTCA(CCOM.clURI.dis_dataset_detail + '/' + dataSetId, false, { skipInjectingRegion: SKIP_REGION }) as DatasetDetail
 }
 
 // TODO: Show details
 export async function getTemplates (showTable: boolean): Promise<Template[]> {
   log(INFO, 'Getting templates...')
+  prepDiscoverProps ()
   // https://discover.labs.tibcocloud.com/visualisation/templates
-  const disTEMP = await callTCA(CCOM.clURI.dis_temp, false, { skipInjectingRegion: true }) as Template[]
+  const disTEMP = await callTCA(CCOM.clURI.dis_temp, false, { skipInjectingRegion: SKIP_REGION }) as Template[]
   // console.log(disTEMP)
   const paTable = createTable(disTEMP, CCOM.mappings.dis_temp, false)
   pexTable(paTable, 'discover-templates', getPEXConfig(), showTable)
@@ -67,8 +71,9 @@ export async function getTemplates (showTable: boolean): Promise<Template[]> {
 // TODO: Show details
 export async function getDataSetFiles (showTable: boolean): Promise<DiscoverFileInfo[]> {
   log(INFO, 'Getting dataset file info...')
+  prepDiscoverProps ()
   // https://discover.labs.tibcocloud.com/catalog/files
-  const disFiles = await callTCA(CCOM.clURI.dis_files, false, { skipInjectingRegion: true }) as DiscoverFileInfo[]
+  const disFiles = await callTCA(CCOM.clURI.dis_files, false, { skipInjectingRegion: SKIP_REGION }) as DiscoverFileInfo[]
   // console.log(disFiles)
   // TODO: Make a FILESIZE format, to display the filesize nicely
   const paTable = createTable(disFiles, CCOM.mappings.dis_files, false)
@@ -102,6 +107,7 @@ export async function exportDataSets () {
 // upload-discover-dataset-file
 export async function uploadDataSetFile () {
   log(INFO, 'Uploading a dataset file...')
+  prepDiscoverProps ()
   // TODO: Implement
 
   // upload-discover-dataset-file, upload-discover-file (https://discover.labs.tibcocloud.com/files/01dzbgce4xgn899zq7ns238vk3)(orgID)
@@ -117,6 +123,7 @@ export async function uploadDataSetFile () {
 
 export async function removeDataSetFile () {
   log(INFO, 'Removing a dataset file...')
+  prepDiscoverProps ()
   // TODO: Implement
 }
 
@@ -126,7 +133,7 @@ export async function createDataSet () {
   // Ask if you want to monitor the progress
   const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the dataset creation ?', ['YES', 'NO'])
   // Create the dataset
-  const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', getProp('Discover_Folder') + '/Datasets', '.json', { skipInjectingRegion: true }) as CreateDataSetResult
+  const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', getProp('Discover_Folder') + '/Datasets', '.json', { skipInjectingRegion: SKIP_REGION }) as CreateDataSetResult
   if (dsResponse.status === 'OK') {
     log(INFO, 'Dataset Created with id: ' + col.green(dsResponse.datasetId))
     if (doProgress) {
@@ -138,7 +145,7 @@ export async function createDataSet () {
       while (i < 1500 && !isDone) {
         i++
         // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
-        const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, { skipInjectingRegion: true }) as PreviewStatus
+        const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, { skipInjectingRegion: SKIP_REGION }) as PreviewStatus
         if (dsStatus.Progression) {
           if (progress !== dsStatus.Progression) {
             log(INFO, 'Dataset Creation Status', col.green((dsStatus.Progression + '%').padStart(4)) + ' Message: ' + col.green(dsStatus.Message))
@@ -162,7 +169,22 @@ export async function createDataSet () {
 export async function removeDataSet () {
   log(INFO, 'Removing a dataset...')
   prepDiscoverProps()
-
+  const datasets = await getDataSets(true)
+  const dsNameToRemove = await askMultipleChoiceQuestionSearch('Which data set do you want to remove ?', ['NONE', ...datasets.map(v => v.name!)])
+  if (dsNameToRemove.toLowerCase() !== 'none') {
+    // Chosen PA
+    const dsToRemove = datasets.find(v => v.name === dsNameToRemove)
+    if (dsToRemove) {
+      await CCOM.callTCA(CCOM.clURI.dis_dataset_detail + '/' + dsToRemove.datasetid, false, { method: 'DELETE', skipInjectingRegion: SKIP_REGION })
+      // console.log(response)
+      log(INFO, col.green('Successfully removed dataset: ') + col.blue(dsNameToRemove) + col.reset(' (id: ' + dsToRemove.datasetid + ')'))
+    } else {
+      log(ERROR, 'Dataset ' + dsNameToRemove + ' Not found...')
+    }
+  } else {
+    logCancel(true)
+  }
+  // https://discover.labs.tibcocloud.com/catalog/dataset/clidataset-ef9fdb89-5189-4c3e-a480-1636c13c7b16
   // TODO: Implement
 
   // DELETE
@@ -171,10 +193,11 @@ export async function removeDataSet () {
 
 export async function runProcessAnalysis () {
   log(INFO, 'Running Process Analysis...')
+  prepDiscoverProps()
   // Ask if you want to monitor the progress
   const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the process mining ?', ['YES', 'NO'])
   // Create the dataset
-  const paResponse = await postToCloud(CCOM.clURI.dis_pa, 'What would you like to use to do process mining ?', getProp('Discover_Folder') + '/ProcessAnalysis', '.json', { skipInjectingRegion: true }) as CreateProcessAnalysisResult
+  const paResponse = await postToCloud(CCOM.clURI.dis_pa, 'What would you like to use to do process mining ?', getProp('Discover_Folder') + '/ProcessAnalysis', '.json', { skipInjectingRegion: SKIP_REGION }) as CreateProcessAnalysisResult
   if (paResponse.id) {
     log(INFO, 'Process Analysis created with id: ' + col.green(paResponse.id))
     if (doProgress) {
@@ -186,7 +209,7 @@ export async function runProcessAnalysis () {
       while (i < 4500 && !isDone) {
         i++
         // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
-        const pmStatus = await callTCA(CCOM.clURI.dis_pa_status + '/' + paResponse.id + '/status', false, { skipInjectingRegion: true }) as AnalysisStatus
+        const pmStatus = await callTCA(CCOM.clURI.dis_pa_status + '/' + paResponse.id + '/status', false, { skipInjectingRegion: SKIP_REGION }) as AnalysisStatus
         if (pmStatus.progression) {
           if (progress !== pmStatus.progression) {
             log(INFO, 'Process Mining Status', col.green((pmStatus.progression + '%').padStart(4)) + ' Message: ' + col.green(pmStatus.message))
@@ -207,17 +230,77 @@ export async function runProcessAnalysis () {
   }
 }
 
-export async function rerunProcessAnalysis () {
-  log(INFO, 'Re-Running Process Analysis...')
-  // TODO: Implement
+export async function actionProcessAnalysis () {
+  log(INFO, 'Action Process Analysis...')
+  prepDiscoverProps()
+  const prAnalysis = await getProcessAnalysis(false)
+  const conf = { ...CCOM.mappings.dis_pa }
+  conf.entries.push({
+    header: 'Available Actions',
+    field: 'actions'
+  })
+  const paTable = createTable(prAnalysis, conf, false)
+  pexTable(paTable, 'discover-process-analysis-actions', getPEXConfig(), true)
+  // console.log(prAnalysis)
+  await sleep(100)
+  const doAction = await askMultipleChoiceQuestionSearch('Which action do you wish to execute on a Process Analysis ?', ['NONE', ...getAvailableActions(prAnalysis)])
+  if (doAction.toLowerCase() !== 'none') {
+    await sleep(100)
+    const doActionPA = await askMultipleChoiceQuestionSearch('Which Process Analysis do you wish to ' + col.blue(doAction) + ' ?', ['NONE', ...getAvailablePAforAction(prAnalysis, doAction).map(v => v.data.name)])
+    if (doActionPA.toLowerCase() !== 'none') {
+      // Chosen PA
+      const paChosen = prAnalysis.find(v => v.data.name === doActionPA)
+      if (paChosen) {
+        if (paChosen.actions && paChosen.actions.indexOf(doAction) > -1) {
+          log(INFO, 'Running ' + col.blue(doAction) + ' on Process Analysis: ', col.blue(paChosen.data.name) + ' (with id: ' + paChosen.id + ')')
+          // POST
+          // https://discover.labs.tibcocloud.com/repository/analysis/4c61e5ae-fc5e-4cab-b78b-834534069886-1624635032381/action/Archive
+          const actionResult = await callTCA(CCOM.clURI.dis_pa + '/' + paChosen.id + '/action/' + doAction, false, { skipInjectingRegion: SKIP_REGION, method: 'POST' })
+          // console.log(actionResult)
+          if (actionResult) {
+            log(INFO, col.green('Successfully completed ' + doAction + '...'))
+          } else {
+            log(ERROR, 'Error Running action: ', actionResult)
+          }
+        } else {
+          log(ERROR, 'Action (' + doAction + ') not allowed on Process Analysis: ', paChosen.data.name + ' (with id: ' + paChosen.id + ')')
+        }
+      } else {
+        log(ERROR, 'Process Analysis not found: ', doActionPA)
+      }
+    } else {
+      logCancel(true)
+    }
+  } else {
+    logCancel(true)
+  }
 }
 
-export async function archiveProcessAnalysis () {
-  log(INFO, 'Archiving Process Analysis...')
-  // TODO: Implement
+function getAvailablePAforAction (prAnalysis: Analysis[], action: string) {
+  const re:Analysis[] = []
+  for (const prA of prAnalysis) {
+    if (prA.actions && prA.actions.length > 0) {
+      if (prA.actions.indexOf(action) > -1) {
+        re.push(prA)
+      }
+    }
+  }
+  return re
 }
 
-export async function removeProcessAnalysis () {
-  log(INFO, 'Removing Process Analysis...')
-  // TODO: Implement
+function getAvailableActions (prAnalysis: Analysis[]) {
+  const actions = []
+  for (const prA of prAnalysis) {
+    if (prA.actions && prA.actions.length > 0) {
+      for (const action of prA.actions) {
+        if (!(actions.indexOf(action) > -1)) {
+          // We don't allow for the edit action
+          if (action !== 'Edit') {
+            actions.push(action)
+          }
+        }
+      }
+    }
+  }
+  return actions
 }
