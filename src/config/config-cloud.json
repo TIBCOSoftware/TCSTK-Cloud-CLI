@@ -477,10 +477,6 @@
           "field": "type"
         },
         {
-          "header": "Description",
-          "field": "description"
-        },
-        {
           "header": "Analytic Report",
           "field": "spotfireLocation"
         },
