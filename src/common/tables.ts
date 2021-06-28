@@ -147,14 +147,14 @@ export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrin
 
 export function showTableFromTobject (tObject: any, title?: string) {
   // console.table(tObject)
-  let serverMode = false
+  const serverMode = false
   let MAX_TERMINAL_LENGTH = 250
   if (process.stdout && process.stdout.columns) {
     MAX_TERMINAL_LENGTH = process.stdout.columns
   } else {
     // log(INFO, 'SERVER MODE')
     // TODO: When in Server mode make it look nice
-    serverMode = true
+    // serverMode = true
   }
   const Table = require('cli-table')
   let topLeft = '╔'
