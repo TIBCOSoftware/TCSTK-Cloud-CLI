@@ -562,7 +562,22 @@ export function getRelativeTime (millisec: number) {
   if (diff < 60000 && diff > 0) {
     return 'Less than a minute ago...'
   }
-  return millisec ? DateTime.fromMillis(millisec).toRelative() : ''
+  const re = millisec ? DateTime.fromMillis(millisec).toRelative() : ''
+  if (re) {
+    switch (true) {
+      case re.indexOf('days') > -1:
+        return col.blue(re)
+      case re.indexOf('month') > -1:
+        return col.cyan(re)
+      case re.indexOf('years') > -1:
+        return col.red(re)
+      case re.indexOf('year') > -1:
+        return col.yellow(re)
+      default:
+        return re
+    }
+  }
+  return re
 }
 
 // function to store a JSON to a file

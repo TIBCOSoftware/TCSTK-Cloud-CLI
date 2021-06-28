@@ -1,7 +1,8 @@
 import { Mapping, PEXConfig } from '../models/tcli-models'
-import { DEBUG, INFO, log } from './logging'
+import { DEBUG, INFO, log, WARNING } from './logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 import { col, doesFileExist, getOrganization, getRelativeTime, mkdirIfNotExist } from './common-functions'
+import { readableSize } from './cloud-communications'
 // import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
 const _ = require('lodash')
@@ -20,16 +21,19 @@ export function createTable (arrayObject: any[], config: Mapping, doShowTable: b
     // TODO: Change to debug
     // log(INFO, rowNumber + ') APP NAME: ' + response.body[element].name  + ' Published Version: ' +  response.body[element].publishedVersion + ' (Latest:' + response.body[element].publishedVersion + ')') ;
     for (const conf of config.entries) {
-      if (conf.format && conf.format.toLowerCase() === 'date') {
-        /*
-        const options: DateTimeFormatOptions = {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        } */
-        // tableRow[conf.header] = new Date(_.get(arrayObject[element], conf.field)).toLocaleDateString('en-US', options)
-        tableRow[conf.header] = getRelativeTime(new Date(_.get(arrayObject[element], conf.field)).getTime())
+      if (conf.format) {
+        // FILESIZE
+        switch (conf.format.toLowerCase()) {
+          case 'date':
+            tableRow[conf.header] = getRelativeTime(new Date(_.get(arrayObject[element], conf.field)).getTime())
+            break
+          case 'filesize':
+            tableRow[conf.header] = readableSize(_.get(arrayObject[element], conf.field))
+            break
+          default:
+            log(WARNING, 'Unrecognized table element format: ' + conf.format)
+            tableRow[conf.header] = _.get(arrayObject[element], conf.field)
+        }
       } else {
         tableRow[conf.header] = _.get(arrayObject[element], conf.field)
       }
@@ -161,7 +165,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
   }
   let headerArray: string[] = []
   let colAlignArray: string[] = []
-  const maxColLengthObject:any = {}
+  const maxColLengthObject: any = {}
   let ind = 0
   for (const row of Object.keys(tObject)) {
     ind++
@@ -174,7 +178,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
       if (!maxColLengthObject.NR || maxColLengthObject.NR < indexLength) {
         maxColLengthObject.NR = indexLength
       }
-      if (tObject[row][col]) {
+      if (tObject[row][col] !== undefined) {
         const headLength = (col + '').length
         const tempColLength = (tObject[row][col] + '').length
         let maxL = headLength
@@ -239,8 +243,21 @@ export function showTableFromTobject (tObject: any, title?: string) {
     index++
     const rowArray = [index + '']
     for (const el of Object.keys(tObject[row])) {
-      if (tObject[row][el]) {
-        rowArray.push(tObject[row][el])
+      if (tObject[row][el] !== undefined && tObject[row][el] !== null) {
+        switch (typeof tObject[row][el]) {
+          case 'boolean':
+            if (tObject[row][el]) {
+              rowArray.push(col.green(tObject[row][el]))
+            } else {
+              rowArray.push(col.red(tObject[row][el]))
+            }
+            break
+          case 'number':
+            rowArray.push(col.yellow(tObject[row][el]))
+            break
+          default:
+            rowArray.push(tObject[row][el])
+        }
       } else {
         rowArray.push('')
       }

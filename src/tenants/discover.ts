@@ -11,6 +11,8 @@ import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch } from '../c
 import { CreateDataSetResult, CreateProcessAnalysisResult } from '../models/discover/CustomModels'
 import { PreviewStatus } from '../models/discover/previewStatus'
 import { AnalysisStatus } from '../models/discover/analysisStatus'
+import { DatasetDetail } from '../models/discover/datasetDetail'
+
 const CCOM = require('../common/cloud-communications')
 
 export function prepDiscoverProps () {
@@ -24,7 +26,7 @@ export function prepDiscoverProps () {
 }
 
 // TODO: Show details
-export async function getProcessAnalysis (showTable: boolean) : Promise<Analysis[]> {
+export async function getProcessAnalysis (showTable: boolean): Promise<Analysis[]> {
   log(INFO, 'Getting process analysis...')
   // https://discover.labs.tibcocloud.com/repository/analysis
   const disPA = await callTCA(CCOM.clURI.dis_pa, false, { skipInjectingRegion: true }) as Analysis[]
@@ -42,6 +44,10 @@ export async function getDataSets (showTable: boolean): Promise<Dataset[]> {
   const paTable = createTable(disDS, CCOM.mappings.dis_ds, false)
   pexTable(paTable, 'discover-datasets', getPEXConfig(), showTable)
   return disDS
+}
+
+async function getDataSetDetail (dataSetId: string): Promise<DatasetDetail> {
+  return await callTCA(CCOM.clURI.dis_dataset_detail + '/' + dataSetId, false, { skipInjectingRegion: true }) as DatasetDetail
 }
 
 // TODO: Show details
@@ -77,11 +83,13 @@ export async function exportDataSets () {
   const dsToExport = await askMultipleChoiceQuestionSearch('Which datasets would you like to export ?', ['NONE', 'ALL', ...dataSets.map(v => v.name!)])
   if (dsToExport.toLowerCase() !== 'none') {
     if (dsToExport.toLowerCase() === 'all') {
-      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/ALL_Datasets.json', dataSets)
+      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/ALL_Datasets_Summary.json', dataSets)
       for (const ds of dataSets) {
+        storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '_details.json', await getDataSetDetail(ds.datasetid!))
         storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '.json', ds)
       }
     } else {
+      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '_details.json', await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
       storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '.json', dataSets.find(v => v.name === dsToExport))
     }
   } else {
@@ -98,13 +106,13 @@ export async function uploadDataSetFile () {
 
   // upload-discover-dataset-file, upload-discover-file (https://discover.labs.tibcocloud.com/files/01dzbgce4xgn899zq7ns238vk3)(orgID)
   /*
-  newline: \r\n
-  encoding: UTF8
-  separator: ,
-  quoteChar: "
-  escapeChar: \
-  csv: (binary)
-   */
+    newline: \r\n
+    encoding: UTF8
+    separator: ,
+    quoteChar: "
+    escapeChar: \
+    csv: (binary)
+     */
 }
 
 export async function removeDataSetFile () {

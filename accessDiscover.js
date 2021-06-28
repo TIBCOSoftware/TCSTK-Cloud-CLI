@@ -11,7 +11,7 @@ function accessDiscover (useDiscover) {
   }
   const dataForFile = JSON.stringify({
     cliTasks: tasks
-  })
+  }, null, 2)
   fs.writeFileSync('./src/config/config-cli-task.json', dataForFile, 'utf8')
 }
 

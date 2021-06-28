@@ -535,14 +535,14 @@ export function readableSize (sizeBytes: number) {
   } else {
     const fsKb = Math.round(sizeBytes / 1024 * 100) / 100
     if (fsKb < 1024) {
-      return fsKb + ' KB'
+      return col.blue(fsKb + ' KB')
     } else {
       const fsMb = Math.round(fsKb / 1024 * 100) / 100
       if (fsMb < 1024) {
-        return fsMb + ' MB'
+        return col.yellow(fsMb + ' MB')
       } else {
         const fsGb = Math.round(fsMb / 1024 * 100) / 100
-        return fsGb + ' GB'
+        return col.red(fsGb + ' GB')
       }
     }
   }
