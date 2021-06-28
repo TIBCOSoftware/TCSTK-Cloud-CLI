@@ -15,4 +15,4 @@ function accessDiscover (useDiscover) {
   fs.writeFileSync('./src/config/config-cli-task.json', dataForFile, 'utf8')
 }
 
-accessDiscover(true)
+accessDiscover(false)

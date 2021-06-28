@@ -1025,7 +1025,7 @@
     },
     "show-discover-process-analysis": {
       "description": "Show's the process analysis of Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverPAWrapper",
@@ -1040,7 +1040,7 @@
     },
     "show-discover-datasets": {
       "description": "Show's the datasets of Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSWrapper",
@@ -1056,7 +1056,7 @@
     },
     "show-discover-templates": {
       "description": "Show's the templates of Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverTempWrapper",
@@ -1072,7 +1072,7 @@
     },
     "show-discover-dataset-files": {
       "description": "Show's a list of dataset files for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSFilesWrapper",
@@ -1088,7 +1088,7 @@
     },
     "export-discover-datasets": {
       "description": "Exports the datasets of Project Discover into JSON files",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "exportDiscoverDSWrapper",
@@ -1104,7 +1104,7 @@
     },
     "upload-discover-dataset-file": {
       "description": "Uploads a CSV file for analysis in Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "uploadDiscoverDSFileWrapper",
@@ -1119,7 +1119,7 @@
     },
     "remove-discover-dataset-file": {
       "description": "Removes a Dataset file in Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverDSFileWrapper",
@@ -1134,7 +1134,7 @@
     },
     "create-discover-dataset": {
       "description": "Create a Dataset for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "createDiscoverDSWrapper",
@@ -1149,7 +1149,7 @@
     },
     "remove-discover-dataset": {
       "description": "Removes a Dataset for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverDSWrapper",
@@ -1164,7 +1164,7 @@
     },
     "run-discover-process-analysis": {
       "description": "Runs a Process Analysis for Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "runDiscoverPAWrapper",
@@ -1180,7 +1180,7 @@
     },
     "action-discover-process-analysis": {
       "description": "Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover",
-      "enabled": true,
+      "enabled": false,
       "internal": false,
       "multipleInteraction": true,
       "task": "actionDiscoverPAWrapper",
