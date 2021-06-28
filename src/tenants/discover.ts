@@ -12,6 +12,7 @@ import { CreateDataSetResult, CreateProcessAnalysisResult } from '../models/disc
 import { PreviewStatus } from '../models/discover/previewStatus'
 import { AnalysisStatus } from '../models/discover/analysisStatus'
 import { DatasetDetail } from '../models/discover/datasetDetail'
+import path from 'path'
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
@@ -29,7 +30,7 @@ export function prepDiscoverProps () {
 // TODO: Show details
 export async function getProcessAnalysis (showTable: boolean): Promise<Analysis[]> {
   log(INFO, 'Getting process analysis...')
-  prepDiscoverProps ()
+  prepDiscoverProps()
   // https://discover.labs.tibcocloud.com/repository/analysis
   const disPA = await callTCA(CCOM.clURI.dis_pa, false, { skipInjectingRegion: SKIP_REGION }) as Analysis[]
   const paTable = createTable(disPA, CCOM.mappings.dis_pa, false)
@@ -40,7 +41,7 @@ export async function getProcessAnalysis (showTable: boolean): Promise<Analysis[
 // TODO: Show details
 export async function getDataSets (showTable: boolean): Promise<Dataset[]> {
   log(INFO, 'Getting datasets...')
-  prepDiscoverProps ()
+  prepDiscoverProps()
   // https://discover.labs.tibcocloud.com/catalog/datasets
   const disDS = await callTCA(CCOM.clURI.dis_ds, false, { skipInjectingRegion: SKIP_REGION }) as Dataset[]
   // console.log(disDS)
@@ -56,7 +57,7 @@ async function getDataSetDetail (dataSetId: string): Promise<DatasetDetail> {
 // TODO: Show details
 export async function getTemplates (showTable: boolean): Promise<Template[]> {
   log(INFO, 'Getting templates...')
-  prepDiscoverProps ()
+  prepDiscoverProps()
   // https://discover.labs.tibcocloud.com/visualisation/templates
   const disTEMP = await callTCA(CCOM.clURI.dis_temp, false, { skipInjectingRegion: SKIP_REGION }) as Template[]
   // console.log(disTEMP)
@@ -71,7 +72,7 @@ export async function getTemplates (showTable: boolean): Promise<Template[]> {
 // TODO: Show details
 export async function getDataSetFiles (showTable: boolean): Promise<DiscoverFileInfo[]> {
   log(INFO, 'Getting dataset file info...')
-  prepDiscoverProps ()
+  prepDiscoverProps()
   // https://discover.labs.tibcocloud.com/catalog/files
   const disFiles = await callTCA(CCOM.clURI.dis_files, false, { skipInjectingRegion: SKIP_REGION }) as DiscoverFileInfo[]
   // console.log(disFiles)
@@ -107,7 +108,7 @@ export async function exportDataSets () {
 // upload-discover-dataset-file
 export async function uploadDataSetFile () {
   log(INFO, 'Uploading a dataset file...')
-  prepDiscoverProps ()
+  prepDiscoverProps()
   // TODO: Implement
 
   // upload-discover-dataset-file, upload-discover-file (https://discover.labs.tibcocloud.com/files/01dzbgce4xgn899zq7ns238vk3)(orgID)
@@ -123,7 +124,7 @@ export async function uploadDataSetFile () {
 
 export async function removeDataSetFile () {
   log(INFO, 'Removing a dataset file...')
-  prepDiscoverProps ()
+  prepDiscoverProps()
   // TODO: Implement
 }
 
@@ -133,7 +134,7 @@ export async function createDataSet () {
   // Ask if you want to monitor the progress
   const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the dataset creation ?', ['YES', 'NO'])
   // Create the dataset
-  const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', getProp('Discover_Folder') + '/Datasets', '.json', { skipInjectingRegion: SKIP_REGION }) as CreateDataSetResult
+  const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', path.join(getProp('Discover_Folder'), 'Datasets'), '.json', { skipInjectingRegion: SKIP_REGION }) as CreateDataSetResult
   if (dsResponse.status === 'OK') {
     log(INFO, 'Dataset Created with id: ' + col.green(dsResponse.datasetId))
     if (doProgress) {
