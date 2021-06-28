@@ -13,6 +13,7 @@ import { CallConfig, LoginCookie, MappingGroup } from '../models/tcli-models'
 import { askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
 import { DEBUG, ERROR, INFO, log, logCancel, logO, WARNING } from './logging'
 import { getProp, setProperty } from './property-file-management'
+import path from 'path'
 
 declare let global: Global
 
@@ -386,8 +387,8 @@ export async function postToCloud (endpoint: string, question?: string, fileFold
         return await postFileToCloud(endpoint, await askQuestion('Provide the location of the file for the message:'), customConfig)
       } else {
         // user has provided the file
-        // return await postFileToCloud(endpoint, path.join('./', fileFolder!, typeForPost), customConfig)
-        return await postFileToCloud(endpoint, fileFolder! + '/' + typeForPost, customConfig)
+        return await postFileToCloud(endpoint, path.join(fileFolder!, typeForPost), customConfig)
+        // return await postFileToCloud(endpoint, fileFolder! + '/' + typeForPost, customConfig)
       }
     }
   } else {
