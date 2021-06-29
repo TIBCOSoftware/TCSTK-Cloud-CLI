@@ -169,7 +169,7 @@ export async function promptTask (stDir: string, cwdDir: string): Promise<void> 
       return promptTask(stDir, cwdDir)
     }
     if (com === 'browse-tasks' || com === BACK) {
-      const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory)
+      const chosenCat = await askMultipleChoiceQuestionSearch(CAT_QUESTION, gCategory)
       loadTaskDesc(chosenCat)
       return promptTask(stDir, cwdDir)
     }
@@ -223,7 +223,7 @@ export async function promptTask (stDir: string, cwdDir: string): Promise<void> 
 export async function browseTasks () {
   // Load categories
   loadTaskDesc('ALL')
-  const chosenCat = await askMultipleChoiceQuestion(CAT_QUESTION, gCategory)
+  const chosenCat = await askMultipleChoiceQuestionSearch(CAT_QUESTION, gCategory)
   mainT(chosenCat)
 }
 
@@ -735,7 +735,7 @@ export async function showDiscoverPAWrapper () {
 
 export async function showDiscoverDSWrapper () {
   const DISCOVER = require('./tenants/discover')
-  await DISCOVER.getDataSets(true)
+  await DISCOVER.showDataSets()
 }
 
 export async function showDiscoverTempWrapper () {

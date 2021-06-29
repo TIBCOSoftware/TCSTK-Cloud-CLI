@@ -12,6 +12,33 @@ const _ = require('lodash')
 
 // Look at:
 // https://www.npmjs.com/package/cli-table
+export function createTableFromObject (objectForTable: any) {
+  console.log(objectForTable)
+  // console.table(eachRecursive(objectForTable, []))
+}
+
+/*
+function eachRecursive (obj: any, table: any, base?:string): any {
+  let returnTable
+  for (const k in obj) {
+    if (typeof obj[k] === 'object' && obj[k] !== null) {
+      if (base) {
+        returnTable = eachRecursive(obj[k], base + '.' + k)
+      } else {
+        returnTable = eachRecursive(obj[k], k)
+      }
+    } else {
+      if (base) {
+        console.log(base + '|' + k + ':' + obj[k])
+        return createTableValue(base + '|' + k, obj[k], table)
+      } else {
+        console.log(col.blue(k) + ':' + obj[k])
+        return createTableValue(col.blue(k), obj[k], table)
+      }
+    }
+  }
+  return returnTable
+} */
 
 export function createTable (arrayObject: any[], config: Mapping, doShowTable: boolean): any {
   const tableObject: any = {}

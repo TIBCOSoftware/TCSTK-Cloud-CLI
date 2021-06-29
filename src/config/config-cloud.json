@@ -431,16 +431,8 @@
     "dis_ds": {
       "entries": [
         {
-          "header": "Id",
-          "field": "datasetid"
-        },
-        {
           "header": "Name",
           "field": "name"
-        },
-        {
-          "header": "Description",
-          "field": "description"
         },
         {
           "header": "Created",

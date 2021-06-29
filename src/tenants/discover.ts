@@ -1,7 +1,7 @@
-import { ERROR, INFO, log, logCancel } from '../common/logging'
+import {ERROR, INFO, log, logCancel, WARNING} from '../common/logging'
 import { callTCA, postToCloud } from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
-import { createTable, getPEXConfig, pexTable } from '../common/tables'
+import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
 import { Dataset } from '../models/discover/dataset'
 import { Template } from '../models/discover/template'
 import { DiscoverFileInfo } from '../models/discover/FileInfo'
@@ -38,8 +38,8 @@ export async function getProcessAnalysis (showTable: boolean): Promise<Analysis[
   return disPA
 }
 
-// TODO: Show details
-export async function getDataSets (showTable: boolean): Promise<Dataset[]> {
+// Function to get all the datasets
+async function getDataSets (showTable: boolean): Promise<Dataset[]> {
   log(INFO, 'Getting datasets...')
   prepDiscoverProps()
   // https://discover.labs.tibcocloud.com/catalog/datasets
@@ -50,6 +50,25 @@ export async function getDataSets (showTable: boolean): Promise<Dataset[]> {
   return disDS
 }
 
+// Show datasets and possibly details
+export async function showDataSets () {
+  const dataSets = await getDataSets(true)
+  const dsToExport = await askMultipleChoiceQuestionSearch('For which dataset would you like to see the details ?', ['NONE', 'ALL', ...dataSets.map(v => v.name!)])
+  if (dsToExport.toLowerCase() !== 'none') {
+    if (dsToExport.toLowerCase() === 'all') {
+      for (const ds of dataSets) {
+        console.log(await getDataSetDetail(ds.datasetid!))
+      }
+    } else {
+      // console.table(await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
+      createTableFromObject(await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
+    }
+  } else {
+    logCancel(true)
+  }
+}
+
+// Function to get details for a dataset
 async function getDataSetDetail (dataSetId: string): Promise<DatasetDetail> {
   return await callTCA(CCOM.clURI.dis_dataset_detail + '/' + dataSetId, false, { skipInjectingRegion: SKIP_REGION }) as DatasetDetail
 }
@@ -76,7 +95,6 @@ export async function getDataSetFiles (showTable: boolean): Promise<DiscoverFile
   // https://discover.labs.tibcocloud.com/catalog/files
   const disFiles = await callTCA(CCOM.clURI.dis_files, false, { skipInjectingRegion: SKIP_REGION }) as DiscoverFileInfo[]
   // console.log(disFiles)
-  // TODO: Make a FILESIZE format, to display the filesize nicely
   const paTable = createTable(disFiles, CCOM.mappings.dis_files, false)
   pexTable(paTable, 'discover-dataset-files', getPEXConfig(), showTable)
   return disFiles
@@ -147,19 +165,27 @@ export async function createDataSet () {
         i++
         // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
         const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, { skipInjectingRegion: SKIP_REGION }) as PreviewStatus
-        if (dsStatus.Progression) {
+        // console.log(dsStatus)
+        if (dsStatus.Progression || dsStatus.Progression === 0) {
           if (progress !== dsStatus.Progression) {
             log(INFO, 'Dataset Creation Status', col.green((dsStatus.Progression + '%').padStart(4)) + ' Message: ' + col.green(dsStatus.Message))
             progress = dsStatus.Progression
           }
-          if (progress > 99) {
+          if (dsStatus.Progression > 99) {
             isDone = true
           }
-          if (progress === 0 && i > 25) {
-            log(ERROR, 'There was an error creating the dataset', dsStatus)
+          if ((dsStatus.Progression === 0 && i > 10) || dsStatus.Level === 'ERROR') {
+            if (dsStatus.Message) {
+              log(ERROR, 'There was an error creating the dataset: ', dsStatus.Message)
+            } else {
+              log(ERROR, 'There was an UNKNOWN error creating the dataset: ', dsStatus)
+            }
+            process.exit(1)
           }
-          await sleep(200)
+        } else {
+          log(WARNING, 'No progress reported...', dsStatus)
         }
+        await sleep(200)
       }
     }
   } else {
@@ -211,19 +237,24 @@ export async function runProcessAnalysis () {
         i++
         // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
         const pmStatus = await callTCA(CCOM.clURI.dis_pa_status + '/' + paResponse.id + '/status', false, { skipInjectingRegion: SKIP_REGION }) as AnalysisStatus
-        if (pmStatus.progression) {
+        if (pmStatus.progression || pmStatus.progression === 0) {
           if (progress !== pmStatus.progression) {
             log(INFO, 'Process Mining Status', col.green((pmStatus.progression + '%').padStart(4)) + ' Message: ' + col.green(pmStatus.message))
             progress = pmStatus.progression
           }
-          if (progress > 99) {
+          if (pmStatus.progression > 99) {
             isDone = true
           }
-          if (progress === 0 && i > 25) {
-            log(ERROR, 'There was an error creating the process analysis', pmStatus)
+          if ((pmStatus.progression === 0 && i > 600) || pmStatus.level === 'ERROR') {
+            if (pmStatus.message) {
+              log(ERROR, 'There was an error creating the process analysis', pmStatus.message)
+            } else {
+              log(ERROR, 'There was an UNKNOWN error creating the process analysis: ', pmStatus)
+            }
+            process.exit(1)
           }
-          await sleep(200)
         }
+        await sleep(200)
       }
     }
   } else {
