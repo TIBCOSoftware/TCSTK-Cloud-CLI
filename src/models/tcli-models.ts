@@ -23,6 +23,11 @@ export interface TCLITask {
     taskFullName?: string;
 }
 
+export interface Replacement {
+    from: string;
+    to: string;
+}
+
 export interface Template {
     name: string;
     displayName: string;
@@ -37,11 +42,6 @@ export interface Template {
     PostCommands: string[];
     PostCommandsWin: any[];
     replacements: Replacement[];
-}
-
-export interface Replacement {
-    from: string;
-    to: string;
 }
 
 export interface Entry {
@@ -115,3 +115,8 @@ export interface LCookie {
 }
 
 export type LoginCookie = LCookie | 'ERROR' | null;
+
+export interface TableElement {
+    NAME: string;
+    VALUE: any;
+}

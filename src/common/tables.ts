@@ -1,4 +1,4 @@
-import { Mapping, PEXConfig } from '../models/tcli-models'
+import { Mapping, PEXConfig, TableElement } from '../models/tcli-models'
 import { DEBUG, INFO, log, WARNING } from './logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 import { col, doesFileExist, getOrganization, getRelativeTime, mkdirIfNotExist } from './common-functions'
@@ -10,35 +10,37 @@ const _ = require('lodash')
 // It's undefined on Jenkins, so use width 150
 // Cloning into 'C:\Program Files (x86)\Jenkins\workspace\CLOUD STARTERS\CS Run CLI Testcases and Publish\tmp\TCSTK-Cloud-CLI\test\tmpTest/CS-FORM-TEST-CM-
 
-// Look at:
-// https://www.npmjs.com/package/cli-table
-export function createTableFromObject (objectForTable: any) {
-  console.log(objectForTable)
-  // console.table(eachRecursive(objectForTable, []))
+export function createTableFromObject (objectForTable: any, title: string) {
+  const tableArray = eachRecursive(objectForTable, [])
+  tableArray.sort(compareTable)
+  showTableFromTobject(tableArray, title)
 }
 
-/*
-function eachRecursive (obj: any, table: any, base?:string): any {
+function compareTable (a:TableElement, b:TableElement) {
+  return ('' + a.NAME).localeCompare(b.NAME)
+}
+
+function eachRecursive (obj: any, table: any, base?:string): TableElement[] {
   let returnTable
   for (const k in obj) {
     if (typeof obj[k] === 'object' && obj[k] !== null) {
       if (base) {
-        returnTable = eachRecursive(obj[k], base + '.' + k)
+        returnTable = eachRecursive(obj[k], table, base + '.' + k)
       } else {
-        returnTable = eachRecursive(obj[k], k)
+        returnTable = eachRecursive(obj[k], table, k)
       }
     } else {
       if (base) {
-        console.log(base + '|' + k + ':' + obj[k])
-        return createTableValue(base + '|' + k, obj[k], table)
+        // console.log(base + '|' + k + ':' + obj[k])
+        returnTable = createTableValue(col.cyan(base) + '.' + k, obj[k], table)
       } else {
-        console.log(col.blue(k) + ':' + obj[k])
-        return createTableValue(col.blue(k), obj[k], table)
+        // console.log(col.blue(k) + ':' + obj[k])
+        returnTable = createTableValue(col.blue(k), obj[k], table)
       }
     }
   }
   return returnTable
-} */
+}
 
 export function createTable (arrayObject: any[], config: Mapping, doShowTable: boolean): any {
   const tableObject: any = {}
@@ -88,7 +90,15 @@ export function createTableValue (name: string, value: any, table?: any, headerN
   table = table || []
   const entry: any = {}
   entry[hName] = name
-  entry[hValue] = value
+  if(name && (name.toLowerCase().indexOf('date') > -1 || name.toLowerCase().indexOf('time') > -1)){
+    try {
+      entry[hValue] = getRelativeTime(new Date(value).getTime())
+    } catch (e) {
+      entry[hValue] = value
+    }
+  } else {
+    entry[hValue] = value
+  }
   table[table.length] = entry
   return table
 }
@@ -175,7 +185,7 @@ export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrin
 export function showTableFromTobject (tObject: any, title?: string) {
   // console.table(tObject)
   const serverMode = false
-  let MAX_TERMINAL_LENGTH = 190
+  let MAX_TERMINAL_LENGTH = 150
   if (process.stdout && process.stdout.columns) {
     MAX_TERMINAL_LENGTH = process.stdout.columns
   } else {

@@ -1,4 +1,4 @@
-import {ERROR, INFO, log, logCancel, WARNING} from '../common/logging'
+import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
 import { callTCA, postToCloud } from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
 import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
@@ -61,7 +61,8 @@ export async function showDataSets () {
       }
     } else {
       // console.table(await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
-      createTableFromObject(await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
+      const ds = dataSets.find(v => v.name === dsToExport)!
+      createTableFromObject(await getDataSetDetail(ds.datasetid!), 'DATASET - ' + ds.name)
     }
   } else {
     logCancel(true)
