@@ -57,7 +57,9 @@ export async function showDataSets () {
   if (dsToExport.toLowerCase() !== 'none') {
     if (dsToExport.toLowerCase() === 'all') {
       for (const ds of dataSets) {
-        console.log(await getDataSetDetail(ds.datasetid!))
+        // console.log(await getDataSetDetail(ds.datasetid!))
+        // const dsT = dataSets.find(v => v.name === dsToExport)!
+        createTableFromObject(await getDataSetDetail(ds.datasetid!), 'DATASET - ' + ds.name)
       }
     } else {
       // console.table(await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
@@ -212,11 +214,6 @@ export async function removeDataSet () {
   } else {
     logCancel(true)
   }
-  // https://discover.labs.tibcocloud.com/catalog/dataset/clidataset-ef9fdb89-5189-4c3e-a480-1636c13c7b16
-  // TODO: Implement
-
-  // DELETE
-  // https://discover.labs.tibcocloud.com/catalog/dataset/clidataset-525cd81f-c59e-4a60-b910-7b5a097e437d
 }
 
 export async function runProcessAnalysis () {
