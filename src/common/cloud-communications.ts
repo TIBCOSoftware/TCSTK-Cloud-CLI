@@ -398,7 +398,7 @@ export async function postToCloud (endpoint: string, question?: string, fileFold
 }
 
 export async function postFileToCloud (endpoint: string, fileLocation: string, customConfig? :CallConfig) {
-  log(INFO, 'Posting file to the cloud: ', fileLocation, ' (endpoint: ' + endpoint + ')')
+  log(DEBUG, 'Posting file to the cloud: ', fileLocation, ' (endpoint: ' + endpoint + ')')
   // Load the file and post it to the cloud (if it's a JSON file, parse the json)
   const fs = require('fs')
   let fileData = fs.readFileSync(fileLocation)

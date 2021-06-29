@@ -148,7 +148,7 @@ export function pexTable (tObject: any, tName: string, config: PEXConfig, doPrin
 export function showTableFromTobject (tObject: any, title?: string) {
   // console.table(tObject)
   const serverMode = false
-  let MAX_TERMINAL_LENGTH = 250
+  let MAX_TERMINAL_LENGTH = 190
   if (process.stdout && process.stdout.columns) {
     MAX_TERMINAL_LENGTH = process.stdout.columns
   } else {

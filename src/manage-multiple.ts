@@ -206,7 +206,7 @@ export function processMultipleFile () {
           showTask = false
           command += 'node ' + tObj.SV
         }
-        log(INFO, logT + 'Command (before replacing): ' + command)
+        log(DEBUG, logT + 'Command (before replacing): ' + command)
         // command = replaceGlobal(replaceAtSign(command, currLoc + propFile))
         command = replaceAtSign(command, currLoc + propFile)
         if (showTask) {
