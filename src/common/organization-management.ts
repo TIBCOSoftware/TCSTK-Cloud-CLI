@@ -12,7 +12,7 @@ import {
 } from './tables'
 import { ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestionSearch } from './user-interaction'
-import { SelectedAccount } from '../models/organizations'
+import { Accounts, SelectedAccount } from '../models/organizations'
 import { getOAUTHDetails } from './oauth'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 import { DEBUG, ERROR, INFO, log, logCancel } from './logging'
@@ -218,4 +218,25 @@ export async function getClientIdForOrg (accountId: string) {
   // Invalidate the login after using Re-Authorize
   CCOM.invalidateLogin()
   return clientIDResponse.ClientID
+}
+
+export async function getCurrentOrgId () {
+  let re = ''
+  const organizations = await getOrganizations() as Accounts
+  const currentOrgName = await getOrganization()
+  // console.log(currentOrgName)
+  for (const org of organizations) {
+    if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
+      for (const childOrg of org.childAccountsInfo) {
+        if (childOrg.accountDisplayName === currentOrgName) {
+          re = childOrg.subscriptionId
+        }
+      }
+    }
+    if (org.accountDisplayName === currentOrgName) {
+      re = org.subscriptionId
+    }
+  }
+  // console.log('Current org ID: ', re)
+  return re
 }

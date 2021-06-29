@@ -12,12 +12,11 @@ import {
 } from '../common/tables'
 import { ORGFile, ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
-import { getClientIdForOrg, getOrganizations } from './organization-management'
+import { getClientIdForOrg, getCurrentOrgId, getOrganizations } from './organization-management'
 import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from './logging'
 import { getOAUTHDetails, parseOAUTHToken, setOAUTHDetails } from './oauth'
 import { getSharedState, selectSharedState } from '../tenants/shared-state'
 import { listOnType, prepSpotfireProps } from '../tenants/spotfire'
-import { Accounts } from '../models/organizations'
 import path from 'path'
 
 const LA = require('../tenants/live-apps')
@@ -279,7 +278,6 @@ export async function generateCloudPropertyFiles () {
       doOauth = true
     }
   }
-
   let propForMFile = ''
   if (propFilesToGenerate !== 'NONE') {
     let genOne = true
@@ -423,10 +421,11 @@ export async function updateProperty () {
     }
     // Organization_ID
     if (vType.toLowerCase() === 'organization_id') {
-      pValue = ''
+      pValue = await getCurrentOrgId()
+      /*
       const organizations = await getOrganizations() as Accounts
       const currentOrgName = await getOrganization()
-      console.log(currentOrgName)
+      // console.log(currentOrgName)
       for (const org of organizations) {
         if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
           for (const childOrg of org.childAccountsInfo) {
@@ -438,9 +437,8 @@ export async function updateProperty () {
         if (org.accountDisplayName === currentOrgName) {
           pValue = org.subscriptionId
         }
-      }
+      } */
     }
-
     if (vType.toLowerCase() === 'sandboxid') {
       pValue = await LA.getProductionSandbox()
     }

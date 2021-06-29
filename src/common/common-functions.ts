@@ -241,6 +241,26 @@ export async function copyFileInteractiveIfNotExists (source: string, destinatio
   return doCopy
 }
 
+export function getFilesFromFolder (folder: string, folderFilter? : string): string[] {
+  const re:string[] = []
+  if (folder) {
+    const fs = require('fs')
+    fs.readdirSync(folder).forEach((file: string) => {
+      let doAdd = true
+      if (folderFilter) {
+        if (!(file.indexOf(folderFilter) > -1)) {
+          doAdd = false
+        }
+      }
+      if (doAdd) {
+        log(INFO, 'Found file: ' + col.blue(file))
+        re.push(file)
+      }
+    })
+  }
+  return re
+}
+
 // fs.copyFileSync(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName);
 
 // Update the cloud login properties

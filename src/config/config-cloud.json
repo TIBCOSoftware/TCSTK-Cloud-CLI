@@ -41,11 +41,13 @@
     "mes_durables": "messaging.cloud.tibco.com/tcm/v1/system/durables",
     "mes_clients": "messaging.cloud.tibco.com/tcm/v1/system/eftl/clients",
     "mes_keys": "messaging.cloud.tibco.com/tcm/ui/uiapi/v1/keysInfo",
+    "dis_host": "discover.labs.tibcocloud.com",
     "dis_pa": "discover.labs.tibcocloud.com/repository/analysis",
     "dis_ds": "discover.labs.tibcocloud.com/catalog/datasets",
     "dis_dataset_detail": "discover.labs.tibcocloud.com/catalog/dataset",
     "dis_temp": "discover.labs.tibcocloud.com/visualisation/templates",
     "dis_files": "discover.labs.tibcocloud.com/catalog/files",
+    "dis_file_upload": "/files",
     "dis_dataset_preview": "discover.labs.tibcocloud.com/catalog/dataset/preview",
     "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status",
     "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis"

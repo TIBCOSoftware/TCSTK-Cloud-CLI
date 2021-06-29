@@ -1,18 +1,19 @@
 import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
-import { callTCA, postToCloud } from '../common/cloud-communications'
+import { callTCA, postToCloud, uploadToCloud } from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
 import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
 import { Dataset } from '../models/discover/dataset'
 import { Template } from '../models/discover/template'
 import { DiscoverFileInfo } from '../models/discover/FileInfo'
 import { getProp, prepProp } from '../common/property-file-management'
-import { col, mkdirIfNotExist, sleep, storeJsonToFile } from '../common/common-functions'
-import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch } from '../common/user-interaction'
+import { col, getFilesFromFolder, mkdirIfNotExist, sleep, storeJsonToFile } from '../common/common-functions'
+import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
 import { CreateDataSetResult, CreateProcessAnalysisResult } from '../models/discover/CustomModels'
 import { PreviewStatus } from '../models/discover/previewStatus'
 import { AnalysisStatus } from '../models/discover/analysisStatus'
 import { DatasetDetail } from '../models/discover/datasetDetail'
 import path from 'path'
+import { getCurrentOrgId } from '../common/organization-management'
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
@@ -103,34 +104,44 @@ export async function getDataSetFiles (showTable: boolean): Promise<DiscoverFile
   return disFiles
 }
 
-export async function exportDataSets () {
-  log(INFO, 'Exporting Datasets...')
-  prepDiscoverProps()
-  const dataSets = await getDataSets(true)
-  const dsToExport = await askMultipleChoiceQuestionSearch('Which datasets would you like to export ?', ['NONE', 'ALL', ...dataSets.map(v => v.name!)])
-  if (dsToExport.toLowerCase() !== 'none') {
-    if (dsToExport.toLowerCase() === 'all') {
-      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/ALL_Datasets_Summary.json', dataSets)
-      for (const ds of dataSets) {
-        storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '_details.json', await getDataSetDetail(ds.datasetid!))
-        storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '.json', ds)
-      }
-    } else {
-      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '_details.json', await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
-      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '.json', dataSets.find(v => v.name === dsToExport))
-    }
-  } else {
-    logCancel(true)
-  }
-}
-
 // To run a test we need
 
 // upload-discover-dataset-file
 export async function uploadDataSetFile () {
   log(INFO, 'Uploading a dataset file...')
   prepDiscoverProps()
-  // TODO: Implement
+  const optionList = ['NONE', 'FILE', ...getFilesFromFolder(getProp('Discover_Folder') + '/DatasetFiles')]
+  log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
+  const typeForUpload = await askMultipleChoiceQuestionSearch('What would you like to upload as a Dataset File ? ', optionList)
+  if (typeForUpload.toLowerCase() !== 'none') {
+    // Set initial form data
+    const FD = require('form-data')
+    const formData = new FD()
+    // TODO: Make configurable
+    formData.append('newline', '\\r\\n')
+    formData.append('encoding', 'UTF8')
+    formData.append('separator', ',')
+    formData.append('quoteChar', '"')
+    formData.append('escapeChar', '\\')
+    if (typeForUpload.toLowerCase() === 'file') {
+      // if FILE, ask the user for the file location
+      const localFileLocation = await askQuestion('Provide the location of the file to upload as dataset file:')
+      if (localFileLocation && localFileLocation.toLowerCase() !== 'none') {
+        // TODO: HIER VERDER; FILE UPLOAD DOES NOT WORK
+        const result = await uploadToCloud('csv', localFileLocation, CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase(), CCOM.clURI.dis_host, formData, SKIP_REGION)
+        console.log(result)
+      } else {
+        logCancel(true)
+      }
+    } else {
+      // user has provided the file
+      const result = await uploadToCloud('csv', path.join(getProp('Discover_Folder'), 'DatasetFiles', typeForUpload), CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase(), CCOM.clURI.dis_host, formData, SKIP_REGION)
+      console.log(result)
+    }
+  } else {
+    // if NONE, end interaction
+    logCancel(true)
+  }
 
   // upload-discover-dataset-file, upload-discover-file (https://discover.labs.tibcocloud.com/files/01dzbgce4xgn899zq7ns238vk3)(orgID)
   /*
@@ -146,7 +157,21 @@ export async function uploadDataSetFile () {
 export async function removeDataSetFile () {
   log(INFO, 'Removing a dataset file...')
   prepDiscoverProps()
-  // TODO: Implement
+  const datasetFiles = await getDataSetFiles(true)
+  const dsfToRemove = datasetFiles.filter(v => !v.beingUsed).map(v => v.redisFileInfo.OriginalFilename!)
+  const dsFileNameToRemove = await askMultipleChoiceQuestionSearch('Which data-set file do you want to remove ?', ['NONE', ...dsfToRemove])
+  if (dsFileNameToRemove.toLowerCase() !== 'none') {
+    const dsToRemove = datasetFiles.find(v => v.redisFileInfo.OriginalFilename === dsFileNameToRemove)
+    if (dsToRemove) {
+      // https://discover.labs.tibcocloud.com/catalog/files/CallcenterExampleAutoTest.csv
+      await CCOM.callTCA(CCOM.clURI.dis_files + '/' + dsToRemove.redisFileInfo.OriginalFilename, true, { method: 'DELETE', skipInjectingRegion: SKIP_REGION })
+      log(INFO, col.green('Successfully removed dataset: ') + col.blue(dsFileNameToRemove) + col.reset(' (Location: ' + dsToRemove.redisFileInfo.FileLocation + ')'))
+    } else {
+      log(ERROR, 'Dataset ' + dsFileNameToRemove + ' Not found...')
+    }
+  } else {
+    logCancel(true)
+  }
 }
 
 export async function createDataSet () {
@@ -193,6 +218,27 @@ export async function createDataSet () {
     }
   } else {
     log(ERROR, 'Error creating dataset: ', dsResponse)
+  }
+}
+
+export async function exportDataSets () {
+  log(INFO, 'Exporting Datasets...')
+  prepDiscoverProps()
+  const dataSets = await getDataSets(true)
+  const dsToExport = await askMultipleChoiceQuestionSearch('Which datasets would you like to export ?', ['NONE', 'ALL', ...dataSets.map(v => v.name!)])
+  if (dsToExport.toLowerCase() !== 'none') {
+    if (dsToExport.toLowerCase() === 'all') {
+      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/ALL_Datasets_Summary.json', dataSets)
+      for (const ds of dataSets) {
+        storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '_details.json', await getDataSetDetail(ds.datasetid!))
+        storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '.json', ds)
+      }
+    } else {
+      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '_details.json', await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
+      storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '.json', dataSets.find(v => v.name === dsToExport))
+    }
+  } else {
+    logCancel(true)
   }
 }
 

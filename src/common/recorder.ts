@@ -1,7 +1,7 @@
 import { prepProp } from './property-file-management'
 
 export function prepRecorderProps () {
-  // Shared state filter (picked up from configuration if exists)
+  // Recording properties (picked up from configuration if exists)
   prepProp('Recorder_Use', 'YES', '------------------------\n' +
         '#  RECORDER\n' +
         '# ------------------------\n' +

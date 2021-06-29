@@ -1,6 +1,6 @@
 import {
   col,
-  getCurrentRegion, getOrganization, getRegion, isIterable,
+  getCurrentRegion, getFilesFromFolder, getOrganization, getRegion, isIterable,
   isOauthUsed,
   obfuscatePW,
   setOrganization
@@ -356,8 +356,10 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
 export async function postToCloud (endpoint: string, question?: string, fileFolder?: string, folderFilter?: string, customConfig? :CallConfig) {
   const useQuestion = question || 'What would you like to use for the post message ?'
   // If the folder is provided Get the files in the folder using the folder filter
-  const optionList = ['NONE', 'MESSAGE', 'FILE']
+  let optionList = ['NONE', 'MESSAGE', 'FILE']
   if (fileFolder) {
+    optionList = optionList.concat(getFilesFromFolder(fileFolder, folderFilter))
+    /*
     const fs = require('fs')
     fs.readdirSync(fileFolder).forEach((file: string) => {
       let doAdd = true
@@ -370,7 +372,7 @@ export async function postToCloud (endpoint: string, question?: string, fileFold
         log(INFO, 'Found file option for upload: ' + col.blue(file))
         optionList.push(file)
       }
-    })
+    }) */
   }
   // console.log(optionList)
   log(INFO, 'Use NONE to cancel, Use MESSAGE to paste a message and use FILE to use a custom file or choose a pre-provided file...')
@@ -430,10 +432,18 @@ export async function postMessageToCloud (endpoint: string, message: any, custom
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function uploadToCloud (formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host) {
+export async function uploadToCloud (formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host, initialFormData? : FormData, skipInjectingRegion?: boolean) {
+  let hostName = getCurrentRegion() + customHost
+  if (skipInjectingRegion) {
+    hostName = customHost
+    // console.log('Skipped region; host: ', hostName)
+  }
   return new Promise<void>(async (resolve, reject) => {
     const FD = require('form-data')
-    const formData = new FD()
+    let formData = new FD()
+    if (initialFormData) {
+      formData = initialFormData
+    }
     const fs = require('fs')
     const { size: fileSize } = fs.statSync(localFileLocation)
     log(INFO, 'UPLOADING FILE: ' + col.blue(localFileLocation) + ' (to:' + uploadFileURI + ')' + ' Filesize: ' + readableSize(fileSize))
@@ -453,7 +463,7 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
       }
     }
     const query = require('https').request({
-      hostname: getCurrentRegion() + customHost, // cloudHost,*/
+      hostname: hostName, // cloudHost,*/
       path: uploadFileURI,
       method: 'POST',
       headers: header
@@ -463,7 +473,7 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
         data += chunk.toString('utf8')
       })
       res.on('end', () => {
-        // console.log(data);
+        console.log(data);
         if (data) {
           const dataObj = JSON.parse(data)
           if (dataObj && dataObj.message) {
