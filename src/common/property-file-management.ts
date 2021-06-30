@@ -711,13 +711,13 @@ function applyPipe (prop: string, pipe: string) {
 }
 
 export function getPropFromFile (property: string, file: string) {
-  log(INFO, 'Getting Property: |' + property + '| from file: ' + file)
+  log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file)
   const PropertiesReader = require('properties-reader')
   let propsToGet
   try {
     propsToGet = PropertiesReader(file).path()
   } catch (e) {
-    log(INFO, 'Error getting proeprty from file: ', file, ' error: ' + e.message)
+    log(ERROR, 'Error getting property from file: ', file, ' error: ' + e.message)
     process.exit(1)
   }
   const re = _.get(propsToGet, property)
