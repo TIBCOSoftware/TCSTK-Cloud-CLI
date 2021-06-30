@@ -1,12 +1,19 @@
 import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
-import { callTCA, postToCloud, uploadToCloud } from '../common/cloud-communications'
+import { callTCA, postToCloud, readableSize } from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
 import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
 import { Dataset } from '../models/discover/dataset'
 import { Template } from '../models/discover/template'
 import { DiscoverFileInfo } from '../models/discover/FileInfo'
 import { getProp, prepProp } from '../common/property-file-management'
-import { col, getFilesFromFolder, mkdirIfNotExist, sleep, storeJsonToFile } from '../common/common-functions'
+import {
+  col,
+  getCurrentRegion,
+  getFilesFromFolder,
+  mkdirIfNotExist,
+  sleep,
+  storeJsonToFile
+} from '../common/common-functions'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from '../common/user-interaction'
 import { CreateDataSetResult, CreateProcessAnalysisResult } from '../models/discover/CustomModels'
 import { PreviewStatus } from '../models/discover/previewStatus'
@@ -114,44 +121,59 @@ export async function uploadDataSetFile () {
   log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
   const typeForUpload = await askMultipleChoiceQuestionSearch('What would you like to upload as a Dataset File ? ', optionList)
   if (typeForUpload.toLowerCase() !== 'none') {
-    // Set initial form data
-    const FD = require('form-data')
-    const formData = new FD()
-    // TODO: Make configurable
-    formData.append('newline', '\\r\\n')
-    formData.append('encoding', 'UTF8')
-    formData.append('separator', ',')
-    formData.append('quoteChar', '"')
-    formData.append('escapeChar', '\\')
+    const endpoint = CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase()
     if (typeForUpload.toLowerCase() === 'file') {
       // if FILE, ask the user for the file location
       const localFileLocation = await askQuestion('Provide the location of the file to upload as dataset file:')
       if (localFileLocation && localFileLocation.toLowerCase() !== 'none') {
-        // TODO: HIER VERDER; FILE UPLOAD DOES NOT WORK
-        const result = await uploadToCloud('csv', localFileLocation, CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase(), CCOM.clURI.dis_host, formData, SKIP_REGION)
-        console.log(result)
+        await uploadToDiscover(localFileLocation, endpoint)
       } else {
         logCancel(true)
       }
     } else {
       // user has provided the file
-      const result = await uploadToCloud('csv', path.join(getProp('Discover_Folder'), 'DatasetFiles', typeForUpload), CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase(), CCOM.clURI.dis_host, formData, SKIP_REGION)
-      console.log(result)
+      await uploadToDiscover(path.join(getProp('Discover_Folder'), 'DatasetFiles', typeForUpload), endpoint)
     }
   } else {
     // if NONE, end interaction
     logCancel(true)
   }
+}
 
-  // upload-discover-dataset-file, upload-discover-file (https://discover.labs.tibcocloud.com/files/01dzbgce4xgn899zq7ns238vk3)(orgID)
-  /*
-    newline: \r\n
-    encoding: UTF8
-    separator: ,
-    quoteChar: "
-    escapeChar: \
-    csv: (binary)
-     */
+async function uploadToDiscover (fileLocation: string, uploadURL: string) {
+  const axios = require('axios')
+  const FormData = require('form-data')
+  const fs = require('fs')
+  const { size: fileSize } = fs.statSync(fileLocation)
+  log(INFO, 'UPLOADING FILE TO DISCOVER: ' + col.blue(fileLocation) + ' Filesize: ' + readableSize(fileSize))
+  log(INFO, '                  ENDPOINT: ' + uploadURL)
+  const data = new FormData()
+  // TODO: Make configurable
+  data.append('newline', '\\r\\n')
+  data.append('encoding', 'UTF8')
+  data.append('separator', ',')
+  data.append('quoteChar', '"')
+  data.append('escapeChar', '\\')
+  data.append('csv', fs.createReadStream(fileLocation))
+  let url = 'https://'
+  if (!SKIP_REGION) {
+    url += getCurrentRegion(false)
+  }
+  url += uploadURL
+  const config = {
+    method: 'post',
+    url: url,
+    headers: {
+      ...data.getHeaders()
+    },
+    data: data
+  }
+  const response = await axios(config)
+  if (response && response.status === 201 && response.data && response.data.message && response.data.file) {
+    log(INFO, 'FILE UPLOADED SUCCESSFULLY: ' + col.green(response.data.message) + ' File Location: ' + col.blue(response.data.file))
+  } else {
+    log(ERROR, 'Error uploading file to discover (status: ' + response.status + ') Message: ', response.data)
+  }
 }
 
 export async function removeDataSetFile () {

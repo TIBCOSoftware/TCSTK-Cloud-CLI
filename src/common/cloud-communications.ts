@@ -473,9 +473,14 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
         data += chunk.toString('utf8')
       })
       res.on('end', () => {
-        console.log(data);
+        // console.log(data)
         if (data) {
-          const dataObj = JSON.parse(data)
+          let dataObj
+          try {
+            dataObj = JSON.parse(data)
+          } catch (e) {
+            log(WARNING, 'Parse Error: ', e.message)
+          }
           if (dataObj && dataObj.message) {
             log(INFO, ' UPLOAD RESULT:', col.green(dataObj.message))
           } else {

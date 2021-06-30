@@ -771,14 +771,15 @@
       ],
       "category": "cloud-files"
     },
-    "download-file-from-cloud-folder": {
+    "download-cloud-files-from-cloud-folder": {
       "description": "Downloads file(s) from a LiveApps Organization Folder to disk",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "downloadFileWrapper",
       "taskAlternativeNames": [
-        "download-file-from-org-folder"
+        "download-file-from-org-folder",
+        "download-file-from-cloud-folder"
       ],
       "availableOnOs": [
         "all"
