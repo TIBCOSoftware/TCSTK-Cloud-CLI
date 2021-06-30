@@ -11,7 +11,7 @@ import {
 } from './common/tables'
 import { TCLITask } from './models/tcli-models'
 import { askMultipleChoiceQuestionSearch, askQuestion } from './common/user-interaction'
-import {addOrUpdateProperty, replaceAtSign} from './common/property-file-management'
+import { addOrUpdateProperty, replaceAtSign } from './common/property-file-management'
 import { parseOAUTHToken } from './common/oauth'
 import { DEBUG, ERROR, INFO, log, WARNING } from './common/logging'
 
@@ -55,9 +55,11 @@ export function processMultipleFile () {
   const doFailOnError = !(failOnError.toLowerCase() === 'no')
 
   // log(INFO, '- Looping over Configured Starter JOBS: ' + csJobs);
-  let nvs = createTableValue('File', mFile)
+  const nvs = [{ NAME: 'File', VALUE: col.blue(mFile), JOB: '', ENVIRONMENT: '' }]
+  // let nvs = createTableValue('File', mFile)
   if (fileExtension.trim() !== '') {
-    nvs = createTableValue('File Extension', fileExtension, nvs)
+    // nvs = createTableValue('File Extension', fileExtension, nvs)
+    nvs.push({ NAME: 'File Extension', VALUE: fileExtension, JOB: '', ENVIRONMENT: '' })
   }
   const csJobsA = csJobs.split(',')
   // let jobN = 0;
@@ -74,14 +76,12 @@ export function processMultipleFile () {
     const environmentsA = environments.split(',')
     for (let l = 0; l < environmentsA.length; l++) {
       // jobN++;
-      nvs = createTableValue(currentJob, environmentsA[l].trim(), nvs, 'JOB', 'ENVIRONMENT')
+      nvs.push({ NAME: '', VALUE: '', JOB: col.blue(currentJob), ENVIRONMENT: col.yellow(environmentsA[l].trim()) })
+      // nvs = createTableValue(currentJob, environmentsA[l].trim(), nvs, 'JOB', 'ENVIRONMENT')
     }
   }
   log(INFO, col.blue('JOB SUMMARY]') + ' FILE: ' + mFile)
-  console.table(nvs)
-  // TODO: It does not show the details
-  // showTableFromTobject(nvs, '[JOB SUMMARY] FILE: ' + mFile)
-
+  showTableFromTobject(nvs, '[JOB SUMMARY] FILE: ' + mFile)
   for (let i = 0; i < csJobsA.length; i++) {
     const currentJob = trim(csJobsA[i])
     const logS = col.blue('[STARTER JOB: ' + currentJob + ']')
