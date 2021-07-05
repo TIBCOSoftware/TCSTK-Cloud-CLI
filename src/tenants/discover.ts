@@ -186,8 +186,8 @@ export async function removeDataSetFile () {
     const dsToRemove = datasetFiles.find(v => v.redisFileInfo.OriginalFilename === dsFileNameToRemove)
     if (dsToRemove) {
       // https://discover.labs.tibcocloud.com/catalog/files/CallcenterExampleAutoTest.csv
-      await CCOM.callTCA(CCOM.clURI.dis_files + '/' + dsToRemove.redisFileInfo.OriginalFilename, true, { method: 'DELETE', skipInjectingRegion: SKIP_REGION })
-      log(INFO, col.green('Successfully removed dataset: ') + col.blue(dsFileNameToRemove) + col.reset(' (Location: ' + dsToRemove.redisFileInfo.FileLocation + ')'))
+      await CCOM.callTCA(CCOM.clURI.dis_files + '/' + dsToRemove.redisFileInfo.OriginalFilename, false, { method: 'DELETE', skipInjectingRegion: SKIP_REGION })
+      log(INFO, col.green('Successfully removed dataset file: ') + col.blue(dsFileNameToRemove) + col.reset(' (Location: ' + dsToRemove.redisFileInfo.FileLocation + ')'))
     } else {
       log(ERROR, 'Dataset ' + dsFileNameToRemove + ' Not found...')
     }
@@ -196,12 +196,16 @@ export async function removeDataSetFile () {
   }
 }
 
+// const MAX_DATASET_CYCLES = 5
+const MAX_DATASET_CYCLES = 1500
+
 export async function createDataSet () {
   log(INFO, 'Creating a dataset...')
   prepDiscoverProps()
   // Ask if you want to monitor the progress
   const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the dataset creation ?', ['YES', 'NO'])
   // Create the dataset
+  console.time('Creating Dataset Took')
   const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', path.join(getProp('Discover_Folder'), 'Datasets'), '.json', { skipInjectingRegion: SKIP_REGION }) as CreateDataSetResult
   if (dsResponse.status === 'OK') {
     log(INFO, 'Dataset Created with id: ' + col.green(dsResponse.datasetId))
@@ -211,7 +215,7 @@ export async function createDataSet () {
       // Maximum 5 minutes = 200 ms * 5 = 1 second; 300 seconds is 1500 polls
       let isDone = false
       let progress = 0
-      while (i < 1500 && !isDone) {
+      while (i <= MAX_DATASET_CYCLES && !isDone) {
         i++
         // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
         const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, { skipInjectingRegion: SKIP_REGION }) as PreviewStatus
@@ -236,6 +240,12 @@ export async function createDataSet () {
           log(WARNING, 'No progress reported...', dsStatus)
         }
         await sleep(200)
+      }
+      log(INFO, 'Monitoring Dataset Took: ' + (i / 5) + ' Seconds...')
+      console.timeEnd('Creating Dataset Took')
+      if (i >= MAX_DATASET_CYCLES) {
+        log(ERROR, 'Creating Dataset Timed Out...')
+        process.exit(1)
       }
     }
   } else {
@@ -284,12 +294,16 @@ export async function removeDataSet () {
   }
 }
 
+const MAX_PM_CYCLES = 4500
+// const MAX_PM_CYCLES = 45
+
 export async function runProcessAnalysis () {
   log(INFO, 'Running Process Analysis...')
   prepDiscoverProps()
   // Ask if you want to monitor the progress
   const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the process mining ?', ['YES', 'NO'])
   // Create the dataset
+  console.time('Running Process Mining Took')
   const paResponse = await postToCloud(CCOM.clURI.dis_pa, 'What would you like to use to do process mining ?', getProp('Discover_Folder') + '/ProcessAnalysis', '.json', { skipInjectingRegion: SKIP_REGION }) as CreateProcessAnalysisResult
   if (paResponse.id) {
     log(INFO, 'Process Analysis created with id: ' + col.green(paResponse.id))
@@ -299,7 +313,7 @@ export async function runProcessAnalysis () {
       // Maximum 15 minutes = 200 ms * 5 = 1 second; 300 seconds is 4500 polls
       let isDone = false
       let progress = 0
-      while (i < 4500 && !isDone) {
+      while (i <= MAX_PM_CYCLES && !isDone) {
         i++
         // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
         const pmStatus = await callTCA(CCOM.clURI.dis_pa_status + '/' + paResponse.id + '/status', false, { skipInjectingRegion: SKIP_REGION }) as AnalysisStatus
@@ -321,6 +335,12 @@ export async function runProcessAnalysis () {
           }
         }
         await sleep(200)
+      }
+      log(INFO, 'Monitoring Process Mining Took: ' + (i / 5) + ' Seconds...')
+      console.timeEnd('Running Process Mining Took')
+      if (i >= MAX_PM_CYCLES) {
+        log(ERROR, 'Process Mining Timed Out...')
+        process.exit(1)
       }
     }
   } else {
