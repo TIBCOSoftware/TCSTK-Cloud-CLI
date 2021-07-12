@@ -3,7 +3,7 @@ import {
   col,
   createMultiplePropertyFile,
   deleteFolder,
-  displayGlobalConnectionConfig, displayOpeningMessage,
+  displayGlobalConnectionConfig, displayOpeningMessage, getCurrentRegion,
   getGit,
   getOrganization,
   getRegion,
@@ -17,10 +17,17 @@ import {
 import { Global } from './models/base'
 import { TCLITask } from './models/tcli-models'
 import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './common/user-interaction'
-import { addOrUpdateProperty, getProp, getPropFileName, setProperty } from './common/property-file-management'
-import { DEBUG, ERROR, INFO, log, RECORDER, setLogDebug, throb } from './common/logging'
+import {
+  addOrUpdateProperty,
+  checkForLoginProps,
+  getProp,
+  getPropFileName,
+  setProperty
+} from './common/property-file-management'
+import { DEBUG, ERROR, INFO, log, RECORDER, setLogDebug, throb, WARNING } from './common/logging'
 import { prepRecorderProps } from './common/recorder'
 import { checkForLocalPropertyFileUpgrades } from './common/upgrades'
+import { callTCA, cLogin, clURI } from './common/cloud-communications'
 
 declare let global: Global
 // require('./tenants/common-functions');
@@ -44,7 +51,6 @@ let globalLastCommand = 'help'
 // Wrapper to main task
 export async function mainT (cat?: string) {
   const catToUse = cat || 'ALL'
-  loadTaskDesc(catToUse)
   prepRecorderProps()
   displayOpeningMessage()
   console.log('[TIBCO CLOUD CLI - V' + version + '] ("exit" to quit / "help" to display tasks)')
@@ -54,10 +60,100 @@ export async function mainT (cat?: string) {
     const pass = await askQuestion('Please provide your password: ', 'password')
     setProperty('CloudLogin.pass', obfuscatePW(pass))
   }
+  checkForLoginProps()
+  await loadTasks(catToUse)
   await promptTask(__dirname, appRoot)
 }
 
-export function loadTaskDesc (category?: string) {
+async function loadTasks (catToUse: string) {
+  let availableCategories = ['ALL']
+  if (getProp('CloudLogin.OnStartup') && getProp('CloudLogin.OnStartup').toLowerCase() === 'yes') {
+    const login = await cLogin('TSC', 'https://' + getCurrentRegion() + clURI.general_login, false, undefined, true)
+    if (login !== 'ERROR') {
+      if (getProp('CloudLogin.OnlyShowAvailableTasks') && getProp('CloudLogin.OnlyShowAvailableTasks').toLowerCase() === 'yes') {
+        log(INFO, 'Successfully logged on, available categories: ')
+        // console.log('Getting available tasks...')
+        const userRoles = await callTCA(clURI.account_user_roles, false, {
+          tenant: 'TSC',
+          customLoginURL: 'https://' + getCurrentRegion() + clURI.general_login,
+          handleErrorOutside: true
+        })
+        availableCategories = ['tcli', 'tibco-cloud', 'oauth']
+        if (getProp('CloudLogin.AdditionalCategories')) {
+          availableCategories = availableCategories.concat((getProp('CloudLogin.AdditionalCategories').split(',')))
+        }
+        if (userRoles.userRolesDetailsForTenants) {
+          for (const role of userRoles.userRolesDetailsForTenants) {
+            if (role && role.tenantId) {
+              switch (role.tenantId.toLowerCase()) {
+                case 'bpm':
+                  availableCategories.push('cloud-starters', 'live-apps', 'shared-state', 'cloud-files')
+                  break
+                case 'spotfire':
+                  availableCategories.push('spotfire')
+                  break
+                case 'tci':
+                  availableCategories.push('tci')
+                  break
+                case 'tcm':
+                  availableCategories.push('messaging')
+                  break
+              }
+            }
+          }
+        }
+        const allCat = getAllCategories()
+        let idX = 0
+        let toStr = ''
+        for (const cat of allCat) {
+          idX++
+          let check = ''
+          let catCol = ''
+          if (availableCategories.indexOf(cat) > -1) {
+            check += ' [' + col.green('V') + '] '
+            catCol = col.green(cat)
+          } else {
+            check += ' [' + col.red('X') + '] '
+            catCol = col.red(cat)
+          }
+          toStr += check + catCol.padEnd(30)
+          if (idX > 3) {
+            log(INFO, toStr)
+            toStr = ''
+            idX = 0
+          }
+        }
+        log(INFO, toStr)
+      } else {
+        log(INFO, col.green('Successfully logged on... '))
+      }
+    } else {
+      log(WARNING, 'Login failed; only tcli tasks are available')
+      availableCategories = ['tcli']
+    }
+  }
+  loadTaskDesc(catToUse, availableCategories)
+}
+
+function getAllCategories () {
+  const cats = []
+  for (const cliTask in cTsks) {
+    if (cTsks[cliTask]) {
+      const task = cTsks[cliTask]!
+      if (task.category) {
+        if (!(cats.indexOf(task.category) > -1)) {
+          cats.push(task.category)
+        }
+      }
+    }
+  }
+  return cats
+}
+
+export function loadTaskDesc (category?: string, availableCat?: string[]) {
+  if (!availableCat) {
+    availableCat = ['ALL']
+  }
   gTasksDescr = []
   gTasksNames = []
   const catToUse = category || 'ALL'
@@ -65,7 +161,6 @@ export function loadTaskDesc (category?: string) {
     gTasksDescr.push(BACK, BACK_TO_ALL)
     gTasksNames.push(BACK, BACK_TO_ALL)
   }
-
   let taskCounter = 0
   for (const cliTask in cTsks) {
     if (cTsks[cliTask]) {
@@ -78,7 +173,7 @@ export function loadTaskDesc (category?: string) {
           }
         }
       }
-      if (task.enabled && allowed) {
+      if (task.enabled && allowed && (availableCat.indexOf('ALL') > -1 || availableCat.indexOf(task.category) > -1)) {
         // Add to global category (if not exits)
         if (gCategory.indexOf(task.category) === -1) {
           gCategory.push(task.category)
@@ -124,8 +219,8 @@ let globalDoRecord = false
 // Main Cloud CLI Questions
 export async function promptTask (stDir: string, cwdDir: string): Promise<void> {
   const inquirer = require('inquirer')
-  log(DEBUG, 'PromtTask)           stDir dir: ' + stDir)
-  log(DEBUG, 'PromtTask) current working dir: ' + cwdDir)
+  log(DEBUG, 'PromptTask)           stDir dir: ' + stDir)
+  log(DEBUG, 'PromptTask) current working dir: ' + cwdDir)
   return new Promise<void>(async function (resolve) {
     inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'))
     let pMes = '[TCLI - ' + col.blue(getRegion(true, true)) + ' - ' + col.yellow(getProp('App_Name')) + ']: '
@@ -214,6 +309,10 @@ export async function promptTask (stDir: string, cwdDir: string): Promise<void> 
     const commandTcli = 'tcli ' + comToInject + ' -p "' + getPropFileName() + '" ' + additionalArugments
     // TODO: Don't call tcli again but create a CLIRun Class
     run(commandTcli, false)
+    // If organization was changed re-check the tasks
+    if (selectedTask === 'change-tibco-cloud-organization') {
+      await loadTasks('ALL')
+    }
     return promptTask(stDir, cwdDir)
   })
   // });

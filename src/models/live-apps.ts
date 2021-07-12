@@ -1,19 +1,3 @@
-export interface LApp {
-    actions: Process[];
-    applicationId: string;
-    applicationInternalName: string;
-    applicationName: any;
-    applicationVersion: number;
-    attributes: CaseAttribute[];
-    creators: Process[];
-    id: string;
-    isCase: boolean
-    label: any;
-    name: string;
-    states: CaseTypeState[];
-    jsonSchema: JsonSchema;
-}
-
 export interface CaseAttribute {
     isIdentifier: boolean;
     isMandatory: boolean;
@@ -32,6 +16,14 @@ export interface CaseTypeState {
     isTerminal: boolean;
 }
 
+export interface JsonSchema {
+    $schema: string;
+    definitions: any[];
+    properties: any[];
+    type: string;
+    required: string[];
+}
+
 export interface Process {
     jsonSchema: JsonSchema;
     name: string;
@@ -39,14 +31,6 @@ export interface Process {
     formTag: string;
     processType: string;
     unsupportedForm: boolean;
-}
-
-export interface JsonSchema {
-    $schema: string;
-    definitions: any[];
-    properties: any[];
-    type: string;
-    required: string[];
 }
 
 export interface LAGroup {
@@ -138,4 +122,20 @@ export interface LADesignTimeApp {
     lastPublished: LastPublished;
     lastWithdrawn?: any;
     inBin: boolean;
+}
+
+export interface LApp {
+    actions: Process[];
+    applicationId: string;
+    applicationInternalName: string;
+    applicationName: any;
+    applicationVersion: number;
+    attributes: CaseAttribute[];
+    creators: Process[];
+    id: string;
+    isCase: boolean
+    label: any;
+    name: string;
+    states: CaseTypeState[];
+    jsonSchema: JsonSchema;
 }

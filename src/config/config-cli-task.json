@@ -25,7 +25,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "tcli"
+      "category": "tibco-cloud"
     },
     "show-cloud-starters": {
       "description": "Show a Table of all the deployed Cloud Starters",
@@ -259,7 +259,54 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "tcli"
+      "category": "tibco-cloud"
+    },
+    "change-tibco-cloud-region": {
+      "description": "Change the Region in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": false,
+      "task": "changeRegion",
+      "taskAlternativeNames": [
+        "change-cloud-region",
+        "change-region",
+        "cr"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tibco-cloud"
+    },
+    "show-tibco-cloud-organizations": {
+      "description": "Shows the Cloud Organization and potentially more details",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showOrganizationWrapper",
+      "taskAlternativeNames": [
+        "show-cloud-organizations",
+        "show-organizations",
+        "show-orgs"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tibco-cloud"
+    },
+    "change-tibco-cloud-organization": {
+      "description": "Changes the Organization in the cloud-properties file",
+      "enabled": true,
+      "internal": false,
+      "task": "changeOrganizationWrapper",
+      "taskAlternativeNames": [
+        "change-cloud-organization",
+        "change-organization",
+        "co"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tibco-cloud"
     },
     "show-properties": {
       "description": "Shows the properties in your properties file (and possibly the global values)",
@@ -281,50 +328,6 @@
       "internal": false,
       "multipleInteraction": false,
       "task": "updatePropertyWrapper",
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "tcli"
-    },
-    "change-cloud-region": {
-      "description": "Change the Region in the cloud-properties file",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": false,
-      "task": "changeRegion",
-      "taskAlternativeNames": [
-        "change-region",
-        "cr"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "tcli"
-    },
-    "show-cloud-organizations": {
-      "description": "Shows the Cloud Organization and potentially more details",
-      "enabled": true,
-      "internal": false,
-      "multipleInteraction": true,
-      "task": "showOrganizationWrapper",
-      "taskAlternativeNames": [
-        "show-organizations",
-        "show-orgs"
-      ],
-      "availableOnOs": [
-        "all"
-      ],
-      "category": "tcli"
-    },
-    "change-cloud-organization": {
-      "description": "Changes the Organization in the cloud-properties file",
-      "enabled": true,
-      "internal": false,
-      "task": "changeOrganizationWrapper",
-      "taskAlternativeNames": [
-        "change-organization",
-        "co"
-      ],
       "availableOnOs": [
         "all"
       ],
@@ -1026,7 +1029,7 @@
     },
     "show-discover-process-analysis": {
       "description": "Show's the process analysis of Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverPAWrapper",
@@ -1041,7 +1044,7 @@
     },
     "show-discover-datasets": {
       "description": "Show's the datasets of Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSWrapper",
@@ -1057,7 +1060,7 @@
     },
     "show-discover-templates": {
       "description": "Show's the templates of Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverTempWrapper",
@@ -1073,7 +1076,7 @@
     },
     "show-discover-dataset-files": {
       "description": "Show's a list of dataset files for Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showDiscoverDSFilesWrapper",
@@ -1089,7 +1092,7 @@
     },
     "export-discover-datasets": {
       "description": "Exports the datasets of Project Discover into JSON files",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "exportDiscoverDSWrapper",
@@ -1105,7 +1108,7 @@
     },
     "upload-discover-dataset-file": {
       "description": "Uploads a CSV file for analysis in Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "uploadDiscoverDSFileWrapper",
@@ -1120,7 +1123,7 @@
     },
     "remove-discover-dataset-file": {
       "description": "Removes a Dataset file in Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverDSFileWrapper",
@@ -1135,7 +1138,7 @@
     },
     "create-discover-dataset": {
       "description": "Create a Dataset for Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "createDiscoverDSWrapper",
@@ -1150,7 +1153,7 @@
     },
     "remove-discover-dataset": {
       "description": "Removes a Dataset for Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "removeDiscoverDSWrapper",
@@ -1165,7 +1168,7 @@
     },
     "run-discover-process-analysis": {
       "description": "Runs a Process Analysis for Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "runDiscoverPAWrapper",
@@ -1181,7 +1184,7 @@
     },
     "action-discover-process-analysis": {
       "description": "Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "actionDiscoverPAWrapper",

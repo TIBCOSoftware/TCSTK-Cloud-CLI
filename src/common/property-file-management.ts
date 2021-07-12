@@ -724,3 +724,13 @@ export function getPropFromFile (property: string, file: string) {
   log(DEBUG, 'Returning Property(' + property + '): ', re)
   return re
 }
+
+export function checkForLoginProps () {
+  if (!getProp('CloudLogin.OnStartup')) {
+    addOrUpdateProperty(getPropFileName(), 'CloudLogin.OnStartup', 'YES', 'Determines weather the tcli directly logs in on startup. Options: (YES | NO)', true)
+  }
+  if (!getProp('CloudLogin.OnlyShowAvailableTasks')) {
+    addOrUpdateProperty(getPropFileName(), 'CloudLogin.OnlyShowAvailableTasks', 'YES', 'Determines weather the tcli only displays the task you have access to. Options: (YES | NO)', true)
+  }
+}
+

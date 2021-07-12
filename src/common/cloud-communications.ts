@@ -94,7 +94,7 @@ export function invalidateLogin () {
   isOAUTHValid = null
 }
 
-export async function cLogin (tenant?: string, customLoginURL?: string, forceClientID?: boolean, manualOAUTH?: string) {
+export async function cLogin (tenant?: string, customLoginURL?: string, forceClientID?: boolean, manualOAUTH?: string, handleErrorOutside? :boolean) {
   const fClientID = forceClientID || false
   if (isOauthUsed() && !fClientID) {
     log(DEBUG, 'Using OAUTH for Authentication...')
@@ -175,9 +175,9 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
     if (loginC == null) {
       loginC = await cloudLoginV3(tenantID, clientID, email, pass, setLoginURL)
     }
-    if (loginC === 'ERROR') {
+    if (loginC === 'ERROR' && !handleErrorOutside) {
       // TODO: exit the task properly
-      log(INFO, 'Error Exiting..')
+      // log(INFO, 'Error Exiting..')
       process.exit(1)
     }
     // console.log("RETURN: " , loginC);
@@ -618,6 +618,7 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
     showTableFromTobject(nvs, 'Cloud Info')
   }
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud')
+  return response
 }
 
 export async function isOAUTHLoginValid () {
