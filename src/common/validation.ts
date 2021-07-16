@@ -10,6 +10,8 @@ import { askMultipleChoiceQuestion, askQuestion } from './user-interaction'
 import { ERROR, INFO, log } from './logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 import { askTypes, getNameForSFType, listOnType } from '../tenants/spotfire'
+import { getCurrentOrganizationRoles } from './organization-management'
+import { TenantRolesDetail } from '../models/organizations'
 
 declare let global: Global
 
@@ -24,7 +26,7 @@ export async function validate () {
   // console.log('Validate ',new Date());
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate')
   // TODO: Add; case_folder_exist,
-  const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_exist', 'Case_not_exist', 'Case_in_state', 'Spotfire_Library_Item_exists']
+  const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'Tenant_Access', 'Tenant_Role', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_exist', 'Case_not_exist', 'Case_in_state', 'Spotfire_Library_Item_exists']
   const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase()
   log(INFO, 'Validating: ', valD)
   if (valD === 'property_exist' || valD === 'property_is_set' || valD === 'property_is_set_ask') {
@@ -119,6 +121,48 @@ export async function validate () {
       typeList = []
     }
     await validationItemHelper(typeList, 'Spotfire Library Item (' + getNameForSFType(libType) + ')', 'TCLIPath')
+  }
+  if (valD === 'tenant_access' || valD === 'tenant_role') {
+    const TENANTS = ['BPM', 'TSC', 'SPOTFIRE', 'TCI', 'TCDS', 'TCM']
+    // TODO: Allow for a + sign in the input
+    const tenantToValidate = (await askMultipleChoiceQuestion('Which tenant\'s access would like  validate ?', TENANTS)).toLowerCase()
+    const userRoles = await getCurrentOrganizationRoles()
+    let access = false
+    let tenantRoles: TenantRolesDetail[] = []
+    for (const role of userRoles) {
+      if (role && role.tenantId) {
+        log(INFO, 'You have access to tenant: ' + col.blue(role.tenantId))
+        if (role.tenantId.toLowerCase() === tenantToValidate) {
+          access = true
+          if (role.tenantRolesDetails) {
+            tenantRoles = role.tenantRolesDetails
+          }
+        }
+      }
+    }
+    if (!access) {
+      validationFailed('You don\'t have have access to the tenant: ' + tenantToValidate.toUpperCase())
+    } else {
+      validationOk('You have access to the tenant: ' + tenantToValidate.toUpperCase())
+    }
+    if (valD === 'tenant_role') {
+      const rolesToValidate = await askQuestion('Which role would you like to validate (Use plus character to validate multiple roles\'s, for example: role1+role2) ?')
+      const roleArray = rolesToValidate.split('+')
+      for (const role of roleArray) {
+        let valid = false
+        for (const tRole of tenantRoles) {
+          log(INFO, 'You have access to role (on ' + tenantToValidate.toUpperCase() + '): ' + col.blue(tRole.roleId))
+          if (tRole.roleId === role) {
+            valid = true
+          }
+        }
+        if (!valid) {
+          validationFailed('You don\'t have have access to the role (on ' + tenantToValidate.toUpperCase() + '): ' + role)
+        } else {
+          validationOk('You have access to the role (on ' + tenantToValidate.toUpperCase() + '): ' + role)
+        }
+      }
+    }
   }
 }
 

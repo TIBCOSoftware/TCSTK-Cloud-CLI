@@ -14,6 +14,7 @@ import { askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction
 import { DEBUG, ERROR, INFO, log, logCancel, logO, WARNING } from './logging'
 import { getProp, setProperty } from './property-file-management'
 import path from 'path'
+import {getCurrentOrganizationRoles} from "./organization-management";
 
 declare let global: Global
 
@@ -587,12 +588,9 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
   }
   if (showRoles) {
     // account_user_roles
-    const userRoles = await callTCA(clURI.account_user_roles, false, {
-      tenant: 'TSC',
-      customLoginURL: 'https://' + getCurrentRegion() + clURI.general_login
-    })
+    const userRoles = await getCurrentOrganizationRoles()
     // console.log(userRoles)
-    for (const role of userRoles.userRolesDetailsForTenants) {
+    for (const role of userRoles) {
       if (role) {
         let rDetails = 'ROLES: '
         if (role.teamAdmin) {

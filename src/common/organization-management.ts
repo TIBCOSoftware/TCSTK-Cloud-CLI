@@ -12,10 +12,11 @@ import {
 } from './tables'
 import { ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestionSearch } from './user-interaction'
-import { Accounts, SelectedAccount } from '../models/organizations'
+import { Accounts, SelectedAccount, UserRolesDetailsForTenant } from '../models/organizations'
 import { getOAUTHDetails } from './oauth'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 import { DEBUG, ERROR, INFO, log, logCancel } from './logging'
+import { callTCA, clURI } from './cloud-communications'
 
 const CCOM = require('./cloud-communications')
 const OAUTH = require('./oauth')
@@ -34,6 +35,14 @@ export async function getCurrentOrganizationInfo (): Promise<SelectedAccount> {
     tenant: 'TSC',
     customLoginURL: 'https://' + getCurrentRegion() + CCOM.clURI.general_login
   })).selectedAccount
+}
+
+// Get your roles in an organization
+export async function getCurrentOrganizationRoles (): Promise<UserRolesDetailsForTenant[]> {
+  return (await callTCA(clURI.account_user_roles, false, {
+    tenant: 'TSC',
+    customLoginURL: 'https://' + getCurrentRegion() + clURI.general_login
+  })).userRolesDetailsForTenants
 }
 
 // Function to get the Client ID
