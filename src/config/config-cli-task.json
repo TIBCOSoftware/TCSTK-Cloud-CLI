@@ -398,6 +398,20 @@
       ],
       "category": "tcli"
     },
+    "replace-values-in-files": {
+      "description": "Replace string in file following based on answers provided",
+      "enabled": true,
+      "internal": false,
+      "task": "replaceValuesInFileWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "taskAlternativeNames": [
+        "replace-interactive",
+        "replace-string-in-file-interactive"
+      ],
+      "category": "tcli"
+    },
     "validate": {
       "description": "Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.",
       "enabled": true,

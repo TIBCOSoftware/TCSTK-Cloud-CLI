@@ -2,7 +2,7 @@ import {
   col,
   copyFile,
   doesFileExist, getOrganization,
-  isOauthUsed,
+  isOauthUsed, replaceInFile,
   run, trim
 } from './common-functions'
 import {
@@ -710,6 +710,43 @@ function applyPipe (prop: string, pipe: string) {
   return re
 }
 
+// Function to replace a string in a file
+export function replaceStringInFileOne (prefix: string) {
+  let rFrom = getProp(prefix + 'Replace_FROM')
+  let rTo = getProp(prefix + 'Replace_TO')
+  const rPat = getProp(prefix + 'Replace_PATTERN')
+  if (rFrom == null || rTo == null || rPat == null) {
+    log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...')
+  } else {
+    rFrom = rFrom.trim()
+    rTo = rTo.trim()
+    log(DEBUG, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ', rPat)
+    replaceInFile(rFrom, rTo, rPat)
+  }
+}
+
+// Function to replace multiple strings in files
+export function replaceStringInFile () {
+  const rMul = getProp('Replace_MULTIPLE')
+  if (rMul == null) {
+    replaceStringInFileOne('')
+  } else {
+    const replaceA = rMul.split(',')
+    for (let i = 0; i < replaceA.length; i++) {
+      if (replaceA[i]) {
+        const currentRep = trim(replaceA[i]!)
+        replaceStringInFileOne(currentRep)
+      }
+    }
+  }
+}
+export async function replaceValuesInFile () {
+  const rFrom = await askQuestion('What would you like to search for (Similar to Replace_FROM) ?')
+  const rTo = await askQuestion('What would you like to replace it with (Similar to Replace_TO) ?')
+  const rPat = await askQuestion('In which files (file pattern) would you like to do the replacements (Similar to Replace_PATTERN) ?')
+  replaceInFile(rFrom, rTo, rPat)
+}
+
 export function getPropFromFile (property: string, file: string) {
   log(DEBUG, 'Getting Property: |' + property + '| from file: ' + file)
   const PropertiesReader = require('properties-reader')
@@ -735,4 +772,3 @@ export function checkForLoginProps () {
     setProperty('CloudLogin.OnlyShowAvailableTasks', 'YES')
   }
 }
-

@@ -9,9 +9,8 @@ import {
   getRegion,
   isOauthUsed,
   obfuscatePW,
-  replaceInFile,
   run,
-  trim, updateCloudPackages,
+  updateCloudPackages,
   updateGlobalConnectionConfig, updateRegion, updateTCLI
 } from './common/common-functions'
 import { Global } from './models/base'
@@ -24,7 +23,7 @@ import {
   getPropFileName,
   setProperty
 } from './common/property-file-management'
-import { DEBUG, ERROR, INFO, log, RECORDER, setLogDebug, throb, WARNING } from './common/logging'
+import { DEBUG, INFO, log, RECORDER, setLogDebug, throb, WARNING } from './common/logging'
 import { prepRecorderProps } from './common/recorder'
 import { checkForLocalPropertyFileUpgrades } from './common/upgrades'
 import { callTCA, cLogin, clURI } from './common/cloud-communications'
@@ -499,35 +498,16 @@ export async function updateGlobalConfig () {
   await updateGlobalConnectionConfig()
 }
 
-// Function to replace a string in a file
-export function replaceStringInFileOne (prefix: string) {
-  let rFrom = getProp(prefix + 'Replace_FROM')
-  let rTo = getProp(prefix + 'Replace_TO')
-  const rPat = getProp(prefix + 'Replace_PATTERN')
-  if (rFrom == null || rTo == null || rPat == null) {
-    log(ERROR, 'Replace properties not found, please set Replace_FROM, Replace_TO and Replace_PATTERN in your properties file...')
-  } else {
-    rFrom = rFrom.trim()
-    rTo = rTo.trim()
-    log(DEBUG, 'Replacing From: |' + rFrom + '| To: |' + rTo + '| Pattern: ', rPat)
-    replaceInFile(rFrom, rTo, rPat)
-  }
+// Function to replace multiple strings in files
+export function replaceStringInFileWrapper () {
+  const PROPM = require('./common/property-file-management')
+  PROPM.replaceStringInFile()
 }
 
 // Function to replace multiple strings in files
-export async function replaceStringInFileWrapper () {
-  const rMul = getProp('Replace_MULTIPLE')
-  if (rMul == null) {
-    replaceStringInFileOne('')
-  } else {
-    const replaceA = rMul.split(',')
-    for (let i = 0; i < replaceA.length; i++) {
-      if (replaceA[i]) {
-        const currentRep = trim(replaceA[i]!)
-        replaceStringInFileOne(currentRep)
-      }
-    }
-  }
+export async function replaceValuesInFileWrapper () {
+  const PROPM = require('./common/property-file-management')
+  await PROPM.replaceValuesInFile()
 }
 
 // Wrapper to create a multiple prop file
