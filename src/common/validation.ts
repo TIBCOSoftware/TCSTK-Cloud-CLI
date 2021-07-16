@@ -61,12 +61,14 @@ export async function validate () {
         }
       }
     }
+    return
   }
 
   // Validate if a liveApps App exist
   if (valD === 'liveapps_app_exist') {
     const apps = await LA.showLiveApps(false, false)
     await validationItemHelper(apps, 'LiveApps App', 'name')
+    return
   }
 
   // Validate if a liveApps Group exist
@@ -75,12 +77,14 @@ export async function validate () {
     const groups = await USERGROUPS.getGroupsTable(false)
     // console.log(iterateTable(groups));
     await validationItemHelper(iterateTable(groups), 'LiveApps Group', 'Name')
+    return
   }
 
   // Validate if a Flogo App exist
   if (valD === 'tci_app_exist') {
     const apps = await TCI.showTCI(false)
     await validationItemHelper(iterateTable(apps), 'TCI App', 'Name')
+    return
   }
 
   // Validate if a Cloud Starter exist
@@ -88,6 +92,7 @@ export async function validate () {
     const apps = await CS.showAvailableApps(true)
     // console.log(apps);
     await validationItemHelper(apps, 'Cloudstarter', 'name')
+    return
   }
 
   // Validate if an org folder exist (and possibly contains file)
@@ -99,12 +104,14 @@ export async function validate () {
       const files = await CFILES.getOrgFolderFiles(chosenFolder, false)
       await validationItemHelper(iterateTable(files), 'Org File', 'Name')
     }
+    return
   }
 
   // Validate if a LiveApps Case exist or not
   if (valD === 'case_exist' || valD === 'case_not_exist') {
     const casesToValidate = await askQuestion('Which case reference would you like to validate (Use plus character to validate multiple case\'s, for example: caseRef1+caseRef2) ?')
     await validateLACase(casesToValidate, valD)
+    return
   }
 
   // Validate if a LiveApps Case is in a specific state
@@ -112,6 +119,7 @@ export async function validate () {
     const caseRef = await askQuestion('For which case reference would you like to validate the state ?')
     const caseState = await askQuestion('For state would you like to validate ?')
     await validateLACaseState(caseRef, caseState)
+    return
   }
 
   if (valD === 'spotfire_library_item_exists') {
@@ -121,6 +129,7 @@ export async function validate () {
       typeList = []
     }
     await validationItemHelper(typeList, 'Spotfire Library Item (' + getNameForSFType(libType) + ')', 'TCLIPath')
+    return
   }
   if (valD === 'tenant_access' || valD === 'tenant_role') {
     const TENANTS = ['BPM', 'TSC', 'SPOTFIRE', 'TCI', 'TCDS', 'TCM']
@@ -163,7 +172,9 @@ export async function validate () {
         }
       }
     }
+    return
   }
+  validationFailed('Unknown validation command: ' + valD)
 }
 
 // Validate the state of a case
