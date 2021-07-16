@@ -741,9 +741,9 @@ export function replaceStringInFile () {
   }
 }
 export async function replaceValuesInFile () {
-  const rFrom = await askQuestion('What would you like to search for (Similar to Replace_FROM) ?')
-  const rTo = await askQuestion('What would you like to replace it with (Similar to Replace_TO) ?')
-  const rPat = await askQuestion('In which files (file pattern) would you like to do the replacements (Similar to Replace_PATTERN) ?')
+  const rFrom = await askQuestion('   Replace_FROM:')
+  const rTo = await askQuestion('     Replace_TO:')
+  const rPat = await askQuestion('Replace_PATTERN:')
   replaceInFile(rFrom, rTo, rPat)
 }
 
