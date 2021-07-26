@@ -298,6 +298,8 @@ export async function deleteApp () {
 
 // Get details of a cloud starter
 async function getApplicationDetails (application: any, version: string, showTable: boolean) {
+  const UPPER_CALL_LIMIT = 1000
+  let callCounter = 0
   const doShowTable = (typeof showTable === 'undefined') ? false : showTable
   const details:any = {}
   // console.log(getApplicationDetailsURL +  application + '/applicationVersions/' + version + '/artifacts/');
@@ -310,8 +312,12 @@ async function getApplicationDetails (application: any, version: string, showTab
     if (i !== 0) {
       skip = '&$skip=' + i
     }
-    const appDet = await CCOM.callTCA(CCOM.clURI.app_info + application + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip)
-    if (appDet) {
+    const appDet = await CCOM.callTCA(CCOM.clURI.app_info + encodeURIComponent(application) + '/applicationVersions/' + version + '/artifacts/?&$top=' + artefactStepSize + skip, false, { handleErrorOutside: true })
+    callCounter++
+    if (appDet.errorCode) {
+      log(WARNING, '\n' + appDet.errorCode + ' (' + appDet.errorMsg + ')')
+    }
+    if (appDet && !appDet.errorCode && callCounter < UPPER_CALL_LIMIT) {
       if (appDet.length < artefactStepSize) {
         hasMoreArtefacts = false
       }
