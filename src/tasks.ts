@@ -327,13 +327,11 @@ export async function browseTasks () {
 
 export async function testTask () {
   console.log('Test...')
-  const PROPM = require('./common/property-file-management')
-  // await PROPM.getClientIDforOrg();
-  // const LA = require('./tenants/live-apps');
-  // const PROPM = require('./common/property-file-management');
-  const orgs = await PROPM.getCurrentOrganizationInfo()
-  console.log(orgs)
-  // await LA.showLiveAppsDesign(true);
+  // const Watcher = require('./common/watcher')
+  // const myWatcher = new Watcher('/Users/hpeters@tibco.com/WebstormProjects/TEST_TCLI_Listing/TestWatch', 'discover.labs.tibcocloud.com/configuration')
+  // await myWatcher.pullFiles()
+  // await myWatcher.watch()
+  console.log('After watching')
 }
 
 // Function to display help
@@ -860,6 +858,21 @@ export async function runDiscoverPAWrapper () {
 export async function actionDiscoverPAWrapper () {
   const DISCOVER = require('./tenants/discover')
   await DISCOVER.actionProcessAnalysis()
+}
+
+export async function exportDiscoverConfigWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.exportDiscoverConfig()
+}
+
+export async function importDiscoverConfigWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.importDiscoverConfig()
+}
+
+export async function watchDiscoverConfigWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.watchDiscoverConfig()
 }
 
 /*

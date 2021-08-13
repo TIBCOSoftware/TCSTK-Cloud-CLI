@@ -9,7 +9,7 @@ import { getProp, prepProp } from '../common/property-file-management'
 import {
   col,
   getCurrentRegion,
-  getFilesFromFolder,
+  getFilesFromFolder, getOrganization,
   mkdirIfNotExist,
   sleep,
   storeJsonToFile
@@ -21,6 +21,7 @@ import { AnalysisStatus } from '../models/discover/analysisStatus'
 import { DatasetDetail } from '../models/discover/datasetDetail'
 import path from 'path'
 import { getCurrentOrgId } from '../common/organization-management'
+import Watcher from '../common/watcher'
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
@@ -33,6 +34,7 @@ export function prepDiscoverProps () {
   mkdirIfNotExist(getProp('Discover_Folder') + '/DatasetFiles')
   mkdirIfNotExist(getProp('Discover_Folder') + '/Templates')
   mkdirIfNotExist(getProp('Discover_Folder') + '/ProcessAnalysis')
+  mkdirIfNotExist(getProp('Discover_Folder') + '/Configuration')
 }
 
 // TODO: Show details
@@ -392,6 +394,146 @@ export async function actionProcessAnalysis () {
   } else {
     logCancel(true)
   }
+}
+
+const STORE_OPTIONS = { spaces: 2, EOL: '\r\n' }
+
+// Function to export the configuration of discover to a JSON file
+export async function exportDiscoverConfig () {
+  log(INFO, 'Exporting Discover Configuration ' + col.blue('(for ' + getOrganization() + ')'))
+  prepDiscoverProps()
+  const configResult = await callTCA(CCOM.clURI.dis_configuration, false, { skipInjectingRegion: true })
+  const configFileName = getProp('Discover_Folder') + '/Configuration/discover_config (' + getOrganization() + ').json'
+  require('jsonfile').writeFileSync(configFileName, configResult, STORE_OPTIONS)
+  log(INFO, 'Exported Discover Configuration to : ' + col.green(configFileName))
+}
+
+// TODO: Formats & Messages seems to be missing
+// Config service properties
+const DISCOVER_CONFIGS =
+    [{ objectName: 'general', endpoint: 'general', label: 'General' },
+      { objectName: 'landingPage', endpoint: 'landingpages', label: 'Landing Pages' },
+      { objectName: 'investigations', endpoint: 'investigations', label: 'Investigations' },
+      { objectName: 'analytics', endpoint: 'analytics', label: 'Analytics' },
+      { objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping' }]
+
+// Function to export the configuration of discover to a JSON file
+export async function importDiscoverConfig (configFilename?: string, importAll?: boolean) {
+  let configFileNameToUse = ''
+  log(INFO, 'Importing Discover Configuration...')
+  prepDiscoverProps()
+  // if no file name provided look into the config folder
+  if (!configFilename) {
+    const defaultF = getProp('Discover_Folder') + '/Configuration/discover_config (' + getOrganization() + ').json'
+    const optionList = ['NONE', 'DEFAULT', 'FILE', ...getFilesFromFolder(getProp('Discover_Folder') + '/Configuration')]
+    log(INFO, 'Use NONE to cancel or DEFAULT to import the configuration file for this environment (in this case: ' + col.blue(defaultF) + ')')
+    log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
+    const configFileForImport = await askMultipleChoiceQuestionSearch('Which configuration file would you like to import ? ', optionList)
+    // console.log(configFileForImport)
+    let configFileLocation
+    switch (configFileForImport.toLowerCase()) {
+      case 'none':
+        logCancel(true)
+        break
+      case 'default':
+        configFileNameToUse = defaultF
+        break
+      case 'file':
+        configFileLocation = await askQuestion('Provide the location of the configuration file for import:')
+        if (configFileLocation && configFileLocation.toLowerCase() !== 'none') {
+          configFileNameToUse = configFileLocation
+        } else {
+          logCancel(true)
+        }
+        break
+      default:
+        configFileNameToUse = getProp('Discover_Folder') + '/Configuration/' + configFileForImport
+    }
+  } else {
+    configFileNameToUse = configFilename
+  }
+
+  log(INFO, 'Analyzing: ' + col.blue(configFileNameToUse))
+  const fs = require('fs')
+  const configFile = fs.readFileSync(configFileNameToUse)
+  let configObject:any = {}
+  try {
+    configObject = JSON.parse(configFile)
+  } catch (error) {
+    log(ERROR, 'JSON Parsing error on configuration: ', error.message)
+    process.exit(1)
+  }
+  // Ask if all configuration needs to be added or just a single
+  let configTypeToImport = 'all'
+  if(!importAll) {
+    const optionList = ['ALL', ...DISCOVER_CONFIGS.map(v => v.label), 'NONE']
+    configTypeToImport = await askMultipleChoiceQuestionSearch('Which configuration type would you like to import ? ', optionList)
+  }
+  let disConf
+  switch (configTypeToImport.toLowerCase()) {
+    case 'none':
+      logCancel(true)
+      break
+    case 'all':
+      for (const disc of DISCOVER_CONFIGS.map(v => v.objectName)) {
+        if (configObject[disc]) {
+          // console.log(configObject[disc])
+          log(INFO, 'Found the configuration for ' + disc)
+          // Upload this config
+          await updateDiscoverConfig(DISCOVER_CONFIGS.find(v => v.objectName === disc)!.endpoint, configObject[disc])
+        } else {
+          log(WARNING, 'The configuration for ' + disc + ' seems to be missing !!!')
+        }
+      }
+      break
+    default: // Use the config file provided
+      disConf = DISCOVER_CONFIGS.find(v => v.label.toLowerCase() === configTypeToImport.toLowerCase())!
+      if (configObject[disConf.objectName]) {
+        await updateDiscoverConfig(disConf.endpoint, configObject[disConf.objectName])
+      } else {
+        log(ERROR, 'The configuration for ' + disConf.label + ' is missing !!!')
+      }
+  }
+}
+
+async function updateDiscoverConfig (endpoint: string, configObject:any) {
+  log(INFO, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
+  // log(INFO, 'New Config: ', configObject)
+  // const result = await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, { skipInjectingRegion: SKIP_REGION, handleErrorOutside: true, returnResponse: true })
+  // console.log('Result:  ', result.body, ' Status: ', result.statusCode)
+  // TODO: Use this to update config (after service is enabled)
+  // const configResult = await callTCA(CCOM.clURI.dis_configuration + '/' + endpoint, true, { skipInjectingRegion: true })
+  // console.log(configResult)
+  /// await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, { skipInjectingRegion: SKIP_REGION })
+  console.log('Posting ' + configObject + ' to: ', CCOM.clURI.dis_configuration + '/' + endpoint)
+}
+
+// Function to export the configuration of discover to a JSON file
+export async function watchDiscoverConfig () {
+  log(INFO, 'Watching Configuration...')
+  prepDiscoverProps()
+  /*
+  Watcher has two callbacks;
+  refreshFiles --> This function calls the cloud and provides the input for the file (this is called initially (optionally) and everytime the user presses 'r'
+  uploadOnRefresh --> This function gets the refreshed object everytime the watcher detects a file change.
+   */
+  const myWatcher = new Watcher(getProp('Discover_Folder') + '/Configuration/',
+    async (folder) => {
+      console.log('Refreshing files: ', folder)
+      await exportDiscoverConfig()
+    }, async (changedFile) => {
+      console.log('changed file: ', changedFile)
+      await importDiscoverConfig('./' + changedFile, true)
+    }
+  )
+  // Ask if you want to export before starting to watch
+  const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest Discover Config ?', ['YES', 'NO'])
+  if (decision === 'YES') {
+    await myWatcher.pullFiles()
+  }
+  await myWatcher.watch()
+
+  // Only watch one file
 }
 
 function getAvailablePAforAction (prAnalysis: Analysis[], action: string) {

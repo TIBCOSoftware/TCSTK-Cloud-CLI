@@ -455,10 +455,8 @@ export async function watchSharedStateMain () {
   const decision = await askMultipleChoiceQuestion('Before you watch the files for changes, do you want to do an export of the latest shared state (filtered) ?', ['YES', 'NO'])
   if (decision === 'YES') {
     await exportSharedState()
-    run(commandSTDO)
-  } else {
-    run(commandSTDO)
   }
+  run(commandSTDO)
 }
 
 let ignoreChanges = 0

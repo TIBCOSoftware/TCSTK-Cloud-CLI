@@ -50,7 +50,8 @@
     "dis_file_upload": "discover.labs.tibcocloud.com/files",
     "dis_dataset_preview": "discover.labs.tibcocloud.com/catalog/dataset/preview",
     "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status",
-    "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis"
+    "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis",
+    "dis_configuration": "discover.labs.tibcocloud.com/configuration"
   },
   "mappings": {
     "oauth": {
