@@ -429,7 +429,7 @@ export async function postMessageToCloud (endpoint: string, message: any, custom
   if (customConfig) {
     config = { ...config, ...customConfig }
   }
-  return await callTCA(endpoint, true, config)
+  return await callTCA(endpoint, false, config)
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
