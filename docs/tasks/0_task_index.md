@@ -3,7 +3,7 @@
 ---
 
 
-## tcli
+## tibco-cloud
 
 ---
 
@@ -12,29 +12,11 @@
 
 [show-cloud-roles](./show-cloud-roles.md) - Displays which tenants you have access to, and what roles you have
 
-[show-properties](./show-properties.md) - Shows the properties in your properties file (and possibly the global values)
+[change-tibco-cloud-region](./change-tibco-cloud-region.md) - Change the Region in the cloud-properties file
 
-[add-or-update-property](./add-or-update-property.md) - Adds or Updates a property in a file.
+[show-tibco-cloud-organizations](./show-tibco-cloud-organizations.md) - Shows the Cloud Organization and potentially more details
 
-[change-cloud-region](./change-cloud-region.md) - Change the Region in the cloud-properties file
-
-[show-cloud-organizations](./show-cloud-organizations.md) - Shows the Cloud Organization and potentially more details
-
-[change-cloud-organization](./change-cloud-organization.md) - Changes the Organization in the cloud-properties file
-
-[obfuscate-password](./obfuscate-password.md) - Obfuscate a password and put it in the cloud-properties file
-
-[view-global-config](./view-global-config.md) - View the global cloud connection configuration
-
-[update-global-config](./update-global-config.md) - Update the global cloud connection configuration
-
-[create-multiple-property-file](./create-multiple-property-file.md) - Creating an initial property file to manage multiple cloud starters and environments.
-
-[generate-cloud-property-files](./generate-cloud-property-files.md) - Generates a list of cloud property files.
-
-[replace-string-in-file](./replace-string-in-file.md) - Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties
-
-[validate](./validate.md) - Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.
+[change-tibco-cloud-organization](./change-tibco-cloud-organization.md) - Changes the Organization in the cloud-properties file
 
 
 ## cloud-starters
@@ -69,6 +51,32 @@
 [undo-lib-sources](./undo-lib-sources.md) - Undoes the enabling for Cloud Library Debugging
 
 [schematic-add](./schematic-add.md) - Add a schematic into your project
+
+
+## tcli
+
+---
+
+
+[show-properties](./show-properties.md) - Shows the properties in your properties file (and possibly the global values)
+
+[add-or-update-property](./add-or-update-property.md) - Adds or Updates a property in a file.
+
+[obfuscate-password](./obfuscate-password.md) - Obfuscate a password and put it in the cloud-properties file
+
+[view-global-config](./view-global-config.md) - View the global cloud connection configuration
+
+[update-global-config](./update-global-config.md) - Update the global cloud connection configuration
+
+[create-multiple-property-file](./create-multiple-property-file.md) - Creating an initial property file to manage multiple cloud starters and environments.
+
+[generate-cloud-property-files](./generate-cloud-property-files.md) - Generates a list of cloud property files.
+
+[replace-string-in-file](./replace-string-in-file.md) - Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties
+
+[replace-values-in-files](./replace-values-in-files.md) - Replace string in file following based on answers provided
+
+[validate](./validate.md) - Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.
 
 
 ## live-apps
@@ -136,7 +144,7 @@
 
 [upload-file-to-cloud-folder](./upload-file-to-cloud-folder.md) - Uploads a file to a LiveApps Organization Folder
 
-[download-file-from-cloud-folder](./download-file-from-cloud-folder.md) - Downloads file(s) from a LiveApps Organization Folder to disk
+[download-cloud-files-from-cloud-folder](./download-cloud-files-from-cloud-folder.md) - Downloads file(s) from a LiveApps Organization Folder to disk
 
 
 ## tci
@@ -183,6 +191,40 @@
 [upload-spotfire-dxp](./upload-spotfire-dxp.md) - Uploads a Spotfire DXP into a specific library folder.
 
 [download-spotfire-dxp](./download-spotfire-dxp.md) - Downloads a Spotfire DXP from a library folder.
+
+
+## discover
+
+---
+
+
+[show-discover-process-analysis](./show-discover-process-analysis.md) - Show's the process analysis of Project Discover
+
+[show-discover-datasets](./show-discover-datasets.md) - Show's the datasets of Project Discover
+
+[show-discover-templates](./show-discover-templates.md) - Show's the templates of Project Discover
+
+[show-discover-dataset-files](./show-discover-dataset-files.md) - Show's a list of dataset files for Project Discover
+
+[export-discover-datasets](./export-discover-datasets.md) - Exports the datasets of Project Discover into JSON files
+
+[upload-discover-dataset-file](./upload-discover-dataset-file.md) - Uploads a CSV file for analysis in Project Discover
+
+[remove-discover-dataset-file](./remove-discover-dataset-file.md) - Removes a Dataset file in Project Discover
+
+[create-discover-dataset](./create-discover-dataset.md) - Create a Dataset for Project Discover
+
+[remove-discover-dataset](./remove-discover-dataset.md) - Removes a Dataset for Project Discover
+
+[run-discover-process-analysis](./run-discover-process-analysis.md) - Runs a Process Analysis for Project Discover
+
+[action-discover-process-analysis](./action-discover-process-analysis.md) - Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover
+
+[export-discover-config](./export-discover-config.md) - Exports the configuration for Project Discover into a JSON file
+
+[import-discover-config](./import-discover-config.md) - Imports the configuration for Project Discover into a JSON file
+
+[watch-discover-config](./watch-discover-config.md) - Looks for changes in configuration for Project Discover JSON file, and uploads them
 
 
 ## oauth

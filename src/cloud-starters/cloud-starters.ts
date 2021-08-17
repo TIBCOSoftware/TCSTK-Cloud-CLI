@@ -188,7 +188,7 @@ export function buildCloudStarterZip (cloudStarter: string) {
   log(INFO, 'ZIP Created: ./dist/' + cloudStarter + '.zip')
 }
 
-// function that shows all the availible applications in the cloud
+// function that shows all the available applications in the cloud
 export async function showAvailableApps (showTable?: boolean) {
   // TODO: Use table config
   const doShowTable = (typeof showTable === 'undefined') ? false : showTable

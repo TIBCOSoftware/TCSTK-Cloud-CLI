@@ -27,11 +27,13 @@ If we answer ***CloudLogin.Region***, we will get the following result:
 
 ![TCLI_Show_Links](imgs/006_Validate.png#zoom)
 
-> ***Note:*** There are a whole bunch of things you can validate:
+> ***Note:*** There are a bunch of things you can validate:
 
 * Property_exist
 * Property_is_set
 * Property_is_set_ask
+* Tenant_Access
+* Tenant_Role
 * LiveApps_app_exist
 * Live_Apps_group_exist
 * TCI_App_exist

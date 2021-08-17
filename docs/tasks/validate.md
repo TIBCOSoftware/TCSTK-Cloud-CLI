@@ -16,6 +16,8 @@ These are the things you can validate:
 * Property_exist: Validates if a property exists in your tibco cloud property file.
 * Property_is_set: Validates if a property exists and has a value.
 * Property_is_set_ask: Does the same as Property_is_set, but if not set it will ask for a value(interactively).
+* Tenant_Access: Do you have access to a specific tenant (within the organization).
+* Tenant_Role: Do you have the right roles within a tenant.
 * LiveApps_app_exist: Validates if a LiveApps Application exists.
 * Live_Apps_group_exist: Validates if a LiveApps Group exists.
 * TCI_App_exist: Validates if a TCI Application exists.

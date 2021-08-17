@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "2.4.0",
+  "version": "3.0.1",
   "scripts": {
     "postinstall": "node message.js",
     "testO": "node ./test/run-test-cases.js",

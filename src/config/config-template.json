@@ -2,7 +2,7 @@
   "templates": [
     {
       "name": "TCSTK-base-template-git",
-      "displayName": "Basic Cloud Starter Template - LATEST Angular 10",
+      "displayName": "Basic Cloud Starter Template (Angular 12)",
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
@@ -29,7 +29,7 @@
     },
     {
       "name": "TCSTK-case-manager-app-git",
-      "displayName": "Case Manager App - LATEST Angular 10",
+      "displayName": "Case Manager App (Angular 12)",
       "enabled": true,
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": true,
@@ -58,7 +58,7 @@
     },
     {
       "name": "Form-Template-Git",
-      "displayName": "Form Template - LATEST Angular 10",
+      "displayName": "Form Template (Angular 12)",
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
@@ -78,7 +78,7 @@
     },
     {
       "name": "TCSTK-spotfire-template-git",
-      "displayName": "Analytics Application Template - LATEST Angular 10",
+      "displayName": "Analytics Application Template (Angular 12)",
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
