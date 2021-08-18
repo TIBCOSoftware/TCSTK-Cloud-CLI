@@ -7,7 +7,7 @@
       "templateFolder": "",
       "useGit": true,
       "git": "https://github.com/TIBCOSoftware/TCSTK-base-app",
-      "gitTag": "LATEST",
+      "gitTag": "Ang12",
       "removeGitFolder": true,
       "gitPostCommands": [],
       "gitPostCommandsWin": [],
@@ -34,7 +34,7 @@
       "templateFolder": "/applicationTemplate/TCSTK-case-manager-app",
       "useGit": true,
       "git": "https://github.com/TIBCOSoftware/TCSTK-case-manager-app",
-      "gitTag": "LATEST",
+      "gitTag": "Ang12",
       "removeGitFolder": true,
       "gitPostCommands": [
         "rm package-lock.json"

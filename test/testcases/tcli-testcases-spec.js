@@ -170,10 +170,10 @@ describe('tcli testsuite', function () {
   })
 
   // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Build and Deploy Basic Cloud Starter'
-  // Basic Cloud Starter Template - LATEST Angular 10
+  // Basic Cloud Starter Template (Angular 12)
   it('TEMPLATE: Build and Deploy Basic Cloud Starter', function () {
     const CSName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime()
-    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Basic Cloud Starter Template - LATEST Angular 10" -s')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Basic Cloud Starter Template (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true, 'Command: ' + cObj.command)
@@ -187,12 +187,10 @@ describe('tcli testsuite', function () {
   })
 
   // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Case Manager and Schematics'
-  // Basic Cloud Starter Template - LATEST Angular 10
-
   // TODO: Testcase fails on windows (on ./backup folder)
   it('TEMPLATE: Case Manager and Schematics', function () {
     const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime()
-    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true, 'Command: ' + cObj.command)
     // TODO: Test Schematic add by making it more interactive...
 
@@ -209,7 +207,7 @@ describe('tcli testsuite', function () {
   // jasmine --config=test/support/jasmine.json --filter='Case Manager and Lib Sources'
   xit('Case Manager and Lib Sources', function () {
     const CSName = 'CS-CASE-TEST-CM-' + (new Date()).getTime()
-    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App - LATEST Angular 10" -s')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Case Manager App (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true, 'Command: ' + cObj.command)
     // ng generate @tibco-tcstk/component-template:analytics-cockpit CustomAnalyticsCockpit
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'inject-lib-sources')).toBe(true, 'Command: ' + cObj.command)
@@ -221,11 +219,10 @@ describe('tcli testsuite', function () {
   })
 
   // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Form and Schematics'
-  // Form Template - LATEST Angular 10
   // TODO: Testcase fails on: Cannot read property 'length' of undefined
   xit('TEMPLATE: Form and Schematics', function () {
     const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime()
-    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Form Template - LATEST Angular 10" -s')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Form Template (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true, 'Command: ' + cObj.command)
 
     // TODO: Add default ID for form ref
@@ -235,10 +232,9 @@ describe('tcli testsuite', function () {
   })
 
   // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Analytics Template and Schematics'
-  // Analytics Application Template - LATEST Angular 10
   it('TEMPLATE: Analytics Template and Schematics', function () {
     const CSName = 'CS-FORM-TEST-CM-' + (new Date()).getTime()
-    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template - LATEST Angular 10" -s')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Analytics Application Template (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build-cloud-starter')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy-cloud-starter')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'validate -a cloud_starter_exist:' + CSName)).toBe(true, 'Command: ' + cObj.command)
