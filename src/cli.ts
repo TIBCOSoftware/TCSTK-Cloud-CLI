@@ -11,13 +11,13 @@ import { multipleInteraction, processMultipleFile } from './manage-multiple'
 import { Global } from './models/base'
 import { TCLITask } from './models/tcli-models'
 import {
-  askMultipleChoiceQuestion,
+  askMultipleChoiceQuestion, escapeColon,
   getGivenAnswers,
   isGlobalAnswersUsed,
   setGlobalAnswers
 } from './common/user-interaction'
 import { addOrUpdateProperty, getProp, setProperty, setPropFileName } from './common/property-file-management'
-import {DEBUG, disableLogging, ERROR, INFO, log, RECORDER, setLogCategory, WARNING} from './common/logging'
+import { DEBUG, disableLogging, ERROR, INFO, log, RECORDER, setLogCategory, WARNING } from './common/logging'
 
 declare let global: Global
 
@@ -361,7 +361,7 @@ export async function cli (args: any) {
               let taskCommand = 'tcli ' + options.task + ' '
               let answers = ''
               getGivenAnswers().forEach(ans => {
-                answers += ans + ':'
+                answers += escapeColon(ans) + ':'
               })
               if (answers !== '') {
                 // Remove last semicolon
@@ -369,11 +369,11 @@ export async function cli (args: any) {
                 taskCommand += '-a "' + answers + '"'
               }
               // Add different property file (if used)
-              if (options.propfile != 'tibco-cloud.properties') {
+              if (options.propfile !== 'tibco-cloud.properties') {
                 taskCommand += ' -p "' + options.propfile + '"'
               }
               let rec = col.white('● ')
-              if (options.record != '') {
+              if (options.record !== '') {
                 rec = col.red('● ')
                 const recordFile = trim(options.record)
                 log(RECORDER, rec + 'Adding command to: ' + col.underline(recordFile))

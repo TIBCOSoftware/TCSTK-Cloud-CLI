@@ -114,9 +114,20 @@ export function isGlobalAnswersUsed () {
   return useGlobalAnswers
 }
 
+const COLON_ESCAPE = '[[:]]'
+
+export function escapeColon (text: string) {
+  return text.replace(':', COLON_ESCAPE)
+}
+
 export function setGlobalAnswers (answers: string) {
   // console.log('Answers: ' , answers);
   if (answers) {
+    let uniqueRepl
+    if (answers.indexOf(COLON_ESCAPE) > 0) {
+      uniqueRepl = '[DOUBLE-COLON-' + (new Date()).getTime() + ']'
+      answers = answers.replace(COLON_ESCAPE, uniqueRepl)
+    }
     // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
     if (answers.indexOf(':') > 0) {
       globalAnswers = answers.split(':')
@@ -124,6 +135,13 @@ export function setGlobalAnswers (answers: string) {
       globalAnswers = answers.split(',')
     }
     if (globalAnswers.length > 0) {
+      if (uniqueRepl) {
+        for (const gAns in globalAnswers) {
+          if (globalAnswers[gAns]) {
+            globalAnswers[gAns] = globalAnswers[gAns]!.replace(uniqueRepl, ':')
+          }
+        }
+      }
       useGlobalAnswers = true
       log(INFO, 'Global Answers set: ', globalAnswers)
     }
