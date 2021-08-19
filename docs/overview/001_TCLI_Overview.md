@@ -25,7 +25,7 @@ node -v
 npm -v
 ```
 
-Since a Cloud Starter is an <a href="https://angular.io/" target="_blank">Angular Application</a>, you will need the <a href="https://cli.angular.io/" target="_blank">Angular CLI.</a> After you have installed Node.js, you can install the Angular CLI with the following command:
+Since a TIBCO Cloud Application is an <a href="https://angular.io/" target="_blank">Angular Application</a>, you will need the <a href="https://cli.angular.io/" target="_blank">Angular CLI.</a> After you have installed Node.js, you can install the Angular CLI with the following command:
 
 ```console
 npm install -g @angular/cli
