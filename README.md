@@ -89,7 +89,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |update-tcli|Update the Cloud CLI|
 |help|Display's help message|
 |browse-tasks|Browses the TCLI tasks by category|
-|repeat-last-task|Repeats the last executed task|
+|repeat-last-task|Repeats the last executed task (easy accessible using the up button)|
 
 ## cloud-starters
 
