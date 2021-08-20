@@ -70,13 +70,8 @@ These are the available TIBCO Cloud™ CLI Tasks:
 
 | TASK | Description |
 |------|:------------|
-|[show-cloud](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud/)|Show Cloud Details|
-|[show-cloud-roles](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-roles/)|Displays which tenants you have access to, and what roles you have|
 |[show-properties](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-properties/)|Shows the properties in your properties file (and possibly the global values)|
 |[add-or-update-property](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/add-or-update-property/)|Adds or Updates a property in a file.|
-|[change-tibco-cloud-region](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-region/)|Change the Region in the cloud-properties file|
-|[show-tibco-cloud-organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-tibco-cloud-organizations/)|Shows the Cloud Organization and potentially more details|
-|[change-tibco-cloud-organization](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-organization/)|Changes the Organization in the cloud-properties file|
 |[obfuscate-password](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/obfuscate-password/)|Obfuscate a password and put it in the cloud-properties file|
 |[view-global-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/view-global-config/)|View the global cloud connection configuration|
 |[update-global-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/update-global-config/)|Update the global cloud connection configuration|
@@ -90,6 +85,17 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |help|Display's help message|
 |browse-tasks|Browses the TCLI tasks by category|
 |repeat-last-task|Repeats the last executed task (easy accessible using the up button)|
+
+## tibco-cloud
+
+| TASK | Description |
+|------|:------------|
+|[show-cloud](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud/)|Show Cloud Details|
+|[show-cloud-roles](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-roles/)|Displays which tenants you have access to, and what roles you have|
+|[change-tibco-cloud-region](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-region/)|Change the Region in the cloud-properties file|
+|[show-tibco-cloud-organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-tibco-cloud-organizations/)|Shows the Cloud Organization and potentially more details|
+|[change-tibco-cloud-organization](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-organization/)|Changes the Organization in the cloud-properties file|
+
 
 ## cloud-starters
 
