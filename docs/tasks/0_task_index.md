@@ -220,12 +220,6 @@
 
 [action-discover-process-analysis](./action-discover-process-analysis.md) - Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover
 
-[export-discover-config](./export-discover-config.md) - Exports the configuration for Project Discover into a JSON file
-
-[import-discover-config](./import-discover-config.md) - Imports the configuration for Project Discover into a JSON file
-
-[watch-discover-config](./watch-discover-config.md) - Looks for changes in configuration for Project Discover JSON file, and uploads them
-
 
 ## oauth
 
