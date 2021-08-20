@@ -37,6 +37,8 @@ Before you run the command to change the region.
 
 ---
 ### Alternatives:
+> tcli change-cloud-region
+
+> tcli change-region
+
 > tcli cr
-
-

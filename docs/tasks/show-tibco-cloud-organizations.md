@@ -12,6 +12,8 @@ This task lists all the organizations that exists on your cloud subscription, an
 
 ---
 ### Alternatives:
+> tcli show-cloud-organizations
+
 > tcli show-organizations
 
 > tcli show-orgs

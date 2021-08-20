@@ -77,6 +77,18 @@ Resulting in:
 
 ![TCLI_Show_Links](imgs/006_Answers_Validation_Failed.png#zoom)
 
+> Note: You want to escape backslashes in property files (by using double '\\' And you can escape a semi-colon in the answer itself by escaping it with [[:]]. This is useful when passing in Windows folder structures for example:
+
+```console
+tcli add-or-update-property -a "file.properties:Folder_To_Use:none:C[[:]]\\My_Folder\\
+```
+
+> Also note that the Recorder will automatically create these Semicolon escapes for you, for example:
+
+```console
+[RECORDER] ● Replay command: tcli add-or-update-property -a "default:MyFolder:Folder to use:C[[:]]\Folder\"
+```
+
 ---
 ## Updating properties with answers
 

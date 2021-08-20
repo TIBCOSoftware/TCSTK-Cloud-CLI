@@ -47,5 +47,4 @@ TIBCO CLOUD CLI] (INFO)  Library Item Name: Sales and Marketing
 TIBCO CLOUD CLI] (INFO)  UPLOADING DXP: ./Spotfire_DXPs/Sales and Marketing.dxp (to:/spotfire/attachment) Filesize: 1.46 MB
 TIBCO CLOUD CLI] (INFO)  DXP Uploaded successfully.... (Attachment ID: 7d75bb2d-0c86-1234-a2b3-3a156a701abc)
 TIBCO CLOUD CLI] (INFO)  Item Saved Successfully 
-
 ```

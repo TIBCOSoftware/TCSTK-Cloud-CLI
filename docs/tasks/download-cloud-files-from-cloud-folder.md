@@ -13,3 +13,6 @@ This task allows you to download one or All files from a specific cloud folder.
 ---
 ### Alternatives:
 > tcli download-file-from-org-folder
+
+> tcli download-file-from-cloud-folder
+

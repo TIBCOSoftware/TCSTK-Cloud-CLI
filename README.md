@@ -71,18 +71,19 @@ These are the available TIBCO Cloud™ CLI Tasks:
 | TASK | Description |
 |------|:------------|
 |[show-cloud](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud/)|Show Cloud Details|
-|[show-cloud-roles](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-roles.md)|Displays which tenants you have access to, and what roles you have|
+|[show-cloud-roles](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-roles/)|Displays which tenants you have access to, and what roles you have|
 |[show-properties](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-properties/)|Shows the properties in your properties file (and possibly the global values)|
 |[add-or-update-property](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/add-or-update-property/)|Adds or Updates a property in a file.|
-|[change-cloud-region](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-cloud-region/)|Change the Region in the cloud-properties file|
-|[show-cloud-organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-organizations/)|Shows the Cloud Organization and potentially more details|
-|[change-cloud-organization](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-cloud-organization/)|Changes the Organization in the cloud-properties file|
+|[change-tibco-cloud-region](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-region/)|Change the Region in the cloud-properties file|
+|[show-tibco-cloud-organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-tibco-cloud-organizations/)|Shows the Cloud Organization and potentially more details|
+|[change-tibco-cloud-organization](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-organization/)|Changes the Organization in the cloud-properties file|
 |[obfuscate-password](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/obfuscate-password/)|Obfuscate a password and put it in the cloud-properties file|
 |[view-global-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/view-global-config/)|View the global cloud connection configuration|
 |[update-global-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/update-global-config/)|Update the global cloud connection configuration|
 |[create-multiple-property-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-multiple-property-file/)|Creating an initial property file to manage multiple cloud starters and environments.|
 |[generate-cloud-property-files](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/generate-cloud-property-files/)|Generates a list of cloud property files.|
 |[replace-string-in-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/replace-string-in-file/)|Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties|
+|[replace-values-in-files](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/replace-values-in-files/)|Replace string in file following based on answers provided|
 |[validate](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/validate/)|Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.|
 |quit|Quit the console|
 |update-tcli|Update the Cloud CLI|
@@ -147,7 +148,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[show-cloud-folders](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-folders/)|Displays the content of the LiveApps Organization Folders.|
 |[create-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-cloud-folder/)|Creates a new LiveApps Organization Folder.|
 |[upload-file-to-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/upload-file-to-cloud-folder/)|Uploads a file to a LiveApps Organization Folder|
-|[download-file-from-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/download-file-from-cloud-folder/)|Downloads file(s) from a LiveApps Organization Folder to disk|
+|[download-cloud-files-from-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/download-cloud-files-from-cloud-folder/)|Downloads file(s) from a LiveApps Organization Folder to disk|
 
 ## tci
 
@@ -177,6 +178,22 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[create-spotfire-library-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-spotfire-library-folder/)|Creates a new Library Folder.|
 |[upload-spotfire-dxp](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/upload-spotfire-dxp/)|Uploads a Spotfire DXP into a specific library folder.|
 |[download-spotfire-dxp](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/download-spotfire-dxp/)|Downloads a Spotfire DXP from a library folder.|
+
+## discover
+
+| TASK | Description |
+|------|:------------|
+|[show-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-discover-process-analysis/)|Show's the process analysis of Project Discover|
+|[show-discover-datasets](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-discover-datasets/)|Show's the datasets of Project Discover|
+|[show-discover-templates](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-discover-templates/)|Show's the templates of Project Discover|
+|[show-discover-dataset-files](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-discover-dataset-files/)|Show's a list of dataset files for Project Discover|
+|[export-discover-datasets](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/export-discover-datasets/)|Exports the datasets of Project Discover into JSON files|
+|[upload-discover-dataset-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/upload-discover-dataset-file/)|Uploads a CSV file for analysis in Project Discover|
+|[remove-discover-dataset-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/remove-discover-dataset-file/)|Removes a Dataset file in Project Discover|
+|[create-discover-dataset](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-discover-dataset/)|Create a Dataset for Project Discover|
+|[remove-discover-dataset](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/remove-discover-dataset/)|Removes a Dataset for Project Discover|
+|[run-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/run-discover-process-analysis/)|Runs a Process Analysis for Project Discover|
+|[action-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/action-discover-process-analysis/)|Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover|
 
 ## oauth
 
