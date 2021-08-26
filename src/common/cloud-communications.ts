@@ -14,7 +14,7 @@ import { askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction
 import { DEBUG, ERROR, INFO, log, logCancel, logO, WARNING } from './logging'
 import { getProp, setProperty } from './property-file-management'
 import path from 'path'
-import {getCurrentOrganizationRoles} from "./organization-management";
+import { getCurrentOrganizationRoles } from './organization-management'
 
 declare let global: Global
 
@@ -240,6 +240,7 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
   if (conf.skipInjectingRegion) {
     urlToCall = 'https://' + url
   }
+  if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Before calling ', urlToCall)
   const doErrorOutside = conf.handleErrorOutside || false
   const fOAUTH = conf.forceOAUTH || false
   const fCLIENTID = conf.forceCLIENTID || false
@@ -318,6 +319,7 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
       method: cMethod.toUpperCase()
     }, body)
   }
+  if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After calling ', urlToCall)
   if ((response.statusCode < 200 || response.statusCode >= 300) && !doErrorOutside) {
     if (response.body != null) {
       log(ERROR, 'Error Calling URL: ' + urlToCall + ' Status: ' + response.statusCode + ' \n Message: ', response.body)

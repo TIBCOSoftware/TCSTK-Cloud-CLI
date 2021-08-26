@@ -150,6 +150,7 @@ function getAllCategories () {
 }
 
 export function loadTaskDesc (category?: string, availableCat?: string[]) {
+  if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Before task descriptions')
   if (!availableCat) {
     availableCat = ['ALL']
   }
