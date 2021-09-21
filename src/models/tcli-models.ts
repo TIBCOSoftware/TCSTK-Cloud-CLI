@@ -1,7 +1,7 @@
 
 export type Category =
     'tcli'
-    | 'cloud-starters'
+    | 'cloud-apps'
     | 'live-apps'
     | 'shared-state'
     | 'cloud-files'

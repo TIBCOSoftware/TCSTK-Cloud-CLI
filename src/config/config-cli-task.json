@@ -27,147 +27,156 @@
       ],
       "category": "tibco-cloud"
     },
-    "show-cloud-starters": {
-      "description": "Show a Table of all the deployed Cloud Starters",
+    "show-cloud-apps": {
+      "description": "Show a Table of all the deployed Cloud Applications",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showApps",
       "taskAlternativeNames": [
+        "show-cloud-starters",
         "scs",
         "show"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
-    "show-cloud-starter-links": {
-      "description": "Show Links to your Cloud Starters",
+    "show-cloud-app-links": {
+      "description": "Show Links to your Cloud Applications",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "showLinks",
       "taskAlternativeNames": [
+        "show-cloud-starter-links",
         "sl",
         "show-links"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
-    "start-cloud-starter": {
-      "description": "Start your local cloud starter project",
+    "start-cloud-app": {
+      "description": "Start your local cloud application project",
       "enabled": true,
       "internal": false,
       "task": "startWrapper",
       "taskAlternativeNames": [
+        "start-cloud-starter",
         "s",
         "start"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
-    "build-cloud-starter": {
-      "description": "Build your local cloud starter project",
+    "build-cloud-app": {
+      "description": "Build your local cloud application project",
       "enabled": true,
       "internal": false,
       "task": "buildCloudStarter",
       "taskAlternativeNames": [
+        "build-cloud-starter",
         "b",
         "build"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
-    "test-cloud-starter": {
-      "description": "Run Test cases for your cloud starter",
+    "test-cloud-app": {
+      "description": "Run Test cases for your cloud application",
       "enabled": true,
       "internal": false,
       "task": "testCSWrapper",
       "taskAlternativeNames": [
+        "test-cloud-starter",
         "t",
         "test"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters",
+      "category": "cloud-apps",
       "availableOnTemplate": [
         "all"
       ]
     },
-    "test-cloud-starter-headless": {
-      "description": "Run Test cases for your cloud starter, headless (without opening the browser)",
+    "test-cloud-app-headless": {
+      "description": "Run Test cases for your cloud application, headless (without opening the browser)",
       "enabled": true,
       "internal": false,
       "task": "testCSHeadlessWrapper",
       "taskAlternativeNames": [
+        "test-cloud-starter-headless",
         "th",
         "test-headless"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters",
+      "category": "cloud-apps",
       "availableOnTemplate": [
         "all"
       ]
     },
-    "deploy-cloud-starter": {
-      "description": "Deploy your local cloud starter project",
+    "deploy-cloud-app": {
+      "description": "Deploy your local cloud application project",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "deploy",
       "taskAlternativeNames": [
+        "deploy-cloud-starter",
         "d",
         "deploy"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
-    "build-deploy-cloud-starter": {
+    "build-deploy-cloud-app": {
       "description": "Builds and Deploys your local project to the cloud",
       "enabled": true,
       "internal": false,
       "task": "buildDeploy",
       "taskAlternativeNames": [
+        "build-deploy-cloud-starter",
         "bd",
         "build-deploy"
       ],
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "publish": {
-      "description": "Publish your cloud starter project in the cloud",
+      "description": "Publish your cloud application project in the cloud",
       "enabled": false,
       "internal": false,
       "task": "publish",
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
-    "delete-cloud-starter": {
-      "description": "Delete a LiveApps WebApp",
+    "delete-cloud-app": {
+      "description": "Delete a cloud application",
       "enabled": true,
       "internal": false,
       "task": "deleteAppWrapper",
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters",
+      "category": "cloud-apps",
       "taskAlternativeNames": [
+        "delete-cloud-starter",
         "delete"
       ]
     },
@@ -179,7 +188,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "generate-descriptor": {
       "description": "Generates the configured Public Cloud Descriptor",
@@ -192,7 +201,7 @@
       "taskAlternativeNames": [
         "generate-cloud-descriptor"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "update-packages": {
       "description": "Updates the NPM packages in the @tibco-tcstk scope in your project.",
@@ -205,7 +214,7 @@
       "taskAlternativeNames": [
         "update-cloud-packages"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "get-cloud-libs-from-git": {
       "description": "Get's the cloud libraries from git",
@@ -215,7 +224,7 @@
       "availableOnOs": [
         "darwin"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "inject-lib-sources": {
       "description": "Enables your project for Cloud Library Debugging",
@@ -225,7 +234,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "undo-lib-sources": {
       "description": "Undoes the enabling for Cloud Library Debugging",
@@ -235,7 +244,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "schematic-add": {
       "description": "Add a schematic into your project",
@@ -245,7 +254,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "show-cloud-roles": {
       "description": "Displays which tenants you have access to, and what roles you have",
@@ -878,7 +887,7 @@
       "availableOnOs": [
         "all"
       ],
-      "category": "cloud-starters"
+      "category": "cloud-apps"
     },
     "show-messaging-summary": {
       "description": "Show summary of cloud messaging",

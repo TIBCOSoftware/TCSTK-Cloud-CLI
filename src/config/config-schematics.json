@@ -32,14 +32,14 @@
       true
     ],
     "AvailableInTemplate": [
-      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Analytics Application Template - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)","Analytics Application Template (Angular 12)"],
+      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Analytics Application Template - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)","Analytics Application Template (Angular 12)", "Basic Cloud Application Template (Angular 12)"],
       ["Case Manager App - LATEST Angular 10","Case Manager App (Angular 12)"],
-      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)"],
+      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)", "Basic Cloud Application Template (Angular 12)"],
       ["Form Template - LATEST Angular 10","Form Template (Angular 12)"],
       ["Form Template - LATEST Angular 10","Form Template (Angular 12)"],
       ["Form Template - LATEST Angular 10","Form Template (Angular 12)"],
-      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Analytics Application Template - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)","Analytics Application Template (Angular 12)"],
-      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)"]
+      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Analytics Application Template - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)","Analytics Application Template (Angular 12)", "Basic Cloud Application Template (Angular 12)"],
+      ["Basic Cloud Starter Template - LATEST Angular 10","Case Manager App - LATEST Angular 10","Basic Cloud Starter Template (Angular 12)","Case Manager App (Angular 12)", "Basic Cloud Application Template (Angular 12)"]
     ]
   }
 }

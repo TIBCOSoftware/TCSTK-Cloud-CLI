@@ -251,11 +251,11 @@ export async function showAvailableApps (showTable?: boolean) {
       delete appTempDisplay['LATEST DEPLOYED']
       appsDisplay[appN] = appTempDisplay
     }
-    pexTable(apps, 'cloud-starters', getPEXConfig(), false)
+    pexTable(apps, 'cloud-apps', getPEXConfig(), false)
     if (doShowTable) {
       // log(INFO, col.blue('TABLE] cloud-starters'))
       // console.table(appsDisplay)
-      showTableFromTobject(appsDisplay, 'cloud-starters')
+      showTableFromTobject(appsDisplay, 'cloud-apps')
     }
     return response
   }
@@ -335,7 +335,7 @@ async function getApplicationDetails (application: any, version: string, showTab
     appTemp['DETAIL NAME'] = allArteFacts[det].name
     details[appN] = appTemp
   }
-  pexTable(details, 'cloud-starter-details', getPEXConfig(), doShowTable)
+  pexTable(details, 'cloud-app-details', getPEXConfig(), doShowTable)
   return allArteFacts
 }
 
@@ -385,10 +385,10 @@ export async function getAppLinks (showTable?: boolean) {
       appLinkTable[appN] = appTemp
     }
     process.stdout.write('\n')
-    pexTable(appLinkTable, 'cloud-starter-links', getPEXConfig(), false)
+    pexTable(appLinkTable, 'cloud-app-links', getPEXConfig(), false)
     if (showTable) {
       // console.table(nvs)
-      showTableFromTobject(nvs, 'cloud-starter-links')
+      showTableFromTobject(nvs, 'cloud-app-links')
     }
   }
   return appLinkTable

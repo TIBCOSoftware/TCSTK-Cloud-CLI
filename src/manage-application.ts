@@ -19,7 +19,7 @@ const isWindows = process.platform === 'win32'
 
 // Function called from the cli to pick up info and call the create starter
 export async function newStarter () {
-  log(INFO, 'Creating New Starter...')
+  log(INFO, 'Composing new cloud application...')
   const templates = require('./config/config-template.json').templates as Template[]
   for (const template of templates) {
     if (template.enabled) {
@@ -53,20 +53,20 @@ export async function newStarter () {
   }
   // console.log('doStart: ' + doStart);
   if (starterName === '') {
-    starterName = await askQuestion('What is the name of your cloud starter ?')
+    starterName = await askQuestion('What is the name of your cloud application, to compose ?')
   }
   if (starterTemplate === '') {
-    starterTemplate = await askMultipleChoiceQuestion('Which Template would you like to use for your cloud starter ?', templatesToUse)
+    starterTemplate = await askMultipleChoiceQuestion('Which Template would you like to use for your cloud application ?', templatesToUse)
   }
-  log(INFO, '    Cloud Starter Name: ' + starterName)
+  log(INFO, '    Cloud Application Name: ' + starterName)
   let stTempJson: any = {}
   for (const template of templates) {
     if (starterTemplate === template.displayName) {
       stTempJson = template
     }
   }
-  log(INFO, 'Cloud Starter Template: ', stTempJson.displayName)
-  log(DEBUG, 'Cloud Starter Template: ', stTempJson)
+  log(INFO, 'Cloud Application Template: ', stTempJson.displayName)
+  log(DEBUG, 'Cloud Application Template: ', stTempJson)
   createNewStarter(starterName, stTempJson, doStart)
 }
 
@@ -125,10 +125,10 @@ function createNewStarter (name:string, template:Template, doStart:boolean) {
       }
     }
     if (doStart) {
-      log(INFO, '\x1b[34m Cloud Starter ' + name + ' Created Successfully !!!\x1b[0m')
+      log(INFO, '\x1b[34m Cloud Application ' + name + ' Created Successfully !!!\x1b[0m')
       run('cd ' + toDir + ' && tcli')
     } else {
-      console.log('\x1b[36m%s\x1b[0m', 'Cloud Starter ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)')
+      console.log('\x1b[36m%s\x1b[0m', 'Cloud Application ' + name + ' Created Successfully, now you can go into the cloud starter directory "cd ' + name + '" and run "tcli start" to start your cloud starter or run "tcli" in your cloud starter folder to manage your cloud starter. Have fun :-)')
     }
   } catch (error) {
     log(ERROR, 'Error occurred:', error)

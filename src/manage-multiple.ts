@@ -28,7 +28,7 @@ export function processMultipleFile () {
   mFile = mOpts.name
   // log(INFO, '- Managing Multiple, Using file: ' + mFile);
   // Go Over All Cloud Starter Jobs
-  let csJobs = getMProp('Cloud_Starter_JOBS')
+  let csJobs = getMProp('TIBCO_CLOUD_JOBS')
   if (mOpts.job && mOpts.job.trim() !== '') {
     csJobs = mOpts.job
   }
@@ -38,12 +38,17 @@ export function processMultipleFile () {
   }
   if (!csJobs) {
     // Try to get from old definition for backwards compatibility.
-    csJobs = getMProp('Cloud_Starters')
+    csJobs = getMProp('Cloud_Starter_JOBS')
     if (csJobs != null) {
-      log(WARNING, 'Using the |Cloud_Starters| property for backward compatibility but rename this to: |Cloud_Starter_JOBS|...')
+      log(WARNING, 'Using the |Cloud_Starter_JOBS| property for backward compatibility but rename this to: |TIBCO_CLOUD_JOBS|...')
     } else {
-      log(ERROR, 'Please specify JOBS in the Cloud_Starter_JOBS property in: ' + mFile + ' (or the common file if used...)')
-      process.exit(1)
+      csJobs = getMProp('Cloud_Starters')
+      if (csJobs != null) {
+        log(WARNING, 'Using the |Cloud_Starters| property for backward compatibility but rename this to: |TIBCO_CLOUD_JOBS|...')
+      } else {
+        log(ERROR, 'Please specify JOBS in the TIBCO_CLOUD_JOBS property in: ' + mFile + ' (or the common file if used...)')
+        process.exit(1)
+      }
     }
   }
   let failOnError = getMProp('Fail_On_Error')
@@ -84,7 +89,7 @@ export function processMultipleFile () {
   showTableFromTobject(nvs, '[JOB SUMMARY] FILE: ' + mFile)
   for (let i = 0; i < csJobsA.length; i++) {
     const currentJob = trim(csJobsA[i])
-    const logS = col.blue('[STARTER JOB: ' + currentJob + ']')
+    const logS = col.blue('[TIBCO CLOUD JOB: ' + currentJob + ']')
     // log(INFO, logS);
     // Per Starter Go Over the Configured Environments
     const currLoc = getMProp(currentJob + '_Location')

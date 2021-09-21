@@ -86,7 +86,7 @@ async function loadTasks (catToUse: string) {
             if (role && role.tenantId) {
               switch (role.tenantId.toLowerCase()) {
                 case 'bpm':
-                  availableCategories.push('cloud-starters', 'live-apps', 'shared-state', 'cloud-files')
+                  availableCategories.push('cloud-apps', 'live-apps', 'shared-state', 'cloud-files')
                   break
                 case 'spotfire':
                   availableCategories.push('spotfire')
@@ -186,7 +186,7 @@ export function loadTaskDesc (category?: string, availableCat?: string[]) {
             // Remove the category from the name
             let taskName = cliTask.replace(task.category, '')
             // Special case for cloud starter since the category is called cloud starters
-            taskName = taskName.replace('cloud-starter', '')
+            taskName = taskName.replace('cloud-app', '')
             // Replace double --
             taskName = taskName.replace('--', '-')
             // Remove -'s at the end or beginning

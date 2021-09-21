@@ -351,13 +351,12 @@ export function getPEXConfig (): PEXConfig {
     log(INFO, 'No Table_Export_File_Prefix property found; We are adding it to: ' + getPropFileName())
     addOrUpdateProperty(getPropFileName(), 'Table_Export_File_Prefix', tableExportFilePrefix, 'Prefix to use for the export to table CSV files.')
   }
-  // table-export-tables=cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states
   let tableExportTables = 'ALL'
   if (getProp('Table_Export_Tables') != null) {
     tableExportTables = getProp('Table_Export_Tables')
   } else {
     log(INFO, 'No Table_Export_Tables property found; We are adding it to: ' + getPropFileName())
-    addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', tableExportTables, 'Which tables to export, Possible values: ALL (OR any of) cloud-starters,cloud-starter-links,cloud-starter-details,live-apps,shared-states')
+    addOrUpdateProperty(getPropFileName(), 'Table_Export_Tables', tableExportTables, 'Which tables to export, Possible values: ALL (OR any of) cloud-apps,cloud-app-links,cloud-app-details,live-apps,shared-states')
   }
   return {
     export: tableExportToCsv.toLowerCase() === 'yes',

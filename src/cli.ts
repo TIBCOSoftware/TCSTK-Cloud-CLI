@@ -194,7 +194,7 @@ export async function cli (args: any) {
   }
   const projectManagementMode = true
   if (!(options.doMultiple || options.doMultipleInteraction)) {
-    if (options.task === 'new' || options.task === 'new-starter') {
+    if (options.task === 'new' || options.task === 'new-starter' || options.task === 'new-application') {
       // options.task = 'new-starter';
       await require('./manage-application').newStarter()
       process.exit()
@@ -202,7 +202,7 @@ export async function cli (args: any) {
     } else {
       // Test if tibco-cloud.properties exists
       const fs = require('fs')
-      const tCreate = 'Create New Cloud Starter'
+      const tCreate = 'Compose New Cloud Application'
       const tCProp = 'Create New TIBCO Cloud properties file'
       const tManageG = 'Manage Global Cloud Connection Configuration'
       const tMultiple = 'Create New Multiple Properties file'
@@ -213,7 +213,7 @@ export async function cli (args: any) {
         let cif = tCProp
         if (!options.createCP) {
           displayOpeningMessage()
-          console.log('\x1b[36m%s\x1b[0m', '[TIBCO Cloud Starter CLI ' + require('../package.json').version + ']')
+          console.log('\x1b[36m%s\x1b[0m', '[TIBCO Cloud Composer CLI ' + require('../package.json').version + ']')
           console.log('No TIBCO Cloud Properties file found...')
           cif = await askMultipleChoiceQuestion('What would you like to do ? ', [tCreate, tCProp, tMultiple, tManageG, tNothing])
         }
@@ -271,7 +271,7 @@ export async function cli (args: any) {
             await require('./manage-application').manageGlobalConfig()
             process.exit()
           case tCreate:
-            log(INFO, 'Creating new Cloud starter...')
+            log(DEBUG, 'Creating new Cloud Application...')
             // create a new cloud starter
             await require('./manage-application').newStarter()
             process.exit()

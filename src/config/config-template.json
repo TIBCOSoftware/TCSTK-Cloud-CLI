@@ -2,7 +2,7 @@
   "templates": [
     {
       "name": "TCSTK-base-template-git",
-      "displayName": "Basic Cloud Starter Template (Angular 12)",
+      "displayName": "Basic Cloud Application Template (Angular 12)",
       "enabled": true,
       "templateFolder": "",
       "useGit": true,
