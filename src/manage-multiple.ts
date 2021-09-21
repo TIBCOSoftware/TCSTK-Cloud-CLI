@@ -128,7 +128,7 @@ export function processMultipleFile () {
           try {
             // console.log('Parsing: ', jTask);
             tObj = JSON.parse(jTask)
-          } catch (e) {
+          } catch (e:any) {
             log(ERROR, 'Parsing error on: |' + jTask + '| (' + e.message + ')')
             process.exit(1)
           }

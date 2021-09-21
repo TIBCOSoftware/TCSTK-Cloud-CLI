@@ -18,11 +18,14 @@ import { getOAUTHDetails, parseOAUTHToken, setOAUTHDetails } from './oauth'
 import { getSharedState, selectSharedState } from '../tenants/shared-state'
 import { listOnType, prepSpotfireProps } from '../tenants/spotfire'
 import path from 'path'
+import { Global } from '../models/base'
 
 const LA = require('../tenants/live-apps')
 const _ = require('lodash')
 const CCOM = require('./cloud-communications')
 const os = require('os')
+
+declare let global: Global
 
 let globalProperties: any
 let propsGl: any
@@ -78,6 +81,7 @@ function set (path: string, value: string, obj: any) {
 
 export function getProp (propName: string, forceRefresh?: boolean, forceGlobalRefresh?: boolean): string {
   log(DEBUG, 'Getting Property: ' + propName, ' Forcing a Refresh: ', forceRefresh, 'Forcing a Global Refresh: ', forceGlobalRefresh)
+  // if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Before getting property ')
   if (forceRefresh) {
     propsGl = null
   }
@@ -91,7 +95,7 @@ export function getProp (propName: string, forceRefresh?: boolean, forceGlobalRe
   if (propsGl != null) {
     try {
       re = _.get(propsGl, propName)
-    } catch (e) {
+    } catch (e:any) {
       log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')')
       process.exit(1)
     }
@@ -125,6 +129,7 @@ export function getProp (propName: string, forceRefresh?: boolean, forceGlobalRe
   // Adding organization name as global
   re = replaceGlobal(re)
   log(DEBUG, 'Returning Property [END]: ', re)
+  // if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After getting property ')
   return re
 }
 
@@ -136,7 +141,7 @@ function getPropertyFromGlobal (propName: string, forceGlobalRefresh?: boolean) 
     }
     try {
       re = _.get(globalProperties, propName)
-    } catch (e) {
+    } catch (e:any) {
       log(ERROR, 'Unable to get Property: ' + propName + ' (error: ' + e.message + ')')
       process.exit(1)
     }
@@ -754,7 +759,7 @@ export function getPropFromFile (property: string, file: string) {
   let propsToGet
   try {
     propsToGet = PropertiesReader(file).path()
-  } catch (e) {
+  } catch (e:any) {
     log(ERROR, 'Error getting property from file: ', file, ' error: ' + e.message)
     process.exit(1)
   }

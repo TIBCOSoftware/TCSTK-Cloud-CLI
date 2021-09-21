@@ -450,7 +450,7 @@ export function run (command: string, failOnError?: boolean) {
       command,
       { stdio: 'inherit' }
     )
-  } catch (err) {
+  } catch (err:any) {
     // console.log('Got Error ' , err);
     // logO(DEBUG, reason);
     log(ERROR, 'Error Running command: ' + err.message)
@@ -478,7 +478,7 @@ export function deleteFile (file: string) {
     const fs = require('fs')
     fs.unlinkSync(file)
     // file removed
-  } catch (err) {
+  } catch (err:any) {
     log(INFO, 'Could not delete file, maybe file does not exist ?... (' + err.code + ')')
     // console.log(err)
   }
@@ -605,7 +605,7 @@ export function storeJsonToFile (contentFileName: string, contentObject: any) {
   try {
     require('jsonfile').writeFileSync(contentFileName, contentObject, { spaces: 2, EOL: '\r\n' })
     log(INFO, 'Stored JSON file: ' + col.blue(contentFileName))
-  } catch (e) {
+  } catch (e:any) {
     log(ERROR, 'Error storing JSON: ', contentObject, '\n To File: ' + contentFileName, '\n Error: ' + e.message)
   }
 }

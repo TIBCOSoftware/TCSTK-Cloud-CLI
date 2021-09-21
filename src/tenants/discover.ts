@@ -1,5 +1,5 @@
 import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
-import { callTCA, postToCloud, readableSize } from '../common/cloud-communications'
+import {callTCA, postMessageToCloud, postToCloud, readableSize} from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
 import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
 import { Dataset } from '../models/discover/dataset'
@@ -459,7 +459,7 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
   let configObject:any = {}
   try {
     configObject = JSON.parse(configFile)
-  } catch (error) {
+  } catch (error:any) {
     log(ERROR, 'JSON Parsing error on configuration: ', error.message)
     process.exit(1)
   }
@@ -498,9 +498,9 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
 
 async function updateDiscoverConfig (endpoint: string, configObject:any) {
   log(INFO, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
-  // log(INFO, 'New Config: ', configObject)
-  // const result = await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, { skipInjectingRegion: SKIP_REGION, handleErrorOutside: true, returnResponse: true })
-  // console.log('Result:  ', result.body, ' Status: ', result.statusCode)
+  log(INFO, 'New Config: ', configObject)
+  const result = await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, { skipInjectingRegion: SKIP_REGION, handleErrorOutside: true, returnResponse: true })
+  console.log('Result:  ', result.body, ' Status: ', result.statusCode)
   // TODO: Use this to update config (after service is enabled)
   // const configResult = await callTCA(CCOM.clURI.dis_configuration + '/' + endpoint, true, { skipInjectingRegion: true })
   // console.log(configResult)
@@ -509,6 +509,7 @@ async function updateDiscoverConfig (endpoint: string, configObject:any) {
 }
 
 // Function to export the configuration of discover to a JSON file
+// TODO: disabled for now (till watcher works properly)
 export async function watchDiscoverConfig () {
   log(INFO, 'Watching Configuration...')
   prepDiscoverProps()

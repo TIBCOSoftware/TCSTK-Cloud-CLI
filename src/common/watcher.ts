@@ -43,7 +43,7 @@ export default class Watcher {
       const readline = require('readline')
       readline.emitKeypressEvents(process.stdin)
       process.stdin.setRawMode(true)
-      console.log('process.stdin ', process.stdin)
+      // console.log('process.stdin ', process.stdin)
       // TODO: HIER VERDER, THE KEY PRESS SEEMS TO HANG !!!!
       process.stdin.on('keypress', async (_str, key) => {
         console.log('Key ', key)

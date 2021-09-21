@@ -357,7 +357,7 @@ async function importSharedStateFile (ssFile: string) {
   let ssObject: any = {}
   try {
     ssObject = JSON.parse(contentContextFile)
-  } catch (e) {
+  } catch (e:any) {
     log(ERROR, 'Parse Error on: ' + ssFile)
     log(ERROR, e.message)
     process.exit(1)
@@ -374,7 +374,7 @@ async function importSharedStateFile (ssFile: string) {
           const shortJSONString = JSON.stringify(JSON.parse(contentContentFile))
           // console.log('shortJsonString: ', shortJSONString);
           ssObject.content.json = shortJSONString
-        } catch (e) {
+        } catch (e:any) {
           log(WARNING, 'Parse Error on: ' + contentFile)
           log(WARNING, e.message)
           // process.exit(1);

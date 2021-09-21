@@ -410,7 +410,7 @@ export async function postFileToCloud (endpoint: string, fileLocation: string, c
   if (fileLocation.indexOf('json') > -1) {
     try {
       fileData = JSON.parse(fileData)
-    } catch (error) {
+    } catch (error:any) {
       log(ERROR, 'JSON Parsing error: ', error.message)
       process.exit(1)
     }
@@ -481,7 +481,7 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
           let dataObj
           try {
             dataObj = JSON.parse(data)
-          } catch (e) {
+          } catch (e:any) {
             log(WARNING, 'Parse Error: ', e.message)
           }
           if (dataObj && dataObj.message) {

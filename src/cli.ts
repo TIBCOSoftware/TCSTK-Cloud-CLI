@@ -72,7 +72,7 @@ function parseArgumentsIntoOptions (rawArgs: any) {
         argv: rawArgs.slice(2)
       }
     )
-  } catch (e) {
+  } catch (e:any) {
     log(ERROR, e.message)
     process.exit(1)
   }
@@ -383,7 +383,7 @@ export async function cli (args: any) {
               }
               log(RECORDER, rec + 'Replay command: ' + col.underline(taskCommand))
             }
-          } catch (err) {
+          } catch (err:any) {
             log(ERROR, 'Task ' + options.task + ' failed: ' + err.message)
             console.log(err)
           }

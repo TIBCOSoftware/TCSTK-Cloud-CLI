@@ -1213,7 +1213,7 @@
     },
     "export-discover-config": {
       "description": "Exports the configuration for Project Discover into a JSON file",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "exportDiscoverConfigWrapper",
@@ -1227,7 +1227,7 @@
     },
     "import-discover-config": {
       "description": "Imports the configuration for Project Discover into a JSON file",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "importDiscoverConfigWrapper",
