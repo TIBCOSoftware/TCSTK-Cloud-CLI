@@ -307,7 +307,7 @@ export async function cli (args: any) {
       // Check if the task exists...
       const cliTaskConfigCLI = require('./config/config-cli-task.json')
       const cTsks = cliTaskConfigCLI.cliTasks as TCLITask[]
-      const taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-do']
+      const taskArray = ['new', 'new-starter', 'new-application', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-do']
       let taskExist = false
       let directTask = false
       let directTaskMethod = ''

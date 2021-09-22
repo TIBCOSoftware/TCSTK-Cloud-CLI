@@ -3,12 +3,8 @@ import { DEBUG, INFO, log, WARNING } from './logging'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
 import { col, doesFileExist, getOrganization, getRelativeTime, mkdirIfNotExist } from './common-functions'
 import { readableSize } from './cloud-communications'
-// import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
 const _ = require('lodash')
-
-// It's undefined on Jenkins, so use width 150
-// Cloning into 'C:\Program Files (x86)\Jenkins\workspace\CLOUD STARTERS\CS Run CLI Testcases and Publish\tmp\TCSTK-Cloud-CLI\test\tmpTest/CS-FORM-TEST-CM-
 
 export function createTableFromObject (objectForTable: any, title: string) {
   const tableArray = eachRecursive(objectForTable, [])
@@ -90,7 +86,7 @@ export function createTableValue (name: string, value: any, table?: any, headerN
   table = table || []
   const entry: any = {}
   entry[hName] = name
-  if(name && (name.toLowerCase().indexOf('date') > -1 || name.toLowerCase().indexOf('time') > -1)){
+  if (name && (name.toLowerCase().indexOf('date') > -1 || name.toLowerCase().indexOf('time') > -1)) {
     try {
       entry[hValue] = getRelativeTime(new Date(value).getTime())
     } catch (e) {

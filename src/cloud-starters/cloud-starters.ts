@@ -91,12 +91,12 @@ export function generateCloudDescriptor () {
     addOrUpdateProperty(getPropFileName(), 'Add_Descriptor_Timestamp', 'YES')
   }
   // Add Descriptor
-  let DESCRIPTOR_FILE = './src/assets/cloudstarter.json'
+  let DESCRIPTOR_FILE = './src/assets/cloud_app_descriptor.json'
   if (getProp('Descriptor_File') !== null) {
     DESCRIPTOR_FILE = getProp('Descriptor_File')
   } else {
     log(INFO, 'No Descriptor_File Property found; Adding Descriptor_File to ' + getPropFileName())
-    addOrUpdateProperty(getPropFileName(), 'Descriptor_File', './src/assets/cloudstarter.json')
+    addOrUpdateProperty(getPropFileName(), 'Descriptor_File', './src/assets/cloud_app_descriptor.json')
   }
   log(INFO, 'Adding descriptor file: ' + DESCRIPTOR_FILE + ' Adding Timestamp: ' + ADD_DESCRIPTOR_TIMESTAMP)
   // Get the version from the JSON File
@@ -131,7 +131,7 @@ export function generateCloudDescriptor () {
         description: description
       }
     }
-    log(INFO, 'Adding Cloud Starter Descriptor: ', csObject)
+    log(INFO, 'Adding Cloud App Descriptor: ', csObject)
     const storeOptions = { spaces: 2, EOL: '\r\n' }
     require('jsonfile').writeFileSync(DESCRIPTOR_FILE, csObject, storeOptions)
   } else {
@@ -142,7 +142,7 @@ export function generateCloudDescriptor () {
   // TODO: Possibly add dependencies into the file
 }
 
-// Function to display the location on the deployed cloudstarter and possilby the descriptor.
+// Function to display the location on the deployed cloud app and possibly the descriptor.
 export function showAppLinkInfo () {
   // TODO: Get from global file
   // let cloudURLdisp = getProp('Cloud_URL');
@@ -179,7 +179,7 @@ export function buildCloudStarterZip (cloudStarter: string) {
     bType = 'NON-HASHROUTING'
     buildCommand = 'ng build --prod --base-href ' + csURL + ' --deploy-url ' + csURL
   }
-  log(INFO, 'Building Cloudstarter Using Command(Type: ' + bType + '): ' + buildCommand)
+  log(INFO, 'Building Cloud App Using Command(Type: ' + bType + '): ' + buildCommand)
   run(buildCommand)
   // TODO: Use NPM to zip a folder, fix bug on extraction when upload to cloud... (perhaps use no compression)
   // const folderToZip = './dist/' + cloudStarter + '/';
@@ -197,7 +197,7 @@ export async function showAvailableApps (showTable?: boolean) {
   // console.log(response)
   if (response.errorMsg) {
     if (response.errorMsg === 'Application does not exist') {
-      log(WARNING, 'No Cloud Starters deployed yet...')
+      log(WARNING, 'No Cloud Apps deployed yet...')
       return null
     } else {
       log(ERROR, response.errorMsg)
@@ -331,7 +331,7 @@ async function getApplicationDetails (application: any, version: string, showTab
     const appTemp:any = {}
     const appN = i
     i++
-    appTemp['CLOUD STARTER'] = application
+    appTemp['CLOUD APP'] = application
     appTemp['DETAIL NAME'] = allArteFacts[det].name
     details[appN] = appTemp
   }
@@ -341,7 +341,7 @@ async function getApplicationDetails (application: any, version: string, showTab
 
 // Get Links to all the applications
 export async function getAppLinks (showTable?: boolean) {
-  log(INFO, 'Getting Cloud Starter Links...')
+  log(INFO, 'Getting Cloud Application Links...')
   const appLinkTable:any = {}
   const apps = await showAvailableApps(false)
   if (apps) {
@@ -351,7 +351,7 @@ export async function getAppLinks (showTable?: boolean) {
       const appTemp:any = {}
       appTemp['APP NAME'] = app.name
       // nvs = createTableValue('CLOUD STARTER ' + i, '*** C L O U D    S T A R T E R ***', nvs)
-      nvs = createTableValue('CLOUD STARTER ' + i, '', nvs)
+      nvs = createTableValue('CLOUD APP ' + i, '', nvs)
       nvs = createTableValue('NAME', app.name, nvs)
       const appN = i++
       const tempDet:any = await getApplicationDetails(app.name, app.publishedVersion, false)
