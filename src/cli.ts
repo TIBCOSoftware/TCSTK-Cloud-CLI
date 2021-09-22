@@ -86,7 +86,7 @@ function parseArgumentsIntoOptions (rawArgs: any) {
     propfile: args['--propfile'] || 'tibco-cloud.properties',
     doMultiple: args['--multiple'] || false,
     doMultipleInteraction: args['--multipleInteraction'] || false,
-    multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
+    multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-organizations.properties',
     surpressStart: args['--surpressStart'] || false,
     task: args._[0] || '',
     taskHelp: args._[1] || '',

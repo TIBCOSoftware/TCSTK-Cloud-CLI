@@ -323,9 +323,9 @@ export async function generateCloudPropertyFiles () {
     log(INFO, 'Property for tcli interaction: ' + tcliIprop)
     const doUpdate = await askMultipleChoiceQuestion('Do you want to add this to your manage-multiple-cloud-starters property file ?', ['YES', 'NO'])
     if (doUpdate === 'YES') {
-      let fileName = await askQuestion('What is file name of multiple property file ? (press enter for: manage-multiple-cloud-starters.properties)')
+      let fileName = await askQuestion('What is file name of multiple property file ? (press enter for: manage-multiple-cloud-organizations.properties)')
       if (fileName === '') {
-        fileName = 'manage-multiple-cloud-starters.properties'
+        fileName = 'manage-multiple-cloud-organizations.properties'
       }
       const currVal = require('properties-reader')(fileName).path().Multiple_Interaction_Property_Files
       if (currVal) {

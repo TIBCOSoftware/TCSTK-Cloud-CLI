@@ -191,9 +191,8 @@ export function trim (value: string) {
 
 // Function to create a new multiple prop file
 export async function createMultiplePropertyFile () {
-  // 'manage-multiple-cloud-starters.properties'
-  let mPropFileName = 'manage-multiple-cloud-starters.properties'
-  const nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: ' + col.blue('manage-multiple-cloud-starters') + ') ?')
+  let mPropFileName = 'manage-multiple-cloud-organizations.properties'
+  const nameAnsw = await askQuestion('Please specify a name for the Multiple prop file (Use DEFAULT or Enter for: ' + col.blue('manage-multiple-cloud-organizations') + ') ?')
   // console.log('nameAnsw: ' + nameAnsw);
   if (nameAnsw != null && nameAnsw !== '' && nameAnsw.toLowerCase() !== 'default') {
     mPropFileName = nameAnsw + '.properties'

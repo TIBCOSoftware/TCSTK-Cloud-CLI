@@ -27,7 +27,7 @@ export async function showInlineHelp () {
   console.log('       --browse: browse tcli tasks (with an existing tibco-cloud.properties file)')
   console.log('     --propfile: when specified tcli will use a different property file then the default tibco-cloud.properties')
   console.log('     --multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud starters and many different configured environments at the same time.')
-  console.log(' --multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties')
+  console.log(' --multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-organizations.properties')
   console.log(' --multipleInteraction: when specified, the multiple file will also be used, but in an interactive way. This is extremely handy if you want to run specific tcli jobs on multiple environments quickly.')
   console.log('--surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.\n')
   console.log('      --answers: A comma(,) or column(:) separated list of answers to interactive questions. This is useful to run the tcli completely verbose; useful in a build-pipeline.')
