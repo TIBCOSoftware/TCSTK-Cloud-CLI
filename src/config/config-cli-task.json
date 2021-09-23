@@ -377,7 +377,7 @@
       "category": "tcli"
     },
     "create-multiple-property-file": {
-      "description": "Creating an initial property file to manage multiple cloud starters and environments.",
+      "description": "Creating an initial property file to manage multiple cloud applications and organizations.",
       "enabled": true,
       "internal": false,
       "task": "createMultiplePropertyFileWrapper",
@@ -422,7 +422,7 @@
       "category": "tcli"
     },
     "validate": {
-      "description": "Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.",
+      "description": "Validations on the setting and/or the value of a property, the existence of a Cloud Application, LiveApp or TCI App.",
       "enabled": true,
       "internal": false,
       "multipleInteraction": false,
@@ -879,7 +879,7 @@
       "category": "tci"
     },
     "describe-cloud": {
-      "description": "A combination of show-cloud, show-tci-apps, show-spotfire-reports, show-live-apps-cases & show-cloud-starters.",
+      "description": "A combination of show-cloud, show-tci-apps, show-spotfire-reports, show-live-apps-cases & show-cloud-applications.",
       "enabled": false,
       "internal": false,
       "multipleInteraction": false,

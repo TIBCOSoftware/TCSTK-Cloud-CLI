@@ -86,7 +86,7 @@ function parseArgumentsIntoOptions (rawArgs: any) {
     propfile: args['--propfile'] || 'tibco-cloud.properties',
     doMultiple: args['--multiple'] || false,
     doMultipleInteraction: args['--multipleInteraction'] || false,
-    multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-starters.properties',
+    multipleFile: args['--multipleFile'] || 'manage-multiple-cloud-organizations.properties',
     surpressStart: args['--surpressStart'] || false,
     task: args._[0] || '',
     taskHelp: args._[1] || '',
@@ -307,7 +307,7 @@ export async function cli (args: any) {
       // Check if the task exists...
       const cliTaskConfigCLI = require('./config/config-cli-task.json')
       const cTsks = cliTaskConfigCLI.cliTasks as TCLITask[]
-      const taskArray = ['new', 'new-starter', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-do']
+      const taskArray = ['new', 'new-starter', 'new-application', 'manage-global-config', 'create-multiple-property-file', 'run-multiple', 'watch-shared-state-do']
       let taskExist = false
       let directTask = false
       let directTaskMethod = ''

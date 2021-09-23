@@ -26,6 +26,10 @@ export function processMultipleFile () {
   // setLogDebug('true');
   const mOpts: any = getMultipleOptions()
   mFile = mOpts.name
+  if (!doesFileExist(mFile) && doesFileExist('manage-multiple-cloud-starters.properties')) {
+    mFile = 'manage-multiple-cloud-starters.properties'
+    log(WARNING, 'Falling back to the multiple file ' + mFile + ', for backwards compatability. Please consider renaming this file to manage-multiple-cloud-organizations.properties...')
+  }
   // log(INFO, '- Managing Multiple, Using file: ' + mFile);
   // Go Over All Cloud Starter Jobs
   let csJobs = getMProp('TIBCO_CLOUD_JOBS')

@@ -26,7 +26,7 @@ export async function validate () {
   // console.log('Validate ',new Date());
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Validate')
   // TODO: Add; case_folder_exist,
-  const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'Tenant_Access', 'Tenant_Role', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_Starter_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_exist', 'Case_not_exist', 'Case_in_state', 'Spotfire_Library_Item_exists']
+  const valChoices = ['Property_exist', 'Property_is_set', 'Property_is_set_ask', 'Tenant_Access', 'Tenant_Role', 'LiveApps_app_exist', 'Live_Apps_group_exist', 'TCI_App_exist', 'Cloud_App_exist', 'Org_Folder_exist', 'Org_Folder_And_File_exist', 'Case_exist', 'Case_not_exist', 'Case_in_state', 'Spotfire_Library_Item_exists']
   const valD = (await askMultipleChoiceQuestion('What would you like to validate ?', valChoices)).toLowerCase()
   log(INFO, 'Validating: ', valD)
   if (valD === 'property_exist' || valD === 'property_is_set' || valD === 'property_is_set_ask') {
@@ -88,10 +88,10 @@ export async function validate () {
   }
 
   // Validate if a Cloud Starter exist
-  if (valD === 'cloud_starter_exist') {
+  if (valD === 'cloud_starter_exist' || valD === 'cloud_app_exist') {
     const apps = await CS.showAvailableApps(true)
     // console.log(apps);
-    await validationItemHelper(apps, 'Cloudstarter', 'name')
+    await validationItemHelper(apps, 'Cloud App', 'name')
     return
   }
 
