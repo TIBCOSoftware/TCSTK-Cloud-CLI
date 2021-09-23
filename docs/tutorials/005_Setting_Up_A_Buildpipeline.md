@@ -133,7 +133,7 @@ tMassageImportFiles={"S": "massageData.js"}
 tRunLAImportVerbose={"T":"import-live-apps-cases -a ${LA_Import_Configuration}:Yes"}
 ```
 
-This is a piece of a pipeline to import data into LiveApps. There are a few things to uncover here. First of all the top task reuses the tasks below and the ***tCopyFilesForImport*** task is even divided into two more subtasks. Replacements for the ***Case_Folder*** property are made from the ***organizational/environmental property files***(by using @{}). The tasks themselves and a values called ***LA_EXPORT_FOLDER*** and ***LA_Import_Configuration*** are replaced from the multiple property file(by using ${}). The ***import-live-apps-cases*** tcli task is provided answers by the -a character. [Click here for more information on Providing Answers](./006_Passing_In_Answers.md).
+This is a piece of a pipeline to import data into LiveApps. There are a few things to uncover here. First of all the top task reuses the tasks below and the ***tCopyFilesForImport*** task is even divided into two more subtasks. Replacements for the ***Case_Folder*** property are made from the ***organizational/environmental property files***(by using @{}). The tasks themselves and a values called ***LA_EXPORT_FOLDER*** and ***LA_Import_Configuration*** are replaced from the multiple property file(by using ${}). The ***import-live-apps-cases*** tcli task is provided answers by the -a character. [Click here for more information on Providing Answers](../concepts/006_Passing_In_Answers.md).
 
 We also see an ***os_copy*** task being replaced, and this is ***an interesting one***. TCLI provides the capability to ***extend the property files by*** setting a value called ***PROPERTY_EXTENSION_FILE*** For example:
 

@@ -83,7 +83,7 @@ Without any additional options the command line tool will look for a file called
 
 ![TCLI_New_Folder](imgs/001_New_Folder.png#zoom)
 
-To get started just choose to create a new property file. The tcli will ask you for your Client ID and login details to the TIBCO Cloud to create an OAUTH Token. Get your client ID from https://cloud.tibco.com/ -> Settings -> Advanced Settings -> Display Client ID. If you have a global configuration already setup the tcli will use that configuration for the connection details. Read more about Global Configuration here: [Global Configuration](./002_Global_Configuration.md#zoom)
+To get started just choose to create a new property file. The tcli will ask you for your Client ID and login details to the TIBCO Cloud to create an OAUTH Token. Get your client ID from https://cloud.tibco.com/ -> Settings -> Advanced Settings -> Display Client ID. If you have a global configuration already setup the tcli will use that configuration for the connection details. Read more about Global Configuration here: [Global Configuration](../concepts/002_Global_Configuration.md#zoom)
 
 > ***Note:*** You can also run to use or create a tibco cloud property file with a different name:
 
@@ -111,7 +111,7 @@ You can also run a task directly without getting into the interactive menu, by r
 tcli <TASK-NAME>
 ```
 
-> ***Note:*** You can make this direct task completely verbose (non-interactive) by providing answers inline. [Click here for more information about providing answers](./006_Passing_In_Answers.md#zoom)
+> ***Note:*** You can make this direct task completely verbose (non-interactive) by providing answers inline. [Click here for more information about providing answers](../concepts/006_Passing_In_Answers.md#zoom)
 
 
 > For example:
@@ -134,5 +134,5 @@ You can find these Alternatives in the help description of a task:
 tcli -h show-cloud-starter-links
 ```
 
-Now you are ready to [setup your own Cloud Starter](./003_Get_Started_With_Cloud_Starters.md#zoom)
+Now you are ready to [setup your own Cloud Starter](../tutorials/003_Get_Started_With_Cloud_Starters.md#zoom)
 

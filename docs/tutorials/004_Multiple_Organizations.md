@@ -38,7 +38,7 @@ It is recommended that you use a ***global configuration*** for the authenticati
 
 ![TCLI_Show_Links](imgs/004_Env_Global.png#zoom)
 
-For more information on [Global Configuration click here.](./002_Global_Configuration.md)
+For more information on [Global Configuration click here.](../concepts/002_Global_Configuration.md)
 
 In the next step we will create a tibco-cloud property file for every organization that we want to connect to. These files will al use the tibco-cloud property file that we just have created as a base (and tcli will make copies of them). So if we want to make changes to it, it is best to do it now. We will make two changes:
 

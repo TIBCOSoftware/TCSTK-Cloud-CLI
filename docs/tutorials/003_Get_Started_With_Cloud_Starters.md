@@ -42,7 +42,7 @@ When you choose the template to use the tcli will fetch the Cloud Starter(from G
 ![TCLI_Show_Links](imgs/003_CS_Folder.png#zoom)
 
 
-> If you have a global configuration the tibco-cloud property file crated will contain ***USE-GLOBAL*** for your authentication values. [Click here for more information on global configuration](./002_Global_Configuration.md)
+> If you have a global configuration the tibco-cloud property file crated will contain ***USE-GLOBAL*** for your authentication values. [Click here for more information on global configuration](../concepts/002_Global_Configuration.md)
 
 > If all was successfully, you will directly get into the interactive tcli menu in your newly created cloud starter folder:
 
