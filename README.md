@@ -200,6 +200,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[remove-discover-dataset](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/remove-discover-dataset/)|Removes a Dataset for Project Discover|
 |[run-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/run-discover-process-analysis/)|Runs a Process Analysis for Project Discover|
 |[action-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/action-discover-process-analysis/)|Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover|
+|[export-discover-config](./docs/tasks/export-discover-config.md)|Exports the configuration for Project Discover into a JSON file|
 
 ## oauth
 
