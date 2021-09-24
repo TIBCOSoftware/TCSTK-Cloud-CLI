@@ -1,4 +1,4 @@
-# TIBCO Cloud™ Starters Toolkit - Command Line Interface 
+# TIBCO Cloud™ Composer - Command Line Interface 
 <img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>Powered by [TIBCO Labs™](https://community.tibco.com/wiki/tibco-labs)
 
 Command Line Interface for creating TIBCO Cloud™ Starter Projects [(For more information see the Full Documentation)](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/001_TCLI_Overview/) 
@@ -221,5 +221,5 @@ Copyright © 2021. TIBCO Software Inc.
 This file is subject to the license terms contained
 in the license file that is distributed with this file.
 
-Please see 'TIB_cloud-starters-toolkit_x.x.x_license'.pdf/.txt for details of license and dependent third party components referenced by this library.
+Please see 'TIB_cloud-composer_x.x.x_license'.pdf/.txt for details of license and dependent third party components referenced by this library.
 
