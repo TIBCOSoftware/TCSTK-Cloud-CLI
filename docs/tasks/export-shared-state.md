@@ -57,8 +57,8 @@ TIBCO CLOUD CLI] (INFO)  Type of Shared State: PUBLIC
 TIBCO CLOUD CLI] (INFO)  Using OAUTH Authentication, ORGANIZATION: TIBCO LABS DEV
 Got Shared States: 207
 TIBCO CLOUD CLI] (INFO)  Total Number of Shared State Entries: 207
-TIBCO CLOUD CLI] (INFO)  Applying Shared State Filter: MyCloudStarter
+TIBCO CLOUD CLI] (INFO)  Applying Shared State Filter: MyCloudApplication
 TIBCO CLOUD CLI] (INFO)  Filtered Shared State Entries: 1 
-TIBCO CLOUD CLI] (INFO)  [STORED CONTENT]: ./Shared_State/CONTENT/MyCloudStarter.PUBLIC.CONTENT.json 
-TIBCO CLOUD CLI] (INFO)  [STORED CONTEXT]: ./Shared_State/MyCloudStarter.PUBLIC.json 
+TIBCO CLOUD CLI] (INFO)  [STORED CONTENT]: ./Shared_State/CONTENT/MyCloudApplication.PUBLIC.CONTENT.json 
+TIBCO CLOUD CLI] (INFO)  [STORED CONTEXT]: ./Shared_State/MyCloudApplication.PUBLIC.json 
 ```

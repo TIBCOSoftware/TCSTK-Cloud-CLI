@@ -37,7 +37,7 @@ If we answer ***CloudLogin.Region***, we will get the following result:
 * LiveApps_app_exist
 * Live_Apps_group_exist
 * TCI_App_exist
-* Cloud_Starter_exist
+* Cloud_App_exist
 * Org_Folder_exist
 * Org_Folder_And_File_exist
 * Case_Exist

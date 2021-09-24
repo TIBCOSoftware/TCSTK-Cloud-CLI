@@ -4,7 +4,7 @@
 ### Description:
 > Export the details of a Live Apps Case Type
 
-This task lists the LiveApp cases and allows to export the description file of one of the cases in JSON. This is useful for development in your cloud starter and create Typescript models from them for example.
+This task lists the LiveApp cases and allows to export the description file of one of the cases in JSON. This is useful for development in your cloud application and create Typescript models from them for example.
 
 The following properties in the cloud properties file are being used:
 

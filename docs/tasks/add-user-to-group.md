@@ -5,7 +5,7 @@
 
 > Adds a user to a LiveApps group.
 
-This is useful to assign users to your Cloud Starter
+This is useful to assign users to your Cloud Application
 
 ---
 ### Questions:

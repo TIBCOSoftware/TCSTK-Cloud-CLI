@@ -4,11 +4,11 @@
 ### Description:
 > Generates the configured Public Cloud Descriptor
 
-This generates a descriptor for your cloud starter. This descriptor contains the name, version and description from your package.json file. Optionally the build date can be added.
+This generates a descriptor for your cloud application. This descriptor contains the name, version and description from your package.json file. Optionally the build date can be added.
 
 The following properties in the cloud properties file are being used:
 
-Note: If you use setting Add_Descriptor=YES a descriptor will be added during build-cloud-starter task.
+Note: If you use setting Add_Descriptor=YES a descriptor will be added during build-cloud-app task.
 
 > Add_Descriptor_Timestamp
 
@@ -31,13 +31,13 @@ Location of the descriptor file
 
 ```console
 TIBCO CLOUD CLI] (INFO)  Selected task] generate-descriptor 
-TIBCO CLOUD CLI] (INFO)  Adding descriptor file: ./src/assets/cloudstarter.json Adding Timestamp: YES 
-TIBCO CLOUD CLI] (INFO)  Adding Cloud Starter Descriptor:  {
+TIBCO CLOUD CLI] (INFO)  Adding descriptor file: ./src/assets/cloud_app_descriptor.json Adding Timestamp: YES 
+TIBCO CLOUD CLI] (INFO)  Adding Cloud App Descriptor:  {
   cloudstarter: {
-    name: 'MyCloudStarter',
+    name: 'MyCloudApplication',
     version: '2.1.01615482836035',
     build_date: 2021-03-11T17:13:56.035Z,
-    description: 'My Awesome Cloud Starter'
+    description: 'My Awesome Cloud Application'
   }
 } 
 ```

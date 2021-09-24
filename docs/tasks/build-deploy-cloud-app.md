@@ -1,11 +1,9 @@
-# TCLI TASK: build-cloud-starter
+# TCLI TASK: build-deploy-cloud-app
 
 ---
 ### Description:
 
-> Build your local cloud starter project
-
-This task creates the zip file required for you Cloud Starter to run in the Cloud. This task is verly closely related to the TASK: build-deploy-cloud-starter, which also deploys the Cloud Starter.
+> Builds and Deploys your local project to the cloud
 
 The following properties in the cloud properties file are being used:
 
@@ -30,17 +28,20 @@ Add a timestamp to the version in the descriptor (for example 1.0.01591605316). 
 
 > Descriptor_File
 
-Location of the descriptor file; For example: (./src/assets/cloudstarter.json)
+Location of the descriptor file; For example: (./src/assets/cloud_app_descriptor.json)
 
 ---
 ### Example Usage:
-> tcli build-cloud-starter
+
+> tcli build-deploy-cloud-app
 
 ---
-### Alternatives:
-> tcli b
+### Alternatives
+> tcli build-deploy-cloud-starter
 
-> tcli build
+> tcli bd
 
-For more information see the **Get started with Cloud Starters** section in the online documentation:
-[Get started with Cloud Starters](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)
+> tcli build-deploy
+
+For more information see the **Get started with the TIBCO Cloud Composer** section in the online documentation:
+[Get started with the TIBCO Cloud Composer](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)

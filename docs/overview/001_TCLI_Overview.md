@@ -7,8 +7,8 @@
 ## Description
 The **TIBCO Command Line Interface (TCLI)** is a tool that can be run from the command line to **manage** your **Cloud Applications** and interact with the **TIBCO Cloud**. The tool can be used on Windows, Linux or a MAC. By entering commands on a terminal you work **interactively** (Questions & Answers) or **directly** by providing the answers inline or from a (property) file. It serves the following use cases:
 
-* Manage your developer environment of a Cloud Starter.
-* Interact and Manage your Cloud Starter on the TIBCO Cloud.
+* Manage your developer environment of a Cloud Application.
+* Interact and Manage your Cloud Application on the TIBCO Cloud.
 * Support certain operations in your TIBCO Cloud Organization.
 * Execute repeatable deployment, management, monitoring and testing tasks.
 * Integrate with a Continuous Integration Build pipeline
@@ -117,7 +117,7 @@ tcli <TASK-NAME>
 > For example:
 
 ```console
-tcli show-cloud-starter-links
+tcli show-cloud-app-links
 ```
 
 ![TCLI_Show_Links](imgs/001_Show_Links.png#zoom)
@@ -131,8 +131,8 @@ tcli sl
 You can find these Alternatives in the help description of a task:
 
 ```console
-tcli -h show-cloud-starter-links
+tcli -h show-cloud-app-links
 ```
 
-Now you are ready to [setup your own Cloud Starter](../tutorials/003_Get_Started_With_Cloud_Starters.md#zoom)
+Now you are ready to [setup your own Cloud Application](../tutorials/003_Get_Started_With_Cloud_Starters.md#zoom)
 

@@ -3,7 +3,7 @@
 ![TCLI_Show_Links](imgs/004_Multiple_Overview.png#zoom)
 
 ---
-## Manage multiple Cloud Starters
+## Manage multiple Cloud Applications
 When you run the tcli in a folder without the tibco-cloud property file:
 
 ```console
@@ -21,7 +21,7 @@ This will ask you for the property name, but you can choose to use the default n
 
 ![TCLI_Show_Links](imgs/004_Multiple_File.png#zoom)
 
-> We will talk about the structure of this manage-multiple Cloud Starter property file in the section [Structure of the Multiple Property file ](#structure-of-the-multiple-property-file) down below.
+> We will talk about the structure of this manage-multiple Cloud Application property file in the section [Structure of the Multiple Property file ](#structure-of-the-multiple-property-file) down below.
 
 You don't need to do this, but it's a good practice to create a separate folder to keep your various environment configurations, for example:
 
@@ -49,7 +49,7 @@ You can disable a property by using a '#' character in front of it as follows:
 
 ![TCLI_Show_Links](imgs/004_File_Changes.png#zoom)
 
-And replace ***USE-GLOBAL*** of ***CloudLogin.OAUTH_Generate_Token_Name*** by a specific value. For example use ***MyCloudStarter_Cli_Token_1*** 
+And replace ***USE-GLOBAL*** of ***CloudLogin.OAUTH_Generate_Token_Name*** by a specific value. For example use ***MyCloudApplication_Cli_Token_1*** 
 
 > ***Note:*** It is important to use an underscore and a number at the end of your token name (for example: '_1'). So that your OAUTH Token can be ***Rotated*** by the tcli.
 
@@ -78,7 +78,7 @@ You will get the question:
 What is the name of your Project ?
 ```
 
-Provide the name of your project (for example ***MyCloudStarter***).
+Provide the name of your project (for example ***MyCloudApplication***).
 Now you will get a list of organizations that you have access to and for every organization you can create a file for the US, EU and AU regions.
 
 > ***Note***: You can choose to generate all the files, or all in a region or for a specific organization.
@@ -86,19 +86,19 @@ Now you will get a list of organizations that you have access to and for every o
 After selecting the organizations you will get this question: 
 
 ```console
-Do you want to add this to your manage-multiple-cloud-starters property file ?
+Do you want to add this to your manage-multiple-cloud-organizations property file ?
 ```
 
-Choose Yes to update the manage-multiple Cloud Starter property file to use this file. The next question will ask you for the name of this file:
+Choose Yes to update the manage-multiple Cloud Application property file to use this file. The next question will ask you for the name of this file:
 
 ```console
-What is file name of multiple property file ? (press enter for: manage-multiple-cloud-starters.properties)
+What is file name of multiple property file ? (press enter for: manage-multiple-cloud-organizations.properties)
 ```
 
 > ***Note:*** If you have created the Env folder this file will live one folder up, in that case provide this as answer:
 
 ```console
-../manage-multiple-cloud-starters.properties
+../manage-multiple-cloud-organizations.properties
 ```
 
 > ***Note***: The ClientID will automatically be added to all the property files, and if you use OAUTH in the main file and OAUTH Token will be generated automatically (in that case you can ignore the steps below.)
@@ -131,9 +131,9 @@ Or simply:
 tcli -i
 ```
 
-In the folder where the manage-multiple Cloud Starter property file sits.
+In the folder where the manage-multiple Cloud Application property file sits.
 
-> ***Note:*** If you use a different name for the manage-multiple Cloud Starter property file, you can also use:
+> ***Note:*** If you use a different name for the manage-multiple Cloud Application property file, you can also use:
 
 ```console
 tcli -i --multipleFile <multiple-file-name>
@@ -142,7 +142,7 @@ tcli -i --multipleFile <multiple-file-name>
 Or simply:
 
 ```console
-tcli -i -f MyCUTSOM-multiple-cloud-starters.properties
+tcli -i -f MyCUTSOM-multiple-cloud-organizations.properties
 ```
 
 This will bring you in an interactive menu that shows your Organizations:
@@ -173,4 +173,4 @@ Now you are ready to run any task on any environment and run specific tasks on m
 
 ![TCLI_Show_Links](imgs/004_Show_LA_Cases.png#zoom)
 
-> You can automate this as well in Jobs, which are managed in the remaining part of the multiple cloud starter file. We will discuss this in [Setting up Build Pipelines](./005_Setting_Up_A_Buildpipeline.md)
+> You can automate this as well in Jobs, which are managed in the remaining part of the multiple cloud application file. We will discuss this in [Setting up Build Pipelines](./005_Setting_Up_A_Buildpipeline.md)
