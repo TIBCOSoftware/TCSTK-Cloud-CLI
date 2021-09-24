@@ -1,7 +1,7 @@
-# TIBCO Cloud™ Composer Toolkit - Command Line Interface 
+# TIBCO Cloud™ Composer - Command Line Interface 
 <img src="https://community.tibco.com/sites/default/files/tibco_labs_final_with_tm2-01.png" alt="drawing" width="100"/>Powered by [TIBCO Labs™](https://community.tibco.com/wiki/tibco-labs)
 
-Command Line Interface for creating TIBCO Cloud™ Applications [(For more information see the Full Documentation)](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/001_TCLI_Overview/) 
+Command Line Interface for creating TIBCO Cloud™ Starter Projects [(For more information see the Full Documentation)](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/001_TCLI_Overview/) 
 
 ### TIBCO Cloud™ CLI) Installation:
 ```
@@ -15,7 +15,7 @@ tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
 
-### Create new Tibco Cloud™ Application:
+### Create new Tibco Cloud™ starter:
 ```
 tcli new
 ```
@@ -37,13 +37,13 @@ tcli new <name> [--template(-t)] <template-to-use>
 
 * propfile: when specified tcli will use a different property file then the default tibco-cloud.properties
 
-* multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud applications and many different configured environments at the same time.
+* multiple: run the task specified in the configured multiple property file. This allows you to execute tasks on many cloud starters and many different configured environments at the same time.
 
-* multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-organizations.properties you can optionally specify a job to run and an environment to run this in; this is handy in integrating with CI/CD Buildpipelines.
+* multipleFile: when specified tcli will use a different property file then the default manage-multiple-cloud-starters.properties you can optionally specify a job to run and an environment to run this in; this is handy in integrating with CI/CD Buildpipelines.
 
 * multipleInteraction: when specified, the multiple file will also be used, but in an interactive way. This is extremely handy if you want to run specific tcli jobs on multiple environments quickly.
 
-* surpressStart: When using this option after creating a new cloud application the interactive tcli will not start.
+* surpressStart: When using this option after creating a new cloud starter the interactive tcli will not start.
 
 * answers: A comma(,) or column(:) separated list of answers to interactive questions. This is useful to run the tcli completely verbose; useful in a build-pipeline. 
 
@@ -56,7 +56,7 @@ These are the available TIBCO Cloud™ CLI Tutorials:
 |------|:------------|
 |1. [TCLI Overview](https://tibcosoftware.github.io/TCSToolkit/cli/overview/001_TCLI_Overview/)|Provides an overview of the Archtiecture and Concepts of the TCLI|
 |2. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/concepts/002_Global_Configuration/)|This guide explains the concept of properties and global properties |
-|3. [Get started with the TIBCO Cloud Composer](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)|This guide provides step by step instructions on how to create, adjust and deploy a cloud application to the TIBCO Cloud|
+|3. [Get Started With Cloud Starters](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)|This guide provides step by step instructions on how to create, adjust and deploy a cloud starter to the TIBCO Cloud|
 |4. [Managing multiple TIBCO Cloud Organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/004_Multiple_Organizations/)|This guide explains how to manage multiple organizations in the TIBCO Cloud with the TCLI  |
 |5. [Setting Up A Buildpipeline](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/005_Setting_Up_A_Buildpipeline/)|This guide explains how to setup a build pipeline with for example Jenkins or TeamCity|
 |6. [Passing In Answers](https://tibcosoftware.github.io/TCSToolkit/cli/concepts/006_Passing_In_Answers/)|This guide explains the concept of passing in answers to a TCLI task |
@@ -75,11 +75,11 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[obfuscate-password](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/obfuscate-password/)|Obfuscate a password and put it in the cloud-properties file|
 |[view-global-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/view-global-config/)|View the global cloud connection configuration|
 |[update-global-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/update-global-config/)|Update the global cloud connection configuration|
-|[create-multiple-property-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-multiple-property-file/)|Creating an initial property file to manage multiple cloud applications and environments.|
+|[create-multiple-property-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-multiple-property-file/)|Creating an initial property file to manage multiple cloud starters and environments.|
 |[generate-cloud-property-files](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/generate-cloud-property-files/)|Generates a list of cloud property files.|
 |[replace-string-in-file](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/replace-string-in-file/)|Replace string in file following the Replace_FROM, Replace_TO and Replace_PATTERN properties|
 |[replace-values-in-files](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/replace-values-in-files/)|Replace string in file following based on answers provided|
-|[validate](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/validate/)|Validations on the setting and/or the value of a property, the existence of a Cloud Application, LiveApp or TCI App.|
+|[validate](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/validate/)|Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.|
 |quit|Quit the console|
 |update-tcli|Update the Cloud CLI|
 |help|Display's help message|
@@ -97,19 +97,19 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[change-tibco-cloud-organization](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/change-tibco-cloud-organization/)|Changes the Organization in the cloud-properties file|
 
 
-## cloud-apps
+## cloud-starters
 
 | TASK | Description |
 |------|:------------|
-|[show-cloud-apps](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-apps/)|Show a Table of all the deployed Cloud Applications|
-|[show-cloud-app-links](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-app-links/)|Show Links to your Cloud Applications|
-|[start-cloud-app](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/start-cloud-app/)|Start your local cloud application|
-|[build-cloud-app](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/build-cloud-app/)|Build your local cloud application|
-|[test-cloud-app](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/test-cloud-app/)|Run Test cases for your cloud application|
-|[test-cloud-app-headless](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/test-cloud-app-headless/)|Run Test cases for your cloud application, headless (without opening the browser)|
-|[deploy-cloud-app](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/deploy-cloud-app/)|Deploy your local cloud application to the TIBCO Cloud|
-|[build-deploy-cloud-app](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/build-deploy-cloud-app/)|Builds and Deploys your local project to the cloud|
-|[delete-cloud-app](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/delete-cloud-app/)|Delete a LiveApps WebApp|
+|[show-cloud-starters](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-starters/)|Show a Table of all the deployed Cloud Starters|
+|[show-cloud-starter-links](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/show-cloud-starter-links/)|Show Links to your Cloud Starters|
+|[start-cloud-starter](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/start-cloud-starter/)|Start your local cloud starter project|
+|[build-cloud-starter](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/build-cloud-starter/)|Build your local cloud starter project|
+|[test-cloud-starter](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/test-cloud-starter/)|Run Test cases for your cloud starter|
+|[test-cloud-starter-headless](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/test-cloud-starter-headless/)|Run Test cases for your cloud starter, headless (without opening the browser)|
+|[deploy-cloud-starter](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/deploy-cloud-starter/)|Deploy your local cloud starter project|
+|[build-deploy-cloud-starter](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/build-deploy-cloud-starter/)|Builds and Deploys your local project to the cloud|
+|[delete-cloud-starter](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/delete-cloud-starter/)|Delete a LiveApps WebApp|
 |[generate-descriptor](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/generate-descriptor/)|Generates the configured Public Cloud Descriptor|
 |[update-packages](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/update-packages/)|Updates the NPM packages in the @tibco-tcstk scope in your project.|
 |[inject-lib-sources](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/inject-lib-sources/)|Enables your project for Cloud Library Debugging|
@@ -200,7 +200,6 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[remove-discover-dataset](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/remove-discover-dataset/)|Removes a Dataset for Project Discover|
 |[run-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/run-discover-process-analysis/)|Runs a Process Analysis for Project Discover|
 |[action-discover-process-analysis](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/action-discover-process-analysis/)|Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover|
-|[export-discover-config](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/export-discover-config/)|Exports the configuration for Project Discover into a JSON file|
 
 ## oauth
 
@@ -222,5 +221,5 @@ Copyright © 2021. TIBCO Software Inc.
 This file is subject to the license terms contained
 in the license file that is distributed with this file.
 
-Please see 'TIB_cloud-composer-toolkit_x.x.x_license'.pdf/.txt for details of license and dependent third party components referenced by this library.
+Please see 'TIB_cloud-composer_x.x.x_license'.pdf/.txt for details of license and dependent third party components referenced by this library.
 
