@@ -171,9 +171,9 @@ describe('tcli testsuite', function () {
 
   // jasmine --config=test/support/jasmine.json --filter='TEMPLATE: Build and Deploy Basic Cloud Starter'
   // Basic Cloud Starter Template (Angular 12)
-  it('TEMPLATE: Build and Deploy Basic Cloud Starter', function () {
+  it('TEMPLATE: Build and Deploy Basic Cloud Application', function () {
     const CSName = 'CS-BASIC-TEST-CM-' + (new Date()).getTime()
-    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Basic Cloud Starter Template (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + ' new ' + CSName + ' -t "Basic Cloud Application Template (Angular 12)" -s')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'build')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'show-cloud')).toBe(true, 'Command: ' + cObj.command)
     expect(run('cd ' + CSName + ' && ' + CLI_EXECUTOR_CS + 'deploy')).toBe(true, 'Command: ' + cObj.command)
