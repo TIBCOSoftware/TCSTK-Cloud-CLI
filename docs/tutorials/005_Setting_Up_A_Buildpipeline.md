@@ -4,11 +4,11 @@
 ## Multiple Properties file
 > In the previous tutorial we have seen how to work with multiple organizations and how to configure the [Multiple Properties file](./004_Multiple_Organizations.md)
 
-In this section we will look at the rest of this file and how to configure it. Basically we can define ***Cloud Starter Jobs*** in the manage multiple Cloud Starter file:
+In this section we will look at the rest of this file and how to configure it. Basically we can define ***Cloud Application Jobs*** in the manage multiple Cloud Applications / Cloud Organizations file:
 
 ![TCLI_Show_Links](imgs/005_Mfile_Jobs.png)
 
-The initial multiple property file looks like this for example, notice the ***Cloud_Starter_JOBS*** property:
+The initial multiple property file looks like this for example, notice the ***TIBCO_CLOUD_JOBS*** property:
 
 ![TCLI_Show_Links](imgs/005_MProp_File.png)
 
@@ -16,7 +16,7 @@ To understand this configuration let's look at the following (simple) example:
 
 ```properties
 # JOB DEFINITIONS  (WHAT TO DO ?)
-Cloud_Starter_JOBS=Say_Hello_Job
+TIBCO_CLOUD_JOBS=Say_Hello_Job
 # Location: Where to run the Job (locally)
 Say_Hello_Job_Location=./
 # Environments: Which environments in the TIBCO Cloud to run the Job on
@@ -24,10 +24,10 @@ Say_Hello_Job_Location=./
 Say_Hello_Job_Environments=US_OOCTO
 Say_Hello_Job_Tasks={"O": "echo Hello World"}
 # ENVIRONMENTS
-US_OOCTO_PropertyFile=./Env/tibco-cloud-MyCloudStarter_US_OOCTO.properties
+US_OOCTO_PropertyFile=./Env/tibco-cloud-MyCloudApplication_US_OOCTO.properties
 ```
 
-So a Cloud Starter Job always needs 3 things:
+So a TIBCO Cloud Job always needs 3 things:
 
 1. A location, defined in the ***[JOB_NAME]_Location*** property. This is the location on the disk where the commands for the tasks will run.
 2. One or more environments; defined in the ***[JOB_NAME]_Environments*** property. This points to the tibco-cloud environment property file defined in the ***[ENVIRONMENT]_PropertyFile***.
@@ -72,7 +72,7 @@ or simply:
 tcli -m
 ```
 
-> ***Note:*** If we want to use another file then manage-multiple-cloud-starters.properties we could run:
+> ***Note:*** If we want to use another file then manage-multiple-cloud-organizations.properties we could run:
 
 ```console
 tcli --multipleFile(-f) <multiple-file-name> 
@@ -92,7 +92,7 @@ Let's take our example and let's make some changes. First we add a property call
 ```properties
 Project=A Fun Project
 # JOB DEFINITIONS  (WHAT TO DO ?)
-Cloud_Starter_JOBS=Say_Hello_Job
+TIBCO_CLOUD_JOBS=Say_Hello_Job
 # Location: Where to run the Job (locally)
 Say_Hello_Job_Location=./
 # Environments: Which environments in the TIBCO Cloud to run the Job on
@@ -100,15 +100,15 @@ Say_Hello_Job_Location=./
 Say_Hello_Job_Environments=US_OOCTO,LABS_DEV
 Say_Hello_Job_Tasks={"O": "echo Hello ${Project}"},{"O": "echo Hello @{App_Name}"}
 # ENVIRONMENTS
-US_OOCTO_PropertyFile=./Env/tibco-cloud-MyCloudStarter_US_OOCTO.properties
-LABS_DEV_PropertyFile=./Env/tibco-cloud-MyCloudStarter_EU_TIBCO_LABS_DEV.properties
+US_OOCTO_PropertyFile=./Env/tibco-cloud-MyCloudApplication_US_OOCTO.properties
+LABS_DEV_PropertyFile=./Env/tibco-cloud-MyCloudApplication_EU_TIBCO_LABS_DEV.properties
 ```
 
 Note the ***${Project}*** and ***@{App_Name}*** variables in our tasks, these are property replacements and they work as follows:
 
 ![TCLI_Show_Links](imgs/005_Property_Replacement.png)
 
-So a property encapsulated within ${} is resolved in the multiple cloud starters file and a property encapsulated within @{} is resolved in the individual environment/organization files. So when we run this we get the following. 
+So a property encapsulated within ${} is resolved in the multiple cloud applications / organizations file and a property encapsulated within @{} is resolved in the individual environment/organization files. So when we run this we get the following. 
 
 ![TCLI_Show_Links](imgs/005_Prop_Replacement_Execution.png#zoom)
 
@@ -138,7 +138,7 @@ This is a piece of a pipeline to import data into LiveApps. There are a few thin
 We also see an ***os_copy*** task being replaced, and this is ***an interesting one***. TCLI provides the capability to ***extend the property files by*** setting a value called ***PROPERTY_EXTENSION_FILE*** For example:
 
 ```properties
-PROPERTY_EXTENSION_FILE=manage-multiple-cloud-starters-common.properties
+PROPERTY_EXTENSION_FILE=manage-multiple-cloud-organizations-common.properties
 ```
 
 This means that the multiple property file can be extended, for example:
@@ -164,7 +164,7 @@ This is useful for Operating System specifics but can also be used for other pur
 ---
 ## Specifying Jobs from the Commandline
 
-Regardless of what you have specified in the Multiple Cloud Starters property file, you can always specify one job and one environment name from the commandline:
+Regardless of what you have specified in the Multiple Cloud Applications / Organizations property file, you can always specify one job and one environment name from the commandline:
 
 ![TCLI_Show_Links](imgs/005_RunMultiple.png)
 
@@ -183,7 +183,7 @@ Which results in:
 ---
 ## Setting up the Build Pipeline
 
-Now that we understand and have setup our Jobs and Tasks in the Multiple Cloud Starters property file we can start setting up our build pipeline in a Build Pipeline tool, like for example Jenkins or Team City.
+Now that we understand and have setup our Jobs and Tasks in the Multiple Cloud Applications / Organizations property file we can start setting up our build pipeline in a Build Pipeline tool, like for example Jenkins or Team City.
 
 ### Jenkins Classic
 
@@ -193,7 +193,7 @@ Jenkins has a rich eco system of plugins fomr the Jenkins classic view we use a 
 
 ![TCLI_Show_Links](imgs/005_JenkisBuildPipeline.png#zoom)
 
-Now in Jenkins every task on the pipeline basically becomes one task in our manage-multiple Cloud Starter property file:
+Now in Jenkins every task on the pipeline basically becomes one task in our manage-multiple Cloud Applications / Organizations property file:
 
 ![TCLI_Show_Links](imgs/005_Jenkins_Pipeline_Tasks.png#zoom)
 
@@ -202,7 +202,7 @@ A more modern way of working with Jenkins is using <a href="https://www.jenkins.
 
 ![TCLI_Show_Links](imgs/005_Jenkins_Pipeline_Script.png#zoom)
 
-Every step in the script is executed by running the ***tcli cloud starter jobs***:
+Every step in the script is executed by running the ***TIBCO Cloud jobs***:
 
 ![TCLI_Show_Links](imgs/005_Jenkins_Script_Pipeline_Connected.png#zoom)
 
@@ -218,7 +218,7 @@ Visually it displays like this:
 
 ![TCLI_Show_Links](imgs/005_Team_City.png#zoom)
 
-Like the Jenkins build pipeline you can connect every build step to a run of the ***tcli cloud starter job***:
+Like the Jenkins build pipeline you can connect every build step to a run of the ***TIBCO Cloud jobs***:
 
 ![TCLI_Show_Links](imgs/005_Team_City_Connected.png#zoom)
 

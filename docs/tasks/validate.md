@@ -2,7 +2,7 @@
 
 ---
 ### Description:
-> Validates the setting of a property & the value of a property or validates the existence of a Cloud Starter, LiveApps app or TCI App.
+> Validates the setting of a property & the value of a property or validates the existence of a Cloud Application, LiveApps app or TCI App.
 
 This is useful when you want to validate certain things on the TIBCO Cloud before or after you run your scripts.
 
@@ -21,7 +21,7 @@ These are the things you can validate:
 * LiveApps_app_exist: Validates if a LiveApps Application exists.
 * Live_Apps_group_exist: Validates if a LiveApps Group exists.
 * TCI_App_exist: Validates if a TCI Application exists.
-* Cloud_Starter_exist: Validates if a Cloud Starter exists.
+* Cloud_App_exist: Validates if a Cloud Application exists.
 * Org_Folder_exist: Validates if an Organization Folder exists.
 * Org_Folder_And_File_exist: Validates if an Organization Folder exists, and if it has a specific file.
 * Case_exist: Validates if a specific LiveApps Case exists.

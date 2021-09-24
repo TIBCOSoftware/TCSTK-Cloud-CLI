@@ -19,28 +19,28 @@
 [change-tibco-cloud-organization](./change-tibco-cloud-organization.md) - Changes the Organization in the cloud-properties file
 
 
-## cloud-starters
+## cloud-apps
 
 ---
 
 
-[show-cloud-starters](./show-cloud-starters.md) - Show a Table of all the deployed Cloud Starters
+[show-cloud-apps](./show-cloud-apps.md) - Show a Table of all the deployed Cloud Applications
 
-[show-cloud-starter-links](./show-cloud-starter-links.md) - Show Links to your Cloud Starters
+[show-cloud-app-links](./show-cloud-app-links.md) - Show Links to your Cloud Applications
 
-[start-cloud-starter](./start-cloud-starter.md) - Start your local cloud starter project
+[start-cloud-app](./start-cloud-app.md) - Start your local cloud application project
 
-[build-cloud-starter](./build-cloud-starter.md) - Build your local cloud starter project
+[build-cloud-app](./build-cloud-app.md) - Build your local cloud application project
 
-[test-cloud-starter](./test-cloud-starter.md) - Run Test cases for your cloud starter
+[test-cloud-app](./test-cloud-app.md) - Run Test cases for your cloud application
 
-[test-cloud-starter-headless](./test-cloud-starter-headless.md) - Run Test cases for your cloud starter, headless (without opening the browser)
+[test-cloud-app-headless](./test-cloud-app-headless.md) - Run Test cases for your cloud application, headless (without opening the browser)
 
-[deploy-cloud-starter](./deploy-cloud-starter.md) - Deploy your local cloud starter project
+[deploy-cloud-app](./deploy-cloud-app.md) - Deploy your local cloud application project
 
-[build-deploy-cloud-starter](./build-deploy-cloud-starter.md) - Builds and Deploys your local project to the cloud
+[build-deploy-cloud-app](./build-deploy-cloud-app.md) - Builds and Deploys your local project to the cloud
 
-[delete-cloud-starter](./delete-cloud-starter.md) - Delete a LiveApps WebApp
+[delete-cloud-app](./delete-cloud-app.md) - Delete a cloud application
 
 [generate-descriptor](./generate-descriptor.md) - Generates the configured Public Cloud Descriptor
 
@@ -68,7 +68,7 @@
 
 [update-global-config](./update-global-config.md) - Update the global cloud connection configuration
 
-[create-multiple-property-file](./create-multiple-property-file.md) - Creating an initial property file to manage multiple cloud starters and environments.
+[create-multiple-property-file](./create-multiple-property-file.md) - Creating an initial property file to manage multiple cloud applications and organizations.
 
 [generate-cloud-property-files](./generate-cloud-property-files.md) - Generates a list of cloud property files.
 
@@ -76,7 +76,7 @@
 
 [replace-values-in-files](./replace-values-in-files.md) - Replace string in file following based on answers provided
 
-[validate](./validate.md) - Validations on the setting and/or the value of a property, the existence of a Cloud Starter, LiveApp or TCI App.
+[validate](./validate.md) - Validations on the setting and/or the value of a property, the existence of a Cloud Application, LiveApp or TCI App.
 
 
 ## live-apps
@@ -219,6 +219,10 @@
 [run-discover-process-analysis](./run-discover-process-analysis.md) - Runs a Process Analysis for Project Discover
 
 [action-discover-process-analysis](./action-discover-process-analysis.md) - Run an action(Archive, Remove, Rerun) on a Process Analysis from Project Discover
+
+[export-discover-config](./export-discover-config.md) - Exports the configuration for Project Discover into a JSON file
+
+[import-discover-config](./import-discover-config.md) - Imports the configuration for Project Discover into a JSON file
 
 
 ## oauth

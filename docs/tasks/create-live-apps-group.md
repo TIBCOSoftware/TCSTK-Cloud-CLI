@@ -4,7 +4,7 @@
 ### Description:
 > Creates a new LiveApps group.
 
-This is useful to create a group to differentiate roles in your cloud starter. (for example Admins, ReadOnly, MyTeamMembers)
+This is useful to create a group to differentiate roles in your cloud application. (for example Admins, ReadOnly, MyTeamMembers)
 
 ---
 ### Questions:

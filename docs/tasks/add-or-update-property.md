@@ -30,7 +30,7 @@ For SPECIAL you can use:
 * LiveApps_AppID: The appId of a specific LiveApp application.
 * LiveApps_ActionID: The actionId (creator or action) of a specific LiveApps action.
 * Shared_StateID: The Id of a specific shared state entry.
-* Spotfire_FolderPath: The path (including Organization ID) of a spotfire folder. (this is needed if you want to display a spotfire report in your cloud starter) 
+* Spotfire_FolderPath: The path (including Organization ID) of a spotfire folder. (this is needed if you want to display a spotfire report in your cloud application) 
 
 NOTE: For specifics (LiveApp applications, SharedState or Spotfire Folders) additional questions are asked.
 

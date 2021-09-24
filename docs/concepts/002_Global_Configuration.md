@@ -22,7 +22,7 @@ After you have setup the TIBCO Cloud Connection details in the global file, when
 ![TCLI_Show_Links](imgs/001_Global_Set.png#zoom)
 
 
-This is very useful when you are managing multiple Cloud Starters and you want to share the connection details:
+This is very useful when you are managing multiple Cloud Applications and you want to share the connection details:
 
 ![TCLI_Show_Links](imgs/001_CS_Global.png#zoom)
 

@@ -2,12 +2,12 @@
 
 ---
 ### Description:
-> Creating an initial property file to manage multiple cloud starters and environments.
+> Creating an initial property file to manage multiple cloud applications and environments.
 
 ---
 ### Questions:
 
-Please specify a name for the Multiple prop file (Use DEFAULT for: manage-multiple-cloud-starters) ?
+Please specify a name for the Multiple prop file (Use DEFAULT for: manage-multiple-cloud-organizations) ?
 
 If the file exists:
 The property file: <FILE>.properties already exists, do you want to Overwrite it ?

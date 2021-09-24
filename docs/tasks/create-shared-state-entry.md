@@ -4,7 +4,7 @@
 ### Description:
 > Create a new shared state entry
 
-This is useful to create shared state entries to store configuration for your cloud starter.
+This is useful to create shared state entries to store configuration for your cloud application.
 
 The following properties in the cloud properties file are being used:
 
