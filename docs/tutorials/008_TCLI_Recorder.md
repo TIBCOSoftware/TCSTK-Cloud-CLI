@@ -131,4 +131,4 @@ You can now rewrite the script to:
 
 ![TCLI_Show_Links](imgs/008_RewroteScript.png#zoom)
 
-In this way you can build script that are generic to deploy your cloud starters to various environments with various different settings.
+In this way you can build script that are generic to deploy your cloud applications to various environments with various different settings.

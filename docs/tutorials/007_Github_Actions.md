@@ -4,7 +4,7 @@
 
 ---
 ## Description
-In this section we will discuss how you can run tcli tasks automatically after committing some cloud starter code into GitHub. On GitHub you will find this Actions section:
+In this section we will discuss how you can run tcli tasks automatically after committing some cloud application code into GitHub. On GitHub you will find this Actions section:
 
 ![TCLI_Show_Links](imgs/007_GitHubActions_Repo.png)
 
@@ -49,9 +49,9 @@ Now create a .github folder (if it does not exist) and a workflows subfolder, li
 And paste the following content:
 
 ```yaml
-# This is a basic workflow to deploy a cloud starter
+# This is a basic workflow to deploy a cloud application
 
-name: DeployCloudStarter
+name: DeployCloudApplication
 
 # Controls when the action will run.
 on:
@@ -75,13 +75,13 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a set of commands using the runners shell
-      - name: Deploy Cloud Starter
+      - name: Deploy Cloud Application
         env:
           TCLI_EMAIL: ${{ secrets.TCLI_EMAIL }}
           TCLI_CLIENTID: ${{ secrets.TCLI_CLIENTID }}
           TCLI_PASS: ${{ secrets.TCLI_PASS }}
         run: |
-          echo DEPLOYING Cloud Starter...
+          echo DEPLOYING Cloud Application...
           npm install
           npm install --save-dev @tibco-tcstk/cloud-cli
           npx tcli -v
@@ -91,7 +91,7 @@ jobs:
           npx tcli -p github-actions.properties add-or-update-property -a DEFAULT:CloudLogin.pass:none:$TCLI_PASS
           npx tcli -p github-actions.properties show-properties
           npx tcli -p github-actions.properties show-cloud
-          npx tcli -p github-actions.properties build-deploy-cloud-starter
+          npx tcli -p github-actions.properties build-deploy-cloud-app
 ```
 
 And commit this to GitHub.
@@ -118,6 +118,6 @@ It is important to realize that you can only enter the secrets, you cannot retri
 
 ### Deploy by Committing
 
-Now when you do a commit, you will see your cloud starter getting build and deployed through the action:
+Now when you do a commit, you will see your cloud application getting build and deployed through the action:
 
 ![TCLI_Show_Links](imgs/007_Deployed.png#zoom)
