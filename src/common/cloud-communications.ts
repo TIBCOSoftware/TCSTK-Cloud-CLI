@@ -232,13 +232,13 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
     conf = {}
   }
   // Check for another Cloud Location
-  if (getProp('CloudLogin.Cloud_Location') != null && getProp('CloudLogin.Cloud_Location') !== 'cloud.tibco.com') {
+  if (getProp('CloudLogin.Cloud_Location') != null && getProp('CloudLogin.Cloud_Location') !== 'cloud.tibco.com' && url.indexOf('cloud.tibco.com') > -1) {
     url = url.replace('cloud.tibco.com', getProp('CloudLogin.Cloud_Location'))
     log(WARNING, 'Using another BASE URL: ', getProp('CloudLogin.Cloud_Location'))
   }
   // discover.labs.tibcocloud.com
   // Check for another Cloud Location
-  if (getProp('CloudLogin.Discover_Location') != null && getProp('CloudLogin.Discover_Location') !== 'discover.labs.tibcocloud.com') {
+  if (getProp('CloudLogin.Discover_Location') != null && getProp('CloudLogin.Discover_Location') !== 'discover.labs.tibcocloud.com' && url.indexOf('discover.labs.tibcocloud.com') > -1) {
     url = url.replace('discover.labs.tibcocloud.com', getProp('CloudLogin.Discover_Location'))
     log(WARNING, 'Using another DISCOVER URL: ', getProp('CloudLogin.Discover_Location'))
   }
