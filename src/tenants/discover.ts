@@ -1,5 +1,5 @@
 import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
-import {callTCA, postMessageToCloud, postToCloud, readableSize} from '../common/cloud-communications'
+import { callTCA, postMessageToCloud, postToCloud, readableSize } from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
 import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
 import { Dataset } from '../models/discover/dataset'
@@ -123,7 +123,11 @@ export async function uploadDataSetFile () {
   log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
   const typeForUpload = await askMultipleChoiceQuestionSearch('What would you like to upload as a Dataset File ? ', optionList)
   if (typeForUpload.toLowerCase() !== 'none') {
-    const endpoint = CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase()
+    let endpoint = CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase()
+    if (getProp('CloudLogin.Discover_Location') != null && getProp('CloudLogin.Discover_Location') !== 'discover.labs.tibcocloud.com') {
+      endpoint = endpoint.replace('discover.labs.tibcocloud.com', getProp('CloudLogin.Discover_Location'))
+      log(WARNING, 'Using another DISCOVER UPLOAD URL: ', getProp('CloudLogin.Discover_Location'))
+    }
     if (typeForUpload.toLowerCase() === 'file') {
       // if FILE, ask the user for the file location
       const localFileLocation = await askQuestion('Provide the location of the file to upload as dataset file:')
@@ -465,7 +469,7 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
   }
   // Ask if all configuration needs to be added or just a single
   let configTypeToImport = 'all'
-  if(!importAll) {
+  if (!importAll) {
     const optionList = ['ALL', ...DISCOVER_CONFIGS.map(v => v.label), 'NONE']
     configTypeToImport = await askMultipleChoiceQuestionSearch('Which configuration type would you like to import ? ', optionList)
   }

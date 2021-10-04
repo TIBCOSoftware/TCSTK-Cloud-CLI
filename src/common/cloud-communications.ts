@@ -236,6 +236,14 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
     url = url.replace('cloud.tibco.com', getProp('CloudLogin.Cloud_Location'))
     log(WARNING, 'Using another BASE URL: ', getProp('CloudLogin.Cloud_Location'))
   }
+  // discover.labs.tibcocloud.com
+  // Check for another Cloud Location
+  if (getProp('CloudLogin.Discover_Location') != null && getProp('CloudLogin.Discover_Location') !== 'discover.labs.tibcocloud.com') {
+    url = url.replace('discover.labs.tibcocloud.com', getProp('CloudLogin.Discover_Location'))
+    log(WARNING, 'Using another DISCOVER URL: ', getProp('CloudLogin.Discover_Location'))
+  }
+
+
   let urlToCall = 'https://' + getCurrentRegion() + url
   if (conf.skipInjectingRegion) {
     urlToCall = 'https://' + url
