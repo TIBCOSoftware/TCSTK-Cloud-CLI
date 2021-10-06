@@ -61,8 +61,7 @@ These are the available TIBCO Cloud™ CLI Tutorials:
 |5. [Setting Up A Buildpipeline](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/005_Setting_Up_A_Buildpipeline/)|This guide explains how to setup a build pipeline with for example Jenkins or TeamCity|
 |6. [Passing In Answers](https://tibcosoftware.github.io/TCSToolkit/cli/concepts/006_Passing_In_Answers/)|This guide explains the concept of passing in answers to a TCLI task |
 |7. [Github Actions](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/007_Github_Actions/)|This guide explains how to run TCLI task on commits to github with github actions |
-|8. [TCLI Recorder](
-TCSToolkit/cli/tutorials/008_TCLI_Recorder/)|This guide explains the concept of recording tasks for replay in scripts|
+|8. [TCLI Recorder](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/008_TCLI_Recorder/)|This guide explains the concept of recording tasks for replay in scripts|
 
 # Available TCLI Tasks
 These are the available TIBCO Cloud™ CLI Tasks:
