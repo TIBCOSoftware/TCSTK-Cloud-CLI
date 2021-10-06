@@ -1,4 +1,4 @@
-import { ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
+import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from '../common/logging'
 import { callTCA, postMessageToCloud, postToCloud, readableSize } from '../common/cloud-communications'
 import { Analysis } from '../models/discover/analysis'
 import { createTable, createTableFromObject, getPEXConfig, pexTable } from '../common/tables'
@@ -482,11 +482,11 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
       break
     case 'all':
       for (const disc of DISCOVER_CONFIGS.map(v => v.objectName)) {
-        if (configObject[disc]) {
+        if (_.get(configObject, disc)) {
           // console.log(configObject[disc])
-          log(INFO, 'Found the configuration for ' + disc)
+          log(DEBUG, 'Found the configuration for ' + disc)
           // Upload this config
-          await updateDiscoverConfig(DISCOVER_CONFIGS.find(v => v.objectName === disc)!.endpoint, configObject[disc])
+          await updateDiscoverConfig(DISCOVER_CONFIGS.find(v => v.objectName === disc)!.endpoint, _.get(configObject, disc))
         } else {
           log(WARNING, 'The configuration for ' + disc + ' seems to be missing !!!')
         }
@@ -505,15 +505,14 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
 }
 
 async function updateDiscoverConfig (endpoint: string, configObject:any) {
-  log(INFO, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
-  log(INFO, 'New Config: ', configObject)
+  log(DEBUG, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
+  log(DEBUG, 'New Config: ', configObject)
   const result = await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, { skipInjectingRegion: SKIP_REGION, handleErrorOutside: true, returnResponse: true })
-  console.log('Result:  ', result.body, ' Status: ', result.statusCode)
-  // TODO: Use this to update config (after service is enabled)
-  // const configResult = await callTCA(CCOM.clURI.dis_configuration + '/' + endpoint, true, { skipInjectingRegion: true })
-  // console.log(configResult)
-  /// await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, { skipInjectingRegion: SKIP_REGION })
-  console.log('Posting ' + configObject + ' to: ', CCOM.clURI.dis_configuration + '/' + endpoint)
+  if (result && result.statusCode && result.statusCode === 200) {
+    log(INFO, col.green('[RESULT OK]') + ' Updated discover config: ' + col.blue(endpoint))
+  } else {
+    log(ERROR, ' [RESULT FAILED] Updating discover config: ' + endpoint + '  Code: ', result.statusCode + ' Result: ', result.body)
+  }
 }
 
 // Function to export the configuration of discover to a JSON file
