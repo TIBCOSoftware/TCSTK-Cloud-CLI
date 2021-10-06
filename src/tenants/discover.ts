@@ -418,6 +418,7 @@ export async function exportDiscoverConfig () {
 const DISCOVER_CONFIGS =
     [{ objectName: 'general', endpoint: 'general', label: 'General' },
       { objectName: 'landingPage', endpoint: 'landingpages', label: 'Landing Pages' },
+      { objectName: 'investigations', endpoint: 'investigations/init', label: 'Investigations Init' },
       { objectName: 'investigations.applications', endpoint: 'investigations', label: 'Investigations' },
       { objectName: 'analytics', endpoint: 'analytics', label: 'Analytics' },
       { objectName: 'formats', endpoint: 'formats', label: 'Date Format' },
