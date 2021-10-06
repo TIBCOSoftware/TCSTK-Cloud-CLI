@@ -25,6 +25,7 @@ import Watcher from '../common/watcher'
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
+const _ = require('lodash')
 
 export function prepDiscoverProps () {
   // Checking if properties exist, otherwise create them with default values
@@ -417,8 +418,9 @@ export async function exportDiscoverConfig () {
 const DISCOVER_CONFIGS =
     [{ objectName: 'general', endpoint: 'general', label: 'General' },
       { objectName: 'landingPage', endpoint: 'landingpages', label: 'Landing Pages' },
-      { objectName: 'investigations', endpoint: 'investigations', label: 'Investigations' },
+      { objectName: 'investigations.applications', endpoint: 'investigations', label: 'Investigations' },
       { objectName: 'analytics', endpoint: 'analytics', label: 'Analytics' },
+      { objectName: 'formats', endpoint: 'formats', label: 'Date Format' },
       { objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping' }]
 
 // Function to export the configuration of discover to a JSON file
@@ -492,8 +494,10 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
       break
     default: // Use the config file provided
       disConf = DISCOVER_CONFIGS.find(v => v.label.toLowerCase() === configTypeToImport.toLowerCase())!
-      if (configObject[disConf.objectName]) {
-        await updateDiscoverConfig(disConf.endpoint, configObject[disConf.objectName])
+      // console.log('_.get(configObject, disConf.objectName): ', _.get(configObject, disConf.objectName))
+      if (_.get(configObject, disConf.objectName)) {
+        await updateDiscoverConfig(disConf.endpoint, _.get(configObject, disConf.objectName))
+        // await updateDiscoverConfig(disConf.endpoint, configObject[disConf.objectName])
       } else {
         log(ERROR, 'The configuration for ' + disConf.label + ' is missing !!!')
       }
