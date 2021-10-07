@@ -422,7 +422,8 @@ const DISCOVER_CONFIGS =
       { objectName: 'investigations.applications', endpoint: 'investigations', label: 'Investigations' },
       { objectName: 'analytics', endpoint: 'analytics', label: 'Analytics' },
       { objectName: 'formats', endpoint: 'formats', label: 'Date Format' },
-      { objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping' }]
+      { objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping' },
+      { objectName: 'messages', endpoint: 'messages', label: 'Messages' }]
 
 // Function to export the configuration of discover to a JSON file
 export async function importDiscoverConfig (configFilename?: string, importAll?: boolean) {
