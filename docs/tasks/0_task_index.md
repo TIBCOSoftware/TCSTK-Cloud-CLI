@@ -224,6 +224,8 @@
 
 [import-discover-config](./import-discover-config.md) - Imports the configuration for Project Discover into a JSON file
 
+[watch-discover-config](./watch-discover-config.md) - Looks for changes in configuration for Project Discover JSON file, and uploads them
+
 
 ## oauth
 

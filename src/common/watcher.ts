@@ -4,7 +4,7 @@ import chokidar from 'chokidar'
 export interface FileContent {
   fileName: string;
   fileContent: string;
-}*/
+} */
 
 // This class watches a folder for changes, and will run a callback when a file has changed. It also runs a callback if the user presses the refresh(r) key.
 export default class Watcher {
@@ -16,7 +16,7 @@ export default class Watcher {
   constructor (public folder: string,
                public refreshFiles: (folder:string) => Promise<void>,
                public onFileChange: (changedFileName: string) => Promise<void>) {
-    console.log('Watcher created...')
+    // console.log('Watcher created...')
   }
 
   // Function to call the callback on reloading the files
@@ -37,17 +37,19 @@ export default class Watcher {
           if (!this.ignoreChanges) {
             log(INFO, 'Update file: ', path)
             await this.onFileChange(path)
+            this.messageOnKeys()
           }
         }
       })
       const readline = require('readline')
+      // We need to create a new interface, because it might have been destroyed by inquirer
+      readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      })
       readline.emitKeypressEvents(process.stdin)
       process.stdin.setRawMode(true)
-      // console.log('process.stdin ', process.stdin)
-      // TODO: HIER VERDER, THE KEY PRESS SEEMS TO HANG !!!!
       process.stdin.on('keypress', async (_str, key) => {
-        console.log('Key ', key)
-
         return new Promise<void>(async (keyResolve) => {
           if (key.ctrl && key.name === 'c') {
             process.exit()
@@ -56,6 +58,7 @@ export default class Watcher {
             // Call the Reload callback
             log(INFO, 'Reloading...')
             await this.pullFiles()
+            this.messageOnKeys()
           }
           if (key.name === 'escape' || key.name === 'q') {
             watcher.close().then(() => {
@@ -67,8 +70,12 @@ export default class Watcher {
           }
         })
       })
-      // process.stdin.on('end', () => console.log('this does trigger'))
-      console.log('Press Escape key or the \'q\'-key to stop listening for file changes, or the \'r\'-key to reload from cloud...')
+      this.messageOnKeys()
     })
   }
+
+  private messageOnKeys() {
+    console.log('Press Escape key or the \'q\'-key to stop listening for file changes, or the \'r\'-key to reload from cloud...')
+  }
+
 }

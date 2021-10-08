@@ -518,9 +518,8 @@ async function updateDiscoverConfig (endpoint: string, configObject:any) {
 }
 
 // Function to export the configuration of discover to a JSON file
-// TODO: disabled for now (till watcher works properly)
 export async function watchDiscoverConfig () {
-  log(INFO, 'Watching Configuration...')
+  log(INFO, 'Watching Discover Configuration...')
   prepDiscoverProps()
   /*
   Watcher has two callbacks;
@@ -528,12 +527,13 @@ export async function watchDiscoverConfig () {
   uploadOnRefresh --> This function gets the refreshed object everytime the watcher detects a file change.
    */
   const myWatcher = new Watcher(getProp('Discover_Folder') + '/Configuration/',
-    async (folder) => {
-      console.log('Refreshing files: ', folder)
+    async (_folder) => {
+      // console.log('Refreshing files: ', folder)
       await exportDiscoverConfig()
     }, async (changedFile) => {
-      console.log('changed file: ', changedFile)
+      // console.log('changed file: ', changedFile)
       await importDiscoverConfig('./' + changedFile, true)
+      log(INFO, 'Updated all discover config in the cloud...')
     }
   )
   // Ask if you want to export before starting to watch
@@ -542,7 +542,6 @@ export async function watchDiscoverConfig () {
     await myWatcher.pullFiles()
   }
   await myWatcher.watch()
-
   // Only watch one file
 }
 

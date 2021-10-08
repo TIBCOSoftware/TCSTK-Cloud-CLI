@@ -1250,7 +1250,7 @@
     },
     "watch-discover-config": {
       "description": "Looks for changes in configuration for Project Discover JSON file, and uploads them",
-      "enabled": false,
+      "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "watchDiscoverConfigWrapper",
