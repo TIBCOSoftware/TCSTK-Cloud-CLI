@@ -321,7 +321,7 @@ export async function generateCloudPropertyFiles () {
     }
     let tcliIprop = propForMFile.substr(0, propForMFile.length - 1)
     log(INFO, 'Property for tcli interaction: ' + tcliIprop)
-    const doUpdate = await askMultipleChoiceQuestion('Do you want to add this to your manage-multiple-cloud-starters property file ?', ['YES', 'NO'])
+    const doUpdate = await askMultipleChoiceQuestion('Do you want to add this to your manage-multiple-cloud-organizations property file ?', ['YES', 'NO'])
     if (doUpdate === 'YES') {
       let fileName = await askQuestion('What is file name of multiple property file ? (press enter for: manage-multiple-cloud-organizations.properties)')
       if (fileName === '') {
