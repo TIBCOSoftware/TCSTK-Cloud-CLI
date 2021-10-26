@@ -47,11 +47,13 @@
     "dis_dataset_detail": "discover.labs.tibcocloud.com/catalog/dataset",
     "dis_temp": "discover.labs.tibcocloud.com/visualisation/templates",
     "dis_files": "discover.labs.tibcocloud.com/catalog/files",
+    "dis_file_upload_tobe": "discover.labs.tibcocloud.com/catalog/files",
     "dis_file_upload": "discover.labs.tibcocloud.com/files",
     "dis_dataset_preview": "discover.labs.tibcocloud.com/catalog/dataset/preview",
     "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status",
     "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis",
-    "dis_configuration": "discover.labs.tibcocloud.com/configuration"
+    "dis_configuration": "discover.labs.tibcocloud.com/configuration",
+    "nimbus_maps": "nimbus.cloud.tibco.com/api/v1/maps"
   },
   "mappings": {
     "oauth": {
@@ -507,6 +509,38 @@
           "header": "Last updated",
           "field": "redisFileInfo.LastModified",
           "format": "DATE"
+        }
+      ]
+    },
+    "nimbus_maps": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Process Id",
+          "field": "processId"
+        },
+        {
+          "header": "Is Published",
+          "field": "isMaster"
+        },
+        {
+          "header": "Draft Id",
+          "field": "draft.mapId"
+        },
+        {
+          "header": "Draft Owner",
+          "field": "draft.owner.name"
+        },
+        {
+          "header": "Master Id",
+          "field": "master.mapId"
+        },
+        {
+          "header": "Master Owner",
+          "field": "master.owner.name"
         }
       ]
     }

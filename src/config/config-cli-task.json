@@ -1050,6 +1050,20 @@
       ],
       "category": "spotfire"
     },
+    "show-nimbus-maps": {
+      "description": "Shows a list of available Nimbus maps",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showNimbusMapsWrapper",
+      "taskAlternativeNames": [
+        "show-maps"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "nimbus"
+    },
     "show-discover-process-analysis": {
       "description": "Show's the process analysis of Project Discover",
       "enabled": true,

@@ -85,14 +85,13 @@ async function loadTasks (catToUse: string) {
           for (const role of userRoles.userRolesDetailsForTenants) {
             if (role && role.tenantId) {
               switch (role.tenantId.toLowerCase()) {
+                case 'spotfire':
+                case 'tci':
+                case 'nimbus':
+                  availableCategories.push(role.tenantId.toLowerCase())
+                  break
                 case 'bpm':
                   availableCategories.push('cloud-apps', 'live-apps', 'shared-state', 'cloud-files')
-                  break
-                case 'spotfire':
-                  availableCategories.push('spotfire')
-                  break
-                case 'tci':
-                  availableCategories.push('tci')
                   break
                 case 'tcm':
                   availableCategories.push('messaging')
@@ -881,6 +880,11 @@ export async function removeDiscoverPAWrapper () {
   const DISCOVER = require('./tenants/discover')
   await DISCOVER.removeProcessAnalysis()
 } */
+
+export async function showNimbusMapsWrapper () {
+  const NIMBUS = require('./tenants/nimbus')
+  await NIMBUS.showNimbusMaps()
+}
 
 export async function updateTCLIwrapper () {
   await updateTCLI()

@@ -125,6 +125,8 @@ export async function uploadDataSetFile () {
   const typeForUpload = await askMultipleChoiceQuestionSearch('What would you like to upload as a Dataset File ? ', optionList)
   if (typeForUpload.toLowerCase() !== 'none') {
     let endpoint = CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase()
+    // let endpoint = CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId())
+    // let endpoint = CCOM.clURI.dis_file_upload
     if (getProp('CloudLogin.Discover_Location') != null && getProp('CloudLogin.Discover_Location') !== 'discover.labs.tibcocloud.com') {
       endpoint = endpoint.replace('discover.labs.tibcocloud.com', getProp('CloudLogin.Discover_Location'))
       log(WARNING, 'Using another DISCOVER UPLOAD URL: ', getProp('CloudLogin.Discover_Location'))
@@ -152,8 +154,6 @@ async function uploadToDiscover (fileLocation: string, uploadURL: string) {
   const FormData = require('form-data')
   const fs = require('fs')
   const { size: fileSize } = fs.statSync(fileLocation)
-  log(INFO, 'UPLOADING FILE TO DISCOVER: ' + col.blue(fileLocation) + ' Filesize: ' + readableSize(fileSize))
-  log(INFO, '                  ENDPOINT: ' + uploadURL)
   const data = new FormData()
   // TODO: Make configurable
   data.append('newline', '\\r\\n')
@@ -171,12 +171,16 @@ async function uploadToDiscover (fileLocation: string, uploadURL: string) {
     method: 'post',
     url: url,
     headers: {
-      ...data.getHeaders()
+      ...data.getHeaders(),
+      Authorization: 'Bearer ' + getProp('CloudLogin.OAUTH_Token')
     },
     data: data
   }
+  // console.log('Config: ' , config)
+  log(INFO, 'UPLOADING FILE TO DISCOVER: ' + col.blue(fileLocation) + ' Filesize: ' + readableSize(fileSize))
+  log(INFO, '                  ENDPOINT: ' + url)
   const response = await axios(config)
-  if (response && response.status === 201 && response.data && response.data.message && response.data.file) {
+  if (response && response.status === 200 && response.data && response.data.message && response.data.file) {
     log(INFO, 'FILE UPLOADED SUCCESSFULLY: ' + col.green(response.data.message) + ' File Location: ' + col.blue(response.data.file))
   } else {
     log(ERROR, 'Error uploading file to discover (status: ' + response.status + ') Message: ', response.data)
