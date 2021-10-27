@@ -180,7 +180,7 @@ async function uploadToDiscover (fileLocation: string, uploadURL: string) {
   log(INFO, 'UPLOADING FILE TO DISCOVER: ' + col.blue(fileLocation) + ' Filesize: ' + readableSize(fileSize))
   log(INFO, '                  ENDPOINT: ' + url)
   const response = await axios(config)
-  if (response && response.status === 200 && response.data && response.data.message && response.data.file) {
+  if (response && response.status >= 200 && response.status < 300 && response.data && response.data.message && response.data.file) {
     log(INFO, 'FILE UPLOADED SUCCESSFULLY: ' + col.green(response.data.message) + ' File Location: ' + col.blue(response.data.file))
   } else {
     log(ERROR, 'Error uploading file to discover (status: ' + response.status + ') Message: ', response.data)
