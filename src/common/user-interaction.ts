@@ -125,7 +125,7 @@ export function setGlobalAnswers (answers: string) {
   if (answers) {
     let uniqueRepl
     if (answers.indexOf(COLON_ESCAPE) > 0) {
-      uniqueRepl = '[DOUBLE-COLON-' + (new Date()).getTime() + ']'
+      uniqueRepl = '-DOUBLE-COLON-' + (new Date()).getTime() + '-'
       answers = answers.replace(new RegExp(COLON_ESCAPE_REGEX, 'g'), uniqueRepl)
     }
     // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
@@ -138,7 +138,7 @@ export function setGlobalAnswers (answers: string) {
       if (uniqueRepl) {
         for (const gAns in globalAnswers) {
           if (globalAnswers[gAns]) {
-            globalAnswers[gAns] = globalAnswers[gAns]!.replace(uniqueRepl, ':')
+            globalAnswers[gAns] = globalAnswers[gAns]!.replace(new RegExp(uniqueRepl, 'g'), ':')
           }
         }
       }
