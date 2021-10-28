@@ -115,18 +115,18 @@ export function isGlobalAnswersUsed () {
 }
 
 const COLON_ESCAPE = '[[:]]'
+const COLON_ESCAPE_REGEX = '\\[\\[:\\]\\]'
 
 export function escapeColon (text: string) {
-  return text.replace(':', COLON_ESCAPE)
+  return text.replace(/:/g, COLON_ESCAPE)
 }
 
 export function setGlobalAnswers (answers: string) {
-  // console.log('Answers: ' , answers);
   if (answers) {
     let uniqueRepl
     if (answers.indexOf(COLON_ESCAPE) > 0) {
       uniqueRepl = '[DOUBLE-COLON-' + (new Date()).getTime() + ']'
-      answers = answers.replace(COLON_ESCAPE, uniqueRepl)
+      answers = answers.replace(new RegExp(COLON_ESCAPE_REGEX, 'g'), uniqueRepl)
     }
     // Try to split on ':' double colon for the global manage multiple file (comma is reserved there)
     if (answers.indexOf(':') > 0) {
