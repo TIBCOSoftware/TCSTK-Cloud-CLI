@@ -15,6 +15,7 @@ import { DEBUG, ERROR, INFO, log, logCancel, logO, WARNING } from './logging'
 import { getProp, setProperty } from './property-file-management'
 import path from 'path'
 import { getCurrentOrganizationRoles } from './organization-management'
+import { WhoAmI } from '../models/organizations'
 
 declare let global: Global
 
@@ -546,24 +547,25 @@ export function readableSize (sizeBytes: number) {
 }
 
 // Function to show claims for the configured user
-export async function showCloudInfo (showTable: boolean, showSandbox: boolean, showRoles: boolean) {
+export async function showCloudInfo (showTable: boolean, showSandbox: boolean, showRoles: boolean): Promise<void> {
   const doShowSandbox = showSandbox || false
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Show Cloud')
   let doShowTable = true
   if (showTable != null) {
     doShowTable = showTable
   }
-  const response = await callTCA(clURI.claims)
+  const me = await callTCA(clURI.account_who_am_i) as WhoAmI
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud')
   let nvs = createTableValue('REGION', getRegion())
   nvs = createTableValue('ORGANIZATION', getOrganization(), nvs)
-  nvs = createTableValue('FIRST NAME', response.firstName, nvs)
-  nvs = createTableValue('LAST NAME', response.lastName, nvs)
-  nvs = createTableValue('EMAIL', response.email, nvs)
-  if (response.sandboxes && doShowSandbox) {
-    for (let i = 0; i < response.sandboxes.length; i++) {
-      nvs = createTableValue('SANDBOX ' + i, response.sandboxes[i].type, nvs)
-      nvs = createTableValue('SANDBOX ' + i + ' ID', response.sandboxes[i].id, nvs)
+  nvs = createTableValue('FIRST NAME', me.firstName, nvs)
+  nvs = createTableValue('LAST NAME', me.lastName, nvs)
+  nvs = createTableValue('EMAIL', me.email, nvs)
+  if (doShowSandbox) {
+    const claims = await callTCA(clURI.claims)
+    for (let i = 0; i < claims.sandboxes.length; i++) {
+      nvs = createTableValue('SANDBOX ' + i, claims.sandboxes[i].type, nvs)
+      nvs = createTableValue('SANDBOX ' + i + ' ID', claims.sandboxes[i].id, nvs)
     }
   }
   if (showRoles) {
@@ -596,7 +598,6 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
     showTableFromTobject(nvs, 'Cloud Info')
   }
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' Final Show Cloud')
-  return response
 }
 
 export async function isOAUTHLoginValid () {
