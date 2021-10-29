@@ -139,16 +139,20 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
       const tempPass = await askQuestion('Provide your password to Continue: ', 'password')
       setProperty('CloudLogin.pass', obfuscatePW(tempPass))
     }
-    let setLoginURL = 'https://' + getCurrentRegion() + clURI.general_login
-    if (customLoginURL) {
-      setLoginURL = customLoginURL
-      // Delete the previous cookie on a custom login
-      loginC = null
-    }
     // For default use BPM
     let tenantID = 'bpm'
     if (tenant) {
       tenantID = tenant
+    }
+    let setLoginURL = 'https://' + getCurrentRegion() + clURI.general_login
+    if (tenantID === 'bpm') {
+      console.log('Using bpm login...');
+      setLoginURL = 'https://' + getCurrentRegion() + clURI.login
+    }
+    if (customLoginURL) {
+      setLoginURL = customLoginURL
+      // Delete the previous cookie on a custom login
+      loginC = null
     }
     // TODO: Set a timer, if login was too long ago login again...
     const clientID = getProp('CloudLogin.clientID')
@@ -554,7 +558,7 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
   if (showTable != null) {
     doShowTable = showTable
   }
-  const me = await callTCA(clURI.account_who_am_i) as WhoAmI
+  const me = await callTCA(clURI.account_who_am_i ,false ,{tenant: 'TSC'}) as WhoAmI
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud')
   let nvs = createTableValue('REGION', getRegion())
   nvs = createTableValue('ORGANIZATION', getOrganization(), nvs)
