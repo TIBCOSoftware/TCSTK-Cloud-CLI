@@ -193,6 +193,14 @@
 [download-spotfire-dxp](./download-spotfire-dxp.md) - Downloads a Spotfire DXP from a library folder.
 
 
+## nimbus
+
+---
+
+
+[show-nimbus-maps](./show-nimbus-maps.md) - Shows a list of available Nimbus maps
+
+
 ## discover
 
 ---

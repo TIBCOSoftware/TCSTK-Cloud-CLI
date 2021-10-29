@@ -185,6 +185,12 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[upload-spotfire-dxp](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/upload-spotfire-dxp/)|Uploads a Spotfire DXP into a specific library folder.|
 |[download-spotfire-dxp](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/download-spotfire-dxp/)|Downloads a Spotfire DXP from a library folder.|
 
+## nimbus
+
+| TASK | Description |
+|------|:------------|
+|[show-nimbus-maps](./docs/tasks/show-nimbus-maps.md)|Shows a list of available Nimbus maps|
+
 ## discover
 
 | TASK | Description |
