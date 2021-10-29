@@ -25,6 +25,7 @@ export const clURI = cloudConfig.endpoints
 export const mappings = cloudConfig.mappings as MappingGroup
 
 let loginC: LoginCookie = null
+let loginTenant: string
 let doOAuthNotify = true
 let isOAUTHValid: boolean | null
 let toldClientID = false
@@ -169,8 +170,9 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
       pass = fus.find(pass)
     }
 
-    if (loginC == null) {
+    if (loginC == null || loginTenant !== tenantID) {
       loginC = await cloudLoginV3(tenantID, clientID, email, pass, setLoginURL)
+      loginTenant = tenantID
     }
     if (loginC === 'ERROR' && !handleErrorOutside) {
       // TODO: exit the task properly
@@ -557,6 +559,10 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
   if (showTable != null) {
     doShowTable = showTable
   }
+  let claims
+  if (doShowSandbox) {
+    claims = await callTCA(clURI.claims)
+  }
   const me = await callTCA(clURI.account_who_am_i, false, { tenant: 'TSC' }) as WhoAmI
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud')
   let nvs = createTableValue('REGION', getRegion())
@@ -565,7 +571,6 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
   nvs = createTableValue('LAST NAME', me.lastName, nvs)
   nvs = createTableValue('EMAIL', me.email, nvs)
   if (doShowSandbox) {
-    const claims = await callTCA(clURI.claims)
     for (let i = 0; i < claims.sandboxes.length; i++) {
       nvs = createTableValue('SANDBOX ' + i, claims.sandboxes[i].type, nvs)
       nvs = createTableValue('SANDBOX ' + i + ' ID', claims.sandboxes[i].id, nvs)
