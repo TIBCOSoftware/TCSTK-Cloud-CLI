@@ -251,7 +251,7 @@ export async function generateOauthToken (tokenNameOverride: string, verbose: bo
   const OauthSeconds = OauthHours * 3600
   const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants
   if (!skipCall) {
-    const me = await CCOM.callTCA(CCOM.clURI.account_who_am_i) as WhoAmI
+    const me = await CCOM.callTCA(CCOM.clURI.account_who_am_i, false, { tenant: 'TSC' }) as WhoAmI
     const response = await CCOM.callTCA(CCOM.clURI.generate_oauth, false, {
       method: 'POST',
       postRequest: postRequest,

@@ -146,7 +146,6 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
     }
     let setLoginURL = 'https://' + getCurrentRegion() + clURI.general_login
     if (tenantID === 'bpm') {
-      console.log('Using bpm login...');
       setLoginURL = 'https://' + getCurrentRegion() + clURI.login
     }
     if (customLoginURL) {
@@ -558,7 +557,7 @@ export async function showCloudInfo (showTable: boolean, showSandbox: boolean, s
   if (showTable != null) {
     doShowTable = showTable
   }
-  const me = await callTCA(clURI.account_who_am_i ,false ,{tenant: 'TSC'}) as WhoAmI
+  const me = await callTCA(clURI.account_who_am_i, false, { tenant: 'TSC' }) as WhoAmI
   if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' After Show Cloud')
   let nvs = createTableValue('REGION', getRegion())
   nvs = createTableValue('ORGANIZATION', getOrganization(), nvs)
