@@ -11,6 +11,7 @@ import { askMultipleChoiceQuestion } from './user-interaction'
 import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from './logging'
 import { OAUTHConfig } from '../models/tcli-models'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
+import { WhoAmI } from '../models/organizations'
 
 const CCOM = require('./cloud-communications')
 
@@ -250,9 +251,7 @@ export async function generateOauthToken (tokenNameOverride: string, verbose: bo
   const OauthSeconds = OauthHours * 3600
   const postRequest = 'maximum_validity=' + OauthSeconds + '&name=' + OauthTokenName + '&scope=' + OauthTenants
   if (!skipCall) {
-    // console.log('URL: ', generateOauthUrl, '\nPOST: ', postRequest)
-    // A bit of a hack to do this call before re-authorizing... (TODO: put call in update token again)
-    const responseClaims = await CCOM.callTCA(CCOM.clURI.claims)
+    const me = await CCOM.callTCA(CCOM.clURI.account_who_am_i) as WhoAmI
     const response = await CCOM.callTCA(CCOM.clURI.generate_oauth, false, {
       method: 'POST',
       postRequest: postRequest,
@@ -284,9 +283,7 @@ export async function generateOauthToken (tokenNameOverride: string, verbose: bo
           // console.log('Response: ', response);
           const expiryDate = new Date((new Date()).getTime() + (response.expires_in * 1000))
           // ADD Get Claims Call here...
-          // console.log(responseClaims);
-          const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + responseClaims.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token
-          // console.log(tokenToInject);
+          const tokenToInject = '[Token Name: ' + OauthTokenName + '][Region: ' + getRegion() + '][User: ' + me.email + '][Org: ' + getOrganization() + '][Scope: ' + response.scope + '][Expiry Date: ' + expiryDate + ']Token:' + response.access_token
           if (returnProp) {
             return tokenToInject
           } else {

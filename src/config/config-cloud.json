@@ -8,6 +8,7 @@
     "apps": "liveapps.cloud.tibco.com/webresource/apps/",
     "types": "liveapps.cloud.tibco.com/case/v1/types",
     "shared_state": "liveapps.cloud.tibco.com/clientstate/v1/states",
+    "account_who_am_i": "account.cloud.tibco.com/tsc-ws/v2/whoami",
     "account_info": "account.cloud.tibco.com/tsc-ws/v1/my-accounts/info",
     "account_user_roles": "account.cloud.tibco.com/tsc-utd/v1/tenant-user-roles",
     "general_login": "account.cloud.tibco.com/idm/v3/login-oauth",

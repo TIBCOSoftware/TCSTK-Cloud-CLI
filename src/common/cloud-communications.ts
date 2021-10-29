@@ -95,19 +95,11 @@ export function invalidateLogin () {
   isOAUTHValid = null
 }
 
-export async function cLogin (tenant?: string, customLoginURL?: string, forceClientID?: boolean, manualOAUTH?: string, handleErrorOutside? :boolean) {
+export async function cLogin (tenant?: string, customLoginURL?: string, forceClientID?: boolean, manualOAUTH?: string, handleErrorOutside?: boolean) {
   const fClientID = forceClientID || false
   if (isOauthUsed() && !fClientID) {
     log(DEBUG, 'Using OAUTH for Authentication...')
-    // isOAUTHValid = true;
-    // Getting the organization info
-    // console.log('Get Org: ' , getOrganization());
-    // TODO: think of a fix for OAUTH Tokens that just have LA Access (get orgname from a live apps api)
-    // if (getOrganization() == null || getOrganization().trim() == '') {
     if (!isOrgChecked) {
-      // Setting this to temp so it breaks the call stack
-      // setOrganization('TEMP');
-      // const response = await callURLA('https://' + getCurrentRegion() + clURI.account_info, null, null, null, false, null, null, null, true, false, true);
       const response = await callTCA(clURI.account_info, false, {
         forceOAUTH: true,
         forceCLIENTID: false,
@@ -146,7 +138,7 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
       const tempPass = await askQuestion('Provide your password to Continue: ', 'password')
       setProperty('CloudLogin.pass', obfuscatePW(tempPass))
     }
-    let setLoginURL = 'https://' + getCurrentRegion() + clURI.login
+    let setLoginURL = 'https://' + getCurrentRegion() + clURI.general_login
     if (customLoginURL) {
       setLoginURL = customLoginURL
       // Delete the previous cookie on a custom login
@@ -181,15 +173,9 @@ export async function cLogin (tenant?: string, customLoginURL?: string, forceCli
       // log(INFO, 'Error Exiting..')
       process.exit(1)
     }
-    // console.log("RETURN: " , loginC);
   }
   return loginC
 }
-
-/*
-export function getCookie () {
-  return loginC
-} */
 
 // Function that logs into the cloud and returns a cookie
 async function cloudLoginV3 (tenantID: string, clientID: string, email: string, pass: string, TCbaseURL: string) {
@@ -236,13 +222,11 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
     url = url.replace('cloud.tibco.com', getProp('CloudLogin.Cloud_Location'))
     log(WARNING, 'Using another BASE URL: ', getProp('CloudLogin.Cloud_Location'))
   }
-  // discover.labs.tibcocloud.com
   // Check for another Cloud Location
   if (getProp('CloudLogin.Discover_Location') != null && getProp('CloudLogin.Discover_Location') !== 'discover.labs.tibcocloud.com' && url.indexOf('discover.labs.tibcocloud.com') > -1) {
     url = url.replace('discover.labs.tibcocloud.com', getProp('CloudLogin.Discover_Location'))
     log(WARNING, 'Using another DISCOVER URL: ', getProp('CloudLogin.Discover_Location'))
   }
-
 
   let urlToCall = 'https://' + getCurrentRegion() + url
   if (conf.skipInjectingRegion) {
@@ -364,26 +348,12 @@ export async function callTCA (url: string, doLog?: boolean, conf?: CallConfig) 
 }
 
 // Function to post to the cloud from a file or pasted message
-export async function postToCloud (endpoint: string, question?: string, fileFolder?: string, folderFilter?: string, customConfig? :CallConfig) {
+export async function postToCloud (endpoint: string, question?: string, fileFolder?: string, folderFilter?: string, customConfig?: CallConfig) {
   const useQuestion = question || 'What would you like to use for the post message ?'
   // If the folder is provided Get the files in the folder using the folder filter
   let optionList = ['NONE', 'MESSAGE', 'FILE']
   if (fileFolder) {
     optionList = optionList.concat(getFilesFromFolder(fileFolder, folderFilter))
-    /*
-    const fs = require('fs')
-    fs.readdirSync(fileFolder).forEach((file: string) => {
-      let doAdd = true
-      if (folderFilter) {
-        if (!(file.indexOf(folderFilter) > -1)) {
-          doAdd = false
-        }
-      }
-      if (doAdd) {
-        log(INFO, 'Found file option for upload: ' + col.blue(file))
-        optionList.push(file)
-      }
-    }) */
   }
   // console.log(optionList)
   log(INFO, 'Use NONE to cancel, Use MESSAGE to paste a message and use FILE to use a custom file or choose a pre-provided file...')
@@ -410,7 +380,7 @@ export async function postToCloud (endpoint: string, question?: string, fileFold
   }
 }
 
-export async function postFileToCloud (endpoint: string, fileLocation: string, customConfig? :CallConfig) {
+export async function postFileToCloud (endpoint: string, fileLocation: string, customConfig?: CallConfig) {
   log(DEBUG, 'Posting file to the cloud: ', fileLocation, ' (endpoint: ' + endpoint + ')')
   // Load the file and post it to the cloud (if it's a JSON file, parse the json)
   const fs = require('fs')
@@ -418,7 +388,7 @@ export async function postFileToCloud (endpoint: string, fileLocation: string, c
   if (fileLocation.indexOf('json') > -1) {
     try {
       fileData = JSON.parse(fileData)
-    } catch (error:any) {
+    } catch (error: any) {
       log(ERROR, 'JSON Parsing error: ', error.message)
       process.exit(1)
     }
@@ -429,7 +399,7 @@ export async function postFileToCloud (endpoint: string, fileLocation: string, c
   return await postMessageToCloud(endpoint, fileData, customConfig)
 }
 
-export async function postMessageToCloud (endpoint: string, message: any, customConfig? :CallConfig) {
+export async function postMessageToCloud (endpoint: string, message: any, customConfig?: CallConfig) {
   log(DEBUG, 'Posting message to the cloud: ', message, ' (endpoint: ' + endpoint + ')')
   // Take possible config
   let config: CallConfig = {
@@ -443,7 +413,7 @@ export async function postMessageToCloud (endpoint: string, message: any, custom
 }
 
 // Function to upload something to the TIBCO Cloud (for example app deployment or upload files)
-export async function uploadToCloud (formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host, initialFormData? : FormData, skipInjectingRegion?: boolean) {
+export async function uploadToCloud (formDataType: string, localFileLocation: string, uploadFileURI: string, customHost: string = clURI.la_host, initialFormData?: FormData, skipInjectingRegion?: boolean) {
   let hostName = getCurrentRegion() + customHost
   if (skipInjectingRegion) {
     hostName = customHost
@@ -489,7 +459,7 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
           let dataObj
           try {
             dataObj = JSON.parse(data)
-          } catch (e:any) {
+          } catch (e: any) {
             log(WARNING, 'Parse Error: ', e.message)
           }
           if (dataObj && dataObj.message) {
@@ -514,7 +484,7 @@ export async function uploadToCloud (formDataType: string, localFileLocation: st
 }
 
 // Function to upload something to the TIBCO Cloud (for example files in cloud folders)
-export async function downloadFromCloud (localFileLocation: string, downloadFileURI: string, headers:any = {}) {
+export async function downloadFromCloud (localFileLocation: string, downloadFileURI: string, headers: any = {}) {
   return new Promise<void>(async (resolve, reject) => {
     const downloadURL = 'https://' + getCurrentRegion() + downloadFileURI
     log(INFO, '     DOWNLOADING: ' + col.blue(downloadURL))

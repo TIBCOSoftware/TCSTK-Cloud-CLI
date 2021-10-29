@@ -38,3 +38,26 @@ export interface RolesResponse {
     userRolesDetailsForTenants: UserRolesDetailsForTenant[];
 }
 
+export interface Sexp {
+    BPM: number;
+    SPOTFIRE: number;
+    TCI: number;
+}
+
+export interface WhoAmI {
+    email: string;
+    firstName: string;
+    lastName: string;
+    admn: boolean;
+    sexp: Sexp;
+    aud: string[];
+    ll: number;
+    regn: string;
+    auth: string;
+    eula: boolean;
+    accountsLength: number;
+    accountsNumber: number;
+    hasSubscription: boolean;
+    hid: string;
+    hacct: string;
+}
