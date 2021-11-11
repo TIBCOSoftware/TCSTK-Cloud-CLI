@@ -9,7 +9,7 @@ import { getProp, prepProp } from '../common/property-file-management'
 import {
   col,
   getCurrentRegion,
-  getFilesFromFolder, getOrganization,
+  getFilesFromFolder, getFolderSafeOrganization, getOrganization,
   mkdirIfNotExist,
   sleep,
   storeJsonToFile
@@ -412,7 +412,7 @@ export async function exportDiscoverConfig () {
   log(INFO, 'Exporting Discover Configuration ' + col.blue('(for ' + getOrganization() + ')'))
   prepDiscoverProps()
   const configResult = await callTCA(CCOM.clURI.dis_configuration, false, { skipInjectingRegion: true })
-  const configFileName = getProp('Discover_Folder') + '/Configuration/discover_config (' + getOrganization() + ').json'
+  const configFileName = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
   require('jsonfile').writeFileSync(configFileName, configResult, STORE_OPTIONS)
   log(INFO, 'Exported Discover Configuration to : ' + col.green(configFileName))
 }
@@ -436,7 +436,7 @@ export async function importDiscoverConfig (configFilename?: string, importAll?:
   prepDiscoverProps()
   // if no file name provided look into the config folder
   if (!configFilename) {
-    const defaultF = getProp('Discover_Folder') + '/Configuration/discover_config (' + getOrganization() + ').json'
+    const defaultF = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
     const optionList = ['NONE', 'DEFAULT', 'FILE', ...getFilesFromFolder(getProp('Discover_Folder') + '/Configuration')]
     log(INFO, 'Use NONE to cancel or DEFAULT to import the configuration file for this environment (in this case: ' + col.blue(defaultF) + ')')
     log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')

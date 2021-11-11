@@ -170,6 +170,14 @@ export function getOrganization (forceRefresh?: boolean) {
   return OrganizationGl
 }
 
+export function getFolderSafeOrganization (forceRefresh?: boolean) {
+  let org = getOrganization(forceRefresh)
+  if (org) {
+    org = org.replace(/[^a-zA-Z ]/g, '')
+  }
+  return org
+}
+
 export function setOrganization (org: string) {
   log(DEBUG, 'Setting org: ' + org)
   OrganizationGl = org
