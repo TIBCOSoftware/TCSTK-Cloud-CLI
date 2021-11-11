@@ -497,7 +497,7 @@ export function mkdirIfNotExist (dir: string) {
   const fs = require('fs')
   if (!fs.existsSync(dir)) {
     log(INFO, 'Creating folder: ' + col.blue(dir))
-    fs.mkdirSync(dir)
+    fs.mkdirSync(dir, { recursive: true })
   }
 }
 
