@@ -735,6 +735,13 @@ export async function downloadFileWrapper () {
   await CFILES.downloadFileFromOrgFolder()
 }
 
+export async function deleteFileWrapper () {
+  const CFILES = require('./tenants/cloud-files')
+  await CFILES.deleteFileFromOrgFolder()
+}
+
+
+
 export async function showPropertiesWrapper () {
   const PROPM = require('./common/property-file-management')
   await PROPM.showPropertiesTable()

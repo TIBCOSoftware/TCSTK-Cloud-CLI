@@ -124,6 +124,21 @@ async function downLoadOrgFolderFile (folder: string, file: string) {
   await CCOM.downloadFromCloud(fileName, CCOM.clURI.la_org_folder_download + '/' + folder + '/' + file + '?$download=true')
 }
 
+async function deleteOrgFolderFile (folder: string, file: string) {
+  // TODO: Option to delete all versions of a file
+  log(INFO, 'Deleting file: ')
+  log(INFO, '    Cloud Folder: ' + col.blue(folder) + ' File: ' + col.blue(file))
+  const deleteResponse = await CCOM.callTCA(CCOM.clURI.la_org_folders + '/' + folder + '/artifacts/' + file, false, {
+    method: 'DELETE'
+  })
+  if(deleteResponse.message) {
+    log(INFO, col.green(deleteResponse.message))
+  } else {
+    log(ERROR, 'Problem deleting file; ', deleteResponse)
+  }
+}
+
+
 // Function to display all the org folders
 export async function showOrgFolders () {
   await prepCloudFileProps()
@@ -230,6 +245,48 @@ export async function downloadFileFromOrgFolder () {
     logCancel(true)
   }
 }
+
+// Download a file from an organization flder
+export async function deleteFileFromOrgFolder () {
+  await prepCloudFileProps()
+  const folderT = await getOrgFolderTable(true, false)
+  const chFolder = ['NONE']
+  for (const fol of iterateTable(folderT)) {
+    chFolder.push(fol.Name)
+  }
+  const folderDecision = await askMultipleChoiceQuestionSearch('From which folder would you like to delete a file ?', chFolder)
+  if (folderDecision.toLowerCase() !== 'none') {
+    const orgFFiles = await getOrgFolderFiles(folderDecision, true)
+    // const chContent = ['NONE', 'ALL']
+    const chContent = ['NONE']
+    for (const fil of iterateTable(orgFFiles)) {
+      chContent.push(fil.Name)
+    }
+    const fileDecision = await askMultipleChoiceQuestionSearch('Which file would you like to delete ?', chContent)
+    /*
+    if (fileDecision.toLowerCase() === 'all') {
+      // TODO: Ask are you sure ?
+
+      const fArray = chContent.slice(2, chContent.length)
+      log(INFO, 'Files to Delete: ' + fArray.length)
+      for (const fN in fArray) {
+        log(INFO, 'Deleting file: ' + (Number(fN) + 1))
+        await downLoadOrgFolderFile(folderDecision, fArray[fN]!)
+      }
+    } else */
+    if (fileDecision.toLowerCase() !== 'none') {
+
+      await deleteOrgFolderFile(folderDecision, fileDecision)
+    } else {
+      logCancel(true)
+    }
+  } else {
+    logCancel(true)
+  }
+}
+
+
+
 
 /*
 ORG FOLDERS:

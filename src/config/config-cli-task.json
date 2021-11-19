@@ -812,6 +812,20 @@
       ],
       "category": "cloud-files"
     },
+    "delete-file-from-cloud-folder": {
+      "description": "Deletes file(s) from a LiveApps Organization Folder",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "deleteFileWrapper",
+      "taskAlternativeNames": [
+        "delete-file-from-org-folder"
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "cloud-files"
+    },
     "export-cloud-folder": {
       "description": "Exports the content of a LiveApps Organization Folder to disk.",
       "enabled": false,
