@@ -146,6 +146,8 @@
 
 [download-cloud-files-from-cloud-folder](./download-cloud-files-from-cloud-folder.md) - Downloads file(s) from a LiveApps Organization Folder to disk
 
+[delete-file-from-cloud-folder](./delete-file-from-cloud-folder.md) - Deletes file(s) from a LiveApps Organization Folder
+
 
 ## tci
 

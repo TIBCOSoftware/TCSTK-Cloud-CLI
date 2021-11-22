@@ -155,6 +155,7 @@ These are the available TIBCO Cloud™ CLI Tasks:
 |[create-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/create-cloud-folder/)|Creates a new LiveApps Organization Folder.|
 |[upload-file-to-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/upload-file-to-cloud-folder/)|Uploads a file to a LiveApps Organization Folder|
 |[download-cloud-files-from-cloud-folder](https://tibcosoftware.github.io/TCSToolkit/cli/tasks/download-cloud-files-from-cloud-folder/)|Downloads file(s) from a LiveApps Organization Folder to disk|
+|[delete-file-from-cloud-folder](./docs/tasks/delete-file-from-cloud-folder.md)|Deletes file(s) from a LiveApps Organization Folder|
 
 ## tci
 

@@ -358,6 +358,7 @@ describe('tcli testsuite', function () {
   it('TCLI: Org Folders', function () {
     expect(run(CLI_EXECUTOR + '--createCP')).toBe(true, 'Command: ' + cObj.command)
     // TODO: Get more than 200 folders
+
     expect(run(CLI_EXECUTOR + 'show-org-folders -a NONE')).toBe(true, 'Command: ' + cObj.command)
     // Get content of a known folder
     expect(run(CLI_EXECUTOR + 'show-org-folders -a discoverapp_assets')).toBe(true, 'Command: ' + cObj.command)
@@ -365,10 +366,43 @@ describe('tcli testsuite', function () {
     // Create a folder
     // TODO: Create a function to delete an (empty folder), and delete a cloud file
     // expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(true, 'Command: ' + cObj.command);
-    expect(run(CLI_EXECUTOR + 'create-org-folder -a jasmine_test_folder')).toBe(true, 'Command: ' + cObj.command)
+    const jTestFolder = 'jasmine_test_folder2'
+    const jTestFile = 'testFile2'
 
-    expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a jasmine_test_folder:tibco-cloud.properties:SAME')).toBe(true, 'Command: ' + cObj.command)
-    expect(run(CLI_EXECUTOR + 'download-file-from-org-folder -a jasmine_test_folder:tibco-cloud.properties')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'create-org-folder -a ' + jTestFolder)).toBe(true, 'Command: ' + cObj.command)
+
+    expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a '+jTestFolder+':tibco-cloud.properties:SAME')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a '+jTestFolder+':tibco-cloud.properties:' + jTestFile)).toBe(true, 'Command: ' + cObj.command)
+
+    expect(run(CLI_EXECUTOR + 'download-file-from-org-folder -a '+jTestFolder+':tibco-cloud.properties')).toBe(true, 'Command: ' + cObj.command)
+
+    // Upload 10 versions
+    for(let i = 1 ; i < 10; i++){
+      expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a '+jTestFolder+':tibco-cloud.properties:' + jTestFile)).toBe(true, 'Command: ' + cObj.command)
+    }
+    // Test exceptions
+    expect(run(CLI_EXECUTOR + 'delete-file-from-cloud-folder -a NONE')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'delete-file-from-cloud-folder -a '+jTestFolder+':NONE')).toBe(true, 'Command: ' + cObj.command)
+    // Delete one version
+    expect(run(CLI_EXECUTOR + 'delete-file-from-cloud-folder -a '+jTestFolder+':' + jTestFile)).toBe(true, 'Command: ' + cObj.command)
+    // Delete all versions
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a "DEFAULT:Cloud_File_Do_Delete_All_Versions:none:YES"')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'delete-file-from-cloud-folder -a '+jTestFolder+':' + jTestFile)).toBe(true, 'Command: ' + cObj.command)
+
+    expect(run(CLI_EXECUTOR + 'delete-file-from-cloud-folder -a '+jTestFolder+':' + jTestFile)).toBe(false, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-org-folders -a '+jTestFolder)).toBe(true, 'Command: ' + cObj.command)
+    // Upload 10 versions
+    for(let i = 1 ; i < 3; i++){
+      expect(run(CLI_EXECUTOR + 'upload-file-to-org-folder -a '+jTestFolder+':tibco-cloud.properties:' + jTestFile)).toBe(true, 'Command: ' + cObj.command)
+    }
+    expect(run(CLI_EXECUTOR + 'show-org-folders -a '+jTestFolder)).toBe(true, 'Command: ' + cObj.command)
+
+    // Delete all files
+    expect(run(CLI_EXECUTOR + 'delete-file-from-cloud-folder -a '+jTestFolder+':ALL:YES')).toBe(true, 'Command: ' + cObj.command)
+
+
+
+
   })
 
   // TCI Apps
