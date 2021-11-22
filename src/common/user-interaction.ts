@@ -29,9 +29,9 @@ export async function askQuestion (question: string, type = 'input') {
 
 // function to ask a question
 export async function askMultipleChoiceQuestion (question: string, options: any[]) {
+  let re = 'result'
   if (!useGlobalAnswers) {
     const inquirerF = require('inquirer')
-    let re = 'result'
     // console.log('Asking Question: ' , question);
     await inquirerF.prompt([{
       type: 'list',
@@ -44,6 +44,7 @@ export async function askMultipleChoiceQuestion (question: string, options: any[
     }]).then((answers:any) => {
       logO(DEBUG, answers)
       re = answers.result
+      syncAnswer = re
       // return answers.result;
     }).catch((error: any) => {
       log(ERROR, error)
@@ -51,8 +52,22 @@ export async function askMultipleChoiceQuestion (question: string, options: any[
     givenAnswers.push(re)
     return re
   } else {
-    return getLastGlobalAnswer(question)
+    re = getLastGlobalAnswer(question)
   }
+  syncAnswer = re
+  return re
+}
+
+// This function can be called synchronously (only use when there is no other option)
+let syncAnswer = ''
+export function askMultipleChoiceQuestionSync(question: string, options: any[]) {
+  syncAnswer = ''
+  const deasync = require('deasync');
+  // The warning of not handling the promise is on purpose here.
+  askMultipleChoiceQuestion(question, options)
+  deasync.loopWhile(function(){return syncAnswer === '';});
+  // returns the set answer
+  return syncAnswer
 }
 
 let gOptions: any[] = []

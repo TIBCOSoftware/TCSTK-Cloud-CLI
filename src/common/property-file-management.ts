@@ -11,7 +11,12 @@ import {
   pexTable, showTableFromTobject
 } from '../common/tables'
 import { ORGFile, ORGInfo } from '../models/tcli-models'
-import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './user-interaction'
+import {
+  askMultipleChoiceQuestion,
+  askMultipleChoiceQuestionSearch,
+  askMultipleChoiceQuestionSync,
+  askQuestion
+} from './user-interaction'
 import { getClientIdForOrg, getCurrentOrgId, getOrganizations } from './organization-management'
 import { DEBUG, ERROR, INFO, log, logCancel, WARNING } from './logging'
 import { getOAUTHDetails, parseOAUTHToken, setOAUTHDetails } from './oauth'
@@ -101,9 +106,23 @@ export function getProp (propName: string, forceRefresh?: boolean, forceGlobalRe
     }
     log(DEBUG, 'Returning Property: ', re)
     if (re === 'USE-GLOBAL') {
+
+      /* Use a sync version of askQuestion */
+      if(!doesFileExist(GLOBALPropertyFileName)){
+        // USE-GLOBAL is set, but the global property file is not found. Give the user the option to create global configuration.
+
+        const decision = askMultipleChoiceQuestionSync('USE-GLOBAL is set for property ' +  col.blue(propName) + ', but no global configuration is set. Do you want to configure this now ?', ['YES', 'NO'])
+        if(decision.toLowerCase() === 'yes') {
+          // TODO: Set the global configuration
+          log(INFO, 'Setting global config')
+          run('tcli -g')
+
+
+        }
+      }
       re = getPropertyFromGlobal(propName, forceGlobalRefresh)
       if (re === null) {
-        log(WARNING, 'USE-GLOBAL specified for property ' + propName + ' but no GLOBAL property found...')
+        log(WARNING, 'USE-GLOBAL specified for property ' + col.blue(propName) + ' but no GLOBAL property found...')
         re = ''
       }
     }

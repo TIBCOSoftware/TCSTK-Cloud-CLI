@@ -36,6 +36,8 @@ function parseArgumentsIntoOptions (rawArgs: any) {
         '-t': '--template',
         '--createCP': Boolean,
         '-c': '--createCP',
+        '--createGlobalConfig': Boolean,
+        '-g': '--createGlobalConfig',
         '--help': Boolean,
         '-h': '--help',
         '--version': Boolean,
@@ -81,6 +83,7 @@ function parseArgumentsIntoOptions (rawArgs: any) {
     debug: args['--debug'] || false,
     help: args['--help'] || false,
     createCP: args['--createCP'] || false,
+    createGlobalConfig: args['--createGlobalConfig'] || false,
     version: args['--version'] || false,
     update: args['--update'] || false,
     propfile: args['--propfile'] || 'tibco-cloud.properties',
@@ -190,6 +193,11 @@ export async function cli (args: any) {
   // Update the TCLI
   if (options.update) {
     updateTCLI()
+    process.exit(0)
+  }
+  // Manage global configuration
+  if(options.createGlobalConfig){
+    await require('./manage-application').manageGlobalConfig()
     process.exit(0)
   }
   const projectManagementMode = true

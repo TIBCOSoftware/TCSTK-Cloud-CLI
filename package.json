@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "scripts": {
     "postinstall": "node message.js",
     "testO": "node ./test/run-test-cases.js",
@@ -25,6 +25,7 @@
     "chokidar": "^3.5.2",
     "cli-table": "^0.3.6",
     "colors": "^1.4.0",
+    "deasync": "^0.1.24",
     "del": "^5.0.0",
     "echomd": "^0.2.3",
     "esm": "^3.2.25",

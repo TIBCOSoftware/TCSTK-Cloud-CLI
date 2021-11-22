@@ -15,7 +15,12 @@ import {
 } from './common/common-functions'
 import { Global } from './models/base'
 import { TCLITask } from './models/tcli-models'
-import { askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion } from './common/user-interaction'
+import {
+  askMultipleChoiceQuestion,
+  askMultipleChoiceQuestionSearch,
+  askMultipleChoiceQuestionSync,
+  askQuestion
+} from './common/user-interaction'
 import {
   addOrUpdateProperty,
   checkForLoginProps,
@@ -331,7 +336,8 @@ export async function testTask () {
   // const myWatcher = new Watcher('/Users/hpeters@tibco.com/WebstormProjects/TEST_TCLI_Listing/TestWatch', 'discover.labs.tibcocloud.com/configuration')
   // await myWatcher.pullFiles()
   // await myWatcher.watch()
-  console.log('After watching')
+  const result = askMultipleChoiceQuestionSync('Question ', ['yes', 'no'])
+  console.log('After question: ' ,result)
 }
 
 // Function to display help

@@ -10,7 +10,7 @@ npm install -g @tibco-tcstk/cloud-cli
 
 ### TIBCO Cloud™ CLI) Usage: 
 ```
-tcli [new / <task>][--debug(-d)] [--createCP(-c)] [--help(-h)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>] [--record(-r) <file-name>]
+tcli [new / <task>][--debug(-d)] [--help(-h)] [--createCP(-c)] [--createGlobalConfig(-g)] [--version(-v)] [--update(-u)] [--browse(-b)] [--propfile(-p)] [--multiple(-m) --multipleFile(-f) <multiple-file-name> --job(-j) <job-name> --environment(-e) <environment name>] [--multipleInteraction(-i)] [--surpressStart(-s)] [--answers(a) <answers>] [--record(-r) <file-name>]
 ```
 
 Note: When you just run "tcli" it will bring you in an interactive menu based on the context.
@@ -26,6 +26,8 @@ tcli new <name> [--template(-t)] <template-to-use>
 * debug: Display debug information.
    
 * createCP: Create a new tibco-cloud.properties file.
+  
+* createGlobalConfig: Mange your global connection configuration.
 
 * help: display help 
 
