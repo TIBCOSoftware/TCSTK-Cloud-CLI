@@ -3,6 +3,8 @@ import _ from 'lodash'
 import { DEBUG, ERROR, INFO, log, logO } from './logging'
 import { getPropFileName, replaceAtSign, replaceGlobal } from './property-file-management'
 
+let supressGlobalAnswerLogs = false
+
 // function to ask a question
 export async function askQuestion (question: string, type = 'input') {
   if (!useGlobalAnswers) {
@@ -158,7 +160,10 @@ export function setGlobalAnswers (answers: string) {
         }
       }
       useGlobalAnswers = true
-      log(INFO, 'Global Answers set: ', globalAnswers)
+      if(!supressGlobalAnswerLogs) {
+        // TODO: Set this back to info
+        log(DEBUG, 'Global Answers set: ', globalAnswers)
+      }
     }
   }
 }
@@ -168,10 +173,26 @@ export function getLastGlobalAnswer (question: string) {
   if (globalAnswers && globalAnswers.length > 0) {
     re = replaceAtSign(globalAnswers.shift()!, getPropFileName())
     re = replaceGlobal(re)
-    log(INFO, 'Injected answer: ', col.blue(re), ' For question: ', question)
+    if(!supressGlobalAnswerLogs) {
+      log(INFO, 'Injected answer: ', col.blue(re), ' For question: ', question)
+    }
   } else {
     log(ERROR, 'No answer left for question: ' + question)
     process.exit(1)
   }
   return re
+}
+
+export async function askQuestionTask () {
+  supressGlobalAnswerLogs = true
+  const question = await askQuestion('Which question do you want to ask ?')
+  const option1 = await askQuestion('Option1 (success): ')
+  const option2 = await askQuestion('Option2 (failure): ')
+  useGlobalAnswers = false
+  const answer = await askMultipleChoiceQuestion(question, [option1, option2])
+  if(answer === option1){
+    process.exit(0)
+  } else {
+    process.exit(1)
+  }
 }

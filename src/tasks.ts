@@ -19,7 +19,7 @@ import {
   askMultipleChoiceQuestion,
   askMultipleChoiceQuestionSearch,
   askMultipleChoiceQuestionSync,
-  askQuestion
+  askQuestion, askQuestionTask
 } from './common/user-interaction'
 import {
   addOrUpdateProperty,
@@ -344,6 +344,11 @@ export async function testTask () {
 export async function helptcliWrapper () {
   const HELP = require('./common/help')
   await HELP.showInteractiveHelp()
+}
+
+// Assisting function to ask a question
+export async function askQuestionWrapper() {
+  await askQuestionTask()
 }
 
 // Function to show cloud info

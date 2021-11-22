@@ -1364,6 +1364,17 @@
       ],
       "category": "oauth"
     },
+    "ask-question": {
+      "description": "Ask multiple choice question (Yes/No, and fails on the second answer).",
+      "NOTE": "LEAVE THIS ONE DISABLED SO IT DOES NOT SHOW UP IN THE LIST",
+      "enabled": false,
+      "internal": true,
+      "task": "askQuestionWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tcli"
+    },
     "quit": {
       "description": "Quit the console",
       "enabled": true,

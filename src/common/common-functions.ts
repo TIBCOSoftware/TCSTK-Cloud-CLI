@@ -446,6 +446,7 @@ export function getGlobalConfig () {
 // Run an OS Command
 export function run (command: string, failOnError?: boolean) {
   let doFail = true
+  let re = true
   if (failOnError != null) {
     doFail = failOnError
   }
@@ -458,16 +459,14 @@ export function run (command: string, failOnError?: boolean) {
       { stdio: 'inherit' }
     )
   } catch (err:any) {
-    // console.log('Got Error ' , err);
-    // logO(DEBUG, reason);
-    log(ERROR, 'Error Running command: ' + err.message)
+    re = false
     if (doFail) {
+      log(ERROR, 'Error Running command: ' + err.message)
       process.exit(1)
     }
-    // reject(err);
+
   }
-  // resolve();
-  // })
+  return re
 }
 
 // Function to copy a directory
