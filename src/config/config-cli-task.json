@@ -859,6 +859,17 @@
       ],
       "category": "cloud-files"
     },
+    "tci-manage-api-access": {
+      "description": "Manage the API access for the TCI API",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "manageAPIAccessTCIWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tci"
+    },
     "show-tci-apps": {
       "description": "List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).",
       "enabled": true,
@@ -887,6 +898,17 @@
       "internal": false,
       "multipleInteraction": true,
       "task": "exportTCIAppWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tci"
+    },
+    "generate-client-code-from-tci-app": {
+      "description": "Generates client code from a Flogo application, so you can invoke this from your application.",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "generateClientCodeForTCIAppWrapper",
       "availableOnOs": [
         "all"
       ],

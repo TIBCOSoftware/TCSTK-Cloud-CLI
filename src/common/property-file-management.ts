@@ -34,8 +34,7 @@ declare let global: Global
 let globalProperties: any
 let propsGl: any
 
-// TODO: Move this to home folder (and add migration)
-// export const GLOBALTCPropFolder = __dirname + '/../../../common/'
+// Users home folder
 export const GLOBALTCPropFolder = path.join(os.homedir(), '.tcli')
 export const GLOBALPropertyFileName = path.join(GLOBALTCPropFolder, 'global-tibco-cloud.properties')
 

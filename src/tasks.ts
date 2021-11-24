@@ -641,9 +641,14 @@ export function updateCloudPackagesWrapper () {
   updateCloudPackages()
 }
 
+export async function manageAPIAccessTCIWrapper () {
+  const TCI = require('./tenants/tci')
+  await TCI.manageAPIAccess()
+}
+
 export async function showTCIWrapper () {
   const TCI = require('./tenants/tci')
-  await TCI.showTCI()
+  await TCI.showTCIApps()
 }
 
 export async function monitorTCIWrapper () {
@@ -654,6 +659,11 @@ export async function monitorTCIWrapper () {
 export async function exportTCIAppWrapper () {
   const TCI = require('./tenants/tci')
   await TCI.exportTCIApp()
+}
+
+export async function generateClientCodeForTCIAppWrapper () {
+  const TCI = require('./tenants/tci')
+  await TCI.generateClientCodeForTCIApp()
 }
 
 export async function browseSpotfireLibraryWrapper () {

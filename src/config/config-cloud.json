@@ -28,6 +28,8 @@
     "la_design_apps": "liveapps.cloud.tibco.com/design/v1/applicationVersions",
     "tci_apps": "integration.cloud.tibco.com/api/v1/apps",
     "tci_export_app": "integration.cloud.tibco.com/wistudio/v2/metadata",
+    "tci_api_enable": "api.cloud.tibco.com/tci/v1/subscriptions/{subscriptionLocator}/apiservice/access",
+    "tci_api_apps": "api.cloud.tibco.com/tci/v1/subscriptions/{subscriptionLocator}/apps",
     "sf_settings": "spotfire-next.cloud.tibco.com/spotfire/wp/settings",
     "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo",
     "sf_create_folder": "spotfire-next.cloud.tibco.com/spotfire/rest/library/createFolder",
@@ -132,6 +134,67 @@
         {
           "header": "Instances",
           "field": "desiredInstanceCount"
+        }
+      ]
+    },
+    "tci_apps_api": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "appName"
+        },
+        {
+          "header": "Type",
+          "field": "appType"
+        },
+        {
+          "header": "Deployment Type",
+          "field": "deploymentType"
+        },
+        {
+          "header": "Visibility",
+          "field": "endpointVisibility"
+        },
+        {
+          "header": "Stage",
+          "field": "deploymentStage"
+        },
+        {
+          "header": "Last Modified",
+          "field": "modifiedTime",
+          "format": "DATE"
+        },
+        {
+          "header": "Instances",
+          "field": "desiredInstanceCount"
+        }
+      ]
+    },
+    "tci_endpoints": {
+      "entries": [
+        {
+          "header": "Title",
+          "field": "apiSpec.info.title"
+        },
+        {
+          "header": "Description",
+          "field": "apiSpec.info.description"
+        },
+        {
+          "header": "Version",
+          "field": "apiSpec.info.version"
+        },
+        {
+          "header": "Visibility",
+          "field": "endpointVisibility"
+        },
+        {
+          "header": "Id",
+          "field": "endpointId"
+        },
+        {
+          "header": "Base Path",
+          "field": "apiSpec.basePath"
         }
       ]
     },
