@@ -420,7 +420,7 @@ describe('tcli testsuite', function () {
         expect(run(CLI_EXECUTOR + 'export-tci-app -a ')).toBe(false, 'Command: ' + cObj.command)
         expect(run(CLI_EXECUTOR + 'export-tci-app -a NONE')).toBe(true, 'Command: ' + cObj.command)
         /* Comment for Local, this only works on Jenkins server */
-        expect(run(CLI_EXECUTOR + 'show-tci-apps -a Test_Flogo_App')).toBe(true, 'Command: ' + cObj.command)
+        expect(run(CLI_EXECUTOR + 'show-tci-apps -a discover_backend_service')).toBe(true, 'Command: ' + cObj.command)
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:NONE')).toBe(true, 'Command: ' + cObj.command);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true, 'Command: ' + cObj.command);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true, 'Command: ' + cObj.command);
