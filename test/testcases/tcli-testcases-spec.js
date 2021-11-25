@@ -425,7 +425,10 @@ describe('tcli testsuite', function () {
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:DEFAULT:DEFAULT')).toBe(true, 'Command: ' + cObj.command);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:NONE:my_flogo.json')).toBe(true, 'Command: ' + cObj.command);
         expect(run(CLI_EXECUTOR + 'export-tci-app -a discover_backend_service:my_manifest.json:my_other_flogo.json')).toBe(true, 'Command: ' + cObj.command);
-
+        // Till here
+        expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true, 'Command: ' + cObj.command)
+        expect(run(CLI_EXECUTOR + 'revoke-oauth-token -a JasmineTCITest_1')).toBe(true, 'Command: ' + cObj.command)
+        expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true, 'Command: ' + cObj.command)
     })
 
     // Shared State Testcases
