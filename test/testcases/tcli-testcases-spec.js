@@ -407,9 +407,10 @@ describe('tcli testsuite', function () {
 
   // TCI Apps
   // jasmine --config=test/support/jasmine.json --filter='TCLI: TCI Apps'
-  it('TCI Apps', function () {
+  it('TCLI: TCI Apps', function () {
     expect(run(CLI_EXECUTOR + '--createCP')).toBe(true, 'Command: ' + cObj.command)
-    expect(run(CLI_EXECUTOR + 'show-tci-apps')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-tci-apps -a NONE')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-tci-apps -a Test_Flogo_App')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'export-tci-app -a ')).toBe(false, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'export-tci-app -a NONE')).toBe(true, 'Command: ' + cObj.command)
     /* Comment for Local, this only works on Jenkins server
