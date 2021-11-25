@@ -868,6 +868,9 @@
       "availableOnOs": [
         "all"
       ],
+      "taskAlternativeNames": [
+        "api-access"
+      ],
       "category": "tci"
     },
     "show-tci-apps": {
@@ -911,6 +914,9 @@
       "task": "generateClientCodeForTCIAppWrapper",
       "availableOnOs": [
         "all"
+      ],
+      "taskAlternativeNames": [
+        "generate-client-code"
       ],
       "category": "tci"
     },

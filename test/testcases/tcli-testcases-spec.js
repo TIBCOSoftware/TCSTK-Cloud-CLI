@@ -409,6 +409,18 @@ describe('tcli testsuite', function () {
   // jasmine --config=test/support/jasmine.json --filter='TCLI: TCI Apps'
   it('TCLI: TCI Apps', function () {
     expect(run(CLI_EXECUTOR + '--createCP')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_Token_Name:none:JasmineTCITest_1:LOCAL')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Generate_For_Tenants:none:TSC,TCI:LOCAL')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'add-or-update-property -a default:CloudLogin.OAUTH_Token:none:USE-LOCAL:LOCAL')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'generate-oauth-token -a YES:YES:YES')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'show-oauth-tokens')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'tci-manage-api-access -a Nothing')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'tci-manage-api-access -a "Disable API Access"')).toBe(true, 'Command: ' + cObj.command)
+    expect(run(CLI_EXECUTOR + 'tci-manage-api-access -a "Enable API Access"')).toBe(true, 'Command: ' + cObj.command)
+    //
+
+
     expect(run(CLI_EXECUTOR + 'show-tci-apps -a NONE')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'show-tci-apps -a Test_Flogo_App')).toBe(true, 'Command: ' + cObj.command)
     expect(run(CLI_EXECUTOR + 'export-tci-app -a ')).toBe(false, 'Command: ' + cObj.command)
