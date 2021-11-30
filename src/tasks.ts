@@ -903,6 +903,12 @@ export async function watchDiscoverConfigWrapper () {
   await DISCOVER.watchDiscoverConfig()
 }
 
+export async function uploadDiscoverLandingPageFileWrapper () {
+  const DISCOVER = require('./tenants/discover')
+  await DISCOVER.uploadDiscoverLandingPageFile()
+}
+
+
 /*
 export async function removeDiscoverPAWrapper () {
   const DISCOVER = require('./tenants/discover')
