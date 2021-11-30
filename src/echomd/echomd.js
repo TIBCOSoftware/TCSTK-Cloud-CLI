@@ -203,9 +203,10 @@ if (module.parent == null) {
     // HUGO: Switched off since it was running in build mode...
     // demo();
   } else if (process.argv.length > 2) {
+    /*
     console.log(
       echomd.apply(null, process.argv.slice(2))
-    )
+    )*/
   }
 } else {
   (module.exports = function echomd () {
