@@ -20,7 +20,6 @@ import {PreviewStatus} from '../models/discover/previewStatus'
 import {AnalysisStatus} from '../models/discover/analysisStatus'
 import {DatasetDetail} from '../models/discover/datasetDetail'
 import path from 'path'
-import {getCurrentOrgId} from '../common/organization-management'
 import Watcher from '../common/watcher'
 
 const CCOM = require('../common/cloud-communications')
@@ -124,9 +123,9 @@ export async function uploadDataSetFile() {
     log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
     const typeForUpload = await askMultipleChoiceQuestionSearch('What would you like to upload as a Dataset File ? ', optionList)
     if (typeForUpload.toLowerCase() !== 'none') {
-        let endpoint = replaceEndpoint(CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase())
+        // let endpoint = replaceEndpoint(CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()).toLowerCase())
         // let endpoint = replaceEndpoint(CCOM.clURI.dis_file_upload + '/' + (await getCurrentOrgId()))
-        // let endpoint = replaceEndpoint(CCOM.clURI.dis_file_upload)
+        let endpoint = replaceEndpoint(CCOM.clURI.dis_file_upload)
         if (typeForUpload.toLowerCase() === 'file') {
             // if FILE, ask the user for the file location
             const localFileLocation = await askQuestion('Provide the location of the file to upload as dataset file:')
