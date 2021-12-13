@@ -154,11 +154,15 @@
 ---
 
 
+[tci-manage-api-access](./tci-manage-api-access.md) - Manage the API access for the TCI API
+
 [show-tci-apps](./show-tci-apps.md) - List all TIBCO Cloud Integration Applications(Flogo, Scribe, Node.JS & Business Works).
 
 [monitor-tci-app](./monitor-tci-app.md) - Monitor the logs of a TIBCO Cloud Integration Flogo Application
 
 [export-tci-app](./export-tci-app.md) - Exports a TCI-Flogo Application
+
+[generate-client-code-from-tci-app](./generate-client-code-from-tci-app.md) - Generates client code from a Flogo application, so you can invoke this from your application.
 
 
 ## messaging
@@ -235,6 +239,8 @@
 [import-discover-config](./import-discover-config.md) - Imports the configuration for Project Discover into a JSON file
 
 [watch-discover-config](./watch-discover-config.md) - Looks for changes in configuration for Project Discover JSON file, and uploads them
+
+[upload-discover-asset](./upload-discover-asset.md) - Uploads a discover asset, for example used in the landing page background picture or icons
 
 
 ## oauth

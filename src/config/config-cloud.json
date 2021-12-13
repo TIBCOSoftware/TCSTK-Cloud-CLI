@@ -56,7 +56,7 @@
     "dis_dataset_status": "discover.labs.tibcocloud.com/catalog/status",
     "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis",
     "dis_configuration": "discover.labs.tibcocloud.com/configuration",
-    "dis_configuration_lp_file_upload": "discover.labs.tibcocloud.com/configuration/landingpages/upload",
+    "dis_configuration_lp_file_upload": "discover.labs.tibcocloud.com/configuration/assets",
     "nimbus_maps": "nimbus.cloud.tibco.com/api/v1/maps"
   },
   "mappings": {
