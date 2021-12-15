@@ -161,8 +161,7 @@ export function setGlobalAnswers (answers: string) {
       }
       useGlobalAnswers = true
       if(!supressGlobalAnswerLogs) {
-        // TODO: Set this back to info
-        log(DEBUG, 'Global Answers set: ', globalAnswers)
+        log(INFO, 'Global Answers set: ', globalAnswers)
       }
     }
   }

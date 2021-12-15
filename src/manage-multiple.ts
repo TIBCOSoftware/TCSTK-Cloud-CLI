@@ -150,7 +150,7 @@ export function processMultipleFile() {
                 taskString = taskString.substring(0, toReplaceArray[i]) + '-TASKDIVIDER-' + taskString.substring(toReplaceArray[i]! + 1);
             }
             const jobTasksA = taskString.split('-TASKDIVIDER-')
-            log(INFO, logSE + ' Tasks: ', jobTasksA)
+            log(DEBUG, logSE + ' Tasks: ', jobTasksA)
             let jvs = []
             if (jobTasksA.length > 0) {
                 for (const jTask of jobTasksA) {
