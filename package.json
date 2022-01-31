@@ -44,7 +44,7 @@
     "tcp-port-used": "^1.0.2",
     "websocket": "^1.0.34",
     "ws": "^7.5.6",
-    "yargs": "^13.3.2"
+    "yargs": "^15.0.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.178",
