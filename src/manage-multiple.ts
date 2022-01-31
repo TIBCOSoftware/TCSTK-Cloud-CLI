@@ -10,7 +10,7 @@ import {
     iterateTable, showTableFromTobject
 } from './common/tables'
 import {TCLITask} from './models/tcli-models'
-import {askMultipleChoiceQuestionSearch, askQuestion} from './common/user-interaction'
+import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion} from './common/user-interaction'
 import {addOrUpdateProperty, replaceAtSign} from './common/property-file-management'
 import {parseOAUTHToken} from './common/oauth'
 import {DEBUG, ERROR, INFO, log, WARNING} from './common/logging'
@@ -365,7 +365,6 @@ export async function multipleInteraction() {
             // console.log('Env: ' ,env);
             environmentOptions.push(i + '. ' + env.NAME)
         }
-        // TODO: Add change task
         const userOptions = ['ALL ENVIRONMENTS', ...environmentOptions]
         userOptions.push('QUIT', 'EXIT', 'CHANGE TASK', 'CHANGE TO INTERACTIVE CLI TASK')
         const chosenEnv = await askMultipleChoiceQuestionSearch('On which environment would you like to run ' + col.blue(displayTask) + ' ?', userOptions)
@@ -404,9 +403,20 @@ export async function multipleInteraction() {
             } else {
                 // 5. Execute the task, when it was none go back directly when it was a task have pause message before displaying the table again
                 let propFileToUse = ''
+                let answerToPass = ''
+                // Check if we want to pass answers
+                const answer = getMProp('Multiple_Interaction_Answer')
+                // only if there is a specific task
+                if(answer && miTask) {
+                    log(INFO, 'Found answer for multiple interactions: ' + col.blue(answer))
+                    const addA = await askMultipleChoiceQuestion('Do you want to add this answers with your tasks ?', ['YES', 'NO'])
+                    if(addA.toLowerCase() === 'yes') {
+                        answerToPass = '-a "' + answer + '"'
+                    }
+                }
                 for (const envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber]
-                    const command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask
+                    let command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask + ' ' + answerToPass
                     if (chosenEnv === 'ALL ENVIRONMENTS') {
                         console.log(col.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'))
                         run(command, doFailOnError)

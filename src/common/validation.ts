@@ -132,7 +132,7 @@ export async function validate () {
     return
   }
   if (valD === 'tenant_access' || valD === 'tenant_role') {
-    const TENANTS = ['BPM', 'TSC', 'SPOTFIRE', 'TCI', 'TCDS', 'TCM']
+    const TENANTS = ['BPM', 'TSC', 'SPOTFIRE', 'TCI', 'TCDS', 'TCM', 'NIMBUS']
     // TODO: Allow for a + sign in the input
     const tenantToValidate = (await askMultipleChoiceQuestion('Which tenant\'s access would like  validate ?', TENANTS)).toLowerCase()
     const userRoles = await getCurrentOrganizationRoles()

@@ -217,7 +217,7 @@ export async function removeDataSetFile() {
             })
             log(INFO, col.green('Successfully removed dataset file: ') + col.blue(dsFileNameToRemove) + col.reset(' (Location: ' + dsToRemove.redisFileInfo.FileLocation + ')'))
         } else {
-            log(ERROR, 'Dataset ' + dsFileNameToRemove + ' Not found...')
+            log(ERROR, 'Dataset file: ' + dsFileNameToRemove + ' Not found...')
         }
     } else {
         logCancel(true)
@@ -246,7 +246,8 @@ export async function createDataSet() {
             while (i <= MAX_DATASET_CYCLES && !isDone) {
                 i++
                 // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
-                const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, {skipInjectingRegion: SKIP_REGION}) as PreviewStatus
+                const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, {skipInjectingRegion: SKIP_REGION, handleErrorOutside: true}) as PreviewStatus
+
                 // console.log(dsStatus)
                 if (dsStatus.Progression || dsStatus.Progression === 0) {
                     if (progress !== dsStatus.Progression) {

@@ -425,7 +425,7 @@
       "description": "Validations on the setting and/or the value of a property, the existence of a Cloud Application, LiveApp or TCI App.",
       "enabled": true,
       "internal": false,
-      "multipleInteraction": false,
+      "multipleInteraction": true,
       "task": "validateWrapper",
       "availableOnOs": [
         "all"
