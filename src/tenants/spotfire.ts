@@ -520,13 +520,13 @@ async function callSFSOAP (action: string, request: any) {
       if (xSRF) {
         client.addHttpHeader('X-XSRF-TOKEN', xSRF)
       }
-      log(INFO, 'SOAP REQUEST: ', request)
+      log(DEBUG, 'SOAP REQUEST: ', request)
       client[action](request, function (err: any, result: any, _rawResponse: any, _soapHeader: any, _rawRequest: any) {
-        log(INFO, 'SOAP Response:         err]', err)
-        log(INFO, 'SOAP Response:      result]', result)
-        log(INFO, 'SOAP Response: rawResponse]', _rawResponse)
-        log(INFO, 'SOAP Response:  soapHeader]', _soapHeader)
-        log(INFO, 'SOAP Response:  rawRequest]', _rawRequest)
+        log(DEBUG, 'SOAP Response:         err]', err)
+        log(DEBUG, 'SOAP Response:      result]', result)
+        log(DEBUG, 'SOAP Response: rawResponse]', _rawResponse)
+        log(DEBUG, 'SOAP Response:  soapHeader]', _soapHeader)
+        log(DEBUG, 'SOAP Response:  rawRequest]', _rawRequest)
         if (err) {
           log(ERROR, err.response.statusCode)
           log(ERROR, err.response.body)
