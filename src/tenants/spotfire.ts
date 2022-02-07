@@ -467,9 +467,16 @@ export async function uploadSpotfireDXP () {
                 type: dxpType,
                 parentId: folderIdToUpload,
                 size: 0,
-                hidden: false
+                hidden: false,
+                // TODO: Fix(?) for discover, make configurable
+                properties:  {
+                  key: 'AllowWebPlayerResume',
+                  value: 'False'
+                },
+                fieldsSet: 'Properties'
               },
-              attachmentID: attachmentID
+              attachmentID: attachmentID,
+              fields: 'Properties'
             }
             // console.log('Args: ' , args);
             // Step 5: Call the save operation: /spotfire/ws/LibraryService (a raw SOAP Message)
@@ -513,12 +520,13 @@ async function callSFSOAP (action: string, request: any) {
       if (xSRF) {
         client.addHttpHeader('X-XSRF-TOKEN', xSRF)
       }
+      log(INFO, 'SOAP REQUEST: ', request)
       client[action](request, function (err: any, result: any, _rawResponse: any, _soapHeader: any, _rawRequest: any) {
-        log(DEBUG, 'SOAP Response:         err]', err)
-        log(DEBUG, 'SOAP Response:      result]', result)
-        log(DEBUG, 'SOAP Response: rawResponse]', _rawResponse)
-        log(DEBUG, 'SOAP Response:  soapHeader]', _soapHeader)
-        log(DEBUG, 'SOAP Response:  rawRequest]', _rawRequest)
+        log(INFO, 'SOAP Response:         err]', err)
+        log(INFO, 'SOAP Response:      result]', result)
+        log(INFO, 'SOAP Response: rawResponse]', _rawResponse)
+        log(INFO, 'SOAP Response:  soapHeader]', _soapHeader)
+        log(INFO, 'SOAP Response:  rawRequest]', _rawRequest)
         if (err) {
           log(ERROR, err.response.statusCode)
           log(ERROR, err.response.body)
