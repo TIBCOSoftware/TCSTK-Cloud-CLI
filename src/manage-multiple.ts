@@ -275,6 +275,7 @@ export function processMultipleFile() {
 const TCLI_INTERACTVIE = 'tcli-interactive'
 
 export async function multipleInteraction() {
+    log(INFO, 'Interacting with Multiple Cloud Organizations')
     const PropertiesReader = require('properties-reader')
     const mOpts: any = getMultipleOptions()
     mFile = mOpts.name
@@ -283,11 +284,9 @@ export async function multipleInteraction() {
         failOnError = 'YES'
     }
     const doFailOnError = !(failOnError.toLowerCase() === 'no')
-    log(INFO, 'Multiple Cloud Interactions')
     log(INFO, '- Managing Multiple, Using file: ' + mFile + ' (Fail on error:', doFailOnError, ')')
     let taskOverRide = false
     let miTask = getMProp('Multiple_Interaction_CLITask')
-
     // Start a loop till the user end's it (interactive), do reload prop files every time
     while (true) {
         const miPropFolder = getMProp('Multiple_Interaction_Property_File_Folder')
@@ -453,6 +452,7 @@ export async function multipleInteraction() {
 
 let propsM: any
 let fileExtension = ''
+let showExtenstion = true
 
 function getMProp(property: string, propFileName?: string) {
     let propFileToUse = mFile
@@ -461,17 +461,17 @@ function getMProp(property: string, propFileName?: string) {
     }
     if (doesFileExist(propFileToUse)) {
         log(DEBUG, 'Getting Property: |' + property + '|')
-        if (propsM == null) {
-            const PropertiesReader = require('properties-reader')
-            propsM = PropertiesReader(propFileToUse).path()
-            if (propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() !== '') {
+        const PropertiesReader = require('properties-reader')
+        propsM = PropertiesReader(propFileToUse).path()
+        if (propsM.PROPERTY_EXTENSION_FILE != null && propsM.PROPERTY_EXTENSION_FILE.trim() !== '') {
+            if(showExtenstion) {
                 log(INFO, 'Adding extension to propfile(' + propFileToUse + ') : ' + propsM.PROPERTY_EXTENSION_FILE)
-                const propsTwo = PropertiesReader(propsM.PROPERTY_EXTENSION_FILE).path()
-                fileExtension = propsM.PROPERTY_EXTENSION_FILE
-                const objectTemp = {...propsTwo, ...propsM}
-                propsM = objectTemp
+                showExtenstion = false
             }
-            // console.log(propsM);
+            const propsTwo = PropertiesReader(propsM.PROPERTY_EXTENSION_FILE).path()
+            fileExtension = propsM.PROPERTY_EXTENSION_FILE
+            const objectTemp = {...propsTwo, ...propsM}
+            propsM = objectTemp
         }
         let re
         if (propsM != null) {
