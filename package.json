@@ -1,6 +1,6 @@
 {
   "name": "@tibco-tcstk/cloud-cli",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "scripts": {
     "postinstall": "node message.js",
     "testO": "node ./test/run-test-cases.js",
@@ -43,12 +43,12 @@
     "string-similarity": "^4.0.4",
     "tcp-port-used": "^1.0.2",
     "websocket": "^1.0.34",
-    "ws": "^7.5.6",
+    "ws": "^7.5.7",
     "yargs": "^13.3.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.178",
-    "@types/node": "^14.18.0",
+    "@types/node": "^14.18.11",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "eslint": "^7.32.0",
@@ -62,7 +62,7 @@
     "ts-node": "^9.1.1",
     "tsc-watch": "2.4.0",
     "typescript": "^4.5.5",
-    "webpack": "^5.67.0",
+    "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2"
   },
   "bin_notes": {

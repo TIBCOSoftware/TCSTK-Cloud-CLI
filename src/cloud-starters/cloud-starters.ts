@@ -399,7 +399,11 @@ export async function uploadApp (application: string) {
   // We use the location here because the way the call is setup (with the host)
   const uploadAppLocation = '/webresource/v1/applications/' + application + '/upload/'
   const appLocation = './dist/' + application + '.zip'
-  await CCOM.uploadToCloud('appContents', appLocation, uploadAppLocation)
+  try {
+    await CCOM.uploadToCloud('appContents', appLocation, uploadAppLocation)
+  } catch (e) {
+    process.exit(1)
+  }
 }
 
 // Function to publish the application to the cloud
