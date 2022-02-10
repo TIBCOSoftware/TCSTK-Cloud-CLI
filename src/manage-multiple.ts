@@ -135,13 +135,13 @@ export function processMultipleFile() {
             const toReplaceArray = []
             for (let i = 0; i < taskString.length; i++) {
                 const char = taskString.charAt(i)
-                if(char === '{') {
+                if (char === '{') {
                     level++
                 }
-                if(char === '}') {
+                if (char === '}') {
                     level--
                 }
-                if(char === ',' && level === 0) {
+                if (char === ',' && level === 0) {
                     toReplaceArray.push(i)
                 }
             }
@@ -359,11 +359,13 @@ export async function multipleInteraction() {
         showTableFromTobject(environmentsTable, 'Environments')
         // 4. Let the user choose an environment to execute on (include All and None/Quit, or Change the Task)
         const environmentOptions = []
+        const environmentName = []
         let i = 0
         for (const env of iterateTable(environmentsTable)) {
             i++
             // console.log('Env: ' ,env);
             environmentOptions.push(i + '. ' + env.NAME)
+            environmentName.push(env.NAME)
         }
         const userOptions = ['ALL ENVIRONMENTS', ...environmentOptions]
         userOptions.push('QUIT', 'EXIT', 'CHANGE TASK', 'CHANGE TO INTERACTIVE CLI TASK')
@@ -407,20 +409,28 @@ export async function multipleInteraction() {
                 // Check if we want to pass answers
                 const answer = getMProp('Multiple_Interaction_Answer')
                 // only if there is a specific task
-                if(answer && miTask) {
+                if (answer && miTask) {
                     log(INFO, 'Found answer for multiple interactions: ' + col.blue(answer))
                     const addA = await askMultipleChoiceQuestion('Do you want to add this answers with your tasks ?', ['YES', 'NO'])
-                    if(addA.toLowerCase() === 'yes') {
+                    if (addA.toLowerCase() === 'yes') {
                         answerToPass = '-a "' + answer + '"'
                     }
                 }
+                const commandResultTable: any = {}
+                const baseCommmand = 'tcli ' + miTask + ' ' + answerToPass
                 for (const envNumber in environmentOptions) {
                     propFileToUse = miPropFilesA[envNumber]
-                    let command = 'tcli -p "' + miPropFolder + propFileToUse + '" ' + miTask + ' ' + answerToPass
+
+                    let command = baseCommmand + ' -p "' + miPropFolder + propFileToUse + '"'
                     if (chosenEnv === 'ALL ENVIRONMENTS') {
+                        const row: any = {}
                         console.log(col.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'))
-                        run(command, doFailOnError)
+                        row['ENVIRONMENT'] = environmentName[envNumber]
+                        row['TASK'] = displayTask
+
+                        row['RESULT'] = run(command, doFailOnError)
                         // await askQuestion('Press [enter] to continue...');
+                        commandResultTable[envNumber] = row
                     } else {
                         if (environmentOptions[envNumber] === chosenEnv) {
                             console.log(col.blue('ENVIRONMENT: ' + environmentOptions[envNumber] + '   (TASK: ' + displayTask + ')'))
@@ -428,6 +438,10 @@ export async function multipleInteraction() {
                             run(command, doFailOnError)
                         }
                     }
+                }
+                if (chosenEnv === 'ALL ENVIRONMENTS') {
+                    // Show result table
+                    showTableFromTobject(commandResultTable, 'Command: ' + baseCommmand)
                 }
                 if (miTask !== '') {
                     await askQuestion('Press [enter] to continue...')
