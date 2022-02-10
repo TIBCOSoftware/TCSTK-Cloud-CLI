@@ -58,7 +58,7 @@ These are the available TIBCO Cloud™ CLI Tutorials:
 |------|:------------|
 |1. [TCLI Overview](https://tibcosoftware.github.io/TCSToolkit/cli/overview/001_TCLI_Overview/)|Provides an overview of the Archtiecture and Concepts of the TCLI|
 |2. [Global Configuration](https://tibcosoftware.github.io/TCSToolkit/cli/concepts/002_Global_Configuration/)|This guide explains the concept of properties and global properties |
-|3. [Get started with the TIBCO Cloud Composer](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started_With_Cloud_Starters/)|This guide provides step by step instructions on how to create, adjust and deploy a cloud application to the TIBCO Cloud|
+|3. [Get started with the TIBCO Cloud Composer](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/003_Get_Started/)|This guide provides step by step instructions on how to create, adjust and deploy a cloud application to the TIBCO Cloud|
 |4. [Managing multiple TIBCO Cloud Organizations](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/004_Multiple_Organizations/)|This guide explains how to manage multiple organizations in the TIBCO Cloud with the TCLI  |
 |5. [Setting Up A Buildpipeline](https://tibcosoftware.github.io/TCSToolkit/cli/tutorials/005_Setting_Up_A_Buildpipeline/)|This guide explains how to setup a build pipeline with for example Jenkins or TeamCity|
 |6. [Passing In Answers](https://tibcosoftware.github.io/TCSToolkit/cli/concepts/006_Passing_In_Answers/)|This guide explains the concept of passing in answers to a TCLI task |

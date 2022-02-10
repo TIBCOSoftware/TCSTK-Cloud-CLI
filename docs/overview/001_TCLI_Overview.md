@@ -134,5 +134,5 @@ You can find these Alternatives in the help description of a task:
 tcli -h show-cloud-app-links
 ```
 
-Now you are ready to [setup your own Cloud Application](../tutorials/003_Get_Started_With_Cloud_Starters.md#zoom)
+Now you are ready to [setup your own Cloud Application](../tutorials/003_Get_Started.md#zoom)
 

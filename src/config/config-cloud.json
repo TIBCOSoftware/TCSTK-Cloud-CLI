@@ -310,25 +310,6 @@
       ]
     },
     "sf_reports": {
-      "old_entries": [
-        {
-          "header": "Type",
-          "field": "ItemType"
-        },
-        {
-          "header": "Created By",
-          "field": "CreatedByName"
-        },
-        {
-          "header": "Created",
-          "field": "CreatedTimestamp",
-          "format": "DATE"
-        },
-        {
-          "header": "Spotfire Library Item",
-          "field": "DisplayPath"
-        }
-      ],
       "entries": [
         {
           "header": "Type",
@@ -337,6 +318,11 @@
         {
           "header": "Created By",
           "field": "CreatedByName"
+        },
+        {
+          "header": "Created On",
+          "field": "CreatedTimestamp",
+          "format": "DATE"
         },
         {
           "header": "Spotfire Library Item",
