@@ -182,6 +182,7 @@ export function showTableFromTobject (tObject: any, title?: string) {
   // console.table(tObject)
   const serverMode = false
   let MAX_TERMINAL_LENGTH = 150
+  let MIN_TERMINAL_LENGTH = 0
   if (process.stdout && process.stdout.columns) {
     MAX_TERMINAL_LENGTH = process.stdout.columns
   } else {
@@ -193,8 +194,12 @@ export function showTableFromTobject (tObject: any, title?: string) {
   let topLeft = '╔'
   let topRight = '╗'
   if (title) {
+    MIN_TERMINAL_LENGTH = title.length + 9
     topLeft = '╠'
     topRight = '╣'
+  }
+  if(MIN_TERMINAL_LENGTH >= MAX_TERMINAL_LENGTH) {
+    MIN_TERMINAL_LENGTH = MAX_TERMINAL_LENGTH
   }
   let headerArray: string[] = []
   let colAlignArray: string[] = []
@@ -239,6 +244,11 @@ export function showTableFromTobject (tObject: any, title?: string) {
   let screenOffset = 0
   // console.log('tableWidth:', tableWidth)
   // console.log('MAX_TERMINAL_LENGTH:', MAX_TERMINAL_LENGTH)
+  // console.log('MIN_TERMINAL_LENGTH:', MIN_TERMINAL_LENGTH)
+  if(tableWidth < MIN_TERMINAL_LENGTH){
+    // tableWidth = MIN_TERMINAL_LENGTH
+    colWidthsArray[colWidthsArray.length - 1] += MIN_TERMINAL_LENGTH - tableWidth
+  }
   if (tableWidth + 5 >= MAX_TERMINAL_LENGTH) {
     // Screen is smaller than the table
     screenOffset = (tableWidth - MAX_TERMINAL_LENGTH) + (colWidthsArray.length - 2)

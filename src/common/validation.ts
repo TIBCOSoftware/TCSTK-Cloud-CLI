@@ -12,14 +12,19 @@ import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-m
 import { askTypes, getNameForSFType, listOnType } from '../tenants/spotfire'
 import { getCurrentOrganizationRoles } from './organization-management'
 import { TenantRolesDetail } from '../models/organizations'
+import {getTCIapps} from "../tenants/tci";
+import {getLaCaseByReference, showLiveApps} from "../tenants/live-apps";
+import {getGroupsTable} from "../tenants/user-groups";
+import {showAvailableApps} from "../cloud-starters/cloud-starters";
+import {getOrgFolderFiles, getOrgFolderTable} from "../tenants/cloud-files";
 
 declare let global: Global
 
-const LA = require('../tenants/live-apps')
-const CFILES = require('../tenants/cloud-files')
-const USERGROUPS = require('../tenants/user-groups')
-const TCI = require('../tenants/tci')
-const CS = require('../cloud-starters/cloud-starters')
+// const LA = require('../tenants/live-apps')
+// const CFILES = require('../tenants/cloud-files')
+// const USERGROUPS = require('../tenants/user-groups')
+// const TCI = require('../tenants/tci')
+// const CS = require('../cloud-starters/cloud-starters')
 
 // Function, that does all sorts of validations
 export async function validate () {
@@ -66,7 +71,7 @@ export async function validate () {
 
   // Validate if a liveApps App exist
   if (valD === 'liveapps_app_exist') {
-    const apps = await LA.showLiveApps(false, false)
+    const apps = await showLiveApps(false, false)
     await validationItemHelper(apps, 'LiveApps App', 'name')
     return
   }
@@ -74,7 +79,7 @@ export async function validate () {
   // Validate if a liveApps Group exist
   // Live_Apps_group_exist
   if (valD === 'live_apps_group_exist') {
-    const groups = await USERGROUPS.getGroupsTable(false)
+    const groups = await getGroupsTable(false)
     // console.log(iterateTable(groups));
     await validationItemHelper(iterateTable(groups), 'LiveApps Group', 'Name')
     return
@@ -82,14 +87,14 @@ export async function validate () {
 
   // Validate if a Flogo App exist
   if (valD === 'tci_app_exist') {
-    const apps = await TCI.showTCI(false)
+    const apps = await getTCIapps(false)
     await validationItemHelper(iterateTable(apps), 'TCI App', 'Name')
     return
   }
 
   // Validate if a Cloud Starter exist
   if (valD === 'cloud_starter_exist' || valD === 'cloud_app_exist') {
-    const apps = await CS.showAvailableApps(true)
+    const apps = await showAvailableApps(true)
     // console.log(apps);
     await validationItemHelper(apps, 'Cloud App', 'name')
     return
@@ -97,11 +102,11 @@ export async function validate () {
 
   // Validate if an org folder exist (and possibly contains file)
   if (valD === 'org_folder_exist' || valD === 'org_folder_and_file_exist') {
-    const folders = await CFILES.getOrgFolderTable(false, false)
+    const folders = await getOrgFolderTable(false, false)
     // console.log(folders);
     const chosenFolder = await validationItemHelper(iterateTable(folders), 'Org Folder', 'Name')
     if (valD === 'org_folder_and_file_exist') {
-      const files = await CFILES.getOrgFolderFiles(chosenFolder, false)
+      const files = await getOrgFolderFiles(chosenFolder, false)
       await validationItemHelper(iterateTable(files), 'Org File', 'Name')
     }
     return
@@ -181,7 +186,7 @@ export async function validate () {
 export async function validateLACaseState (caseRefToValidate: string, stateToValidate: string) {
   // First check if case exists
   await validateLACase(caseRefToValidate, 'case_exist')
-  const caseData = JSON.parse((await LA.getLaCaseByReference(caseRefToValidate)).untaggedCasedata)
+  const caseData = JSON.parse((await getLaCaseByReference(caseRefToValidate)).untaggedCasedata)
   if (caseData.state === stateToValidate) {
     validationOk('Case with Reference ' + col.blue(caseRefToValidate) + '\x1b[0m is in the expected state ' + col.blue(stateToValidate) + '\x1b[0m on organization: ' + col.blue(getOrganization()) + '\x1b[0m...')
   } else {
@@ -194,7 +199,7 @@ export async function validateLACase (casesToValidate: string, valType: string) 
   const caseRefArray = casesToValidate.split('+')
   for (const casRef of caseRefArray) {
     let validCase = false
-    const caseData = await LA.getLaCaseByReference(casRef)
+    const caseData = await getLaCaseByReference(casRef)
     if (caseData.casedata) {
       validCase = true
     } else {
