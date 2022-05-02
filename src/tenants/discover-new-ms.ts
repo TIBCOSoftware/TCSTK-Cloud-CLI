@@ -1,7 +1,14 @@
 import {DEBUG, ERROR, INFO, log, logCancel, WARNING} from '../common/logging'
 import {callTCA, postMessageToCloud, postToCloud, readableSize} from '../common/cloud-communications'
 import {Analysis} from '../models/discover/analysis'
-import {createTable, createTableFromObject, getPEXConfig, pexTable} from '../common/tables'
+import {
+    createTable,
+    createTableFromObject,
+    getPEXConfig,
+    iterateTable,
+    pexTable,
+    showTableFromTobject
+} from '../common/tables'
 import {Dataset} from '../models/discover/dataset'
 import {Template} from '../models/discover/template'
 import {DiscoverFileInfo} from '../models/discover/FileInfo'
@@ -21,6 +28,7 @@ import {AnalysisStatus} from '../models/discover/analysisStatus'
 import {DatasetDetail} from '../models/discover/datasetDetail'
 import path from 'path'
 import Watcher from '../common/watcher'
+import {InvestigationApplication} from "@tibco/discover-client-lib";
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
@@ -28,7 +36,7 @@ const _ = require('lodash')
 
 export function prepDiscoverProps() {
     // Checking if properties exist, otherwise create them with default values
-    prepProp('Discover_Folder', './Project_Discover/', 'Folder used for Project Discover\n# NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder. For Example:\n#Discover_Folder=./Project_Discover (~{ORGANIZATION})/')
+    prepProp('Discover_Folder', './Project_Discover_NMS/', 'Folder used for Project Discover\n# NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder. For Example:\n#Discover_Folder=./Project_Discover (~{ORGANIZATION})/')
     mkdirIfNotExist(getProp('Discover_Folder'))
     mkdirIfNotExist(getProp('Discover_Folder') + '/Datasets')
     mkdirIfNotExist(getProp('Discover_Folder') + '/DatasetFiles')
@@ -188,8 +196,8 @@ async function uploadToDiscover(fileLocation: string, uploadURL: string, doCsv: 
                 error = true
             }
         } else {
-            if (response.data && response.data.path) {
-                log(INFO, 'FILE UPLOADED SUCCESSFULLY: ' + col.green(response.data.path))
+            if (response.statusText === 'Created') {
+                log(INFO, col.green('FILE UPLOADED SUCCESSFULLY... '))
             } else {
                 error = true
             }
@@ -246,7 +254,10 @@ export async function createDataSet() {
             while (i <= MAX_DATASET_CYCLES && !isDone) {
                 i++
                 // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
-                const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, {skipInjectingRegion: SKIP_REGION, handleErrorOutside: true}) as PreviewStatus
+                const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, {
+                    skipInjectingRegion: SKIP_REGION,
+                    handleErrorOutside: true
+                }) as PreviewStatus
 
                 // console.log(dsStatus)
                 if (dsStatus.Progression || dsStatus.Progression === 0) {
@@ -436,9 +447,13 @@ const STORE_OPTIONS = {spaces: 2, EOL: '\r\n'}
 export async function exportDiscoverConfig() {
     log(INFO, 'Exporting Discover Configuration ' + col.blue('(for ' + getOrganization() + ')'))
     prepDiscoverProps()
-    const configResult = await callTCA(CCOM.clURI.dis_configuration, false, {skipInjectingRegion: true})
+    const configResult = await callTCA(CCOM.clURI.dis_nms_configuration, false, {skipInjectingRegion: SKIP_REGION})
+    const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION})
     const configFileName = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
-    require('jsonfile').writeFileSync(configFileName, configResult, STORE_OPTIONS)
+    require('jsonfile').writeFileSync(configFileName, {
+        ...configResult,
+        investigations: applicationConfigResult
+    }, STORE_OPTIONS)
     log(INFO, 'Exported Discover Configuration to : ' + col.green(configFileName))
 }
 
@@ -448,7 +463,9 @@ const DISCOVER_CONFIGS =
     [{objectName: 'general', endpoint: 'general', label: 'General'},
         {objectName: 'landingPage', endpoint: 'landingpages', label: 'Landing Pages'},
         // TODO: Moved to investigations
-        {objectName: 'investigations', endpoint: 'investigations/init', label: 'Investigations Init'},
+
+        {objectName: 'investigations', endpoint: 'investigations', label: 'Investigations'},
+        /*
         {objectName: 'investigations.applications', endpoint: 'investigations', label: 'Investigations'},
         // TODO: Moved to visualizations
         {objectName: 'analytics', endpoint: 'analytics', label: 'Analytics'},
@@ -456,7 +473,7 @@ const DISCOVER_CONFIGS =
         {objectName: 'formats', endpoint: 'formats', label: 'Date Format'},
         // TODO: Moved to repository
         {objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping'},
-        {objectName: 'messages', endpoint: 'messages', label: 'Messages'}]
+        {objectName: 'messages', endpoint: 'messages', label: 'Messages'}*/]
 
 // Function to export the configuration of discover to a JSON file
 export async function importDiscoverConfig(configFilename?: string, importAll?: boolean) {
@@ -540,17 +557,111 @@ export async function importDiscoverConfig(configFilename?: string, importAll?: 
 }
 
 async function updateDiscoverConfig(endpoint: string, configObject: any) {
-    log(DEBUG, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
+    log(INFO, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
     log(DEBUG, 'New Config: ', configObject)
-    const result = await postMessageToCloud(CCOM.clURI.dis_configuration + '/' + endpoint, configObject, {
-        skipInjectingRegion: SKIP_REGION,
-        handleErrorOutside: true,
-        returnResponse: true
-    })
-    if (result && result.statusCode && result.statusCode === 200) {
-        log(INFO, col.green('[RESULT OK]') + ' Updated discover config: ' + col.blue(endpoint))
+    if (endpoint === 'investigations') {
+        await updateDiscoverInvestigationConfig(configObject)
     } else {
-        log(ERROR, ' [RESULT FAILED] Updating discover config: ' + endpoint + '  Code: ', result.statusCode + ' Result: ', result.body)
+        const result = await postMessageToCloud(CCOM.clURI.dis_nms_configuration + '/' + endpoint, configObject, {
+            skipInjectingRegion: SKIP_REGION,
+            handleErrorOutside: true,
+            returnResponse: true
+        })
+        if (result && result.statusCode && result.statusCode === 201) {
+            log(INFO, col.green('[RESULT OK]') + ' Updated discover config: ' + col.blue(endpoint))
+        } else {
+            log(ERROR, ' [RESULT FAILED] Updating discover config: ' + endpoint + '  Code: ', result.statusCode + ' Result: ', result.body)
+        }
+    }
+}
+
+async function updateDiscoverInvestigationConfig(investigations: InvestigationApplication[]) {
+    if (investigations && investigations.length > 0) {
+        for (const inv of investigations) {
+            // Check if the id exists
+            let doPost = true
+            if (inv.id) {
+                const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
+                const invOnServer = applicationConfigResult.find(v => v.id === inv.id)
+                if (invOnServer) {
+                    // Investigation exist on server
+                    doPost = false
+                    // Do a put to update the investigation
+                    log(INFO, 'Investigation Application Config found on the server (id: ' + col.blue(inv.id) + ') updating the config')
+                    const result = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application', false, {
+                        skipInjectingRegion: SKIP_REGION,
+                        method: "PUT",
+                        postRequest: [inv],
+                        handleErrorOutside: true,
+                        returnResponse: true
+                    })
+                    if (result && result.statusCode && result.statusCode === 200) {
+                        log(INFO, col.green('[RESULT OK]') + ' Updated discover investigation application config: ' + col.blue(inv.id))
+                    } else {
+                        log(ERROR, ' [RESULT FAILED] Updating discover investigation application with id: ' + col.blue(inv.id) + '  Code: ', result.statusCode + ' Result: ', result.body)
+                    }
+                } else {
+                    // delete the id (a new one will be created)
+                    // @ts-ignore
+                    delete inv.id
+                }
+            }
+            if (doPost) {
+                log(INFO, 'Investigation Application Config Not found on the server creating a new config...')
+                const result = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application', false, {
+                    skipInjectingRegion: SKIP_REGION,
+                    method: "POST",
+                    postRequest: inv,
+                    handleErrorOutside: true,
+                    returnResponse: true
+                })
+                if (result && result.statusCode && result.statusCode === 201 && result.body && result.body.message) {
+                    log(INFO, col.green('[RESULT OK]') + ' Created discover investigation application config: ' + col.blue(result.body?.message))
+                } else {
+                    log(ERROR, ' [RESULT FAILED] Creating discover investigation application config -  Code: ', result.statusCode + ' Result: ', result.body)
+                }
+            }
+        }
+    }
+}
+
+export async function deleteDiscoverInvestigationConfig() {
+    log(INFO, 'Delete a discover investigation configuration...')
+    prepDiscoverProps()
+    // List all investigation configurations
+    const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
+    const appInvConfTable = createTable(applicationConfigResult, CCOM.mappings.dis_nms_inv_conf, false)
+    pexTable(appInvConfTable, 'discover-investigation-configurations', getPEXConfig(), true)
+    const selectConf = ['NONE', ...iterateTable(appInvConfTable).map(v => v.Name + ' (' + v.Id + ')')]
+    // Choose one to delete
+    const decision = await askMultipleChoiceQuestionSearch('Which application configuration would you like to delete ?', selectConf)
+    if (decision !== 'NONE') {
+        let appConfToDelete = applicationConfigResult.find(ac => ac.customTitle + ' (' + ac.id + ')' === decision)
+        if (!appConfToDelete) {
+            // look for the id (allow this to be injected as well)
+            appConfToDelete = applicationConfigResult.find(ac => ac.id === decision)
+        }
+        if (appConfToDelete) {
+            const decisionSure = await askMultipleChoiceQuestion('Are you sure you want to delete application configuration with id (' + col.blue(appConfToDelete.id) + ') ?', ['YES', 'NO'])
+            if (decisionSure.toLowerCase() === 'yes') {
+                // Call the delete operation
+                const response = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application/' + appConfToDelete.id, false, {
+                    skipInjectingRegion: SKIP_REGION,
+                    method: "DELETE"
+                })
+                if (response && response.result && response.result === 'OK' && response.message) {
+                    log(INFO, 'Deletion successfully: ' + col.green(response.message))
+                } else {
+                    log(ERROR, 'Problem deleting: ', response)
+                }
+            } else {
+                logCancel(true)
+            }
+        } else {
+            log(ERROR, 'App conf ', decision, ' not found to delete...')
+        }
+    } else {
+        logCancel(true)
     }
 }
 
@@ -582,13 +693,9 @@ export async function watchDiscoverConfig() {
     // Only watch one file
 }
 
-
-
-
-
 // Function to export the configuration of discover to a JSON file
-export async function uploadDiscoverLandingPageFile() {
-    log(INFO, 'Upload Discover Landing-page File...')
+export async function uploadDiscoverAsset() {
+    log(INFO, 'Upload Discover Asset...')
     prepDiscoverProps()
     const fileToUpload = await askQuestion('Provide the location of the file that you wish to upload: ')
 
@@ -596,7 +703,7 @@ export async function uploadDiscoverLandingPageFile() {
         // const fileNameToUse = await askQuestion('What file name would you like to use, when uploading (Use SAME or press enter to use the filename): ')
         // if (fileNameToUse.toLowerCase() === 'same' || fileNameToUse.trim() === '') {
         // }
-        let endpoint = replaceEndpoint(CCOM.clURI.dis_configuration_lp_file_upload)
+        let endpoint = replaceEndpoint(CCOM.clURI.dis_nms_assets)
 
         await uploadToDiscover(fileToUpload, endpoint, false)
 

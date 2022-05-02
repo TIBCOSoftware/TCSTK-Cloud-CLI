@@ -923,6 +923,26 @@ export async function exportDiscoverConfigWrapper() {
     await DISCOVER.exportDiscoverConfig()
 }
 
+export async function exportDiscoverNMSConfigWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.exportDiscoverConfig()
+}
+
+export async function importDiscoverNMSConfigWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.importDiscoverConfig()
+}
+
+export async function watchDiscoverNMSConfigWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.watchDiscoverConfig()
+}
+
+export async function deleteDiscoverNMSInvestigationConfigWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.deleteDiscoverInvestigationConfig()
+}
+
 export async function importDiscoverConfigWrapper() {
     const DISCOVER = require('./tenants/discover')
     await DISCOVER.importDiscoverConfig()
@@ -938,6 +958,10 @@ export async function uploadDiscoverLandingPageFileWrapper() {
     await DISCOVER.uploadDiscoverLandingPageFile()
 }
 
+export async function  uploadDiscoverNMSAssetWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.uploadDiscoverAsset()
+}
 
 /*
 export async function removeDiscoverPAWrapper () {

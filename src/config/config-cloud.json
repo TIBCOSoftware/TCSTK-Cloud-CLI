@@ -57,6 +57,9 @@
     "dis_pa_status": "discover.labs.tibcocloud.com/repository/analysis",
     "dis_configuration": "discover.labs.tibcocloud.com/configuration",
     "dis_configuration_lp_file_upload": "discover.labs.tibcocloud.com/configuration/assets",
+    "dis_nms_assets": "eu.api.discover.labs.cloud.tibco.com/configuration/resource",
+    "dis_nms_configuration": "eu.api.discover.labs.cloud.tibco.com/configuration",
+    "dis_nms_investigation_config": "eu.api.discover.labs.cloud.tibco.com/investigation/configuration",
     "nimbus_maps": "nimbus.cloud.tibco.com/api/v1/maps"
   },
   "mappings": {
@@ -592,6 +595,26 @@
         {
           "header": "Master Owner",
           "field": "master.owner.name"
+        }
+      ]
+    },
+    "dis_nms_inv_conf": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "customTitle"
+        },
+        {
+          "header": "Id",
+          "field": "id"
+        },
+        {
+          "header": "Application Id",
+          "field": "applicationId"
+        },
+        {
+          "header": "Creator Id",
+          "field": "creatorId"
         }
       ]
     }
