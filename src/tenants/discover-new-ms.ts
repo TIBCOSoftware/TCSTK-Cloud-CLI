@@ -632,38 +632,55 @@ export async function deleteDiscoverInvestigationConfig() {
     const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
     const appInvConfTable = createTable(applicationConfigResult, CCOM.mappings.dis_nms_inv_conf, false)
     pexTable(appInvConfTable, 'discover-investigation-configurations', getPEXConfig(), true)
-    const selectConf = ['NONE', ...iterateTable(appInvConfTable).map(v => v.Name + ' (' + v.Id + ')')]
+    const selectConf = ['NONE', 'ALL', ...iterateTable(appInvConfTable).map(v => v.Name + ' (' + v.Id + ')')]
     // Choose one to delete
     const decision = await askMultipleChoiceQuestionSearch('Which application configuration would you like to delete ?', selectConf)
-    if (decision !== 'NONE') {
-        let appConfToDelete = applicationConfigResult.find(ac => ac.customTitle + ' (' + ac.id + ')' === decision)
-        if (!appConfToDelete) {
-            // look for the id (allow this to be injected as well)
-            appConfToDelete = applicationConfigResult.find(ac => ac.id === decision)
-        }
-        if (appConfToDelete) {
-            const decisionSure = await askMultipleChoiceQuestion('Are you sure you want to delete application configuration with id (' + col.blue(appConfToDelete.id) + ') ?', ['YES', 'NO'])
-            if (decisionSure.toLowerCase() === 'yes') {
-                // Call the delete operation
-                const response = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application/' + appConfToDelete.id, false, {
-                    skipInjectingRegion: SKIP_REGION,
-                    method: "DELETE"
-                })
-                if (response && response.result && response.result === 'OK' && response.message) {
-                    log(INFO, 'Deletion successfully: ' + col.green(response.message))
-                } else {
-                    log(ERROR, 'Problem deleting: ', response)
+    if (decision.toLowerCase() !== 'none') {
+        if (decision.toLowerCase() === 'all') {
+            const decisionSureAll = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO DELETE ALL APPLICATION CONFIGURATIONS ?', ['YES', 'NO'])
+            if (decisionSureAll.toLowerCase() === 'yes') {
+                for(const appConf of applicationConfigResult){
+                    await deleteSingleAppConfig(appConf.id)
                 }
             } else {
                 logCancel(true)
             }
         } else {
-            log(ERROR, 'App conf ', decision, ' not found to delete...')
+            // Delete a single one
+            let appConfToDelete = applicationConfigResult.find(ac => ac.customTitle + ' (' + ac.id + ')' === decision)
+            if (!appConfToDelete) {
+                // look for the id (allow this to be injected as well)
+                appConfToDelete = applicationConfigResult.find(ac => ac.id === decision)
+            }
+            if (appConfToDelete) {
+                const decisionSure = await askMultipleChoiceQuestion('Are you sure you want to delete application configuration with id (' + col.blue(appConfToDelete.id) + ') ?', ['YES', 'NO'])
+                if (decisionSure.toLowerCase() === 'yes') {
+                    await deleteSingleAppConfig(appConfToDelete.id)
+                } else {
+                    logCancel(true)
+                }
+            } else {
+                log(ERROR, 'App conf ', decision, ' not found to delete...')
+            }
         }
     } else {
         logCancel(true)
     }
 }
+
+async function deleteSingleAppConfig(appConfToDeleteId: string) {
+    // Call the delete operation
+    const response = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application/' + appConfToDeleteId, false, {
+        skipInjectingRegion: SKIP_REGION,
+        method: "DELETE"
+    })
+    if (response && response.result && response.result === 'OK' && response.message) {
+        log(INFO, 'Deletion successfully: ' + col.green(response.message))
+    } else {
+        log(ERROR, 'Problem deleting: ', response)
+    }
+}
+
 
 // Function to export the configuration of discover to a JSON file
 export async function watchDiscoverConfig() {

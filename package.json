@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.182",
-    "@types/node": "^14.18.15",
+    "@types/node": "^14.18.18",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "eslint": "^7.32.0",
@@ -59,11 +59,11 @@
     "eslint-plugin-promise": "^5.2.0",
     "jasmine": "^3.99.0",
     "jasmine-reporters": "^2.5.0",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.16",
     "ts-node": "^9.1.1",
     "tsc-watch": "2.4.0",
-    "typescript": "^4.6.3",
-    "webpack": "^5.72.0",
+    "typescript": "^4.6.4",
+    "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
   },
   "bin_notes": {
