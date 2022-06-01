@@ -197,7 +197,7 @@ async function cloudLoginV3(tenantID: string, clientID: string, email: string, p
         method: 'POST'
     }, postForm) as any
     let re = '' as any
-    console.log(response.body);
+    // console.log(response.body);
     if (response.body.errorMsg != null) {
         log(ERROR, response.body.errorMsg)
         re = 'ERROR'
@@ -206,16 +206,15 @@ async function cloudLoginV3(tenantID: string, clientID: string, email: string, p
             setOrganization(response.body.orgName)
         }
         const loginCookie = response.headers['set-cookie']
-        logO(INFO, loginCookie)
+        logO(DEBUG, loginCookie)
         // const rxd = /cic-user-at=(.*?);/g
         const rxd = /cic-user-at=(.*?);/g
-
         const rxt = /tsc=(.*?);/g
         re = {cicUser: rxd.exec(loginCookie)![1]!, tsc: rxt.exec(loginCookie)![1]!}
         // re = {tsc: rxt.exec(loginCookie)![1]!}
-        logO(INFO, re.cicUser)
-        logO(INFO, re.tsc)
-        logO(INFO, re)
+        logO(DEBUG, re.cicUser)
+        logO(DEBUG, re.tsc)
+        logO(DEBUG, re)
         log(INFO, 'Login Successful of ' + email + '(' + tenantID + ')...')
     }
     return re
