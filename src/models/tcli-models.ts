@@ -110,7 +110,7 @@ export interface ORGInfo {
 }
 
 export interface LCookie {
-    domain: string
+    cicUser: string
     tsc: string;
 }
 

@@ -6,8 +6,7 @@ import {
     createTableFromObject,
     getPEXConfig,
     iterateTable,
-    pexTable,
-    showTableFromTobject
+    pexTable
 } from '../common/tables'
 import {Dataset} from '../models/discover/dataset'
 import {Template} from '../models/discover/template'

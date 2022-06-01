@@ -36,6 +36,7 @@ function parseArgumentsIntoOptions (rawArgs: any) {
         '-t': '--template',
         '--createCP': Boolean,
         '-c': '--createCP',
+        '--createCPL': Boolean,
         '--createGlobalConfig': Boolean,
         '-g': '--createGlobalConfig',
         '--help': Boolean,
@@ -83,6 +84,7 @@ function parseArgumentsIntoOptions (rawArgs: any) {
     debug: args['--debug'] || false,
     help: args['--help'] || false,
     createCP: args['--createCP'] || false,
+    createCPL: args['--createCPL'] || false,
     createGlobalConfig: args['--createGlobalConfig'] || false,
     version: args['--version'] || false,
     update: args['--update'] || false,
@@ -217,9 +219,9 @@ export async function cli (args: any) {
       const tNothing = 'Nothing'
       // if (!fs.existsSync(cwdir + dirDelimiter + propFileName) || options.createCP) {
       // console.log('Workdir: ' + cwdir);
-      if (!fs.existsSync(propFileName) || options.createCP) {
+      if (!fs.existsSync(propFileName) || options.createCP || options.createCPL) {
         let cif = tCProp
-        if (!options.createCP) {
+        if (!options.createCP && !options.createCPL) {
           displayOpeningMessage()
           console.log('\x1b[36m%s\x1b[0m', '[TIBCO Cloud Composer CLI ' + require('../package.json').version + ']')
           console.log('No TIBCO Cloud Properties file found...')
@@ -229,7 +231,7 @@ export async function cli (args: any) {
           case tCProp:
             let copiedFile = true
             // if we use a global config
-            if (getGlobalConfig()) {
+            if (getGlobalConfig() && !options.createCPL) {
               log(DEBUG, 'Using Global Connection Configuration...')
               // console.log(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties')
               copiedFile = await copyFileInteractiveIfNotExists(global.PROJECT_ROOT + 'templates/tibco-cloud_global.properties', cwdir + '/' + propFileName, propFileName)
@@ -295,7 +297,7 @@ export async function cli (args: any) {
     }
   }
 
-  if (!options.createCP && !(options.doMultiple || options.doMultipleInteraction)) {
+  if (!options.createCP && !options.createCPL && !(options.doMultiple || options.doMultipleInteraction)) {
     // Start the specified Task
     if (projectManagementMode) {
       if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' BEFORE Loading Tasks')
