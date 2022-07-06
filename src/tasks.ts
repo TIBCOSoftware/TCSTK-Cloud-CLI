@@ -863,6 +863,11 @@ export async function showMessagingClientsWrapper() {
     await MESSAGING.showClients()
 }
 
+export async function showDiscoverNMSPAWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.showProcessAnalysis()
+}
+
 export async function showDiscoverPAWrapper() {
     const DISCOVER = require('./tenants/discover')
     await DISCOVER.getProcessAnalysis(true)
@@ -873,9 +878,24 @@ export async function showDiscoverDSWrapper() {
     await DISCOVER.showDataSets()
 }
 
+export async function showDiscoverNMSDSWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.showDataSets()
+}
+
 export async function showDiscoverTempWrapper() {
     const DISCOVER = require('./tenants/discover')
     await DISCOVER.getTemplates(true)
+}
+
+export async function showDiscoverNMSTempWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.showTemplates()
+}
+
+export async function showDiscoverNMSConnectionWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.showConnections()
 }
 
 export async function showDiscoverDSFilesWrapper() {

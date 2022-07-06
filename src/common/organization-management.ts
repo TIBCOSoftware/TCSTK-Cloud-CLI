@@ -209,9 +209,11 @@ export async function getClientIdForOrg (accountId: string) {
     returnResponse: true
   })
   const loginCookie = response.headers['set-cookie']
-  const rxd = /cic-user-at=(.*?);/g
+  // const rxd = /cic-user-at=(.*?);/g
+  const rxd = /domain=(.*?);/g
   const rxt = /tsc=(.*?);/g
-  const cookies = { cicUser: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
+  // const cookies = { cicUser: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
+  const cookies = { domain: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
   const axios = require('axios').default
   axios.defaults.validateStatus = () => {
     return true
@@ -219,7 +221,8 @@ export async function getClientIdForOrg (accountId: string) {
   const options = {
     method: 'POST',
     headers: {
-      cookie: 'tsc=' + cookies.tsc + '; cic-user-at=' + cookies.cicUser
+      // cookie: 'tsc=' + cookies.tsc + '; cic-user-at=' + cookies.cicUser
+      cookie: 'tsc=' + cookies.tsc + '; domain=' + cookies.domain
     }
   }
   // Get the ClientID

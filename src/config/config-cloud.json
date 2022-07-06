@@ -60,6 +60,10 @@
     "dis_nms_assets": "eu.api.discover.labs.cloud.tibco.com/configuration/resource",
     "dis_nms_configuration": "eu.api.discover.labs.cloud.tibco.com/configuration",
     "dis_nms_investigation_config": "eu.api.discover.labs.cloud.tibco.com/investigation/configuration",
+    "dis_nms_pa": "eu.api.discover.labs.cloud.tibco.com/repository/analysis",
+    "dis_nms_ds": "eu.api.discover.labs.cloud.tibco.com/catalog/dataset",
+    "dis_nms_templates": "eu.api.discover.labs.cloud.tibco.com/visualisation/templates",
+    "dis_nms_connection": "eu.api.discover.labs.cloud.tibco.com/catalog/connection",
     "nimbus_maps": "nimbus.cloud.tibco.com/api/v1/maps"
   },
   "mappings": {
@@ -487,6 +491,35 @@
         }
       ]
     },
+    "dis_nms_pa": {
+      "entries": [
+        {
+          "header": "Id",
+          "field": "id"
+        },
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Description",
+          "field": "description"
+        },
+        {
+          "header": "Last updated by",
+          "field": "metadata.modifiedBy"
+        },
+        {
+          "header": "Last updated",
+          "field": "metadata.modifiedOn",
+          "format": "DATE"
+        },
+        {
+          "header": "Status",
+          "field": "metadata.status"
+        }
+      ]
+    },
     "dis_ds": {
       "entries": [
         {
@@ -517,6 +550,31 @@
         }
       ]
     },
+    "dis_nms_ds": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "Last updated by",
+          "field": "metadata.modifiedBy"
+        },
+        {
+          "header": "Last updated",
+          "field": "metadata.modifiedOn",
+          "format": "DATE"
+        },
+        {
+          "header": "Status",
+          "field": "metadata.status"
+        }
+      ]
+    },
     "dis_temp": {
       "entries": [
         {
@@ -537,6 +595,57 @@
         }
       ]
     },
+    "dis_nms_temp": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "Last updated by",
+          "field": "metadata.modifiedBy"
+        },
+        {
+          "header": "Last updated",
+          "field": "metadata.modifiedOn",
+          "format": "DATE"
+        },
+        {
+          "header": "Analytic Report",
+          "field": "analysisFileLocation"
+        }
+      ]
+    },
+    "dis_nms_connection": {
+      "entries": [
+        {
+          "header": "Name",
+          "field": "name"
+        },
+        {
+          "header": "Type",
+          "field": "type"
+        },
+        {
+          "header": "Last updated by",
+          "field": "metadata.modifiedBy"
+        },
+        {
+          "header": "Last updated",
+          "field": "metadata.modifiedOn",
+          "format": "DATE"
+        },
+        {
+          "header": "Description",
+          "field": "description"
+        }
+      ]
+    },
+
     "dis_files": {
       "entries": [
         {

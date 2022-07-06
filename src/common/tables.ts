@@ -8,6 +8,7 @@ const _ = require('lodash')
 
 export function createTableFromObject (objectForTable: any, title: string) {
   const tableArray = eachRecursive(objectForTable, [])
+  // console.log('tableArray:  ', tableArray)
   tableArray.sort(compareTable)
   showTableFromTobject(tableArray, title)
 }
@@ -20,6 +21,9 @@ function eachRecursive (obj: any, table: any, base?:string): TableElement[] {
   let returnTable
   for (const k in obj) {
     if (typeof obj[k] === 'object' && obj[k] !== null) {
+      // if(Array.isArray(obj[k]) && obj[k].length === 0){
+      //   obj[k] = 'EMPTY'
+      // }
       if (base) {
         returnTable = eachRecursive(obj[k], table, base + '.' + k)
       } else {
@@ -27,7 +31,7 @@ function eachRecursive (obj: any, table: any, base?:string): TableElement[] {
       }
     } else {
       if (base) {
-        // console.log(base + '|' + k + ':' + obj[k])
+        // console.log(col.cyan(base) + '|' + k + ':' + obj[k])
         returnTable = createTableValue(col.cyan(base) + '.' + k, obj[k], table)
       } else {
         // console.log(col.blue(k) + ':' + obj[k])
@@ -35,7 +39,16 @@ function eachRecursive (obj: any, table: any, base?:string): TableElement[] {
       }
     }
   }
-  return returnTable
+  // console.log('returnTable ' ,  returnTable)
+  // console.log('obj ' ,  obj)
+  // TODO: Fill in empty array when array is empty
+  if(returnTable) {
+    return returnTable
+  } else {
+    // When we iterated over an empty object we
+    return table
+  }
+  // return returnTable
 }
 
 export function createTable (arrayObject: any[], config: Mapping, doShowTable: boolean): any {

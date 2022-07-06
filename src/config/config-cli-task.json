@@ -1121,6 +1121,18 @@
       ],
       "category": "discover"
     },
+    "show-discover-nms-process-analysis": {
+      "description": "Show's the process analysis of Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverNMSPAWrapper",
+      "taskAlternativeNames": [],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
     "show-discover-datasets": {
       "description": "Show's the datasets of Project Discover",
       "enabled": true,
@@ -1137,6 +1149,19 @@
       ],
       "category": "discover"
     },
+    "show-discover-nms-datasets": {
+      "description": "Show's the datasets of Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverNMSDSWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
     "show-discover-templates": {
       "description": "Show's the templates of Project Discover",
       "enabled": true,
@@ -1152,6 +1177,30 @@
         "all"
       ],
       "category": "discover"
+    },
+    "show-discover-nms-templates": {
+      "description": "Show's the templates of Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverNMSTempWrapper",
+      "taskAlternativeNames": [],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
+    "show-discover-nms-connections": {
+      "description": "Show's the cconnections of Project Discover",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverNMSConnectionWrapper",
+      "taskAlternativeNames": [],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
     },
     "show-discover-dataset-files": {
       "description": "Show's a list of dataset files for Project Discover",

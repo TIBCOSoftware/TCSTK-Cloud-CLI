@@ -1,6 +1,5 @@
 import {DEBUG, ERROR, INFO, log, logCancel, WARNING} from '../common/logging'
 import {callTCA, postMessageToCloud, postToCloud, readableSize} from '../common/cloud-communications'
-import {Analysis} from '../models/discover/analysis'
 import {
     createTable,
     createTableFromObject,
@@ -8,8 +7,6 @@ import {
     iterateTable,
     pexTable
 } from '../common/tables'
-import {Dataset} from '../models/discover/dataset'
-import {Template} from '../models/discover/template'
 import {DiscoverFileInfo} from '../models/discover/FileInfo'
 import {getProp, prepProp} from '../common/property-file-management'
 import {
@@ -24,10 +21,10 @@ import {askMultipleChoiceQuestion, askMultipleChoiceQuestionSearch, askQuestion}
 import {CreateDataSetResult, CreateProcessAnalysisResult} from '../models/discover/CustomModels'
 import {PreviewStatus} from '../models/discover/previewStatus'
 import {AnalysisStatus} from '../models/discover/analysisStatus'
-import {DatasetDetail} from '../models/discover/datasetDetail'
+// import {DatasetDetail} from '../models/discover/datasetDetail'
 import path from 'path'
 import Watcher from '../common/watcher'
-import {InvestigationApplication} from "@tibco/discover-client-lib";
+import {InvestigationApplication, Analysis, Dataset, Template, Connection} from "@tibco/discover-client-lib";
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
@@ -44,66 +41,104 @@ export function prepDiscoverProps() {
     mkdirIfNotExist(getProp('Discover_Folder') + '/Configuration')
 }
 
-// TODO: Show details
-export async function getProcessAnalysis(showTable: boolean): Promise<Analysis[]> {
-    log(INFO, 'Getting process analysis...')
+// Re-usable function to show a list of objects (Dataset, Process Analysis, Template, Connection) Given that they have an id and a name
+// Function to show the process analysis in a table and pick one or all to display the details
+export async function showDiscoverObjectTableAndDetails(objectName: string, tableFunction: Function, detailsFunction: Function) {
     prepDiscoverProps()
-    // https://discover.labs.tibcocloud.com/repository/analysis
-    const disPA = await callTCA(CCOM.clURI.dis_pa, false, {skipInjectingRegion: SKIP_REGION}) as Analysis[]
-    const paTable = createTable(disPA, CCOM.mappings.dis_pa, false)
-    pexTable(paTable, 'discover-process-analysis', getPEXConfig(), showTable)
-    return disPA
-}
-
-// Function to get all the datasets
-async function getDataSets(showTable: boolean): Promise<Dataset[]> {
-    log(INFO, 'Getting datasets...')
-    prepDiscoverProps()
-    // https://discover.labs.tibcocloud.com/catalog/datasets
-    const disDS = await callTCA(CCOM.clURI.dis_ds, false, {skipInjectingRegion: SKIP_REGION}) as Dataset[]
-    // console.log(disDS)
-    const paTable = createTable(disDS, CCOM.mappings.dis_ds, false)
-    pexTable(paTable, 'discover-datasets', getPEXConfig(), showTable)
-    return disDS
-}
-
-// Show datasets and possibly details
-export async function showDataSets() {
-    const dataSets = await getDataSets(true)
-    const dsToExport = await askMultipleChoiceQuestionSearch('For which dataset would you like to see the details ?', ['NONE', 'ALL', ...dataSets.map(v => v.name!)])
-    if (dsToExport.toLowerCase() !== 'none') {
-        if (dsToExport.toLowerCase() === 'all') {
-            for (const ds of dataSets) {
-                // console.log(await getDataSetDetail(ds.datasetid!))
-                // const dsT = dataSets.find(v => v.name === dsToExport)!
-                createTableFromObject(await getDataSetDetail(ds.datasetid!), 'DATASET - ' + ds.name)
+    const disObjects = await tableFunction(true)
+    const objectForDetails = await askMultipleChoiceQuestionSearch('For which ' + objectName.toLowerCase() + ' would you like to see the details ?', ['NONE', 'ALL', ...disObjects.map((v: any) => v.name!)])
+    if (objectForDetails.toLowerCase() !== 'none') {
+        if (objectForDetails.toLowerCase() === 'all') {
+            for (const disObj of disObjects) {
+                createTableFromObject(await detailsFunction(disObj.id!), objectName.toUpperCase() + ' - ' + disObj.name)
             }
         } else {
-            // console.table(await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
-            const ds = dataSets.find(v => v.name === dsToExport)!
-            createTableFromObject(await getDataSetDetail(ds.datasetid!), 'DATASET - ' + ds.name)
+            const disObj = disObjects.find((v: any) => v.name === objectForDetails)!
+            createTableFromObject(await detailsFunction(disObj.id!), objectName.toUpperCase() + ' - ' + disObj.name)
         }
     } else {
         logCancel(true)
     }
 }
 
-// Function to get details for a dataset
-async function getDataSetDetail(dataSetId: string): Promise<DatasetDetail> {
-    return await callTCA(CCOM.clURI.dis_dataset_detail + '/' + dataSetId, false, {skipInjectingRegion: SKIP_REGION}) as DatasetDetail
+// Function to show the process analysis in a table and pick one or all to display the details
+export async function showProcessAnalysis() {
+    await showDiscoverObjectTableAndDetails('process analysis', getProcessAnalysis, getProcessAnalysisDetail)
 }
 
-// TODO: Show details
+// Function to get all the process analysis and optionally display them in a table
+export async function getProcessAnalysis(showTable: boolean): Promise<Analysis[]> {
+    log(INFO, 'Getting process analysis...')
+    const disPA = await callTCA(CCOM.clURI.dis_nms_pa, false, {skipInjectingRegion: SKIP_REGION}) as Analysis[]
+    const paTable = createTable(disPA, CCOM.mappings.dis_nms_pa, false)
+    pexTable(paTable, 'discover-process-analysis', getPEXConfig(), showTable)
+    return disPA
+}
+
+// Function to get details for a process analysis
+async function getProcessAnalysisDetail(processAnalysisId: string): Promise<Analysis> {
+    return await callTCA(CCOM.clURI.dis_nms_pa + '/' + processAnalysisId, false, {skipInjectingRegion: SKIP_REGION}) as Analysis
+}
+
+// Show datasets and possibly details
+export async function showDataSets() {
+    await showDiscoverObjectTableAndDetails('dataset', getDataSets, getDataSetDetail)
+}
+
+// Function to get all the datasets
+async function getDataSets(showTable: boolean): Promise<Dataset[]> {
+    log(INFO, 'Getting datasets...')
+    prepDiscoverProps()
+    const disDS = await callTCA(CCOM.clURI.dis_nms_ds, false, {skipInjectingRegion: SKIP_REGION}) as Dataset[]
+    const paTable = createTable(disDS, CCOM.mappings.dis_nms_ds, false)
+    pexTable(paTable, 'discover-datasets', getPEXConfig(), showTable)
+    return disDS
+}
+
+// Function to get details for a dataset
+async function getDataSetDetail(dataSetId: string): Promise<Dataset> {
+    return await callTCA(CCOM.clURI.dis_nms_ds + '/' + dataSetId, false, {skipInjectingRegion: SKIP_REGION}) as Dataset
+}
+
+// Show templates and possibly details
+export async function showTemplates() {
+    await showDiscoverObjectTableAndDetails('template', getTemplates, getTemplateDetail)
+}
+
+// Get a list of details
 export async function getTemplates(showTable: boolean): Promise<Template[]> {
     log(INFO, 'Getting templates...')
-    prepDiscoverProps()
-    // https://discover.labs.tibcocloud.com/visualisation/templates
-    const disTEMP = await callTCA(CCOM.clURI.dis_temp, false, {skipInjectingRegion: SKIP_REGION}) as Template[]
-    // console.log(disTEMP)
-    const paTable = createTable(disTEMP, CCOM.mappings.dis_temp, false)
+    const disTEMP = await callTCA(CCOM.clURI.dis_nms_templates, false, {skipInjectingRegion: SKIP_REGION}) as Template[]
+    const paTable = createTable(disTEMP, CCOM.mappings.dis_nms_temp, false)
     pexTable(paTable, 'discover-templates', getPEXConfig(), showTable)
     return disTEMP
 }
+
+// Function to get details for a dataset
+async function getTemplateDetail(templateId: string): Promise<Template> {
+    return await callTCA(CCOM.clURI.dis_nms_templates + '/' + templateId, false, {skipInjectingRegion: SKIP_REGION}) as Template
+}
+
+// Show templates and possibly details
+export async function showConnections() {
+    await showDiscoverObjectTableAndDetails('connection', getConnections, getConnectionDetail)
+}
+
+// Get a list of details
+export async function getConnections(showTable: boolean): Promise<Connection[]> {
+    log(INFO, 'Getting connections...')
+    const disTEMP = await callTCA(CCOM.clURI.dis_nms_connection, false, {skipInjectingRegion: SKIP_REGION}) as Connection[]
+    const paTable = createTable(disTEMP, CCOM.mappings.dis_nms_connection, false)
+    pexTable(paTable, 'discover-connections', getPEXConfig(), showTable)
+    return disTEMP
+}
+
+// Function to get details for a dataset
+async function getConnectionDetail(templateId: string): Promise<Connection> {
+    return await callTCA(CCOM.clURI.dis_nms_connection + '/' + templateId, false, {skipInjectingRegion: SKIP_REGION}) as Connection
+}
+
+
 
 // TODO: create-discover-template
 // TODO: remove-discover-template
@@ -301,11 +336,11 @@ export async function exportDataSets() {
         if (dsToExport.toLowerCase() === 'all') {
             storeJsonToFile(getProp('Discover_Folder') + '/Datasets/ALL_Datasets_Summary.json', dataSets)
             for (const ds of dataSets) {
-                storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '_details.json', await getDataSetDetail(ds.datasetid!))
+                storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '_details.json', await getDataSetDetail(ds.id!))
                 storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '.json', ds)
             }
         } else {
-            storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '_details.json', await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.datasetid!))
+            storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '_details.json', await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.id!))
             storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '.json', dataSets.find(v => v.name === dsToExport))
         }
     } else {
@@ -322,12 +357,12 @@ export async function removeDataSet() {
         // Chosen PA
         const dsToRemove = datasets.find(v => v.name === dsNameToRemove)
         if (dsToRemove) {
-            await CCOM.callTCA(CCOM.clURI.dis_dataset_detail + '/' + dsToRemove.datasetid, false, {
+            await CCOM.callTCA(CCOM.clURI.dis_dataset_detail + '/' + dsToRemove.id, false, {
                 method: 'DELETE',
                 skipInjectingRegion: SKIP_REGION
             })
             // console.log(response)
-            log(INFO, col.green('Successfully removed dataset: ') + col.blue(dsNameToRemove) + col.reset(' (id: ' + dsToRemove.datasetid + ')'))
+            log(INFO, col.green('Successfully removed dataset: ') + col.blue(dsNameToRemove) + col.reset(' (id: ' + dsToRemove.id + ')'))
         } else {
             log(ERROR, 'Dataset ' + dsNameToRemove + ' Not found...')
         }
@@ -393,6 +428,7 @@ export async function runProcessAnalysis() {
 
 export async function actionProcessAnalysis() {
     log(INFO, 'Action Process Analysis...')
+    /*
     prepDiscoverProps()
     const prAnalysis = await getProcessAnalysis(false)
     const conf = {...CCOM.mappings.dis_pa}
@@ -437,7 +473,7 @@ export async function actionProcessAnalysis() {
         }
     } else {
         logCancel(true)
-    }
+    }*/
 }
 
 const STORE_OPTIONS = {spaces: 2, EOL: '\r\n'}
@@ -638,7 +674,7 @@ export async function deleteDiscoverInvestigationConfig() {
         if (decision.toLowerCase() === 'all') {
             const decisionSureAll = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO DELETE ALL APPLICATION CONFIGURATIONS ?', ['YES', 'NO'])
             if (decisionSureAll.toLowerCase() === 'yes') {
-                for(const appConf of applicationConfigResult){
+                for (const appConf of applicationConfigResult) {
                     await deleteSingleAppConfig(appConf.id)
                 }
             } else {
@@ -738,7 +774,7 @@ function replaceEndpoint(url: string): string {
     return url
 }
 
-
+/*
 function getAvailablePAforAction(prAnalysis: Analysis[], action: string) {
     const re: Analysis[] = []
     for (const prA of prAnalysis) {
@@ -749,8 +785,9 @@ function getAvailablePAforAction(prAnalysis: Analysis[], action: string) {
         }
     }
     return re
-}
+}*/
 
+/*
 function getAvailableActions(prAnalysis: Analysis[]) {
     const actions = []
     for (const prA of prAnalysis) {
@@ -766,4 +803,4 @@ function getAvailableActions(prAnalysis: Analysis[]) {
         }
     }
     return actions
-}
+}*/

@@ -207,12 +207,13 @@ async function cloudLoginV3(tenantID: string, clientID: string, email: string, p
         }
         const loginCookie = response.headers['set-cookie']
         logO(DEBUG, loginCookie)
+        const rxd = /domain=(.*?);/g
         // const rxd = /cic-user-at=(.*?);/g
-        const rxd = /cic-user-at=(.*?);/g
         const rxt = /tsc=(.*?);/g
-        re = {cicUser: rxd.exec(loginCookie)![1]!, tsc: rxt.exec(loginCookie)![1]!}
-        // re = {tsc: rxt.exec(loginCookie)![1]!}
-        logO(DEBUG, re.cicUser)
+        // re = {cicUser: rxd.exec(loginCookie)![1]!, tsc: rxt.exec(loginCookie)![1]!}
+        re = {domain: rxd.exec(loginCookie)![1]!, tsc: rxt.exec(loginCookie)![1]!}
+        logO(DEBUG, re.domain)
+        // logO(DEBUG, re.cicUser)
         logO(DEBUG, re.tsc)
         logO(DEBUG, re)
         log(INFO, 'Login Successful of ' + email + '(' + tenantID + ')...')
@@ -283,13 +284,16 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
         }
     } else {
         if (header.cookie) {
-            header.cookie += 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+            // header.cookie += 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+            header.cookie += 'tsc=' + lCookie.tsc + '; domain=' + lCookie.domain
         } else {
-            header.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+            // header.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+            header.cookie = 'tsc=' + lCookie.tsc + '; domain=' + lCookie.domain
         }
     }
     if (fCLIENTID) {
-        header.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+        // header.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+        header.cookie = 'tsc=' + lCookie.tsc + '; domain=' + lCookie.domain
         delete header.Authorization
     }
 
@@ -329,6 +333,10 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
         process.exit(1)
     }
     if (response.body != null) {
+        if (cdoLog) {
+            log(INFO, '--- RESPONSE ---')
+            log(INFO, response.body)
+        }
         if (response.body.errorMsg != null) {
             if (doErrorOutside) {
                 return response.body
@@ -446,7 +454,8 @@ export async function uploadToCloud(formDataType: string, localFileLocation: str
             const lCookie = await cLogin()
             // console.log(lCookie);
             if (lCookie && lCookie !== 'ERROR') {
-                header.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+                // header.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+                header.cookie = 'tsc=' + lCookie.tsc + '; domain=' + lCookie.domain
             } else {
                 log(ERROR, 'Could not get login cookie...')
             }
@@ -508,7 +517,8 @@ export async function downloadFromCloud(localFileLocation: string, downloadFileU
             const lCookie = await cLogin()
             // console.log(lCookie);
             if (lCookie && lCookie !== 'ERROR') {
-                headers.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+                // headers.cookie = 'tsc=' + lCookie.tsc + '; cic-user-at=' + lCookie.cicUser
+                headers.cookie = 'tsc=' + lCookie.tsc + '; domain=' + lCookie.domain
             } else {
                 log(ERROR, 'Could not get login cookie...')
             }
