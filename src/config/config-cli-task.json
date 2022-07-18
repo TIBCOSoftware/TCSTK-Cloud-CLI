@@ -1390,6 +1390,32 @@
       ],
       "category": "discover-nms"
     },
+    "show-discover-nms-message-config": {
+      "description": "Shows discover message config",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "showDiscoverMessageConfigWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
+    "delete-discover-nms-message-config": {
+      "description": "Deletes a discover message config",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "deleteDiscoverNMSMessageConfigWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
     "import-discover-config": {
       "description": "Imports the configuration for Project Discover into a JSON file",
       "enabled": true,

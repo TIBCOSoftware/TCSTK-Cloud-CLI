@@ -963,6 +963,18 @@ export async function deleteDiscoverNMSInvestigationConfigWrapper() {
     await DISCOVER_NEW_MS.deleteDiscoverInvestigationConfig()
 }
 
+//
+
+export async function showDiscoverMessageConfigWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.showDiscoverMessageConfig()
+}
+
+export async function deleteDiscoverNMSMessageConfigWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.deleteDiscoverMessageConfig()
+}
+
 export async function importDiscoverConfigWrapper() {
     const DISCOVER = require('./tenants/discover')
     await DISCOVER.importDiscoverConfig()

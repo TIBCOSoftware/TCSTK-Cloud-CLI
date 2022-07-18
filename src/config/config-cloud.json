@@ -645,7 +645,6 @@
         }
       ]
     },
-
     "dis_files": {
       "entries": [
         {
@@ -724,6 +723,27 @@
         {
           "header": "Creator Id",
           "field": "creatorId"
+        }
+      ]
+    },
+    "dis_nms_mes_conf": {
+      "entries": [
+
+        {
+          "header": "Id",
+          "field": "id"
+        },
+        {
+          "header": "Message",
+          "field": "message"
+        },
+        {
+          "header": "Scope",
+          "field": "scope"
+        },
+        {
+          "header": "PersistOnClose",
+          "field": "persistOnClose"
         }
       ]
     }

@@ -24,7 +24,14 @@ import {AnalysisStatus} from '../models/discover/analysisStatus'
 // import {DatasetDetail} from '../models/discover/datasetDetail'
 import path from 'path'
 import Watcher from '../common/watcher'
-import {InvestigationApplication, Analysis, Dataset, Template, Connection} from "@tibco/discover-client-lib";
+import {
+    InvestigationApplication,
+    Analysis,
+    Dataset,
+    Template,
+    Connection,
+    MessageConfiguration
+} from "@tibco/discover-client-lib";
 
 const CCOM = require('../common/cloud-communications')
 const SKIP_REGION = true
@@ -67,7 +74,7 @@ export async function showProcessAnalysis() {
 }
 
 // Function to get all the process analysis and optionally display them in a table
-export async function getProcessAnalysis(showTable: boolean): Promise<Analysis[]> {
+async function getProcessAnalysis(showTable: boolean): Promise<Analysis[]> {
     log(INFO, 'Getting process analysis...')
     const disPA = await callTCA(CCOM.clURI.dis_nms_pa, false, {skipInjectingRegion: SKIP_REGION}) as Analysis[]
     const paTable = createTable(disPA, CCOM.mappings.dis_nms_pa, false)
@@ -106,7 +113,7 @@ export async function showTemplates() {
 }
 
 // Get a list of details
-export async function getTemplates(showTable: boolean): Promise<Template[]> {
+async function getTemplates(showTable: boolean): Promise<Template[]> {
     log(INFO, 'Getting templates...')
     const disTEMP = await callTCA(CCOM.clURI.dis_nms_templates, false, {skipInjectingRegion: SKIP_REGION}) as Template[]
     const paTable = createTable(disTEMP, CCOM.mappings.dis_nms_temp, false)
@@ -125,7 +132,7 @@ export async function showConnections() {
 }
 
 // Get a list of details
-export async function getConnections(showTable: boolean): Promise<Connection[]> {
+async function getConnections(showTable: boolean): Promise<Connection[]> {
     log(INFO, 'Getting connections...')
     const disTEMP = await callTCA(CCOM.clURI.dis_nms_connection, false, {skipInjectingRegion: SKIP_REGION}) as Connection[]
     const paTable = createTable(disTEMP, CCOM.mappings.dis_nms_connection, false)
@@ -507,8 +514,8 @@ const DISCOVER_CONFIGS =
         // TODO: Moved to catalog (only field is dateTime)
         {objectName: 'formats', endpoint: 'formats', label: 'Date Format'},
         // TODO: Moved to repository
-        {objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping'},
-        {objectName: 'messages', endpoint: 'messages', label: 'Messages'}*/]
+        {objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping'},*/
+        {objectName: 'messages', endpoint: 'messages', label: 'Messages'}]
 
 // Function to export the configuration of discover to a JSON file
 export async function importDiscoverConfig(configFilename?: string, importAll?: boolean) {
@@ -594,6 +601,28 @@ export async function importDiscoverConfig(configFilename?: string, importAll?: 
 async function updateDiscoverConfig(endpoint: string, configObject: any) {
     log(INFO, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
     log(DEBUG, 'New Config: ', configObject)
+
+
+    switch (endpoint) {
+        case 'investigations':
+            await updateDiscoverInvestigationConfig(configObject)
+            break
+        case 'messages':
+            await updateDiscoverMessagingConfig(configObject)
+            break
+        default:
+            const result = await postMessageToCloud(CCOM.clURI.dis_nms_configuration + '/' + endpoint, configObject, {
+                skipInjectingRegion: SKIP_REGION,
+                handleErrorOutside: true,
+                returnResponse: true
+            })
+            if (result && result.statusCode && result.statusCode === 201) {
+                log(INFO, col.green('[RESULT OK]') + ' Updated discover config: ' + col.blue(endpoint))
+            } else {
+                log(ERROR, ' [RESULT FAILED] Updating discover config: ' + endpoint + '  Code: ', result.statusCode + ' Result: ', result.body)
+            }
+    }
+    /*
     if (endpoint === 'investigations') {
         await updateDiscoverInvestigationConfig(configObject)
     } else {
@@ -606,6 +635,57 @@ async function updateDiscoverConfig(endpoint: string, configObject: any) {
             log(INFO, col.green('[RESULT OK]') + ' Updated discover config: ' + col.blue(endpoint))
         } else {
             log(ERROR, ' [RESULT FAILED] Updating discover config: ' + endpoint + '  Code: ', result.statusCode + ' Result: ', result.body)
+        }
+    }*/
+}
+
+async function updateDiscoverMessagingConfig(messages: MessageConfiguration[]) {
+    if (messages && messages.length > 0) {
+        for (const mes of messages) {
+            const partialMessage = mes as Partial<MessageConfiguration>
+            const mesId = mes.id
+            // remove scope
+            delete partialMessage.scope
+            delete partialMessage.id
+            let doPost = true
+            // Check if the id exists
+            if (mesId) {
+                const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
+                const mesOnServer = messageConfigResult.find(v => v.id === mesId)
+                if (mesOnServer) {
+                    // Message exist on server
+                    doPost = false
+                    // Do a put to update the investigation
+                    log(INFO, 'Message Config found on the server (id: ' + col.blue(mesId) + ') updating the config')
+                    const result = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages/' + mesId, false, {
+                        skipInjectingRegion: SKIP_REGION,
+                        method: "PUT",
+                        postRequest: partialMessage,
+                        handleErrorOutside: true,
+                        returnResponse: true
+                    })
+                    if (result && result.statusCode && result.statusCode === 200) {
+                        log(INFO, col.green('[RESULT OK]') + ' Updated discover message config: ' + col.blue(mesId))
+                    } else {
+                        log(ERROR, ' [RESULT FAILED] Updating discover messaging config with id: ' + col.blue(mesId) + '  Code: ', result.statusCode + ' Result: ', result.body)
+                    }
+                }
+            }
+            if (doPost) {
+                log(INFO, 'Messaging Config Not found on the server; creating a new config...')
+                const result = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {
+                    skipInjectingRegion: SKIP_REGION,
+                    method: "POST",
+                    postRequest: partialMessage,
+                    handleErrorOutside: true,
+                    returnResponse: true
+                })
+                if (result && result.statusCode && result.statusCode === 201 && result.body && result.body.message) {
+                    log(INFO, col.green('[RESULT OK]') + ' Created discover messaging config: ' + col.blue(result.body?.message))
+                } else {
+                    log(ERROR, ' [RESULT FAILED] Creating discover messaging config -  Code: ', result.statusCode + ' Result: ', result.body)
+                }
+            }
         }
     }
 }
@@ -642,7 +722,7 @@ async function updateDiscoverInvestigationConfig(investigations: InvestigationAp
                 }
             }
             if (doPost) {
-                log(INFO, 'Investigation Application Config Not found on the server creating a new config...')
+                log(INFO, 'Investigation Application Config Not found on the server; creating a new config...')
                 const result = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application', false, {
                     skipInjectingRegion: SKIP_REGION,
                     method: "POST",
@@ -716,6 +796,80 @@ async function deleteSingleAppConfig(appConfToDeleteId: string) {
     }
 }
 
+export async function showDiscoverMessageConfig() {
+    log(INFO, 'Show discover message configuration...')
+    prepDiscoverProps()
+    await getDiscoverMessageConfig(true)
+}
+
+export async function getDiscoverMessageConfig(doShowTable: boolean) {
+
+    const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_REGION}) as MessageConfiguration[]
+    const messageConfTable = createTable(messageConfigResult, CCOM.mappings.dis_nms_mes_conf, false)
+    pexTable(messageConfTable, 'discover-message-configurations', getPEXConfig(), doShowTable)
+    return { messageConfigResult, messageConfTable}
+
+}
+
+
+export async function deleteDiscoverMessageConfig() {
+    log(INFO, 'Delete discover message configuration...')
+    prepDiscoverProps()
+    const { messageConfigResult, messageConfTable} = await getDiscoverMessageConfig(true)
+    // List all investigation configurations
+    // const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_REGION}) as MessageConfiguration[]
+    // const messageConfTable = createTable(messageConfigResult, CCOM.mappings.dis_nms_mes_conf, false)
+    // pexTable(messageConfTable, 'discover-message-configurations', getPEXConfig(), true)
+    const selectConf = ['NONE', 'ALL', ...iterateTable(messageConfTable).map(v => v.Message + ' (' + v.Id + ')')]
+    // Choose one to delete
+    const decision = await askMultipleChoiceQuestionSearch('Which message configuration would you like to delete ?', selectConf)
+    if (decision.toLowerCase() !== 'none') {
+        if (decision.toLowerCase() === 'all') {
+            const decisionSureAll = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO DELETE ALL MESSAGE CONFIGURATIONS ?', ['YES', 'NO'])
+            if (decisionSureAll.toLowerCase() === 'yes') {
+                for (const mesConf of messageConfigResult) {
+                    await deleteSingleMessageConfig(mesConf.id)
+                }
+            } else {
+                logCancel(true)
+            }
+        } else {
+            // Delete a single one
+            let mesConfToDelete = messageConfigResult.find(ac => ac.message + ' (' + ac.id + ')' === decision)
+            if (!mesConfToDelete) {
+                // look for the id (allow this to be injected as well)
+                mesConfToDelete = messageConfigResult.find(ac => ac.id === decision)
+            }
+            if (mesConfToDelete) {
+                const decisionSure = await askMultipleChoiceQuestion('Are you sure you want to delete message configuration with id (' + col.blue(mesConfToDelete.id) + ') ?', ['YES', 'NO'])
+                if (decisionSure.toLowerCase() === 'yes') {
+                    await deleteSingleMessageConfig(mesConfToDelete.id)
+                } else {
+                    logCancel(true)
+                }
+            } else {
+                log(ERROR, 'Message conf ', decision, ' not found to delete...')
+            }
+        }
+    } else {
+        logCancel(true)
+    }
+}
+
+async function deleteSingleMessageConfig(mesConfToDeleteId: string) {
+    // Call the delete operation
+    const response = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages/' + mesConfToDeleteId, false, {
+        skipInjectingRegion: SKIP_REGION,
+        method: "DELETE",
+        handleErrorOutside: true,
+        returnResponse: true
+    })
+    if (response && response.statusCode && response.statusCode === 200 && response.body && response.body.message) {
+        log(INFO, 'Deletion successfully: ' + col.green(response.body.message))
+    } else {
+        log(ERROR, 'Problem deleting: ', response)
+    }
+}
 
 // Function to export the configuration of discover to a JSON file
 export async function watchDiscoverConfig() {
