@@ -46,6 +46,7 @@ export function prepDiscoverProps() {
     mkdirIfNotExist(getProp('Discover_Folder') + '/Templates')
     mkdirIfNotExist(getProp('Discover_Folder') + '/ProcessAnalysis')
     mkdirIfNotExist(getProp('Discover_Folder') + '/Configuration')
+    mkdirIfNotExist(getProp('Discover_Folder') + '/Connections')
 }
 
 // Re-usable function to show a list of objects (Dataset, Process Analysis, Template, Connection) Given that they have an id and a name
@@ -334,7 +335,32 @@ export async function createDataSet() {
     }
 }
 
+
+export async function exportDiscoverObjects(objectName:string, getObjectsFunction: Function, getDetailsFunction: Function) {
+    log(INFO, 'Exporting '+objectName+'...')
+    prepDiscoverProps()
+    const discoverObjects = await getObjectsFunction(true)
+    const objectToExport = await askMultipleChoiceQuestionSearch('Which '+objectName+' would you like to export ?', ['NONE', 'ALL', ...discoverObjects.map((v:any) => v.name!)])
+    if (objectToExport.toLowerCase() !== 'none') {
+        if (objectToExport.toLowerCase() === 'all') {
+            storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/ALL_'+objectName+'_Summary.json', discoverObjects)
+            for (const dObject of discoverObjects) {
+                storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + dObject.name + '_details.json', await getDetailsFunction(dObject.id!))
+                storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + dObject.name + '.json', dObject)
+            }
+        } else {
+            storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + objectToExport + '_details.json', await getDetailsFunction(discoverObjects.find((v:any) => v.name === objectToExport)!.id!))
+            storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + objectToExport + '.json', discoverObjects.find((v:any) => v.name === objectToExport))
+        }
+    } else {
+        logCancel(true)
+    }
+}
+
+
 export async function exportDataSets() {
+    await exportDiscoverObjects('Datasets', getDataSets, getDataSetDetail)
+    /*
     log(INFO, 'Exporting Datasets...')
     prepDiscoverProps()
     const dataSets = await getDataSets(true)
@@ -352,8 +378,24 @@ export async function exportDataSets() {
         }
     } else {
         logCancel(true)
-    }
+    }*/
 }
+
+
+export async function exportProcessAnalysis() {
+    await exportDiscoverObjects('ProcessAnalysis', getProcessAnalysis, getProcessAnalysisDetail)
+}
+
+export async function exportTemplates() {
+    await exportDiscoverObjects('Templates', getTemplates, getTemplateDetail)
+}
+
+export async function exportConnections() {
+    await exportDiscoverObjects('Connections', getConnections, getConnectionDetail)
+}
+
+
+
 
 export async function removeDataSet() {
     log(INFO, 'Removing a dataset...')

@@ -34,6 +34,8 @@ import {checkForLocalPropertyFileUpgrades} from './common/upgrades'
 import {callTCA, cLogin, clURI} from './common/cloud-communications'
 import {getOAUTHDetails} from "./common/oauth";
 
+
+
 declare let global: Global
 // require('./tenants/common-functions');
 if (global.SHOW_START_TIME) console.log((new Date()).getTime() - global.TIME.getTime(), ' AFTER Common')
@@ -906,6 +908,26 @@ export async function showDiscoverDSFilesWrapper() {
 export async function exportDiscoverDSWrapper() {
     const DISCOVER = require('./tenants/discover')
     await DISCOVER.exportDataSets()
+}
+// exportDiscoverDSNMSWrapper
+export async function exportDiscoverDSNMSWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.exportDataSets()
+}
+
+export async function exportDiscoverPANMSWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.exportProcessAnalysis()
+}
+
+export async function exportDiscoverCONMSWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.exportConnections()
+}
+
+export async function exportDiscoverTEMPNMSWrapper() {
+    const DISCOVER = require('./tenants/discover-new-ms')
+    await DISCOVER.exportTemplates()
 }
 
 export async function uploadDiscoverDSFileWrapper() {
