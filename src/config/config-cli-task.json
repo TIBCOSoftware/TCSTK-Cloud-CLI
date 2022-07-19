@@ -1286,6 +1286,19 @@
       ],
       "category": "discover-nms"
     },
+    "export-discover-nms-all-objects": {
+      "description": "Exports all the Objects(Connections, Datasets, Process Analysis and Templates) of Project Discover into JSON files",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "exportDiscoverAllNMSWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
     "upload-discover-dataset-file": {
       "description": "Uploads a CSV file for analysis in Project Discover",
       "enabled": true,

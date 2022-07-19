@@ -42,7 +42,7 @@ export function prepDiscoverProps() {
     prepProp('Discover_Folder', './Project_Discover_NMS/', 'Folder used for Project Discover\n# NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder. For Example:\n#Discover_Folder=./Project_Discover (~{ORGANIZATION})/')
     mkdirIfNotExist(getProp('Discover_Folder'))
     mkdirIfNotExist(getProp('Discover_Folder') + '/Datasets')
-    mkdirIfNotExist(getProp('Discover_Folder') + '/DatasetFiles')
+    // mkdirIfNotExist(getProp('Discover_Folder') + '/DatasetFiles')
     mkdirIfNotExist(getProp('Discover_Folder') + '/Templates')
     mkdirIfNotExist(getProp('Discover_Folder') + '/ProcessAnalysis')
     mkdirIfNotExist(getProp('Discover_Folder') + '/Configuration')
@@ -336,11 +336,14 @@ export async function createDataSet() {
 }
 
 
-export async function exportDiscoverObjects(objectName:string, getObjectsFunction: Function, getDetailsFunction: Function) {
+export async function exportDiscoverObjects(objectName:string, getObjectsFunction: Function, getDetailsFunction: Function, doAll: boolean) {
     log(INFO, 'Exporting '+objectName+'...')
     prepDiscoverProps()
     const discoverObjects = await getObjectsFunction(true)
-    const objectToExport = await askMultipleChoiceQuestionSearch('Which '+objectName+' would you like to export ?', ['NONE', 'ALL', ...discoverObjects.map((v:any) => v.name!)])
+    let objectToExport = 'ALL'
+    if(!doAll) {
+        objectToExport = await askMultipleChoiceQuestionSearch('Which ' + objectName + ' would you like to export ?', ['NONE', 'ALL', ...discoverObjects.map((v: any) => v.name!)])
+    }
     if (objectToExport.toLowerCase() !== 'none') {
         if (objectToExport.toLowerCase() === 'all') {
             storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/ALL_'+objectName+'_Summary.json', discoverObjects)
@@ -359,42 +362,32 @@ export async function exportDiscoverObjects(objectName:string, getObjectsFunctio
 
 
 export async function exportDataSets() {
-    await exportDiscoverObjects('Datasets', getDataSets, getDataSetDetail)
-    /*
-    log(INFO, 'Exporting Datasets...')
-    prepDiscoverProps()
-    const dataSets = await getDataSets(true)
-    const dsToExport = await askMultipleChoiceQuestionSearch('Which datasets would you like to export ?', ['NONE', 'ALL', ...dataSets.map(v => v.name!)])
-    if (dsToExport.toLowerCase() !== 'none') {
-        if (dsToExport.toLowerCase() === 'all') {
-            storeJsonToFile(getProp('Discover_Folder') + '/Datasets/ALL_Datasets_Summary.json', dataSets)
-            for (const ds of dataSets) {
-                storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '_details.json', await getDataSetDetail(ds.id!))
-                storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + ds.name + '.json', ds)
-            }
-        } else {
-            storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '_details.json', await getDataSetDetail(dataSets.find(v => v.name === dsToExport)!.id!))
-            storeJsonToFile(getProp('Discover_Folder') + '/Datasets/' + dsToExport + '.json', dataSets.find(v => v.name === dsToExport))
-        }
-    } else {
-        logCancel(true)
-    }*/
+    await exportDiscoverObjects('Datasets', getDataSets, getDataSetDetail, false)
 }
 
-
 export async function exportProcessAnalysis() {
-    await exportDiscoverObjects('ProcessAnalysis', getProcessAnalysis, getProcessAnalysisDetail)
+    await exportDiscoverObjects('ProcessAnalysis', getProcessAnalysis, getProcessAnalysisDetail, false)
 }
 
 export async function exportTemplates() {
-    await exportDiscoverObjects('Templates', getTemplates, getTemplateDetail)
+    await exportDiscoverObjects('Templates', getTemplates, getTemplateDetail, false)
 }
 
 export async function exportConnections() {
-    await exportDiscoverObjects('Connections', getConnections, getConnectionDetail)
+    await exportDiscoverObjects('Connections', getConnections, getConnectionDetail, false)
 }
 
-
+export async function exportAllDiscoverObjects() {
+    const decisionSureAll = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO EXPORT ALL DISCOVER OBJECTS ?', ['YES', 'NO'])
+    if (decisionSureAll.toLowerCase() === 'yes') {
+        await exportDiscoverObjects('Connections', getConnections, getConnectionDetail, true)
+        await exportDiscoverObjects('Datasets', getDataSets, getDataSetDetail, true)
+        await exportDiscoverObjects('ProcessAnalysis', getProcessAnalysis, getProcessAnalysisDetail, true)
+        await exportDiscoverObjects('Templates', getTemplates, getTemplateDetail, true)
+    } else {
+        logCancel(true)
+    }
+}
 
 
 export async function removeDataSet() {
