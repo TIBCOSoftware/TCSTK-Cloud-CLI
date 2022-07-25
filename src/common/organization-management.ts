@@ -5,17 +5,17 @@ import {
   translateAWSRegion
 } from './common-functions'
 import {
-  createTable,
+  createTable, createTableFromObject,
   getPEXConfig,
   iterateTable,
   pexTable
 } from './tables'
-import { ORGInfo } from '../models/tcli-models'
+// import { ORGInfo } from '../models/tcli-models'
 import { askMultipleChoiceQuestionSearch } from './user-interaction'
-import { Accounts, SelectedAccount, UserRolesDetailsForTenant } from '../models/organizations'
+import {AccountInfo, Accounts, SelectedAccount, UserRolesDetailsForTenant} from '../models/organizations'
 import { getOAUTHDetails } from './oauth'
 import { addOrUpdateProperty, getProp, getPropFileName } from './property-file-management'
-import { DEBUG, ERROR, INFO, log, logCancel } from './logging'
+import { ERROR, INFO, log, logCancel } from './logging'
 import { callTCA, clURI } from './cloud-communications'
 
 const CCOM = require('./cloud-communications')
@@ -65,12 +65,7 @@ export async function showOrganization () {
   // List all the organizations
   const orgDetails = await displayOrganizations(true, true, 'For which organization would you like more details ?')
   if (orgDetails) {
-    delete orgDetails.ownersInfo
-    delete orgDetails.regions
-    delete orgDetails.childAccountsInfo
-    console.table(orgDetails)
-    // TODO: Shows up weird
-    // showTableFromTobject(orgDetails, 'Organization Details')
+    createTableFromObject(orgDetails, 'Organization Details')
   }
 }
 
@@ -94,10 +89,10 @@ export async function changeOrganization (accountId?: string) {
   if (currentAccount.accountId === orgAccountId) {
     log(ERROR, 'You are already in the organization: ', currentAccount.displayName)
   } else {
-    log(DEBUG, 'Changing Organization to: ', col.blue(orgAccountId))
+    log(INFO, 'Changing Organization to: ', col.blue(orgAccountId))
     // Get the clientID for that organization
     const clientID = await getClientIdForOrg(orgAccountId)
-    // console.log('Client ID: ' + clientID);
+    console.log('Client ID: ' + clientID);
     let doOauth = false
     // If Oauth is being used: revoke the Key on the Old Organization
     if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
@@ -127,8 +122,8 @@ export async function changeOrganization (accountId?: string) {
   }
 }
 
-function mapOrg (org: ORGInfo) {
-  org.name = org.accountDisplayName
+function mapOrg (org: AccountInfo) {
+  org['name'] = org.accountDisplayName
   if (org.ownersInfo) {
     let i = 1
     for (const owner of org.ownersInfo) {
@@ -178,9 +173,10 @@ export async function displayOrganizations (doShow: boolean, doChoose: boolean, 
     }
     return orgDetails
   }
+  return null
 }
 
-function getSpecificOrganization (organizations: ORGInfo[], name: any) {
+function getSpecificOrganization (organizations: AccountInfo[], name: any) {
   for (const org of organizations) {
     if (name === org.accountDisplayName) {
       return org
@@ -193,13 +189,14 @@ function getSpecificOrganization (organizations: ORGInfo[], name: any) {
       }
     }
   }
+  return null
 }
 
 // display current properties in a table
 export async function getClientIdForOrg (accountId: string) {
-  log(DEBUG, 'Getting client ID for organization, with account ID: ' + col.blue(accountId))
+  log(INFO, 'Getting client ID for organization, with account ID: ' + col.blue(accountId))
   const postRequest = 'account-id=' + accountId + '&opaque-for-tenant=TSC'
-  const response = await CCOM.callTCA(CCOM.clURI.reauthorize, false, {
+  const response = await CCOM.callTCA(CCOM.clURI.reauthorize, true, {
     method: 'POST',
     postRequest: postRequest,
     contentType: 'application/x-www-form-urlencoded',
@@ -209,11 +206,11 @@ export async function getClientIdForOrg (accountId: string) {
     returnResponse: true
   })
   const loginCookie = response.headers['set-cookie']
-  // const rxd = /cic-user-at=(.*?);/g
-  const rxd = /domain=(.*?);/g
+  const rxd = /cic-user-at=(.*?);/g
+  // const rxd = /domain=(.*?);/g
   const rxt = /tsc=(.*?);/g
-  // const cookies = { cicUser: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
-  const cookies = { domain: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
+  const cookies = { cicUser: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
+  // const cookies = { domain: rxd.exec(loginCookie)![1], tsc: rxt.exec(loginCookie)![1] }
   const axios = require('axios').default
   axios.defaults.validateStatus = () => {
     return true
@@ -221,8 +218,8 @@ export async function getClientIdForOrg (accountId: string) {
   const options = {
     method: 'POST',
     headers: {
-      // cookie: 'tsc=' + cookies.tsc + '; cic-user-at=' + cookies.cicUser
-      cookie: 'tsc=' + cookies.tsc + '; domain=' + cookies.domain
+      cookie: 'tsc=' + cookies.tsc + '; cic-user-at=' + cookies.cicUser
+      // cookie: 'tsc=' + cookies.tsc + '; domain=' + cookies.domain
     }
   }
   // Get the ClientID
@@ -235,7 +232,7 @@ export async function getClientIdForOrg (accountId: string) {
 export async function getCurrentOrgId () {
   let re = ''
   const organizations = await getOrganizations() as Accounts
-  const currentOrgName = await getOrganization()
+  const currentOrgName = getOrganization()
   // console.log(currentOrgName)
   for (const org of organizations) {
     if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
@@ -251,4 +248,11 @@ export async function getCurrentOrgId () {
   }
   // console.log('Current org ID: ', re)
   return re
+}
+
+
+export async function getSubscriptionIdForOrgName(orgName: string): Promise<string> {
+  const organizations = await getOrganizations()
+  const orgDetails = getSpecificOrganization(organizations, orgName)
+  return orgDetails?.subscriptionId || ''
 }

@@ -77,7 +77,6 @@ async function loadTasks(catToUse: string) {
         if (login !== 'ERROR') {
             if (getProp('CloudLogin.OnlyShowAvailableTasks') && getProp('CloudLogin.OnlyShowAvailableTasks').toLowerCase() === 'yes') {
                 log(INFO, 'Successfully logged on, available categories: ')
-                // console.log('Getting available tasks...')
                 const userRoles = await callTCA(clURI.account_user_roles, false, {
                     tenant: 'TSC',
                     customLoginURL: 'https://' + getCurrentRegion() + clURI.general_login,
@@ -85,7 +84,7 @@ async function loadTasks(catToUse: string) {
                 })
                 availableCategories = ['tcli', 'tibco-cloud', 'oauth']
                 if (getProp('CloudLogin.AdditionalCategories')) {
-                    availableCategories = availableCategories.concat((getProp('CloudLogin.AdditionalCategories').split(',')))
+                    availableCategories = availableCategories.concat(getProp('CloudLogin.AdditionalCategories').split(','))
                 }
                 let scopeArray: string[] = []
                 let checkOauthScope = false
@@ -154,6 +153,10 @@ async function loadTasks(catToUse: string) {
                         toStr = ''
                         idX = 0
                     }
+                }
+                if(idX > 0){
+                    // Show the left categories
+                    log(INFO, toStr)
                 }
                 // log(INFO, toStr)
                 // TODO: to help
@@ -1019,6 +1022,12 @@ export async function  uploadDiscoverNMSAssetWrapper() {
     const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
     await DISCOVER_NEW_MS.uploadDiscoverAsset()
 }
+
+export async function  updateDxpDiscoverManagementWrapper() {
+    const DISCOVER_MANAGEMENT = require('./tenants/discover-management')
+    await DISCOVER_MANAGEMENT.updateDxp()
+}
+
 
 /*
 export async function removeDiscoverPAWrapper () {

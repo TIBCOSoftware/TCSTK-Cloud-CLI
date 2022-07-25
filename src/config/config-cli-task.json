@@ -1536,6 +1536,19 @@
       ],
       "category": "discover"
     },
+    "discover-management-update-dxp": {
+      "description": "Updates the DXP in a customer environment(Preview or Main)",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "updateDxpDiscoverManagementWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-management"
+    },
     "show-oauth-tokens": {
       "description": "Displays OAUTH tokens to authenticate to the TIBCO Cloud.",
       "enabled": true,

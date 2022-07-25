@@ -64,6 +64,7 @@
     "dis_nms_ds": "eu.api.discover.labs.cloud.tibco.com/catalog/dataset",
     "dis_nms_templates": "eu.api.discover.labs.cloud.tibco.com/visualisation/templates",
     "dis_nms_connection": "eu.api.discover.labs.cloud.tibco.com/catalog/connection",
+    "dis_man_dxp_update": "eu.api.discover.labs.cloud.tibco.com/internal/spotfire/update",
     "nimbus_maps": "nimbus.cloud.tibco.com/api/v1/maps"
   },
   "mappings": {

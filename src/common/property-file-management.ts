@@ -10,7 +10,7 @@ import {
     getPEXConfig,
     pexTable, showTableFromTobject
 } from '../common/tables'
-import {ORGFile, ORGInfo} from '../models/tcli-models'
+import {ORGFile} from '../models/tcli-models'
 import {
     askMultipleChoiceQuestion,
     askMultipleChoiceQuestionSearch,
@@ -23,6 +23,7 @@ import {getSharedState, selectSharedState} from '../tenants/shared-state'
 import {listOnType, prepSpotfireProps} from '../tenants/spotfire'
 import path from 'path'
 import {Global} from '../models/base'
+import {AccountInfo} from "../models/organizations";
 
 const LA = require('../tenants/live-apps')
 const _ = require('lodash')
@@ -362,7 +363,7 @@ export async function generateCloudPropertyFiles() {
 }
 
 // Extract Helper
-function extractCloudInfo(org: ORGInfo, projectName: string, propOption: string[], propFilesALL: ORGFile[], propFilesEU: ORGFile[], propFilesUS: ORGFile[], propFilesAU: ORGFile[]) {
+function extractCloudInfo(org: AccountInfo, projectName: string, propOption: string[], propFilesALL: ORGFile[], propFilesEU: ORGFile[], propFilesUS: ORGFile[], propFilesAU: ORGFile[]) {
     const orgName = '' + org.accountDisplayName
     const accId = org.accountId as string
     const tOrgName = orgName.replace(/ /g, '_').replace(/'/g, '_').replace(/-/g, '_').replace(/_+/g, '_')

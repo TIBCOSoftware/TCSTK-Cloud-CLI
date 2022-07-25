@@ -99,15 +99,15 @@ export interface ORGFile {
     ACCOUNT_ID: string;
 }
 
-export interface ORGInfo {
-    name?: string
-    accountDisplayName?: string;
-    accountId?: string;
-    ownersInfo?: any;
-    regions?: any;
-    childAccountsInfo?: any;
-    [x: string]: any;
-}
+// export interface ORGInfo {
+//     name?: string
+//     accountDisplayName?: string;
+//     accountId?: string;
+//     ownersInfo?: any;
+//     regions?: any;
+//     childAccountsInfo?: any;
+//     [x: string]: any;
+// }
 
 export interface LCookie {
     // cicUser: string

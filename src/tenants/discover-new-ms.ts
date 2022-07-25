@@ -34,7 +34,7 @@ import {
 } from "@tibco/discover-client-lib";
 
 const CCOM = require('../common/cloud-communications')
-const SKIP_REGION = true
+export const SKIP_DISCOVER_REGION = true
 const _ = require('lodash')
 
 export function prepDiscoverProps() {
@@ -77,7 +77,7 @@ export async function showProcessAnalysis() {
 // Function to get all the process analysis and optionally display them in a table
 async function getProcessAnalysis(showTable: boolean): Promise<Analysis[]> {
     log(INFO, 'Getting process analysis...')
-    const disPA = await callTCA(CCOM.clURI.dis_nms_pa, false, {skipInjectingRegion: SKIP_REGION}) as Analysis[]
+    const disPA = await callTCA(CCOM.clURI.dis_nms_pa, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Analysis[]
     const paTable = createTable(disPA, CCOM.mappings.dis_nms_pa, false)
     pexTable(paTable, 'discover-process-analysis', getPEXConfig(), showTable)
     return disPA
@@ -85,7 +85,7 @@ async function getProcessAnalysis(showTable: boolean): Promise<Analysis[]> {
 
 // Function to get details for a process analysis
 async function getProcessAnalysisDetail(processAnalysisId: string): Promise<Analysis> {
-    return await callTCA(CCOM.clURI.dis_nms_pa + '/' + processAnalysisId, false, {skipInjectingRegion: SKIP_REGION}) as Analysis
+    return await callTCA(CCOM.clURI.dis_nms_pa + '/' + processAnalysisId, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Analysis
 }
 
 // Show datasets and possibly details
@@ -97,7 +97,7 @@ export async function showDataSets() {
 async function getDataSets(showTable: boolean): Promise<Dataset[]> {
     log(INFO, 'Getting datasets...')
     prepDiscoverProps()
-    const disDS = await callTCA(CCOM.clURI.dis_nms_ds, false, {skipInjectingRegion: SKIP_REGION}) as Dataset[]
+    const disDS = await callTCA(CCOM.clURI.dis_nms_ds, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Dataset[]
     const paTable = createTable(disDS, CCOM.mappings.dis_nms_ds, false)
     pexTable(paTable, 'discover-datasets', getPEXConfig(), showTable)
     return disDS
@@ -105,7 +105,7 @@ async function getDataSets(showTable: boolean): Promise<Dataset[]> {
 
 // Function to get details for a dataset
 async function getDataSetDetail(dataSetId: string): Promise<Dataset> {
-    return await callTCA(CCOM.clURI.dis_nms_ds + '/' + dataSetId, false, {skipInjectingRegion: SKIP_REGION}) as Dataset
+    return await callTCA(CCOM.clURI.dis_nms_ds + '/' + dataSetId, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Dataset
 }
 
 // Show templates and possibly details
@@ -116,7 +116,7 @@ export async function showTemplates() {
 // Get a list of details
 async function getTemplates(showTable: boolean): Promise<Template[]> {
     log(INFO, 'Getting templates...')
-    const disTEMP = await callTCA(CCOM.clURI.dis_nms_templates, false, {skipInjectingRegion: SKIP_REGION}) as Template[]
+    const disTEMP = await callTCA(CCOM.clURI.dis_nms_templates, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Template[]
     const paTable = createTable(disTEMP, CCOM.mappings.dis_nms_temp, false)
     pexTable(paTable, 'discover-templates', getPEXConfig(), showTable)
     return disTEMP
@@ -124,7 +124,7 @@ async function getTemplates(showTable: boolean): Promise<Template[]> {
 
 // Function to get details for a dataset
 async function getTemplateDetail(templateId: string): Promise<Template> {
-    return await callTCA(CCOM.clURI.dis_nms_templates + '/' + templateId, false, {skipInjectingRegion: SKIP_REGION}) as Template
+    return await callTCA(CCOM.clURI.dis_nms_templates + '/' + templateId, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Template
 }
 
 // Show templates and possibly details
@@ -135,7 +135,7 @@ export async function showConnections() {
 // Get a list of details
 async function getConnections(showTable: boolean): Promise<Connection[]> {
     log(INFO, 'Getting connections...')
-    const disTEMP = await callTCA(CCOM.clURI.dis_nms_connection, false, {skipInjectingRegion: SKIP_REGION}) as Connection[]
+    const disTEMP = await callTCA(CCOM.clURI.dis_nms_connection, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Connection[]
     const paTable = createTable(disTEMP, CCOM.mappings.dis_nms_connection, false)
     pexTable(paTable, 'discover-connections', getPEXConfig(), showTable)
     return disTEMP
@@ -143,7 +143,7 @@ async function getConnections(showTable: boolean): Promise<Connection[]> {
 
 // Function to get details for a dataset
 async function getConnectionDetail(templateId: string): Promise<Connection> {
-    return await callTCA(CCOM.clURI.dis_nms_connection + '/' + templateId, false, {skipInjectingRegion: SKIP_REGION}) as Connection
+    return await callTCA(CCOM.clURI.dis_nms_connection + '/' + templateId, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as Connection
 }
 
 
@@ -156,7 +156,7 @@ export async function getDataSetFiles(showTable: boolean): Promise<DiscoverFileI
     log(INFO, 'Getting dataset file info...')
     prepDiscoverProps()
     // https://discover.labs.tibcocloud.com/catalog/files
-    const disFiles = await callTCA(CCOM.clURI.dis_files, false, {skipInjectingRegion: SKIP_REGION}) as DiscoverFileInfo[]
+    const disFiles = await callTCA(CCOM.clURI.dis_files, false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as DiscoverFileInfo[]
     // console.log(disFiles)
     const paTable = createTable(disFiles, CCOM.mappings.dis_files, false)
     pexTable(paTable, 'discover-dataset-files', getPEXConfig(), showTable)
@@ -212,7 +212,7 @@ async function uploadToDiscover(fileLocation: string, uploadURL: string, doCsv: 
         data.append('file', fs.createReadStream(fileLocation))
     }
     let url = 'https://'
-    if (!SKIP_REGION) {
+    if (!SKIP_DISCOVER_REGION) {
         url += getCurrentRegion(false)
     }
     url += uploadURL
@@ -263,7 +263,7 @@ export async function removeDataSetFile() {
             // https://discover.labs.tibcocloud.com/catalog/files/CallcenterExampleAutoTest.csv
             await CCOM.callTCA(CCOM.clURI.dis_files + '/' + dsToRemove.redisFileInfo.OriginalFilename, false, {
                 method: 'DELETE',
-                skipInjectingRegion: SKIP_REGION
+                skipInjectingRegion: SKIP_DISCOVER_REGION
             })
             log(INFO, col.green('Successfully removed dataset file: ') + col.blue(dsFileNameToRemove) + col.reset(' (Location: ' + dsToRemove.redisFileInfo.FileLocation + ')'))
         } else {
@@ -284,7 +284,7 @@ export async function createDataSet() {
     const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the dataset creation ?', ['YES', 'NO'])
     // Create the dataset
     console.time('Creating Dataset Took')
-    const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', path.join(getProp('Discover_Folder'), 'Datasets'), '.json', {skipInjectingRegion: SKIP_REGION}) as CreateDataSetResult
+    const dsResponse = await postToCloud(CCOM.clURI.dis_dataset_preview, 'What would you like to use to create a Dataset ?', path.join(getProp('Discover_Folder'), 'Datasets'), '.json', {skipInjectingRegion: SKIP_DISCOVER_REGION}) as CreateDataSetResult
     if (dsResponse.status === 'OK') {
         log(INFO, 'Dataset Created with id: ' + col.green(dsResponse.datasetId))
         if (doProgress) {
@@ -297,7 +297,7 @@ export async function createDataSet() {
                 i++
                 // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
                 const dsStatus = await callTCA(CCOM.clURI.dis_dataset_status + '/' + dsResponse.datasetId, false, {
-                    skipInjectingRegion: SKIP_REGION,
+                    skipInjectingRegion: SKIP_DISCOVER_REGION,
                     handleErrorOutside: true
                 }) as PreviewStatus
 
@@ -401,7 +401,7 @@ export async function removeDataSet() {
         if (dsToRemove) {
             await CCOM.callTCA(CCOM.clURI.dis_dataset_detail + '/' + dsToRemove.id, false, {
                 method: 'DELETE',
-                skipInjectingRegion: SKIP_REGION
+                skipInjectingRegion: SKIP_DISCOVER_REGION
             })
             // console.log(response)
             log(INFO, col.green('Successfully removed dataset: ') + col.blue(dsNameToRemove) + col.reset(' (id: ' + dsToRemove.id + ')'))
@@ -424,7 +424,7 @@ export async function runProcessAnalysis() {
     const doProgress = await askMultipleChoiceQuestion('Do you want to monitor the progress of the process mining ?', ['YES', 'NO'])
     // Create the dataset
     console.time('Running Process Mining Took')
-    const paResponse = await postToCloud(CCOM.clURI.dis_pa, 'What would you like to use to do process mining ?', getProp('Discover_Folder') + '/ProcessAnalysis', '.json', {skipInjectingRegion: SKIP_REGION}) as CreateProcessAnalysisResult
+    const paResponse = await postToCloud(CCOM.clURI.dis_pa, 'What would you like to use to do process mining ?', getProp('Discover_Folder') + '/ProcessAnalysis', '.json', {skipInjectingRegion: SKIP_DISCOVER_REGION}) as CreateProcessAnalysisResult
     if (paResponse.id) {
         log(INFO, 'Process Analysis created with id: ' + col.green(paResponse.id))
         if (doProgress) {
@@ -436,7 +436,7 @@ export async function runProcessAnalysis() {
             while (i <= MAX_PM_CYCLES && !isDone) {
                 i++
                 // https://discover.labs.tibcocloud.com/repository/analysis/e8defd49-8231-453a-82a3-356901b5a64b-1624626240682/status
-                const pmStatus = await callTCA(CCOM.clURI.dis_pa_status + '/' + paResponse.id + '/status', false, {skipInjectingRegion: SKIP_REGION}) as AnalysisStatus
+                const pmStatus = await callTCA(CCOM.clURI.dis_pa_status + '/' + paResponse.id + '/status', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as AnalysisStatus
                 if (pmStatus.progression || pmStatus.progression === 0) {
                     if (progress !== pmStatus.progression) {
                         log(INFO, 'Process Mining Status', col.green((pmStatus.progression + '%').padStart(4)) + ' Message: ' + col.green(pmStatus.message))
@@ -495,7 +495,7 @@ export async function actionProcessAnalysis() {
                     // POST
                     // https://discover.labs.tibcocloud.com/repository/analysis/4c61e5ae-fc5e-4cab-b78b-834534069886-1624635032381/action/Archive
                     const actionResult = await callTCA(CCOM.clURI.dis_pa + '/' + paChosen.id + '/action/' + doAction, false, {
-                        skipInjectingRegion: SKIP_REGION,
+                        skipInjectingRegion: SKIP_DISCOVER_REGION,
                         method: 'POST'
                     })
                     // console.log(actionResult)
@@ -524,8 +524,8 @@ const STORE_OPTIONS = {spaces: 2, EOL: '\r\n'}
 export async function exportDiscoverConfig() {
     log(INFO, 'Exporting Discover Configuration ' + col.blue('(for ' + getOrganization() + ')'))
     prepDiscoverProps()
-    const configResult = await callTCA(CCOM.clURI.dis_nms_configuration, false, {skipInjectingRegion: SKIP_REGION})
-    const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION})
+    const configResult = await callTCA(CCOM.clURI.dis_nms_configuration, false, {skipInjectingRegion: SKIP_DISCOVER_REGION})
+    const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_DISCOVER_REGION})
     const configFileName = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
     require('jsonfile').writeFileSync(configFileName, {
         ...configResult,
@@ -551,6 +551,16 @@ const DISCOVER_CONFIGS =
         // TODO: Moved to repository
         {objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping'},*/
         {objectName: 'messages', endpoint: 'messages', label: 'Messages'}]
+
+//Common function to select a file for imports
+//
+// async function selectImportFile(type: string){
+//
+//
+// }
+//
+
+
 
 // Function to export the configuration of discover to a JSON file
 export async function importDiscoverConfig(configFilename?: string, importAll?: boolean) {
@@ -636,8 +646,6 @@ export async function importDiscoverConfig(configFilename?: string, importAll?: 
 async function updateDiscoverConfig(endpoint: string, configObject: any) {
     log(INFO, 'Updating discover config (endpoint: ' + col.blue(endpoint) + ')')
     log(DEBUG, 'New Config: ', configObject)
-
-
     switch (endpoint) {
         case 'investigations':
             await updateDiscoverInvestigationConfig(configObject)
@@ -647,7 +655,7 @@ async function updateDiscoverConfig(endpoint: string, configObject: any) {
             break
         default:
             const result = await postMessageToCloud(CCOM.clURI.dis_nms_configuration + '/' + endpoint, configObject, {
-                skipInjectingRegion: SKIP_REGION,
+                skipInjectingRegion: SKIP_DISCOVER_REGION,
                 handleErrorOutside: true,
                 returnResponse: true
             })
@@ -662,7 +670,7 @@ async function updateDiscoverConfig(endpoint: string, configObject: any) {
         await updateDiscoverInvestigationConfig(configObject)
     } else {
         const result = await postMessageToCloud(CCOM.clURI.dis_nms_configuration + '/' + endpoint, configObject, {
-            skipInjectingRegion: SKIP_REGION,
+            skipInjectingRegion: SKIP_DISCOVER_REGION,
             handleErrorOutside: true,
             returnResponse: true
         })
@@ -685,7 +693,7 @@ async function updateDiscoverMessagingConfig(messages: MessageConfiguration[]) {
             let doPost = true
             // Check if the id exists
             if (mesId) {
-                const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
+                const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as InvestigationApplication[]
                 const mesOnServer = messageConfigResult.find(v => v.id === mesId)
                 if (mesOnServer) {
                     // Message exist on server
@@ -693,7 +701,7 @@ async function updateDiscoverMessagingConfig(messages: MessageConfiguration[]) {
                     // Do a put to update the investigation
                     log(INFO, 'Message Config found on the server (id: ' + col.blue(mesId) + ') updating the config')
                     const result = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages/' + mesId, false, {
-                        skipInjectingRegion: SKIP_REGION,
+                        skipInjectingRegion: SKIP_DISCOVER_REGION,
                         method: "PUT",
                         postRequest: partialMessage,
                         handleErrorOutside: true,
@@ -709,7 +717,7 @@ async function updateDiscoverMessagingConfig(messages: MessageConfiguration[]) {
             if (doPost) {
                 log(INFO, 'Messaging Config Not found on the server; creating a new config...')
                 const result = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {
-                    skipInjectingRegion: SKIP_REGION,
+                    skipInjectingRegion: SKIP_DISCOVER_REGION,
                     method: "POST",
                     postRequest: partialMessage,
                     handleErrorOutside: true,
@@ -731,7 +739,7 @@ async function updateDiscoverInvestigationConfig(investigations: InvestigationAp
             // Check if the id exists
             let doPost = true
             if (inv.id) {
-                const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
+                const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as InvestigationApplication[]
                 const invOnServer = applicationConfigResult.find(v => v.id === inv.id)
                 if (invOnServer) {
                     // Investigation exist on server
@@ -739,7 +747,7 @@ async function updateDiscoverInvestigationConfig(investigations: InvestigationAp
                     // Do a put to update the investigation
                     log(INFO, 'Investigation Application Config found on the server (id: ' + col.blue(inv.id) + ') updating the config')
                     const result = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application', false, {
-                        skipInjectingRegion: SKIP_REGION,
+                        skipInjectingRegion: SKIP_DISCOVER_REGION,
                         method: "PUT",
                         postRequest: [inv],
                         handleErrorOutside: true,
@@ -759,7 +767,7 @@ async function updateDiscoverInvestigationConfig(investigations: InvestigationAp
             if (doPost) {
                 log(INFO, 'Investigation Application Config Not found on the server; creating a new config...')
                 const result = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application', false, {
-                    skipInjectingRegion: SKIP_REGION,
+                    skipInjectingRegion: SKIP_DISCOVER_REGION,
                     method: "POST",
                     postRequest: inv,
                     handleErrorOutside: true,
@@ -779,7 +787,7 @@ export async function deleteDiscoverInvestigationConfig() {
     log(INFO, 'Delete a discover investigation configuration...')
     prepDiscoverProps()
     // List all investigation configurations
-    const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_REGION}) as InvestigationApplication[]
+    const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as InvestigationApplication[]
     const appInvConfTable = createTable(applicationConfigResult, CCOM.mappings.dis_nms_inv_conf, false)
     pexTable(appInvConfTable, 'discover-investigation-configurations', getPEXConfig(), true)
     const selectConf = ['NONE', 'ALL', ...iterateTable(appInvConfTable).map(v => v.Name + ' (' + v.Id + ')')]
@@ -821,7 +829,7 @@ export async function deleteDiscoverInvestigationConfig() {
 async function deleteSingleAppConfig(appConfToDeleteId: string) {
     // Call the delete operation
     const response = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/application/' + appConfToDeleteId, false, {
-        skipInjectingRegion: SKIP_REGION,
+        skipInjectingRegion: SKIP_DISCOVER_REGION,
         method: "DELETE"
     })
     if (response && response.result && response.result === 'OK' && response.message) {
@@ -838,12 +846,10 @@ export async function showDiscoverMessageConfig() {
 }
 
 export async function getDiscoverMessageConfig(doShowTable: boolean) {
-
-    const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_REGION}) as MessageConfiguration[]
+    const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as MessageConfiguration[]
     const messageConfTable = createTable(messageConfigResult, CCOM.mappings.dis_nms_mes_conf, false)
     pexTable(messageConfTable, 'discover-message-configurations', getPEXConfig(), doShowTable)
     return { messageConfigResult, messageConfTable}
-
 }
 
 
@@ -852,7 +858,7 @@ export async function deleteDiscoverMessageConfig() {
     prepDiscoverProps()
     const { messageConfigResult, messageConfTable} = await getDiscoverMessageConfig(true)
     // List all investigation configurations
-    // const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_REGION}) as MessageConfiguration[]
+    // const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as MessageConfiguration[]
     // const messageConfTable = createTable(messageConfigResult, CCOM.mappings.dis_nms_mes_conf, false)
     // pexTable(messageConfTable, 'discover-message-configurations', getPEXConfig(), true)
     const selectConf = ['NONE', 'ALL', ...iterateTable(messageConfTable).map(v => v.Message + ' (' + v.Id + ')')]
@@ -894,7 +900,7 @@ export async function deleteDiscoverMessageConfig() {
 async function deleteSingleMessageConfig(mesConfToDeleteId: string) {
     // Call the delete operation
     const response = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages/' + mesConfToDeleteId, false, {
-        skipInjectingRegion: SKIP_REGION,
+        skipInjectingRegion: SKIP_DISCOVER_REGION,
         method: "DELETE",
         handleErrorOutside: true,
         returnResponse: true

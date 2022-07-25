@@ -8,13 +8,89 @@ export interface AccountInfo {
     accountDisplayName: string;
     accountType: string;
     loggedInUserRole: string;
-    ownersInfo: string[];
+    ownersInfo: OwnersInfo[];
+    childAccountsInfo: ChildAccountsInfo[];
     subscriptionId: string;
     regions: string[];
+    accountSettings: AccountSettings;
+    hs: string;
     selected: boolean;
     index: string;
-    childAccountsInfo: AccountInfo[];
+    [x: string]: any;
 }
+
+export interface OwnersInfo {
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+}
+
+// export interface OwnersInfo2 {
+//     firstName: string;
+//     lastName: string;
+//     email: string;
+//     role: string;
+// }
+
+// export interface AccountSettings {
+//     childLimit: number;
+//     ownerLimit: number;
+//     accountType: string;
+//     syncUser: boolean;
+//     syncSubscription: boolean;
+//     siblingLimit: number;
+//     inheritUsers: boolean;
+//     inheritSubscriptions: boolean;
+//     testOrg: boolean;
+//     sandboxOrg: boolean;
+//     serviceAccountLimit: number;
+//     whitelistCidrLimit: number;
+// }
+
+export interface ChildAccountsInfo {
+    accountId: string;
+    accountDisplayName: string;
+    accountType: string;
+    loggedInUserRole: string;
+    ownersInfo: OwnersInfo[];
+    subscriptionId: string;
+    accountSettings: AccountSettings;
+    hs: string;
+    selected: boolean;
+    index: string;
+}
+
+export interface AccountSettings {
+    childLimit: number;
+    ownerLimit: number;
+    accountType: string;
+    syncUser: boolean;
+    syncSubscription: boolean;
+    siblingLimit: number;
+    inheritUsers: boolean;
+    inheritSubscriptions: boolean;
+    testOrg: boolean;
+    sandboxOrg: boolean;
+    serviceAccountLimit: number;
+    whitelistCidrLimit: number;
+}
+
+// export interface AccountInfo {
+//     accountId: string;
+//     accountDisplayName: string;
+//     accountType: string;
+//     loggedInUserRole: string;
+//     ownersInfo: OwnersInfo[];
+//     childAccountsInfo: ChildAccountsInfo[];
+//     subscriptionId: string;
+//     regions: string[];
+//     accountSettings: AccountSettings;
+//     hs: string;
+//     selected: boolean;
+//     index: string;
+// }
+
 
 export type Accounts = AccountInfo[];
 
