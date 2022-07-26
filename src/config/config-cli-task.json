@@ -1417,11 +1417,24 @@
       "category": "discover-nms"
     },
     "import-discover-nms-config": {
-      "description": "Imports the configuration for Project Discover into a JSON file",
+      "description": "Imports the configuration for Project Discover from a JSON file",
       "enabled": true,
       "internal": false,
       "multipleInteraction": true,
       "task": "importDiscoverNMSConfigWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
+    "import-discover-nms-connection": {
+      "description": "Imports a connection for Project Discover from a JSON file",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "importDiscoverNMSConnectionWrapper",
       "taskAlternativeNames": [
       ],
       "availableOnOs": [

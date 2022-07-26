@@ -92,7 +92,7 @@ export async function changeOrganization (accountId?: string) {
     log(INFO, 'Changing Organization to: ', col.blue(orgAccountId))
     // Get the clientID for that organization
     const clientID = await getClientIdForOrg(orgAccountId)
-    console.log('Client ID: ' + clientID);
+    // console.log('Client ID: ' + clientID);
     let doOauth = false
     // If Oauth is being used: revoke the Key on the Old Organization
     if (isOauthUsed() && await CCOM.isOAUTHLoginValid()) {
@@ -196,7 +196,7 @@ function getSpecificOrganization (organizations: AccountInfo[], name: any) {
 export async function getClientIdForOrg (accountId: string) {
   log(INFO, 'Getting client ID for organization, with account ID: ' + col.blue(accountId))
   const postRequest = 'account-id=' + accountId + '&opaque-for-tenant=TSC'
-  const response = await CCOM.callTCA(CCOM.clURI.reauthorize, true, {
+  const response = await CCOM.callTCA(CCOM.clURI.reauthorize, false, {
     method: 'POST',
     postRequest: postRequest,
     contentType: 'application/x-www-form-urlencoded',

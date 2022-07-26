@@ -147,7 +147,6 @@ async function getConnectionDetail(templateId: string): Promise<Connection> {
 }
 
 
-
 // TODO: create-discover-template
 // TODO: remove-discover-template
 
@@ -336,24 +335,24 @@ export async function createDataSet() {
 }
 
 
-export async function exportDiscoverObjects(objectName:string, getObjectsFunction: Function, getDetailsFunction: Function, doAll: boolean) {
-    log(INFO, 'Exporting '+objectName+'...')
+export async function exportDiscoverObjects(objectName: string, getObjectsFunction: Function, getDetailsFunction: Function, doAll: boolean) {
+    log(INFO, 'Exporting ' + objectName + '...')
     prepDiscoverProps()
     const discoverObjects = await getObjectsFunction(true)
     let objectToExport = 'ALL'
-    if(!doAll) {
+    if (!doAll) {
         objectToExport = await askMultipleChoiceQuestionSearch('Which ' + objectName + ' would you like to export ?', ['NONE', 'ALL', ...discoverObjects.map((v: any) => v.name!)])
     }
     if (objectToExport.toLowerCase() !== 'none') {
         if (objectToExport.toLowerCase() === 'all') {
-            storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/ALL_'+objectName+'_Summary.json', discoverObjects)
+            storeJsonToFile(getProp('Discover_Folder') + '/' + objectName + '/ALL_' + objectName + '_Summary.json', discoverObjects)
             for (const dObject of discoverObjects) {
-                storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + dObject.name + '_details.json', await getDetailsFunction(dObject.id!))
-                storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + dObject.name + '.json', dObject)
+                storeJsonToFile(getProp('Discover_Folder') + '/' + objectName + '/' + dObject.name + '_details.json', await getDetailsFunction(dObject.id!))
+                storeJsonToFile(getProp('Discover_Folder') + '/' + objectName + '/' + dObject.name + '.json', dObject)
             }
         } else {
-            storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + objectToExport + '_details.json', await getDetailsFunction(discoverObjects.find((v:any) => v.name === objectToExport)!.id!))
-            storeJsonToFile(getProp('Discover_Folder') + '/'+objectName+'/' + objectToExport + '.json', discoverObjects.find((v:any) => v.name === objectToExport))
+            storeJsonToFile(getProp('Discover_Folder') + '/' + objectName + '/' + objectToExport + '_details.json', await getDetailsFunction(discoverObjects.find((v: any) => v.name === objectToExport)!.id!))
+            storeJsonToFile(getProp('Discover_Folder') + '/' + objectName + '/' + objectToExport + '.json', discoverObjects.find((v: any) => v.name === objectToExport))
         }
     } else {
         logCancel(true)
@@ -534,33 +533,98 @@ export async function exportDiscoverConfig() {
     log(INFO, 'Exported Discover Configuration to : ' + col.green(configFileName))
 }
 
-// TODO: Formats & Messages seems to be missing
+// Helper function to select a file for imports
+async function selectImportFile(type: string, defaultFile?: string) {
+    let re = ''
+    let optionList = ['NONE', 'FILE', ...getFilesFromFolder(getProp('Discover_Folder') + '/' + type)]
+    if (defaultFile) {
+        optionList = ['NONE', 'DEFAULT', 'FILE', ...getFilesFromFolder(getProp('Discover_Folder') + '/' + type)]
+    }
+    if (defaultFile) {
+        log(INFO, 'Use DEFAULT to import the default ' + type + ' file for this environment (in this case: ' + col.blue(defaultFile) + ')')
+    }
+    log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
+    const fileForImport = await askMultipleChoiceQuestionSearch('Which ' + type + ' file would you like to import ? ', optionList)
+    // console.log(fileForImport)
+    let fileLocation
+    switch (fileForImport.toLowerCase()) {
+        case 'none':
+            logCancel(true)
+            break
+        case 'default':
+            re = defaultFile!
+            break
+        case 'file':
+            fileLocation = await askQuestion('Provide the location of the ' + type + ' file for import:')
+            if (fileLocation && fileLocation.toLowerCase() !== 'none') {
+                re = fileLocation
+            } else {
+                logCancel(true)
+            }
+            break
+        default:
+            re = `${getProp('Discover_Folder')}/${type}/${fileForImport}`
+    }
+    return re
+}
+
+// Helper function to parse the import file
+function parseImportFile(fileName: string): any {
+    log(INFO, 'Analyzing: ' + col.blue(fileName))
+    const fs = require('fs')
+    const importFile = fs.readFileSync(fileName)
+    let importObject: any = {}
+    try {
+        importObject = JSON.parse(importFile)
+    } catch (error: any) {
+        log(ERROR, 'JSON Parsing error on the import file: ', error.message)
+        process.exit(1)
+    }
+    return importObject
+}
+
+// Function to import a discover connection
+export async function importDiscoverConnection() {
+    log(INFO, 'Importing Discover Connection...')
+    prepDiscoverProps()
+    const connectionFileNameToUse = await selectImportFile('Connections')
+    // Check if it is a connection file
+    const connectionObject = parseImportFile(connectionFileNameToUse)
+    let connectionToImport: Partial<Connection>
+    if(connectionObject.name) {
+        connectionToImport = connectionObject as Partial<Connection>;
+        // Ask if you want to provide a new name
+        let connectionNameToUse = await askQuestion('Do you want to provide a new name for your connection ? (Current name: ' + col.blue(connectionObject.name) + ' use DEFAULT or press enter to not change the name)')
+        if(connectionNameToUse.toLowerCase() === '' || connectionNameToUse.toLowerCase() === 'default'){
+            connectionNameToUse = connectionObject.name
+        }
+        delete connectionToImport.id
+        delete connectionToImport.usedBy
+        delete connectionToImport.metadata
+        connectionToImport.name = connectionNameToUse
+        // import the connection
+        log(INFO, 'Creating connection: ' + col.blue(connectionNameToUse) + '...')
+        const result = await postMessageToCloud(CCOM.clURI.dis_nms_connection, connectionObject, {
+            skipInjectingRegion: SKIP_DISCOVER_REGION,
+            returnResponse: true
+        })
+        if(result.statusCode === 201) {
+            log(INFO, 'Connection with name: ' + col.green(connectionNameToUse) + ' successfully created...')
+        } else {
+            log(ERROR, result)
+        }
+    } else {
+        log(INFO, 'Connection file: ', connectionObject)
+        log(ERROR, 'Connection file ' + connectionFileNameToUse + ' does not seem to be a valid connection file')
+    }
+}
+
 // Config service properties
 const DISCOVER_CONFIGS =
     [{objectName: 'general', endpoint: 'general', label: 'General'},
         {objectName: 'landingPage', endpoint: 'landingpages', label: 'Landing Pages'},
-        // TODO: Moved to investigations
-
         {objectName: 'investigations', endpoint: 'investigations', label: 'Investigations'},
-        /*
-        {objectName: 'investigations.applications', endpoint: 'investigations', label: 'Investigations'},
-        // TODO: Moved to visualizations
-        {objectName: 'analytics', endpoint: 'analytics', label: 'Analytics'},
-        // TODO: Moved to catalog (only field is dateTime)
-        {objectName: 'formats', endpoint: 'formats', label: 'Date Format'},
-        // TODO: Moved to repository
-        {objectName: 'automap', endpoint: 'automap', label: 'Auto Mapping'},*/
         {objectName: 'messages', endpoint: 'messages', label: 'Messages'}]
-
-//Common function to select a file for imports
-//
-// async function selectImportFile(type: string){
-//
-//
-// }
-//
-
-
 
 // Function to export the configuration of discover to a JSON file
 export async function importDiscoverConfig(configFilename?: string, importAll?: boolean) {
@@ -570,45 +634,12 @@ export async function importDiscoverConfig(configFilename?: string, importAll?: 
     // if no file name provided look into the config folder
     if (!configFilename) {
         const defaultF = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
-        const optionList = ['NONE', 'DEFAULT', 'FILE', ...getFilesFromFolder(getProp('Discover_Folder') + '/Configuration')]
-        log(INFO, 'Use NONE to cancel or DEFAULT to import the configuration file for this environment (in this case: ' + col.blue(defaultF) + ')')
-        log(INFO, 'Use NONE to cancel, use FILE to use a custom file or choose a pre-provided file to upload...')
-        const configFileForImport = await askMultipleChoiceQuestionSearch('Which configuration file would you like to import ? ', optionList)
-        // console.log(configFileForImport)
-        let configFileLocation
-        switch (configFileForImport.toLowerCase()) {
-            case 'none':
-                logCancel(true)
-                break
-            case 'default':
-                configFileNameToUse = defaultF
-                break
-            case 'file':
-                configFileLocation = await askQuestion('Provide the location of the configuration file for import:')
-                if (configFileLocation && configFileLocation.toLowerCase() !== 'none') {
-                    configFileNameToUse = configFileLocation
-                } else {
-                    logCancel(true)
-                }
-                break
-            default:
-                configFileNameToUse = getProp('Discover_Folder') + '/Configuration/' + configFileForImport
-        }
+        configFileNameToUse = await selectImportFile('Configuration', defaultF)
     } else {
         configFileNameToUse = configFilename
     }
-
-    log(INFO, 'Analyzing: ' + col.blue(configFileNameToUse))
-    const fs = require('fs')
-    const configFile = fs.readFileSync(configFileNameToUse)
-    let configObject: any = {}
-    try {
-        configObject = JSON.parse(configFile)
-    } catch (error: any) {
-        log(ERROR, 'JSON Parsing error on configuration: ', error.message)
-        process.exit(1)
-    }
     // Ask if all configuration needs to be added or just a single
+    const configObject = parseImportFile(configFileNameToUse)
     let configTypeToImport = 'all'
     if (!importAll) {
         const optionList = ['ALL', ...DISCOVER_CONFIGS.map(v => v.label), 'NONE']
@@ -849,14 +880,14 @@ export async function getDiscoverMessageConfig(doShowTable: boolean) {
     const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as MessageConfiguration[]
     const messageConfTable = createTable(messageConfigResult, CCOM.mappings.dis_nms_mes_conf, false)
     pexTable(messageConfTable, 'discover-message-configurations', getPEXConfig(), doShowTable)
-    return { messageConfigResult, messageConfTable}
+    return {messageConfigResult, messageConfTable}
 }
 
 
 export async function deleteDiscoverMessageConfig() {
     log(INFO, 'Delete discover message configuration...')
     prepDiscoverProps()
-    const { messageConfigResult, messageConfTable} = await getDiscoverMessageConfig(true)
+    const {messageConfigResult, messageConfTable} = await getDiscoverMessageConfig(true)
     // List all investigation configurations
     // const messageConfigResult = await callTCA(CCOM.clURI.dis_nms_configuration + '/messages', false, {skipInjectingRegion: SKIP_DISCOVER_REGION}) as MessageConfiguration[]
     // const messageConfTable = createTable(messageConfigResult, CCOM.mappings.dis_nms_mes_conf, false)

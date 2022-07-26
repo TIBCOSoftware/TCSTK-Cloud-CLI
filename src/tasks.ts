@@ -981,6 +981,14 @@ export async function importDiscoverNMSConfigWrapper() {
     await DISCOVER_NEW_MS.importDiscoverConfig()
 }
 
+//
+export async function importDiscoverNMSConnectionWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.importDiscoverConnection()
+}
+
+
+
 export async function watchDiscoverNMSConfigWrapper() {
     const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
     await DISCOVER_NEW_MS.watchDiscoverConfig()
