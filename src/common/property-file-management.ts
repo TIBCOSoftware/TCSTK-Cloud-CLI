@@ -449,22 +449,6 @@ export async function updateProperty() {
         // Organization_ID
         if (vType.toLowerCase() === 'organization_id') {
             pValue = await getCurrentOrgId()
-            /*
-            const organizations = await getOrganizations() as Accounts
-            const currentOrgName = await getOrganization()
-            // console.log(currentOrgName)
-            for (const org of organizations) {
-              if (org.childAccountsInfo && org.childAccountsInfo.length > 0) {
-                for (const childOrg of org.childAccountsInfo) {
-                  if (childOrg.accountDisplayName === currentOrgName) {
-                    pValue = childOrg.subscriptionId
-                  }
-                }
-              }
-              if (org.accountDisplayName === currentOrgName) {
-                pValue = org.subscriptionId
-              }
-            } */
         }
         if (vType.toLowerCase() === 'sandboxid') {
             pValue = await LA.getProductionSandbox()

@@ -1442,6 +1442,19 @@
       ],
       "category": "discover-nms"
     },
+    "import-discover-nms-dataset": {
+      "description": "Imports a dataset for Project Discover from a JSON file",
+      "enabled": true,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "importDiscoverNMSDatasetWrapper",
+      "taskAlternativeNames": [
+      ],
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "discover-nms"
+    },
     "watch-discover-nms-config": {
       "description": "Looks for changes in configuration for Project Discover JSON file, and uploads them",
       "enabled": true,

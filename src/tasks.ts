@@ -910,7 +910,7 @@ export async function exportDiscoverDSWrapper() {
     const DISCOVER = require('./tenants/discover')
     await DISCOVER.exportDataSets()
 }
-// exportDiscoverDSNMSWrapper
+
 export async function exportDiscoverDSNMSWrapper() {
     const DISCOVER = require('./tenants/discover-new-ms')
     await DISCOVER.exportDataSets()
@@ -981,13 +981,15 @@ export async function importDiscoverNMSConfigWrapper() {
     await DISCOVER_NEW_MS.importDiscoverConfig()
 }
 
-//
 export async function importDiscoverNMSConnectionWrapper() {
     const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
     await DISCOVER_NEW_MS.importDiscoverConnection()
 }
-
-
+//
+export async function importDiscoverNMSDatasetWrapper() {
+    const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')
+    await DISCOVER_NEW_MS.importDiscoverDataset()
+}
 
 export async function watchDiscoverNMSConfigWrapper() {
     const DISCOVER_NEW_MS = require('./tenants/discover-new-ms')

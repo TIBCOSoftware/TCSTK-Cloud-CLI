@@ -37,16 +37,25 @@ const CCOM = require('../common/cloud-communications')
 export const SKIP_DISCOVER_REGION = true
 const _ = require('lodash')
 
+const DISCOVER_FOLDER_NAMES = {
+    DATASET: 'Datasets',
+    TEMPLATE: 'Templates',
+    PROCESS_ANALYSIS: 'ProcessAnalysis',
+    CONFIGURATION: 'Configuration',
+    CONNECTION: 'Connections'
+}
+
+
 export function prepDiscoverProps() {
     // Checking if properties exist, otherwise create them with default values
     prepProp('Discover_Folder', './Project_Discover_NMS/', 'Folder used for Project Discover\n# NOTE: You can use ~{ORGANIZATION}, to use the current organization name in your folder. For Example:\n#Discover_Folder=./Project_Discover (~{ORGANIZATION})/')
     mkdirIfNotExist(getProp('Discover_Folder'))
-    mkdirIfNotExist(getProp('Discover_Folder') + '/Datasets')
+    mkdirIfNotExist(getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.DATASET)
     // mkdirIfNotExist(getProp('Discover_Folder') + '/DatasetFiles')
-    mkdirIfNotExist(getProp('Discover_Folder') + '/Templates')
-    mkdirIfNotExist(getProp('Discover_Folder') + '/ProcessAnalysis')
-    mkdirIfNotExist(getProp('Discover_Folder') + '/Configuration')
-    mkdirIfNotExist(getProp('Discover_Folder') + '/Connections')
+    mkdirIfNotExist(getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.TEMPLATE)
+    mkdirIfNotExist(getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.PROCESS_ANALYSIS)
+    mkdirIfNotExist(getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.CONFIGURATION)
+    mkdirIfNotExist(getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.CONNECTION)
 }
 
 // Re-usable function to show a list of objects (Dataset, Process Analysis, Template, Connection) Given that they have an id and a name
@@ -361,28 +370,28 @@ export async function exportDiscoverObjects(objectName: string, getObjectsFuncti
 
 
 export async function exportDataSets() {
-    await exportDiscoverObjects('Datasets', getDataSets, getDataSetDetail, false)
+    await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.DATASET, getDataSets, getDataSetDetail, false)
 }
 
 export async function exportProcessAnalysis() {
-    await exportDiscoverObjects('ProcessAnalysis', getProcessAnalysis, getProcessAnalysisDetail, false)
+    await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.PROCESS_ANALYSIS, getProcessAnalysis, getProcessAnalysisDetail, false)
 }
 
 export async function exportTemplates() {
-    await exportDiscoverObjects('Templates', getTemplates, getTemplateDetail, false)
+    await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.TEMPLATE, getTemplates, getTemplateDetail, false)
 }
 
 export async function exportConnections() {
-    await exportDiscoverObjects('Connections', getConnections, getConnectionDetail, false)
+    await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.CONNECTION, getConnections, getConnectionDetail, false)
 }
 
 export async function exportAllDiscoverObjects() {
     const decisionSureAll = await askMultipleChoiceQuestion('ARE YOU SURE YOU WANT TO EXPORT ALL DISCOVER OBJECTS ?', ['YES', 'NO'])
     if (decisionSureAll.toLowerCase() === 'yes') {
-        await exportDiscoverObjects('Connections', getConnections, getConnectionDetail, true)
-        await exportDiscoverObjects('Datasets', getDataSets, getDataSetDetail, true)
-        await exportDiscoverObjects('ProcessAnalysis', getProcessAnalysis, getProcessAnalysisDetail, true)
-        await exportDiscoverObjects('Templates', getTemplates, getTemplateDetail, true)
+        await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.CONNECTION, getConnections, getConnectionDetail, true)
+        await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.DATASET, getDataSets, getDataSetDetail, true)
+        await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.PROCESS_ANALYSIS, getProcessAnalysis, getProcessAnalysisDetail, true)
+        await exportDiscoverObjects(DISCOVER_FOLDER_NAMES.TEMPLATE, getTemplates, getTemplateDetail, true)
     } else {
         logCancel(true)
     }
@@ -525,7 +534,7 @@ export async function exportDiscoverConfig() {
     prepDiscoverProps()
     const configResult = await callTCA(CCOM.clURI.dis_nms_configuration, false, {skipInjectingRegion: SKIP_DISCOVER_REGION})
     const applicationConfigResult = await callTCA(CCOM.clURI.dis_nms_investigation_config + '/applications', false, {skipInjectingRegion: SKIP_DISCOVER_REGION})
-    const configFileName = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
+    const configFileName = getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.CONFIGURATION + '/discover_config (' + getFolderSafeOrganization() + ').json'
     require('jsonfile').writeFileSync(configFileName, {
         ...configResult,
         investigations: applicationConfigResult
@@ -587,15 +596,15 @@ function parseImportFile(fileName: string): any {
 export async function importDiscoverConnection() {
     log(INFO, 'Importing Discover Connection...')
     prepDiscoverProps()
-    const connectionFileNameToUse = await selectImportFile('Connections')
+    const connectionFileNameToUse = await selectImportFile(DISCOVER_FOLDER_NAMES.CONNECTION)
     // Check if it is a connection file
     const connectionObject = parseImportFile(connectionFileNameToUse)
     let connectionToImport: Partial<Connection>
-    if(connectionObject.name) {
+    if (connectionObject.name) {
         connectionToImport = connectionObject as Partial<Connection>;
         // Ask if you want to provide a new name
         let connectionNameToUse = await askQuestion('Do you want to provide a new name for your connection ? (Current name: ' + col.blue(connectionObject.name) + ' use DEFAULT or press enter to not change the name)')
-        if(connectionNameToUse.toLowerCase() === '' || connectionNameToUse.toLowerCase() === 'default'){
+        if (connectionNameToUse.toLowerCase() === '' || connectionNameToUse.toLowerCase() === 'default') {
             connectionNameToUse = connectionObject.name
         }
         delete connectionToImport.id
@@ -608,7 +617,7 @@ export async function importDiscoverConnection() {
             skipInjectingRegion: SKIP_DISCOVER_REGION,
             returnResponse: true
         })
-        if(result.statusCode === 201) {
+        if (result.statusCode === 201) {
             log(INFO, 'Connection with name: ' + col.green(connectionNameToUse) + ' successfully created...')
         } else {
             log(ERROR, result)
@@ -617,6 +626,14 @@ export async function importDiscoverConnection() {
         log(INFO, 'Connection file: ', connectionObject)
         log(ERROR, 'Connection file ' + connectionFileNameToUse + ' does not seem to be a valid connection file')
     }
+}
+
+// Function to import a discover dataset
+export async function importDiscoverDataset() {
+    log(INFO, 'Importing Discover Dataset...')
+    prepDiscoverProps()
+    const datasetFileNameToUse = await selectImportFile(DISCOVER_FOLDER_NAMES.DATASET)
+    console.log('datasetFileNameToUse: ', datasetFileNameToUse)
 }
 
 // Config service properties
@@ -633,8 +650,8 @@ export async function importDiscoverConfig(configFilename?: string, importAll?: 
     prepDiscoverProps()
     // if no file name provided look into the config folder
     if (!configFilename) {
-        const defaultF = getProp('Discover_Folder') + '/Configuration/discover_config (' + getFolderSafeOrganization() + ').json'
-        configFileNameToUse = await selectImportFile('Configuration', defaultF)
+        const defaultF = getProp('Discover_Folder') + '/' + DISCOVER_FOLDER_NAMES.CONFIGURATION + '/discover_config (' + getFolderSafeOrganization() + ').json'
+        configFileNameToUse = await selectImportFile(DISCOVER_FOLDER_NAMES.CONFIGURATION, defaultF)
     } else {
         configFileNameToUse = configFilename
     }
