@@ -335,7 +335,7 @@ export async function callTCA(url: string, doLog?: boolean, conf?: CallConfig) {
     if (response.body != null) {
         if (cdoLog) {
             log(INFO, '--- RESPONSE ---')
-            log(INFO, response.body)
+            log(INFO, JSON.stringify(response.body, null, 1))
         }
         if (response.body.errorMsg != null) {
             if (doErrorOutside) {

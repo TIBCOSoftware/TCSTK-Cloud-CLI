@@ -906,6 +906,17 @@
       ],
       "category": "tci"
     },
+    "build-tci-app": {
+      "description": "Builds the executable of an TCI-Flogo Application",
+      "enabled": false,
+      "internal": false,
+      "multipleInteraction": true,
+      "task": "buildTCIAppWrapper",
+      "availableOnOs": [
+        "all"
+      ],
+      "category": "tci"
+    },
     "generate-client-code-from-tci-app": {
       "description": "Generates client code from a Flogo application, so you can invoke this from your application.",
       "enabled": true,

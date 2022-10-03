@@ -30,6 +30,7 @@
     "tci_export_app": "integration.cloud.tibco.com/wistudio/v2/metadata",
     "tci_api_enable": "api.cloud.tibco.com/tci/v1/subscriptions/{subscriptionLocator}/apiservice/access",
     "tci_api_apps": "api.cloud.tibco.com/tci/v1/subscriptions/{subscriptionLocator}/apps",
+    "tci_api_build_app": "api.cloud.tibco.com/tci/v1/subscriptions/{subscriptionLocator}/apps/{appId}/flogo/build",
     "sf_settings": "spotfire-next.cloud.tibco.com/spotfire/wp/settings",
     "sf_reports": "spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo",
     "sf_create_folder": "spotfire-next.cloud.tibco.com/spotfire/rest/library/createFolder",
